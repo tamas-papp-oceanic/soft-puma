@@ -18,9 +18,11 @@ function createWindow() {
         width: 1200,
         height: 720,
         frame: false,
+        minWidth: 720,
+        useContentSize: true,
         webPreferences: {
             nodeIntegration: true,
-            // enableRemoteModule: true,
+            enableRemoteModule: true,
             // contextIsolation: false
         },
         // Use this in development mode.
