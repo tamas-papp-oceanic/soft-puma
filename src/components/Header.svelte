@@ -71,7 +71,6 @@
       <HeaderNavItem class="{routeParsed === '/simulate' ? 'active' : ''}" on:click={() => push('/simulate')} text="Simulate" />
       <HeaderNavItem class="{routeParsed === '/program' ? 'active' : ''}"disabled on:click={() => push('/program')} text="Program" />
     </HeaderNav>
-    {$location}
     <HeaderUtilities>
       <HeaderGlobalAction on:click={login} aria-label="Login" icon={Login20} text="Login" />
       <HeaderGlobalAction on:click={closeWindow} id="close-btn" aria-label="Exit" icon={Close20} />
