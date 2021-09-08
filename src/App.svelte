@@ -3,6 +3,7 @@
 	export let appName;
 	import Router from "svelte-spa-router";
 	import Login from './routes/Login.svelte';
+	import Welcome from './routes/Welcome.svelte';
 	import NotFound from './routes/NotFound.svelte';
 	import Header from './components/Header.svelte';
 	import Devices from './routes/devices/Index.svelte';
@@ -13,6 +14,7 @@
 		"/login": Login,
 		"/simulate": Simulate,
 		"/program": Login,
+		"/welcome": Welcome,
 		"/devices/:address" : Configure,
 		"*": NotFound,
 	};
