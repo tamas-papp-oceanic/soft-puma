@@ -16,34 +16,21 @@
     refreshToken,
     loggedIn
   } from '../stores/user.js';
+  import {
+    login
+  } from '../auth/auth.js'
   import {location, push, pop, replace, link} from 'svelte-spa-router'
-  import jwt_decode from "jwt-decode";
   let isSideNavOpen = false;
   let username = '';
   let password = '';
   let error = false;
   export let redirect = "/welcome"
   async function doLogin() {
-    const res = await fetch('http://localhost:8080/login', {
-      method: 'POST',
-      body: JSON.stringify({
-        username,
-        password
-      })
-    });
-    const status = res.status
-    const json = await res.json()
-    if (res.status != 200) {
+    const res = await login(username,password)
+    if (res != true) {
       console.log("Login failed")
       error = true
     } else {
-      console.log("Login Success")
-      error=false
-      accessToken.set(json.accessToken)
-      refreshToken.set(json.refreshToken)
-      loggedIn.set(true)
-      var decoded = jwt_decode(json.access_token);
-      userData.set(decoded)
       push(redirect)
     }
   }

@@ -1,0 +1,34 @@
+{
+  "Engineering": {
+    "serial": "true",
+    "advanced": "true",
+    "program": "true",
+    "configure": "true",
+    "simulate": "true",
+    "analyse": "true",
+  },
+  "Production": {
+    "serial": "true",
+    "advanced": "false",
+    "program": "true",
+    "configure": "true",
+    "simulate": "true",
+    "analyse": "true",
+  },
+  "Customer": {
+    "serial": "false",
+    "advanced": "false",
+    "program": "true",
+    "configure": "true",
+    "simulate": "true",
+    "analyse": "true",
+  },
+  "Guest": {
+    "serial": "false",
+    "advanced": "false",
+    "program": "false",
+    "configure": "true",
+    "simulate": "false",
+    "analyse": "true",
+  }
+}
