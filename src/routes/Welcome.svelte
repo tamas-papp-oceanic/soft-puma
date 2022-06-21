@@ -1,20 +1,14 @@
 <script>
-  import {
-    Grid,
-    Row,
-    Column
-  } from "carbon-components-svelte";
-  import {
-    userData
-  } from '../stores/user.js';
-
+  import { Grid, Row, Column } from "carbon-components-svelte";
+  import { userData } from '../stores/user.js';
   import {location, push, pop, replace, link} from 'svelte-spa-router'
-  </script>
-  <Grid>
-    <Row>
-      <Column sm={4} md={4} lg={8}>
-  <h3>Welcome {$userData.first_name} {$userData.last_name}</h3>
-  <h4>Access Level: {$userData.department}</h4>
-</Column>
-</Row>
+</script>
+
+<Grid>
+  <Row>
+    <Column sm={4} md={4} lg={8}>
+      <h3>Welcome {$userData.first_name} {$userData.last_name}</h3>
+      <h4>Access Level: {$userData.department}</h4>
+    </Column>
+  </Row>
 </Grid>
