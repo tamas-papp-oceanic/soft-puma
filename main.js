@@ -82,30 +82,30 @@ app.on('activate', function () {
 // In this file you can include the rest of your app's specific main process
 // code. You can also put them in separate files and require them here.
 
+const { session } = require('electron')
+
 app.on('ready', () => {
   // Modify the origin for all requests to the following urls.
   const filter = {
-    urls: ['*']
+    urls: ['<all_urls>']
   };
 
   session.defaultSession.webRequest.onBeforeSendHeaders(
     filter,
     (details, callback) => {
-      console.log(details);
-      details.requestHeaders['Origin'] = 'puma://-';
+      details.requestHeaders['Origin'] = 'http://localhost:5000';
       callback({ requestHeaders: details.requestHeaders });
     }
   );
 
-  session.defaultSession.webRequest.onHeadersReceived(
-    filter,
-    (details, callback) => {
-      console.log(details);
-      details.responseHeaders['Access-Control-Allow-Origin'] = [
-        'puma://-'
-      ];
-      callback({ responseHeaders: details.responseHeaders });
-    }
-  );
+  // session.defaultSession.webRequest.onHeadersReceived(
+    // filter,
+    // (details, callback) => {
+      // details.responseHeaders['Access-Control-Allow-Origin'] = [
+        // 'puma://'
+      // ];
+  //    callback({ responseHeaders: details.responseHeaders });
+  //  }
+  //);
 
 });
