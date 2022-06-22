@@ -67,16 +67,20 @@ function createWindow() {
 // initialization and is ready to create browser windows.
 // Some APIs can only be used after this event occurs.
 app.on('ready', () => {
-  ipcMain.on('request-can-channel', (evt) => {
-    // if (evt.senderFrame === mainWindow.webContents.mainFrame) {
+  // Message channel handlers
+  ipcMain.on('can-ready', (evt) => {
+    if (evt.senderFrame === mainWindow.webContents.mainFrame) {
       const { port1, port2 } = new MessageChannelMain();
-      mainWindow.webContents.postMessage('device-can-channel', null, [port1])
-      evt.senderFrame.postMessage('provide-can-channel', null, [port2]);
-    // }
-    // console.log(arg) // prints "ping" in the Node console
-    // // works like `send`, but returning a message back
-    // // to the renderer that sent the original message
-    // evt.reply('reply', 'pong')
+      mainWindow.webContents.postMessage('can-worker', null, [port1])
+      evt.senderFrame.postMessage('can-service', null, [port2]);
+    }
+  });
+  ipcMain.on('serial-ready', (evt) => {
+    if (evt.senderFrame === mainWindow.webContents.mainFrame) {
+      const { port1, port2 } = new MessageChannelMain();
+      mainWindow.webContents.postMessage('serial-worker', null, [port1])
+      evt.senderFrame.postMessage('serial-service', null, [port2]);
+    }
   });
   createWindow();
 });
