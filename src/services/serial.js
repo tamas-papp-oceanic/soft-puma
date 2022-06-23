@@ -11,6 +11,9 @@ ipcRenderer.once('serial-service', (evt) => {
   }
   // ... and start sending it work!
   port.postMessage('serial-start');
+
+console.log("START SENT")
+
   setTimeout(() => {
     port.postMessage('serial-stop')
   }, 1000);

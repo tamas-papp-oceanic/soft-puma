@@ -1,11 +1,10 @@
 const { ipcRenderer } = require('electron')
-const { can } = require('github.com/brutella/can');
-
-let port;
-let active = false;
-
 ipcRenderer.on('can-worker', (evt) => {
-  port = evt.ports[0];
+
+self.postMessage("CAN WORKER");
+
+  const [ port ] = evt.ports;
+
   port.onmessage = (evt) => {
     switch (evt.data) {
       case 'can-start':
@@ -13,7 +12,7 @@ ipcRenderer.on('can-worker', (evt) => {
 console.log("START")
 
       active = true;
-        canRead("can0");
+        // canRead("can0");
         break;
       case 'can-stop':
 
@@ -29,23 +28,23 @@ console.log("STOP")
   }
 });
 
-function sleepFor(sleepDuration){
-  var now = new Date().getTime();
-  while(new Date().getTime() < now + sleepDuration){ 
-      /* Do nothing */ 
-  }
-}
+// function sleepFor(sleepDuration){
+//   var now = new Date().getTime();
+//   while(new Date().getTime() < now + sleepDuration){ 
+//       /* Do nothing */ 
+//   }
+// }
 
-function delay() {
-  return new Promise(resolve => setTimeout(resolve, 1));
-}
-async function delayPost(itm) {
-  await delay();
-  port.postMessage(itm);
-}
+// function delay() {
+//   return new Promise(resolve => setTimeout(resolve, 1));
+// }
+// async function delayPost(itm) {
+//   await delay();
+//   port.postMessage(itm);
+// }
 
-async function canRead(dev) {
-  // canData.forEach(async (itm) => {
-  //   await delayPost(itm);
-  // });
-}
+// async function canRead(dev) {
+//   // canData.forEach(async (itm) => {
+//   //   await delayPost(itm);
+//   // });
+// }

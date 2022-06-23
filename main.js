@@ -22,6 +22,7 @@ function createWindow() {
     useContentSize: true,
     webPreferences: {
       nodeIntegration: true,
+      // nodeIntegrationInWorker: true,
       enableRemoteModule: true,
       // contextIsolation: false
       preload: path.join(isDev() ? process.cwd() : __dirname, 'preload.js'),
@@ -66,23 +67,46 @@ function createWindow() {
 // This method will be called when Electron has finished
 // initialization and is ready to create browser windows.
 // Some APIs can only be used after this event occurs.
-app.on('ready', () => {
+app.whenReady().then(async () => {
+  const cworker = new BrowserWindow({
+    show: false,
+    webPreferences: { nodeIntegration: true }
+  });
+  cworker.loadFile('./src/workers/can.js').catch((err) => {
+    console.log("Unable to load can worker", err);
+  });
+  const sworker = new BrowserWindow({
+    show: false,
+    webPreferences: { nodeIntegration: true }
+  })
+  await sworker.loadFile('./src/workers/serial.js').catch((err) => {
+    console.log("Unable to load serial worker", err);
+  });
+  sworker.onmessage = (evt) => {
+console.log(evt)
+  };
+  createWindow();
   // Message channel handlers
   ipcMain.on('can-ready', (evt) => {
+
+console.log("can-ready")
+
     if (evt.senderFrame === mainWindow.webContents.mainFrame) {
       const { port1, port2 } = new MessageChannelMain();
-      mainWindow.webContents.postMessage('can-worker', null, [port1])
+      cworker.webContents.postMessage('can-worker', null, [port1])
       evt.senderFrame.postMessage('can-service', null, [port2]);
     }
   });
   ipcMain.on('serial-ready', (evt) => {
+
+console.log("serial-ready")
+
     if (evt.senderFrame === mainWindow.webContents.mainFrame) {
       const { port1, port2 } = new MessageChannelMain();
-      mainWindow.webContents.postMessage('serial-worker', null, [port1])
+      sworker.webContents.postMessage('serial-worker', null, [port1])
       evt.senderFrame.postMessage('serial-service', null, [port2]);
     }
   });
-  createWindow();
 });
 
 // Quit when all windows are closed.
