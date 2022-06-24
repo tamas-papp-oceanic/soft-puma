@@ -1,19 +1,13 @@
 
 'use strict';
 
-const { ipcRenderer } = require('electron')
+function start() {
 
-ipcRenderer.send('message', 'serial');
+}
 
-// function start() {
-  
-//   console.log(ipcRenderer)
-
-// }
-
-// module.exports = {
-//   start,
-// };
+module.exports = {
+  start,
+};
 
 
 // const { SerialPort } = require('serialport')

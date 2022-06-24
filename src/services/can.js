@@ -1,6 +1,6 @@
-const { ipcRenderer } = require('electron');
+// const { ipcRenderer } = require('electron');
 
-ipcRenderer.send('message', 'can');
+// ipcRenderer.send('message', 'can');
 
 // self.postMessage("CAN WORKER");
 

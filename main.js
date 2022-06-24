@@ -1,5 +1,5 @@
 // Modules to control application life and create native browser window
-const { app, BrowserWindow, dialog, ipcMain } = require('electron');
+const { app, BrowserWindow, ipcMain, MessageChannelMain } = require('electron');
 const path = require('path');
 const serve = require('electron-serve');
 const loadURL = serve({ directory: 'public' });
@@ -26,7 +26,7 @@ function createWindow() {
     webPreferences: {
       nodeIntegration: true,
       enableRemoteModule: true,
-      // contextIsolation: false
+      contextIsolation: true,
       preload: path.join(isDev() ? process.cwd() : __dirname, 'preload.js'),
     },
     // Use this in development mode.
@@ -43,6 +43,9 @@ function createWindow() {
   } else {
     loadURL(mainWindow);
   }
+
+  // Open the DevTools.
+  mainWindow.webContents.openDevTools();
 
   // Uncomment the following line of code when app is ready to be packaged.
   // loadURL(mainWindow);
@@ -68,12 +71,6 @@ function createWindow() {
 // initialization and is ready to create browser windows.
 // Some APIs can only be used after this event occurs.
 app.whenReady().then(async () => {
-
-
-  ipcMain.on('message', (e) => {
-    console.log(e);
-  });
-
   createWindow();
 });
 
@@ -91,3 +88,28 @@ app.on('activate', function () {
 });
 // In this file you can include the rest of your app's specific main process
 // code. You can also put them in separate files and require them here.
+let can = require('./src/services/can.js');
+let ser = require('./src/services/serial.js');
+ipcMain.on('can-ready', (e, args) => {
+  // Create a new channel ...
+  const { port1, port2 } = new MessageChannelMain();
+  // We can also receive messages from the main world of the renderer.
+  port2.on('message', (e) => {
+    console.log(e.data);
+  })
+  port2.start();
+  // ... send one end to the worker ...
+  mainWindow.webContents.postMessage('can-port', null, [port1])
+});
+ipcMain.on('ser-ready', (e, args) => {
+  // Create a new channel ...
+  const { port1, port2 } = new MessageChannelMain();
+  // We can also receive messages from the main world of the renderer.
+  port2.on('message', (e) => {
+    console.log(e.data);
+  })
+  port2.start();
+  // ... send one end to the worker ...
+  mainWindow.webContents.postMessage('ser-port', null, [port1])
+  ser.start();
+});
