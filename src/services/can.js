@@ -1,17 +1,51 @@
-const { ipcRenderer } = require('electron')
+const { ipcRenderer } = require('electron');
 
-ipcRenderer.send('can-ready');
+ipcRenderer.send('message', 'can');
 
-ipcRenderer.once('can-service', (evt) => {
-  // Once we receive the reply, we can take the port...
-  const [ port ] = evt.ports
-  // ... register a handler to receive results ...
-  port.onmessage = (evt) => {
-    console.log(evt.data)
-  }
-  // ... and start sending it work!
-  // port.postMessage('can-start');
-  // setTimeout(() => {
-  //   port.postMessage('can-stop')
-  // }, 1000);
-});
+// self.postMessage("CAN WORKER");
+
+//   const [ port ] = evt.ports;
+
+//   port.onmessage = (evt) => {
+//     switch (evt.data) {
+//       case 'can-start':
+
+// console.log("START")
+
+//       active = true;
+//         // canRead("can0");
+//         break;
+//       case 'can-stop':
+
+// console.log("STOP")
+
+//         active = false;
+//         break;
+//       default:
+//         const res = "data";
+//         port.postMessage(res);
+//         break;
+//     }
+//   }
+// });
+
+// function sleepFor(sleepDuration){
+//   var now = new Date().getTime();
+//   while(new Date().getTime() < now + sleepDuration){ 
+//       /* Do nothing */ 
+//   }
+// }
+
+// function delay() {
+//   return new Promise(resolve => setTimeout(resolve, 1));
+// }
+// async function delayPost(itm) {
+//   await delay();
+//   port.postMessage(itm);
+// }
+
+// async function canRead(dev) {
+//   // canData.forEach(async (itm) => {
+//   //   await delayPost(itm);
+//   // });
+// }

@@ -1,11 +1,7 @@
 <script>
-	export let version;
-	export let appName;
-	import Router from 'svelte-spa-router';
+  import Router from 'svelte-spa-router';
 	import {location, push, pop, replace, link} from 'svelte-spa-router'
-	import {
-		wrap
-	} from 'svelte-spa-router/wrap';
+	import { wrap } from 'svelte-spa-router/wrap';
 	import Login from './routes/Login.svelte';
 	import Logout from './routes/Logout.svelte';
 	import Welcome from './routes/Welcome.svelte';
@@ -16,10 +12,12 @@
 	import Configure from './routes/Configure.svelte';
 	import Program from './routes/program/Index.svelte';
 	import Program5185 from './routes/program/5185.svelte';
-	import {
-	  loggedIn
-	} from './stores/user.js';
-	const routes = {
+	import { loggedIn } from './stores/user.js';
+
+	export let version;
+	export let appName;
+
+  const routes = {
 		"/": Devices,
 		"/login": wrap({
 			component: Login,
