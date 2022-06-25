@@ -1,56 +1,29 @@
+const { SerialPort } = require('serialport')
+const { ReadlineParser } = require("@serialport/parser-readline");
 
-'use strict';
+const port = new SerialPort({ path: '/dev/ttyACM0', baudRate: 115200, autoOpen: false });
 
-function start() {
+function start(fun) {
+  port.open((err) => {
+    console.log("Couldn't open serial port:", err.message);
+    return;
+  });
+  const parser = port.pipe(new ReadlineParser({ delimiter: '\r\n' }));
+  parser.on('data', line => {
+    fun(line);
+  })
+  port.on('open', () => {
+    console.log('Serial port opened');
+  });
+};
 
-}
+function stop() {
+  if (port.isOpen) {
+    port.close();
+  }
+};
 
 module.exports = {
   start,
+  stop,
 };
-
-
-// const { SerialPort } = require('serialport')
-// const { ReadlineParser } = require("@serialport/parser-readline");
-
-// const sport = new SerialPort({ path: '/dev/ttyACM0', baudRate: 115200, autoOpen: false });
-
-// export function serStart() {
-
-// };
-// ipcRenderer.on('ser-wrk-port', (evt) => {
-
-//   const [ port ] = evt.ports;
-
-//   port.onmessage = (evt) => {
-//     switch (evt.data) {
-//       case 'ser-start':
-//         sport.open((err) => {
-//           if (err) {
-//             port.postMessage("ERROR: " + err.message);
-//             return;
-//           }
-//           port.postMessage("OK");
-//           const parser = sport.pipe(new ReadlineParser({ delimiter: '\r\n' }));
-//           parser.on('data', line => {
-//             port.postMessage(line);
-//           })
-//           sport.on('open', () => {
-//             sport.port.emitData('Serial port opened');
-//           });
-//         })
-//         break;
-//       case 'ser-stop':
-//         if (sport.isOpen) {
-//           sport.close();
-//         }
-//         break;
-//       default:
-//         if (sport.isOpen) {
-//           const res = "data";
-//           sport.port.emitData(res);
-//         }
-//         break;
-//     }
-//   }
-// });

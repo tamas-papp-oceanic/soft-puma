@@ -46,6 +46,22 @@
   function scan(e) {
     console.log(e)
   }
+  // Data getters, setters
+  // window.pumaAPI.recv('can-running', (e, val) => {
+  //   console.log("CAN RUNNING", val);
+  // });
+  window.pumaAPI.send('can-start');
+  setTimeout(() => {
+    window.pumaAPI.send('can-stop');
+  }, 2000);
+
+  // window.pumaAPI.recv('ser-running', (e, val) => {
+  //   console.log("SER RUNNING", val);
+  // });
+  window.pumaAPI.send('ser-start');
+  setTimeout(() => {
+    window.pumaAPI.send('ser-stop');
+  }, 2000);
 </script>
 
 <Grid>

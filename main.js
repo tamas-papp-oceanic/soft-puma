@@ -88,28 +88,23 @@ app.on('activate', function () {
 });
 // In this file you can include the rest of your app's specific main process
 // code. You can also put them in separate files and require them here.
+// Data processing
 let can = require('./src/services/can.js');
 let ser = require('./src/services/serial.js');
-ipcMain.on('can-ready', (e, args) => {
-  // Create a new channel ...
-  const { port1, port2 } = new MessageChannelMain();
-  // We can also receive messages from the main world of the renderer.
-  port2.on('message', (e) => {
-    console.log(e.data);
-  })
-  port2.start();
-  // ... send one end to the worker ...
-  mainWindow.webContents.postMessage('can-port', null, [port1])
+let nme = require('./src/services/nmea.js');
+ipcMain.on('can-start', (e, ...args) => {
+  can.start(nme.process);
+  mainWindow.webContents.send('can-running', true);
 });
-ipcMain.on('ser-ready', (e, args) => {
-  // Create a new channel ...
-  const { port1, port2 } = new MessageChannelMain();
-  // We can also receive messages from the main world of the renderer.
-  port2.on('message', (e) => {
-    console.log(e.data);
-  })
-  port2.start();
-  // ... send one end to the worker ...
-  mainWindow.webContents.postMessage('ser-port', null, [port1])
-  ser.start();
+ipcMain.on('can-stop', (e, ...args) => {
+  can.stop();
+  mainWindow.webContents.send('can-running', false);
+});
+ipcMain.on('ser-start', (e, ...args) => {
+  ser.start(nme.process);
+  mainWindow.webContents.send('ser-running', true);
+});
+ipcMain.on('ser-stop', (e, ...args) => {
+  ser.stop();
+  mainWindow.webContents.send('ser-running', false);
 });
