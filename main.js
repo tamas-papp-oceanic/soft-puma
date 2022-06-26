@@ -91,9 +91,9 @@ app.on('activate', function () {
 // Data processing
 let can = require('./src/services/can.js');
 let ser = require('./src/services/serial.js');
-let nme = require('./src/services/nmea.js');
+let nmea = require('./src/services/nmea.js');
 ipcMain.on('can-start', (e, ...args) => {
-  can.start(nme.process);
+  can.start(nmea.process);
   mainWindow.webContents.send('can-running', true);
 });
 ipcMain.on('can-stop', (e, ...args) => {
@@ -101,7 +101,7 @@ ipcMain.on('can-stop', (e, ...args) => {
   mainWindow.webContents.send('can-running', false);
 });
 ipcMain.on('ser-start', (e, ...args) => {
-  ser.start(nme.process);
+  ser.start(nmea.process);
   mainWindow.webContents.send('ser-running', true);
 });
 ipcMain.on('ser-stop', (e, ...args) => {

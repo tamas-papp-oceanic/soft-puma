@@ -10,6 +10,7 @@ function start(fun) {
   });
   const parser = port.pipe(new ReadlineParser({ delimiter: '\r\n' }));
   parser.on('data', line => {
+    // Convert to can frame
     fun(line);
   })
   port.on('open', () => {
