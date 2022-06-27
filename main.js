@@ -92,6 +92,10 @@ app.on('activate', function () {
 let can = require('./src/services/can.js');
 let ser = require('./src/services/serial.js');
 let nmea = require('./src/services/nmea.js');
+// Start initialization
+let ndef = require('./src/tools/nmea.js');
+ndef.create();
+// End initialization
 ipcMain.on('can-start', (e, ...args) => {
   can.start(nmea.process);
   mainWindow.webContents.send('can-running', true);

@@ -1,0 +1,16 @@
+{
+  "nmea2000/060416": {
+    "function": 1
+  },
+  "nmea2000/126208": {
+    "function": 1
+  },
+  "nmea2000/126464": {
+    "function": 1
+  },
+  "nmea2000/126720": {
+    "manufacturer": 1,
+    "industry": 3,
+    "function": 4
+  }
+}
