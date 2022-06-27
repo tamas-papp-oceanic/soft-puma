@@ -92,22 +92,24 @@ app.on('activate', function () {
 let can = require('./src/services/can.js');
 let ser = require('./src/services/serial.js');
 let nmea = require('./src/services/nmea.js');
-// Start initialization
-let ndef = require('./src/tools/nmea.js');
-ndef.create();
-// End initialization
+// Initialize NMEA translator
+nmea.init();
+// Start can processing
 ipcMain.on('can-start', (e, ...args) => {
   can.start(nmea.process);
   mainWindow.webContents.send('can-running', true);
 });
+// Stop can processing
 ipcMain.on('can-stop', (e, ...args) => {
   can.stop();
   mainWindow.webContents.send('can-running', false);
 });
+// Start serial processing
 ipcMain.on('ser-start', (e, ...args) => {
   ser.start(nmea.process);
   mainWindow.webContents.send('ser-running', true);
 });
+// Stop serial processing
 ipcMain.on('ser-stop', (e, ...args) => {
   ser.stop();
   mainWindow.webContents.send('ser-running', false);
