@@ -18,6 +18,7 @@
 const { app } = require('electron');
 const path = require('path');
 const fs = require('fs');
+const { FileUploaderSkeleton } = require('carbon-components-svelte');
 
 let nmeadefs = {};
 let nmeaconv = {};
@@ -38,82 +39,243 @@ function init() {
   }
 }
 
-// Convert can frame to message
-function fromCanFrame(frm) {
-  let tmp = (frm.id & 0x1FFFF00) >> 8;
-	if (((tmp >> 8) & 0xFF) < 0xF0)
+function getPgn(frm) {
+  let pgn = (frm.id & 0x1FFFF00) >> 8;
+	if (((pgn >> 8) & 0xFF) < 0xF0)
 	{
-		tmp &= 0x1FF00;
+		pgn &= 0x1FF00;
 	}
-  let pgn = tmp.toString().padStart(6, '0');
-  let key = "nmea2000/" + pgn;
-  if (typeof nmeaconv[key] !== "undefined") {
+  return pgn.toString().padStart(6, '0');
+}
 
+function isSingle(frm) {
+  let pgn = getPgn(frm);
+  if ((pgn == "061184") || ((pgn >= "065280") && (pgn <= "065535"))) {
+    return true;      
+  } else if ((pgn.pgn == "126720") || ((pgn.pgn >= "130816") && (pgn.pgn <= "131071"))) {
+    return false;
+  }
+  for (const [key, val] of Object.entries(nmeadefs)) {
+    let tmp = "nmea2000/" + pgn;
+    if (key.startsWith(tmp)) {
+      return val.single;
+    }
+  }
+  return true;
+}
+
+function findPgn(frm) {
+  let pgn = getPgn(frm);
+  let key = "nmea2000/" + pgn;
+  let cnv = nmeaconv[key];
+  if (typeof cnv !== "undefined") {
+    if (typeof cnv.function !== "undefined") {
+      key += "/" + frm.data[cnv.function];
+    } else {
+      key += "/-";
+    }
+    if ((pgn == "061184") || ((pgn >= "065280") && (pgn <= "065535")) || 
+      (pgn == "126720") || ((pgn >= "130816") && (pgn <= "131071"))) {
+      let val = (parseInt(frm.data[1]) * 256) + parseInt(frm.data[0])
+      key += "/" + (val & 0x7FF) + "/" + ((val >> 13) & 7);
+    } else {
+      key += "/-/-";
+    }
   } else {
     key += "/-/-/-";
   }
-  let out = {};
-  if (typeof nmeadefs[key] !== "undefined") {
-    let def = nmeadefs[key];
+  let out = nmeadefs[key];
+  if (typeof out !== "undefined") {
+    out.key = key;
+  }
+  return out;
+}
 
-    if (def.single) {
 
-    } else {
-      let fky = frm.id.toString().padStart(6, '0');
-      if (typeof fastbuff[fky] === "undefined") {
-        let cnt = Number("0x" + frm.data[0]);
-        let len = Number("0x" + frm.data[1]);
-        let fap = {
-          length: len,
-          sequence: cnt >> 5,
-          counter: cnt & 0x1F,
-          expected: 1,
-          index: 0,
-          timeout: (750 / 20) + 1,
-          finished: false,
-          corrupted: (cnt & 0x1F) != 0,
-          data: Buffer.alloc(len),
-        };
-        let dat = Buffer.alloc(8);
-        dat.fill(0xFF);
-        // Copy first part of data
-        for (let i = 0; i < Math.min(fap.length, 6); i++) {
-          dat[fap.index++] = frm.data[i + 2];
+function unpack(frm) {
+  key = frm.id.toString(16).padStart(8, '0');
+  if (isSingle(frm)) {    
+    return frm;
+  } else {
+    let fap = {};
+    let seq = parseInt(frm.data[0]) >> 5;
+    let cnt = parseInt(frm.data[0]) & 0x1F;
+    let min = 0;
+    if (typeof fastbuff[key] === "undefined") {
+      let len = parseInt(frm.data[1]);
+      fap = {
+        sequence: seq,
+        counter: cnt,
+        length: len,
+        index: 0,
+        start: Date.now(),
+        timeout: 750,
+        finished: false,
+        corrupted: cnt != 0,
+        data: Buffer.alloc(len),
+      };
+      if (!fap.corrupted) {
+        min = Math.min(6, len);
+        let dat = Buffer.alloc(min);
+        for (let i = 0; i < min; i++) {
+          dat[i] = frm.data[i + 2];
         }
         dat.copy(fap.data);
-        fap.finished = (fap.index >= fap.length);
-        fastbuff[fky] = fap;
-      } else {
-        let fap = fastbuff[fky];
-        let cnt = Number("0x" + frm.data[0]);
-        if (!fap.corrupted) {
-          if (fap.sequence != (cnt >> 5)) {
-            fap.corrupted = true;
-          }
+      }
+    } else {
+      fap = fastbuff[key];
+      min = Math.min(7, (fap.length - fap.index));
+      if (!fap.corrupted &&  (seq != fap.sequence)) {
+        fap.corrupted = true;
+      }
+      if (!fap.corrupted) {
+        if (cnt != (fap.counter + 1)) {
+          fap.corrupted = true;
+        } else {
+          fap.counter = cnt;
         }
-        if (!fap.corrupted) {
-          if (fap.expected != (cnt & 0x1F)) {
-            fap.corrupted = true;
-          }
+      }
+      if (!fap.corrupted && ((Date.now() - fap.start) > fap.timeout)) {
+        fap.corrupted = true;
+      }
+      if (!fap.corrupted) {
+        let dat = Buffer.alloc(min);
+        for (let i = 0; i < min; i++) {
+          dat[i] = frm.data[i + 1];
         }
-        if (!fap.corrupted) {
-          let start = fap.start
-          let end = Date.Now();
-          if ((end - start) > (fap.timeout * 1000)) {
-            fap.corrupted = true;
-          }
-        }
-        if (!fap.Corrupted) {
-          let min = Math.min(7, (fap.length - fap.index));
-          frm.data.copy(fap.data, fap.index);
-          fap.index += min;
-          fap.expected++;
-          fap.finished = fap.index >= fap.length;
-        }
+        dat.copy(fap.data, fap.index);
+      }
+    }
+    if (!fap.corrupted) {
+      fap.index += min;
+      fap.finished = (fap.index >= fap.length);
+    }
+    if (!fap.finished && !fap.corrupted) {
+      fastbuff[key] = fap;
+    } else {
+      delete fastbuff[key];
+    }
+    if (!fap.corrupted) {
+      if (fap.finished) {
+        delete frm.data;
+        frm.data = Buffer.alloc(fap.length);
+        fap.data.copy(frm.data);
+        return frm;
       }
     }
   }
-  return out;
+  return null;
+}
+
+// Convert can frame to message
+function decode(frm) {
+  let def = findPgn(frm);
+  let msg = {
+    key: def.key,
+    title: def.title,
+    single: def.single,
+    priority: def.priority,
+    interval: def.interval,
+    fields: new Array(),
+  }
+  let pnt = 0;
+  let val = null;
+  for (let i in def.fields) {
+    let fld = def.fields[i];
+    switch (fld.type) {
+      case "int8":
+        val = frm.data.readInt8(pnt);
+        pnt += 1;
+        break;
+      case "uint8":
+        val = frm.data.readUInt8(pnt);
+        pnt += 1;
+        break;
+      case "int16":
+        val = frm.data.readInt16LE(pnt);
+        pnt += 2;
+        break;
+      case "uint16":
+        val = frm.data.readUInt16LE(pnt);
+        pnt += 2;
+        break;
+      case "int24":
+        {
+          let buf = Buffer.alloc(4);
+          buf[0] = frm.data[pnt + 0];
+          buf[1] = frm.data[pnt + 1];
+          if ((frm.data[pnt + 2] >> 7) == 0) {
+            buf[2] = 0;
+          } else {
+            buf[2] = 0xFF;
+          }
+          buf[3] = frm.data[pnt + 2];
+          val = buf.readInt32LE(0);
+          pnt += 3;
+        }
+        break;
+      case "uint16":
+        {
+          let buf = Buffer.alloc(4);
+          buf[0] = frm.data[pnt + 0];
+          buf[1] = frm.data[pnt + 1];
+          buf[2] = 0;
+          buf[3] = frm.data[pnt + 2];
+          val = buf.readUInt32LE(0);
+          pnt += 3;
+        }
+        break;
+      case "int32":
+        val = frm.data.readInt32LE(pnt);
+        pnt += 4;
+        break;
+      case "uint32":
+        val = frm.data.readUInt32LE(pnt);
+        pnt += 4;
+        break;
+      case "int48":
+        {
+          let buf = Buffer.alloc(6);
+          buf[0] = frm.data[pnt + 0];
+          buf[1] = frm.data[pnt + 1];
+          buf[2] = frm.data[pnt + 2];
+          buf[3] = frm.data[pnt + 3];
+          if ((frm.data[pnt + 4] >> 7) == 0) {
+            buf[4] = 0;
+          } else {
+            buf[4] = 0xFF;
+          }
+          buf[5] = frm.data[pnt + 4];
+          val = buf.readInt64LE(0);
+          pnt += 6;
+        }
+        break;
+      case "uint48":
+        {
+          let buf = Buffer.alloc(6);
+          buf[0] = frm.data[pnt + 0];
+          buf[1] = frm.data[pnt + 1];
+          buf[2] = frm.data[pnt + 2];
+          buf[3] = frm.data[pnt + 3];
+          buf[4] = 0;
+          buf[5] = frm.data[pnt + 4];
+          val = buf.readUInt64LE(0);
+          pnt += 6;
+        }
+        break;
+      case "int64":
+        val = frm.data.readInt64LE(pnt);
+        pnt += 8;
+        break;
+      case "uint64":
+        val = frm.data.readUInt64LE(pnt);
+        pnt += 8;
+        break;
+    }
+    fld.value = val;
+    msg.fields.push(fld);
+  }
+  return msg;
 
   // let msg = {
   //   id: pgn,
@@ -128,9 +290,14 @@ function fromCanFrame(frm) {
 }
 
 // NMEA data processing function
-function process(msg) {
-  let def = fromCanFrame(msg);
-console.log(def)
+function process(frm) {
+  let tmp = unpack(frm);
+  if (tmp != null) {
+    let msg = decode(tmp);
+
+console.log(msg)
+
+  }
 }
 
 module.exports = {

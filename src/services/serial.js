@@ -37,8 +37,12 @@ function toCanFrame(str) {
 
 function start(fun) {
 
-  fun(toCanFrame("09F20505 8 0001020304050607"));
-  fun(toCanFrame("09F20105 8 0006020304050607"));
+  // fun(toCanFrame("09F20505 8 0001020304050607"));
+  fun(toCanFrame("09F20105 8 0019000080001094"));
+  fun(toCanFrame("09F20105 8 019900A010270000"));
+  fun(toCanFrame("09F20105 8 0200000008000100"));
+  fun(toCanFrame("09F20105 8 030000007F7FFFFF"));
+  // fun(toCanFrame("09EF0005 8 0005A39902FFFFFF"));
 
   port.open((err) => {
     if (err) {
