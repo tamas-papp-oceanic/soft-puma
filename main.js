@@ -92,11 +92,18 @@ app.on('activate', function () {
 let can = require('./src/services/can.js');
 let ser = require('./src/services/serial.js');
 let nmea = require('./src/services/nmea.js');
+// NMEA processing
+function proc(frm) {
+  let msg = nmea.process(frm);
+  if (msg != null) {
+    mainWindow.webContents.send('nmea-data', msg);
+  }
+}
 // Initialize NMEA translator
 nmea.init();
 // Start can processing
 ipcMain.on('can-start', (e, ...args) => {
-  can.start(nmea.process);
+  can.start(proc);
   mainWindow.webContents.send('can-running', true);
 });
 // Stop can processing
@@ -106,7 +113,7 @@ ipcMain.on('can-stop', (e, ...args) => {
 });
 // Start serial processing
 ipcMain.on('ser-start', (e, ...args) => {
-  ser.start(nmea.process);
+  ser.start(proc);
   mainWindow.webContents.send('ser-running', true);
 });
 // Stop serial processing

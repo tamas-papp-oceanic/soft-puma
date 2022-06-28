@@ -55,9 +55,12 @@
     window.pumaAPI.send('can-stop');
   }, 2000);
 
-  // window.pumaAPI.recv('ser-running', (e, val) => {
-  //   console.log("SER RUNNING", val);
-  // });
+  window.pumaAPI.recv('ser-running', (e, val) => {
+    console.log("SER RUNNING", val);
+  });
+  window.pumaAPI.recv('nmea-data', (e, val) => {
+    console.log("NMEA DATA", val);
+  });
   window.pumaAPI.send('ser-start');
   setTimeout(() => {
     window.pumaAPI.send('ser-stop');
