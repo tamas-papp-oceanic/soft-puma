@@ -22,7 +22,6 @@ const fs = require('fs');
 let nmeadefs = {};
 let nmeaconv = {};
 let fastbuff = {};
-let nmeacurr = {};
 
 function init() {
   let nde = path.join(app.getAppPath(), 'src/config/nmeadefs.json');
@@ -37,7 +36,15 @@ function init() {
   } catch(err) {
     console.log(err);
   }
-}
+};
+
+function load(cfg) {
+  let fil = path.join(app.getAppPath(), 'src/config/' + cfg + '.json');
+  if (fs.existsSync(fil)) {
+    return JSON.parse(fs.readFileSync(fil, 'utf8'));
+  }
+  return null;
+};
 
 function getPgn(frm) {
   let pgn = (frm.id & 0x1FFFF00) >> 8;
@@ -46,7 +53,7 @@ function getPgn(frm) {
 		pgn &= 0x1FF00;
 	}
   return pgn.toString().padStart(6, '0');
-}
+};
 
 function isSingle(frm) {
   let pgn = getPgn(frm);
@@ -62,7 +69,7 @@ function isSingle(frm) {
     }
   }
   return true;
-}
+};
 
 function findPgn(frm) {
   let pgn = getPgn(frm);
@@ -89,12 +96,12 @@ function findPgn(frm) {
     out.key = key;
   }
   return out;
-}
+};
 
 
 function unpack(frm) {
   key = frm.id.toString(16).padStart(8, '0');
-  if (isSingle(frm)) {    
+  if (isSingle(frm)) {
     return frm;
   } else {
     let fap = {};
@@ -165,7 +172,7 @@ function unpack(frm) {
     }
   }
   return null;
-}
+};
 
 // Returns with field status
 function setStatus(val, typ) {
@@ -202,20 +209,22 @@ function setStatus(val, typ) {
     }
   }
   return sts;
-}
+};
 
 // Convert can frame to message
 function decode(frm) {
   let msg = null;
   let def = findPgn(frm);
   if (typeof def !== "undefined") {
+    let raw = Buffer.alloc(4 + frm.data.length);
+    let pgn = Buffer.from(frm.id.toString(16).padStart(8, '0'), "hex");
+    pgn.copy(raw);
+    frm.data.copy(raw, 4);
     msg = {
       key: def.key,
       title: def.title,
-      single: def.single,
-      priority: def.priority,
-      interval: def.interval,
       fields: new Array(),
+      raw: raw,
     }
     let ins = null;
     let typ = null;
@@ -339,7 +348,7 @@ function decode(frm) {
     }
   }
   return msg;
-}
+};
 
 // NMEA data processing function
 function process(frm) {
@@ -355,5 +364,6 @@ function process(frm) {
 
 module.exports = {
   init,
+  load,
   process,
 };

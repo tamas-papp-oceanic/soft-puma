@@ -3,6 +3,7 @@
     Toolbar, ToolbarContent, ToolbarSearch, ToolbarMenu,
     ToolbarMenuItem, OverflowMenu, OverflowMenuItem } from "carbon-components-svelte";
   import { push } from 'svelte-spa-router'
+  import { name, data } from "../../stores/data.js";
 
   const headers = [{
     key: "addr",
@@ -46,20 +47,31 @@
   function scan(e) {
     console.log(e)
   }
+
   // Data getters, setters
-  // window.pumaAPI.recv('can-running', (e, val) => {
-  //   console.log("CAN RUNNING", val);
-  // });
+  // $: {
+  //   rows = new Array();
+  //   for (const [key, val] of Object.entries($name)) {
+  //     let nam = {
+  //       id: "412345",
+  //       addr: key,
+  //       manufacturer: val.manufacturer,
+  //       productCode: "4291",
+  //       productDesc: "4291 4-20mA Fluid Sender",
+  //       instance: val.instance,
+  //     };
+  //     if (typeof $prod[key] !== "undefined") {
+
+  //     }
+  //   }
+  // }
+
   window.pumaAPI.send('can-start');
   setTimeout(() => {
     window.pumaAPI.send('can-stop');
   }, 2000);
-
   window.pumaAPI.recv('ser-running', (e, val) => {
     console.log("SER RUNNING", val);
-  });
-  window.pumaAPI.recv('nmea-data', (e, val) => {
-    console.log("NMEA DATA", val);
   });
   window.pumaAPI.send('ser-start');
   setTimeout(() => {

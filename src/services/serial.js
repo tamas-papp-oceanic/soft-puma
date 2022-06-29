@@ -42,6 +42,7 @@ function start(fun) {
   fun(toCanFrame("09F20105 8 0200000008000100"));
   fun(toCanFrame("09F20105 8 03000000007F7FFF"));
   fun(toCanFrame("09EF0005 8 0005A39902FFFFFF"));
+  fun(toCanFrame("18EEFFDD 8 0000000000000000"));
   fun(toCanFrame("19F014DD 8 00861D0C6B28486F"));
   fun(toCanFrame("19F014DD 8 016E646120424632"));
   fun(toCanFrame("19F014DD 8 0235302050474D2D"));

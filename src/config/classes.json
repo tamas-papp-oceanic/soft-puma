@@ -1,0 +1,19 @@
+{
+   "0": "Reserved",
+   "10": "System Tools",
+   "20": "Safety Systems",
+   "25": "Inter/Intranetwork Device",
+   "30": "Electrical Distribution",
+   "35": "Electrical Generation",
+   "40": "Steering and Control Surfaces",
+   "50": "Propulsion",
+   "60": "Navigation",
+   "70": "Communication",
+   "75": "Sensor Communication Interface",
+   "80": "Instrumentation/General Systems",
+   "85": "External Environment",
+   "90": "Internal Environment",
+   "100": "Deck, Cargo and Fishing Equipment",
+   "120": "Display",
+   "125": "Entertainment"
+}

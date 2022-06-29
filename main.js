@@ -3,6 +3,9 @@ const { app, BrowserWindow, ipcMain, MessageChannelMain } = require('electron');
 const path = require('path');
 const serve = require('electron-serve');
 const loadURL = serve({ directory: 'public' });
+const can = require('./src/services/can.js');
+const ser = require('./src/services/serial.js');
+const nmea = require('./src/services/nmea.js');
 
 // const can = require('./src/services/can.js');
 // const serial = require('./src/services/serial.js');
@@ -89,9 +92,6 @@ app.on('activate', function () {
 // In this file you can include the rest of your app's specific main process
 // code. You can also put them in separate files and require them here.
 // Data processing
-let can = require('./src/services/can.js');
-let ser = require('./src/services/serial.js');
-let nmea = require('./src/services/nmea.js');
 // FOR INIT ONLY
 // let tool = require('./src/tools/nmea.js');
 // tool.create();
@@ -99,11 +99,31 @@ let nmea = require('./src/services/nmea.js');
 function proc(frm) {
   let msg = nmea.process(frm);
   if (msg != null) {
-    mainWindow.webContents.send('nmea-data', msg);
+    if (msg.key.startsWith('nmea2000/060928')) {
+      // Store as name field
+      mainWindow.webContents.send('n2k-name', msg);
+    } else if (msg.key.startsWith('nmea2000/126996')) {
+      // Store as product information
+      mainWindow.webContents.send('n2k-prod', msg);
+    } else {
+      mainWindow.webContents.send('n2k-data', msg);
+    }
   }
 }
 // Initialize NMEA translator
 nmea.init();
+// Load configurations
+ipcMain.on('n2k-ready', (e, ...args) => {
+  const configs = ['classes', 'functions', 'industries', 'manufacturers'];
+  for (let i in configs) {
+    let cnf = configs[i];
+    let dat = nmea.load(cnf);
+    if (dat != null) {
+      mainWindow.webContents.send('n2k-' + cnf.substring(0, 4), dat);
+    }
+  };
+});
+
 // Start can processing
 ipcMain.on('can-start', (e, ...args) => {
   can.start(proc);
