@@ -67,14 +67,12 @@
   window.pumaAPI.send('can-start');
   setTimeout(() => {
     window.pumaAPI.send('can-stop');
-  }, 2000);
-  window.pumaAPI.recv('ser-running', (e, val) => {
-    console.log("SER RUNNING", val);
-  });
+  }, 20000);
+
   window.pumaAPI.send('ser-start');
   setTimeout(() => {
     window.pumaAPI.send('ser-stop');
-  }, 2000);
+  }, 20000);
 </script>
 
 <Grid>
