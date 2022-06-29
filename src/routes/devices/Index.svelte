@@ -28,7 +28,7 @@
     empty: true
   }];
 
-  const rows = [{
+  let rows = [{
     id: "412345",
     addr: "0",
     manufacturer: "Oceanic Systems",
@@ -49,22 +49,20 @@
   }
 
   // Data getters, setters
-  // $: {
-  //   rows = new Array();
-  //   for (const [key, val] of Object.entries($name)) {
-  //     let nam = {
-  //       id: "412345",
-  //       addr: key,
-  //       manufacturer: val.manufacturer,
-  //       productCode: "4291",
-  //       productDesc: "4291 4-20mA Fluid Sender",
-  //       instance: val.instance,
-  //     };
-  //     if (typeof $prod[key] !== "undefined") {
-
-  //     }
-  //   }
-  // }
+  $: {
+    rows = new Array();
+    for (const [key, val] of Object.entries($name)) {
+      let nam = {
+        id: val.uniqueNumber,
+        addr: key,
+        manufacturer: val.manufacturer,
+        productCode: val.productCode,
+        productDesc: val.modelID,
+        instance: val.instance,
+      };
+      rows.push(nam);
+    }
+  }
 
   window.pumaAPI.send('can-start');
   setTimeout(() => {

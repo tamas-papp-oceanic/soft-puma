@@ -2,7 +2,7 @@ const { app } = require('electron');
 const path = require('path');
 const fs = require('fs');
 
-// let can = require('socketcan');
+let can = require('socketcan');
 
 // const channel = can.createRawChannel("can0", true);
 
