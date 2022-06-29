@@ -54,14 +54,20 @@ function create() {
         if (fld.multiplier != null) {
           mul = fld.multiplier;
         }
-        obj.fields.push({
+        if (fld.divider != null) {
+          mul = (mul != null ? mul : 1) / fld.divider;
+        }
+        let tmp = {
           field: fld.field,
           title: fld.description,
           type: typ,
           unit: fld.unit,
-          multiplier: fld.multiplier,
-          divider: fld.divider,
-        });
+          multiplier: mul,
+        };
+        if (typeof fld.instance !== "undefined") {
+          tmp.instance = true;
+        }
+        obj.fields.push(tmp);
       }
       if (pgn.function != null) {
         key += "/" + pgn.function;
@@ -80,18 +86,16 @@ function create() {
     delete out;
     out = {};
     out["nmea2000/060416"] = {
-      function: 1,
+      function: 0,
     }
     out["nmea2000/126208"] = {
-      function: 1,
+      function: 0,
     }
     out["nmea2000/126464"] = {
-      function: 1,
+      function: 0,
     }
     out["nmea2000/126720"] = {
-      manufacturer: 1,
-      industry: 3,
-      function: 4,
+      function: 2,
     }
     fs.writeFileSync(nco, JSON.stringify(out, null, 2));
   } catch(err) {

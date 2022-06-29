@@ -92,6 +92,9 @@ app.on('activate', function () {
 let can = require('./src/services/can.js');
 let ser = require('./src/services/serial.js');
 let nmea = require('./src/services/nmea.js');
+// FOR INIT ONLY
+// let tool = require('./src/tools/nmea.js');
+// tool.create();
 // NMEA processing
 function proc(frm) {
   let msg = nmea.process(frm);

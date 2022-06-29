@@ -1,6 +1,6 @@
 /* NMEA2000 messages
 
-    key = nmea2000/{pgn}/{function}/{manufacturer}/{industry}
+    key = nmea2000/{pgn}/{function}/{manufacturer}/{industry}/{instance}/{fluidtype}
 
     Single-frame Proprietary
       061184          - addressable
@@ -169,35 +169,35 @@ function unpack(frm) {
 
 // Returns with field status
 function setStatus(val, typ) {
-  let sts = 'valid';
+  let sts = 'V';
   if (typ.startsWith('int')) {
     let bit = parseInt(typ.replace('int', ''));
     if (bit < 64) {
       if (val == (2 ** (bit - 1)) - 1) {
-        sts = 'nodata';
+        sts = '-';
       } else if (val == (2 ** (bit - 1)) - 2) {
-        sts = 'error';
+        sts = 'E';
       }
     } else {
       if (BigInt(val) == (2n ** (bit - 1)) - 1) {
-        sts = 'nodata';
+        sts = '-';
       } else if (BigInt(val) == (2n ** (bit - 1)) - 2) {
-        sts = 'error';
+        sts = 'E';
       }
     }
   } else if (typ.startsWith('uint')) {
     let bit = parseInt(typ.replace('uint', ''));
     if (bit < 64) {
       if (val == (2 ** bit) - 1) {
-        sts = 'nodata';
+        sts = '-';
       } else if (val == (2 ** bit) - 2) {
-        sts = 'error';
+        sts = 'E';
       }
     } else {
       if (BigInt(val) == (2n ** bit) - 1) {
-        sts = 'nodata';
+        sts = '-';
       } else if (BigInt(val) == (2n ** bit) - 2) {
-        sts = 'error';
+        sts = 'E';
       }
     }
   }
@@ -206,115 +206,137 @@ function setStatus(val, typ) {
 
 // Convert can frame to message
 function decode(frm) {
+  let msg = null;
   let def = findPgn(frm);
-  let msg = {
-    key: def.key,
-    title: def.title,
-    single: def.single,
-    priority: def.priority,
-    interval: def.interval,
-    fields: new Array(),
-  }
-  let pnt = 0;
-  let val = null;
-  for (let i in def.fields) {
-    let fld = def.fields[i];
-    fld.state = 'valid';
-    let byt = Math.floor(pnt / 8);
-    if (fld.type.startsWith('bit(')) {
-      let len = parseInt(fld.type.replace('bit(', '').replace(')', ''));
-      let cnt = Math.ceil(len / 8);
-      let buf = Buffer.alloc(8);
-      frm.data.copy(buf, 0, byt, byt + cnt);
-      let dat = buf.readBigUInt64LE(0);
-      let msk = BigInt((1 << len) - 1)
-      let off = BigInt(pnt - (byt * 8));
-      val = parseInt(((dat >> off) & msk).toString());
-      pnt += len;
-    } else if (fld.type.startsWith('chr(')) {
-      let len = parseInt(fld.type.replace('chr(', '').replace(')', ''));
-      if (len > 0) {
-        let buf = Buffer.alloc(len);
-        frm.data.copy(buf, 0, byt);
-        val = buf.toString('utf8');
-        pnt += (len * 8);
-      }
-    } else if (fld.type == 'str') {
-      let len = frm.data.readUInt8(byt);
-      let asc = frm.data.readUInt8(byt + 1);
-      if (len > 2) {
-        let buf = Buffer.alloc(len);
-        frm.data.copy(buf, 0, byt);
-        val = buf.toString(asc == 0 ? 'utf8' : 'utf16');
-      }
-      pnt += (len * 8);
-    } else {
-      switch (fld.type) {
-        case "int8":
-          val = frm.data.readInt8(byt);
-          pnt += 8;
-          break;
-        case "uint8":
-          val = frm.data.readUInt8(byt);
-          pnt += 8;
-          break;
-        case "int16":
-          val = frm.data.readInt16LE(byt);
-          pnt += 16;
-          break;
-        case "uint16":
-          val = frm.data.readUInt16LE(byt);
-          pnt += 16;
-          break;
-        case "int24":
-          val = frm.data.readIntLE(byt, 3);
-          pnt += 24;
-          break;
-        case "uint24":
-          val = frm.data.readUIntLE(byt, 3);
-          pnt += 24;
-          break;
-        case "int32":
-          val = frm.data.readInt32LE(byt);
-          pnt += 32;
-          break;
-        case "uint32":
-          val = frm.data.readUInt32LE(byt);
-          pnt += 32;
-          break;
-        case "float32":
-          val = frm.data.readFloatLE(byt);
-          pnt += 32;
-          break;
-        case "int48":
-          val = frm.data.readIntLE(byt, 6);
-          pnt += 48;
-          break;
-        case "uint48":
-          val = frm.data.readUIntLE(byt, 6);
-          pnt += 48;
-          break;
-        case "int64":
-          val = frm.data.readBigInt64LE(byt);
-          pnt += 64;
-          break;
-        case "uint64":
-          val = frm.data.readBigUInt64LE(byt);
-          pnt += 64;
-          break;
-        case "float64":
-          val = frm.data.readDoubleLE(byt);
-          pnt += 64;
-          break;
-      }
-      fld.state = setStatus(val, fld.type);
-      if (fld.multiplier != null) {
-        val *= fld.multiplier;
-      }
+  if (typeof def !== "undefined") {
+    msg = {
+      key: def.key,
+      title: def.title,
+      single: def.single,
+      priority: def.priority,
+      interval: def.interval,
+      fields: new Array(),
     }
-    fld.value = val;
-    delete fld.multiplier;
-    msg.fields.push(fld);
+    let ins = null;
+    let typ = null;
+    let pnt = 0;
+    let val = null;
+    for (let i in def.fields) {
+      let fld = def.fields[i];
+      fld.state = 'V';
+      let byt = Math.floor(pnt / 8);
+      if (fld.type.startsWith('bit(')) {
+        let len = parseInt(fld.type.replace('bit(', '').replace(')', ''));
+        let cnt = Math.ceil(len / 8);
+        let buf = Buffer.alloc(8);
+        frm.data.copy(buf, 0, byt, byt + cnt);
+        let dat = buf.readBigUInt64LE(0);
+        let msk = BigInt((1 << len) - 1)
+        let off = BigInt(pnt - (byt * 8));
+        val = parseInt(((dat >> off) & msk).toString());
+        pnt += len;
+      } else if (fld.type.startsWith('chr(')) {
+        let len = parseInt(fld.type.replace('chr(', '').replace(')', ''));
+        if (len > 0) {
+          let buf = Buffer.alloc(len);
+          frm.data.copy(buf, 0, byt);
+          val = buf.toString('utf8');
+          pnt += (len * 8);
+        }
+      } else if (fld.type == 'str') {
+        let len = frm.data.readUInt8(byt);
+        let asc = frm.data.readUInt8(byt + 1);
+        if (len > 2) {
+          let buf = Buffer.alloc(len);
+          frm.data.copy(buf, 0, byt);
+          val = buf.toString(asc == 0 ? 'utf8' : 'utf16');
+        }
+        pnt += (len * 8);
+      } else {
+        switch (fld.type) {
+          case "int8":
+            val = frm.data.readInt8(byt);
+            pnt += 8;
+            break;
+          case "uint8":
+            val = frm.data.readUInt8(byt);
+            pnt += 8;
+            break;
+          case "int16":
+            val = frm.data.readInt16LE(byt);
+            pnt += 16;
+            break;
+          case "uint16":
+            val = frm.data.readUInt16LE(byt);
+            pnt += 16;
+            break;
+          case "int24":
+            val = frm.data.readIntLE(byt, 3);
+            pnt += 24;
+            break;
+          case "uint24":
+            val = frm.data.readUIntLE(byt, 3);
+            pnt += 24;
+            break;
+          case "int32":
+            val = frm.data.readInt32LE(byt);
+            pnt += 32;
+            break;
+          case "uint32":
+            val = frm.data.readUInt32LE(byt);
+            pnt += 32;
+            break;
+          case "float32":
+            val = frm.data.readFloatLE(byt);
+            pnt += 32;
+            break;
+          case "int48":
+            val = frm.data.readIntLE(byt, 6);
+            pnt += 48;
+            break;
+          case "uint48":
+            val = frm.data.readUIntLE(byt, 6);
+            pnt += 48;
+            break;
+          case "int64":
+            val = frm.data.readBigInt64LE(byt);
+            pnt += 64;
+            break;
+          case "uint64":
+            val = frm.data.readBigUInt64LE(byt);
+            pnt += 64;
+            break;
+          case "float64":
+            val = frm.data.readDoubleLE(byt);
+            pnt += 64;
+            break;
+        }
+        fld.state = setStatus(val, fld.type);
+        if (fld.multiplier != null) {
+          val *= fld.multiplier;
+        }
+      }
+      fld.value = val;
+      delete fld.multiplier;
+      if (typeof fld.instance !== "undefined") {
+        ins = val;
+        delete fld.instance;
+      }
+      if (msg.key.startsWith("nmea2000/127505") && (fld.field == 2)) {
+        typ = val;
+      }
+      msg.fields.push(fld);
+    }
+    if (ins != null) {
+      msg.key += "/" + ins;
+    } else {
+      msg.key += "/-";
+    }
+    if (typ != null) {
+      msg.key += "/" + typ;
+    } else {
+      msg.key += "/-";
+    }
   }
   return msg;
 }
@@ -324,7 +346,9 @@ function process(frm) {
   let tmp = unpack(frm);
   if (tmp != null) {
     let msg = decode(tmp);
-    return msg;
+    if (msg != null) {
+      return msg;
+    }
   }
   return null;
 }

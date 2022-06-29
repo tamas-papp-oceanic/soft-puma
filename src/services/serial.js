@@ -62,6 +62,7 @@ function start(fun) {
   fun(toCanFrame("19F014DD 8 1120202020202020"));
   fun(toCanFrame("19F014DD 8 1220202020202020"));
   fun(toCanFrame("19F014DD 8 130201FFFFFFFFFF"));
+  fun(toCanFrame("19F21110 8 01983A00000000FF"));
 
   port.open((err) => {
     if (err) {
