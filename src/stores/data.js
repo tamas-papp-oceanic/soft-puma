@@ -160,7 +160,7 @@ window.pumaAPI.recv('n2k-prod', (e, val) => {
     }
   }
   dat[src] = nam;
-  prod.set(dat);
+  name.set(dat);
 });
 // NMEA other messages
 window.pumaAPI.recv('n2k-data', (e, val) => {
