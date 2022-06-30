@@ -6,13 +6,13 @@
   import { name, data } from "../../stores/data.js";
 
   const headers = [{
-    key: "addr",
+    key: "id",
     value: "Address"
   },{
     key: "manufacturer",
     value: "Manufacturer"
   },{
-    key: "productCode",
+    key: "modelID",
     value: "Product Code"
   },{
     key: "instance",
@@ -21,14 +21,14 @@
     key: "productDesc",
     value: "Description"
   },{
-    key: "id",
+    key: "uniqueNumber",
     value: "Unique Number"
   },{
     key: "overflow",
     empty: true
   }];
 
-  let rows = [{
+  let rows = [/*{
     id: "412345",
     addr: "0",
     manufacturer: "Oceanic Systems",
@@ -42,43 +42,46 @@
     productCode: "4291",
     productDesc: "4291 4-20mA Fluid Sender",
     instance: "1",
-  }];
+  }*/];
 
   function scan(e) {
     console.log(e)
-  }
+  };
 
   // Data getters, setters
   $: {
     rows = new Array();
     for (const [key, val] of Object.entries($name)) {
       let nam = {
-        id: val.uniqueNumber,
-        addr: key,
+        id: key,
+        uniqueNumber: val.uniqueNumber,
         manufacturer: val.manufacturer,
         productCode: val.productCode,
-        productDesc: val.modelID,
-        instance: val.instance,
+        modelID: val.modelID,
+        instance: val.deviceInstance,
       };
       rows.push(nam);
     }
-  }
+  };
 
   window.pumaAPI.send('can-start');
-  setTimeout(() => {
-    window.pumaAPI.send('can-stop');
-  }, 20000);
+  // setTimeout(() => {
+  //   window.pumaAPI.send('can-stop');
+  // }, 20000);
 
   window.pumaAPI.send('ser-start');
-  setTimeout(() => {
-    window.pumaAPI.send('ser-stop');
-  }, 20000);
+  // setTimeout(() => {
+  //   window.pumaAPI.send('ser-stop');
+  // }, 20000);
 </script>
 
 <Grid>
   <Row>
     <Column>
-      <DataTable sortable {headers} {rows}>
+      <DataTable 
+        sortable
+        {headers}
+        {rows}>
         <Toolbar>
           <ToolbarContent>
             <ToolbarSearch />
@@ -95,7 +98,7 @@
         <span slot="cell" let:cell let:row>
           {#if cell.key === 'overflow'}
             <OverflowMenu flipped>
-              <OverflowMenuItem text="Configure" on:click={() => push('/devices/'+row.addr)} />
+              <OverflowMenuItem text="Configure" on:click={() => push('/devices/'+row.id)} />
               <OverflowMenuItem text="Monitor" />
               <OverflowMenuItem disabled text="Test" />
               <OverflowMenuItem text="Check for Updates" />

@@ -61,9 +61,9 @@
 	@import "~carbon-components-svelte/css/g100.css";
 
 	.content {
-		margin-top: 4rem;
+		margin-top: 10vh;
 		overflow-x: hidden;
-		height: 100%;
+		height: 87vh;
 	}
 
 	@media (min-width: 48rem) {

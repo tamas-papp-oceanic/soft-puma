@@ -31,7 +31,7 @@
     "carbon-components-svelte": "^0.33.0",
     "carbon-icons-svelte": "^10.28.0",
     "concurrently": "^6.0.2",
-    "electron": "^16.2.8",
+    "electron": "^19.0.0",
     "electron-builder": "^22.14.13",
     "electron-rebuild": "^3.2.7",
     "node-sass": "^6.0.0",
