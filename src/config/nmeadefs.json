@@ -441,6 +441,13 @@
     "single": false,
     "priority": 3,
     "interval": null,
+    "repeat": [
+      {
+        "field": 5,
+        "start": 6,
+        "count": 2
+      }
+    ],
     "fields": [
       {
         "field": 1,
@@ -512,6 +519,13 @@
     "single": false,
     "priority": 3,
     "interval": null,
+    "repeat": [
+      {
+        "field": 5,
+        "start": 6,
+        "count": 2
+      }
+    ],
     "fields": [
       {
         "field": 1,
@@ -583,6 +597,13 @@
     "single": false,
     "priority": 3,
     "interval": null,
+    "repeat": [
+      {
+        "field": 5,
+        "start": 6,
+        "count": 1
+      }
+    ],
     "fields": [
       {
         "field": 1,
@@ -640,6 +661,18 @@
     "single": false,
     "priority": 3,
     "interval": null,
+    "repeat": [
+      {
+        "field": 7,
+        "start": 9,
+        "count": 2
+      },
+      {
+        "field": 8,
+        "start": 13,
+        "count": 1
+      }
+    ],
     "fields": [
       {
         "field": 1,
@@ -746,6 +779,18 @@
     "single": false,
     "priority": 3,
     "interval": null,
+    "repeat": [
+      {
+        "field": 7,
+        "start": 9,
+        "count": 2
+      },
+      {
+        "field": 8,
+        "start": 13,
+        "count": 2
+      }
+    ],
     "fields": [
       {
         "field": 1,
@@ -866,6 +911,18 @@
     "single": false,
     "priority": 3,
     "interval": null,
+    "repeat": [
+      {
+        "field": 7,
+        "start": 9,
+        "count": 2
+      },
+      {
+        "field": 8,
+        "start": 13,
+        "count": 2
+      }
+    ],
     "fields": [
       {
         "field": 1,
@@ -986,6 +1043,18 @@
     "single": false,
     "priority": 3,
     "interval": null,
+    "repeat": [
+      {
+        "field": 7,
+        "start": 9,
+        "count": 2
+      },
+      {
+        "field": 8,
+        "start": 13,
+        "count": 2
+      }
+    ],
     "fields": [
       {
         "field": 1,
@@ -1616,6 +1685,13 @@
     "single": false,
     "priority": 2,
     "interval": null,
+    "repeat": [
+      {
+        "field": 10,
+        "start": 11,
+        "count": 4
+      }
+    ],
     "fields": [
       {
         "field": 1,
@@ -1729,6 +1805,13 @@
     "single": false,
     "priority": 2,
     "interval": 10000,
+    "repeat": [
+      {
+        "field": 10,
+        "start": 11,
+        "count": 3
+      }
+    ],
     "fields": [
       {
         "field": 1,
@@ -4888,6 +4971,13 @@
     "single": false,
     "priority": 3,
     "interval": 1000,
+    "repeat": [
+      {
+        "field": 15,
+        "start": 16,
+        "count": 3
+      }
+    ],
     "fields": [
       {
         "field": 1,
@@ -6053,6 +6143,13 @@
     "single": false,
     "priority": 6,
     "interval": null,
+    "repeat": [
+      {
+        "field": 2,
+        "start": 10,
+        "count": 4
+      }
+    ],
     "fields": [
       {
         "field": 1,
@@ -10331,6 +10428,13 @@
     "single": false,
     "priority": 7,
     "interval": null,
+    "repeat": [
+      {
+        "field": 2,
+        "start": 4,
+        "count": 9
+      }
+    ],
     "fields": [
       {
         "field": 1,
@@ -10430,6 +10534,13 @@
     "single": false,
     "priority": 7,
     "interval": null,
+    "repeat": [
+      {
+        "field": 2,
+        "start": 5,
+        "count": 5
+      }
+    ],
     "fields": [
       {
         "field": 1,
@@ -10607,6 +10718,13 @@
     "single": false,
     "priority": 7,
     "interval": null,
+    "repeat": [
+      {
+        "field": 2,
+        "start": 6,
+        "count": 4
+      }
+    ],
     "fields": [
       {
         "field": 1,
@@ -10685,6 +10803,13 @@
     "single": false,
     "priority": 7,
     "interval": null,
+    "repeat": [
+      {
+        "field": 2,
+        "start": 6,
+        "count": 2
+      }
+    ],
     "fields": [
       {
         "field": 1,
@@ -10749,6 +10874,13 @@
     "single": false,
     "priority": 7,
     "interval": null,
+    "repeat": [
+      {
+        "field": 2,
+        "start": 6,
+        "count": 4
+      }
+    ],
     "fields": [
       {
         "field": 1,
@@ -10827,6 +10959,13 @@
     "single": false,
     "priority": 7,
     "interval": null,
+    "repeat": [
+      {
+        "field": 2,
+        "start": 6,
+        "count": 2
+      }
+    ],
     "fields": [
       {
         "field": 1,
@@ -10891,6 +11030,13 @@
     "single": false,
     "priority": 7,
     "interval": null,
+    "repeat": [
+      {
+        "field": 2,
+        "start": 5,
+        "count": 2
+      }
+    ],
     "fields": [
       {
         "field": 1,
@@ -10948,6 +11094,13 @@
     "single": false,
     "priority": 7,
     "interval": null,
+    "repeat": [
+      {
+        "field": 2,
+        "start": 4,
+        "count": 2
+      }
+    ],
     "fields": [
       {
         "field": 1,
@@ -10998,6 +11151,13 @@
     "single": false,
     "priority": 7,
     "interval": null,
+    "repeat": [
+      {
+        "field": 2,
+        "start": 6,
+        "count": 2
+      }
+    ],
     "fields": [
       {
         "field": 1,
@@ -11062,6 +11222,13 @@
     "single": false,
     "priority": 7,
     "interval": null,
+    "repeat": [
+      {
+        "field": 2,
+        "start": 6,
+        "count": 4
+      }
+    ],
     "fields": [
       {
         "field": 1,
@@ -12443,6 +12610,13 @@
     "single": false,
     "priority": 6,
     "interval": null,
+    "repeat": [
+      {
+        "field": 7,
+        "start": 9,
+        "count": 3
+      }
+    ],
     "fields": [
       {
         "field": 1,
@@ -12606,6 +12780,13 @@
     "single": false,
     "priority": 6,
     "interval": null,
+    "repeat": [
+      {
+        "field": 2,
+        "start": 4,
+        "count": 11
+      }
+    ],
     "fields": [
       {
         "field": 1,
@@ -12719,6 +12900,13 @@
     "single": false,
     "priority": 6,
     "interval": null,
+    "repeat": [
+      {
+        "field": 2,
+        "start": 4,
+        "count": 2
+      }
+    ],
     "fields": [
       {
         "field": 1,
@@ -13097,6 +13285,13 @@
     "single": false,
     "priority": 6,
     "interval": null,
+    "repeat": [
+      {
+        "field": 2,
+        "start": 4,
+        "count": 2
+      }
+    ],
     "fields": [
       {
         "field": 1,
@@ -13147,6 +13342,13 @@
     "single": false,
     "priority": 6,
     "interval": null,
+    "repeat": [
+      {
+        "field": 2,
+        "start": 4,
+        "count": 4
+      }
+    ],
     "fields": [
       {
         "field": 1,
@@ -16298,6 +16500,13 @@
     "single": false,
     "priority": 7,
     "interval": null,
+    "repeat": [
+      {
+        "field": 6,
+        "start": 7,
+        "count": 2
+      }
+    ],
     "fields": [
       {
         "field": 1,

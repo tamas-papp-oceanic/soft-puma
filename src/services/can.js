@@ -10,18 +10,29 @@ const path = require('path');
 const fs = require('fs');
 const can = require('socketcan');
 
-const cha = can.createRawChannel("can0", true);
+let cha = null;
+
+try {
+  cha = can.createRawChannel("can0", true);
+} catch (err) {
+  cha = null;
+  console.log(err);
+}
 
 function start(fun) {
-  cha.addListener("onMessage", (msg) => {
-    // console.log('(' + (msg.ts_sec + msg.ts_usec / 1000000).toFixed(6) + ') ' + msg.id.toString(16).toUpperCase().padStart(8, '0') + '#' + msg.data.toString('hex').toUpperCase());
-    fun(msg);
-  });
-  cha.start();
+  if (cha != null) {
+    cha.addListener("onMessage", (msg) => {
+      // console.log('(' + (msg.ts_sec + msg.ts_usec / 1000000).toFixed(6) + ') ' + msg.id.toString(16).toUpperCase().padStart(8, '0') + '#' + msg.data.toString('hex').toUpperCase());
+      fun(msg);
+    });
+    cha.start();
+  }
 };
 
 function stop() {
-  cha.stop();
+  if (cha != null) {
+    cha.stop();
+  }
 };
 
 module.exports = {

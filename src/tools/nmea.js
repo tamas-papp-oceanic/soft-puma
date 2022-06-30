@@ -5,21 +5,26 @@ const fs = require('fs');
 // key = nmea2000/{pgn}/{function}/{manufacturer}/{industry}
 
 function create() {
-  let n20 = path.join(app.getAppPath(), 'src/config/nmea2000.json');
-  let p20 = path.join(app.getAppPath(), 'src/config/prop2000.json');
+  let n20 = '/home/tamas/go/src/git/poseidon/kratos/default/nmea2000.json';
+  let p21 = '/home/tamas/go/src/git/poseidon/kratos/default/prop2000.json';
+  let p22 = '/home/tamas/go/src/git/poseidon/kratos/templates/nike/prop2000.json';
   let nde = path.join(app.getAppPath(), 'src/config/nmeadefs.json');
   let nco = path.join(app.getAppPath(), 'src/config/nmeaconv.json');
   try {
     let ls1 = new Array();
     let ls2 = new Array();
+    let ls3 = new Array();
     let out = {};
     if (fs.existsSync(n20)) {
       ls1 = JSON.parse(fs.readFileSync(n20, 'utf8'));
     }
-    if (fs.existsSync(p20)) {
-      ls2 = JSON.parse(fs.readFileSync(p20, 'utf8'));
+    if (fs.existsSync(p21)) {
+      ls2 = JSON.parse(fs.readFileSync(p21, 'utf8'));
     }
-    let lst = ls1.concat(ls2);
+    if (fs.existsSync(p22)) {
+      ls3 = JSON.parse(fs.readFileSync(p22, 'utf8'));
+    }
+    let lst = ls1.concat(ls2).concat(ls3);
     let key = "";
     for (let i in lst) {
       let pgn = lst[i];
@@ -29,8 +34,28 @@ function create() {
         single: pgn.singleFrame,
         priority: pgn.priority,
         interval: pgn.interval,
-        fields: [],
       };
+      if (typeof pgn.repeatField !== "undefined") {
+        obj.repeat = [{
+          field: pgn.repeatField,
+          start: pgn.startField,
+          count: pgn.fieldCount,
+        }];
+      } else if (typeof pgn.repeatField1 !== "undefined") {
+        obj.repeat = [{
+          field: pgn.repeatField1,
+          start: pgn.startField1,
+          count: pgn.fieldCount1,
+        }];
+      }
+      if (typeof pgn.repeatField2 !== "undefined") {
+        obj.repeat.push({
+          field: pgn.repeatField2,
+          start: pgn.startField2,
+          count: pgn.fieldCount2,
+        });
+      }
+      obj.fields = new Array();
       for (let j in pgn.fields) {
         let fld = pgn.fields[j];
         let typ = fld.type;

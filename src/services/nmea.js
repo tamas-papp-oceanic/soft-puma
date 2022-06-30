@@ -18,6 +18,7 @@
 const { app } = require('electron');
 const path = require('path');
 const fs = require('fs');
+const { object_without_properties } = require('svelte/internal');
 
 let nmeadefs = {};
 let nmeaconv = {};
@@ -94,7 +95,41 @@ function findPgn(frm) {
   let out = nmeadefs[key];
   if (typeof out !== "undefined") {
     out.key = key;
-  }
+//     if (typeof out.repeat !== "undefined") {
+//       let tmp = new Array();
+//       let max = 0;
+//       for (let i in out.repeat) {
+//         if (out.repeat[i].field > max) {
+//           max = out.repeat[i].field;
+//         }
+//       }
+//       for (let i in out.fields) {
+//         if (out.fields[i].field <= max) {
+//           tmp.push(out.fields[i]);
+//         }
+//       }
+//       max++;
+//       for (let i in out.repeat) {
+//         let rep = out.repeat[i];
+//         for (let j in out.fields) {
+//           if (out.fields[j].field == rep.start) {
+//             for (let k = 0; k < rep.count; k++) {
+//               let fld = out.fields[(parseInt(j) + k)];
+//               fld.field = max++;
+//               tmp.push(fld);
+//             }
+//             break;
+//           }
+//         }
+//       }
+//       delete out.fields;
+//       out.fields = tmp;
+//       delete out.repeat;
+      
+// console.log(out)
+
+//     }  
+  }    
   return out;
 };
 
@@ -234,6 +269,37 @@ function decode(frm) {
     let typ = null;
     let pnt = 0;
     let val = null;
+    if (typeof def.repeat !== "undefined") {
+      for (let i in def.repeat) {
+        let byt = 0;
+        for (let j in def.fields) {
+          let fld = def.fields[j];
+          if (fld.field < def.repeat[i].field) {
+            if (fld.type.startsWith('bit(')) {
+              byt += parseInt(fld.type.replace('bit(', '').replace(')', ''));
+            } else if (fld.type.startsWith('chr(')) {
+              byt += parseInt(fld.type.replace('chr(', '').replace(')', ''));
+            } else if (fld.type == 'str') {
+              byt += frm.data.readUInt8(byt);
+            } else if (fld.type.startsWith('int')) {
+              byt += parseInt(fld.type.replace('int', ''));
+            } else if (fld.type.startsWith('uint')) {
+              byt += parseInt(fld.type.replace('uint', ''));
+            } else if (fld.type.startsWith('float')) {
+              byt += parseInt(fld.type.replace('float', ''));
+            }
+          } else {
+            break;
+          }
+        }
+        def.repeat[i].byte = Math.ceil(byt / 8);
+      }
+    }
+    for (let i in def.repeat) {
+
+console.log(def.repeat[i].byte)
+
+    }
     for (let i in def.fields) {
       try {
         let fld = def.fields[i];
@@ -252,12 +318,6 @@ function decode(frm) {
         } else if (fld.type.startsWith('float')) {
           len = parseInt(fld.type.replace('float', ''));
         }
-
-if (len == 0) {
-  console.log(pgn)
-}
-
-
         if ((len > 0) && (frm.data.length >= (byt + len))) {
           fld.state = 'V';
           if (fld.type.startsWith('bit(')) {
@@ -345,7 +405,7 @@ if (len == 0) {
           msg.fields.push(fld);
         }
       } catch (err) {
-console.log("ERROR", pgn, frm, def, err)
+// console.log("ERROR", pgn, frm, def, err)
       }
     }
     if (ins != null) {
@@ -361,6 +421,183 @@ console.log("ERROR", pgn, frm, def, err)
   }
   return msg;
 };
+
+// func ExtendPgnDefDecode(def message.PgnDef, raw []byte) message.PgnDef {
+// 	switch def.Pgn {
+// 	case "126208":
+// 		if len(raw) > 5 {
+// 			val, err := n2000util.BytesToUint64([]byte{raw[1], raw[2], raw[3]}, "uint24", util.ByteOrder)
+// 			if err == nil {
+// 				pgn := int(val)
+// 				def1 := def
+// 				def1.Fields = def1.Fields[:5]
+// 				def2, err := GetPgnDefinition(uint32(pgn), &raw)
+// 				if err == nil {
+// 					rep := 0
+// 					ptr := 0
+// 					switch def.Function {
+// 					case "0", "1":
+// 						if def.Function == "0" {
+// 							rep = int(raw[10])
+// 							ptr = 11
+// 						} else if def.Function == "1" {
+// 							rep = int(raw[5])
+// 							ptr = 6
+// 						}
+// 						for i := 0; i < rep; i++ {
+// 							f := def.Fields[5]
+// 							f.Field = uint16((i * 2) + 6)
+// 							if strings.Index(f.Description, " '1'") != -1 {
+// 								f.Description = f.Description[:strings.Index(f.Description, " '")]
+// 							}
+// 							if strings.Index(f.Description, "'1'") != -1 {
+// 								f.Description = f.Description[:strings.Index(f.Description, "'")]
+// 							}
+// 							if strings.Index(f.Description, " \"") != -1 {
+// 								f.Description = f.Description[:strings.Index(f.Description, " \"")]
+// 							}
+// 							f.Description += " \"" + strconv.Itoa(i+1) + "\""
+// 							def1.Fields = append(def1.Fields, f)
+// 							fld := raw[ptr]
+// 							ptr++
+// 							f = def2.Fields[fld-1]
+// 							f.Field = uint16((i * 2) + 7)
+// 							def1.Fields = append(def1.Fields, f)
+// 							ptr += f.BitSize / 8
+// 						}
+// 						n2000util.ReGroup(&def1)
+// 						return def1
+// 					}
+// 				}
+// 			}
+// 		}
+// 	case "126464":
+// 		if len(raw) > 1 {
+// 			def1 := def
+// 			def1.Fields = def1.Fields[:1]
+// 			rep := 0
+// 			switch def.Function {
+// 			case "0", "1":
+// 				rep = (len(raw) - 1) / 3
+// 				for i := 0; i < rep; i++ {
+// 					f := def.Fields[1]
+// 					f.Field = uint16(i + 2)
+// 					if strings.Index(f.Description, " '1'") != -1 {
+// 						f.Description = f.Description[:strings.Index(f.Description, " '")]
+// 					}
+// 					if strings.Index(f.Description, "'1'") != -1 {
+// 						f.Description = f.Description[:strings.Index(f.Description, "'")]
+// 					}
+// 					if strings.Index(f.Description, " \"") != -1 {
+// 						f.Description = f.Description[:strings.Index(f.Description, " \"")]
+// 					}
+// 					f.Description += " \"" + strconv.Itoa(i+1) + "\""
+// 					def1.Fields = append(def1.Fields, f)
+// 				}
+// 				n2000util.ReGroup(&def1)
+// 				return def1
+// 			}
+// 		}
+// 	default:
+// 		if (def.RepeatField != 0) && (def.StartField != 0) && (def.FieldCount != 0) {
+// 			bitCount := 0
+// 			for i := 0; i < def.RepeatField-1; i++ {
+// 				bitCount += def.Fields[i].BitSize
+// 			}
+// 			fld := bitCount / 8
+// 			typ := def.Fields[def.RepeatField-1].Type
+// 			siz := def.Fields[def.RepeatField-1].BitSize / 8
+// 			rep := 0
+// 			if len(raw) > fld+(siz-1) {
+// 				val, err := n2000util.BytesToUint64(raw[fld:fld+siz], typ, util.ByteOrder)
+// 				if err == nil {
+// 					rep = int(val)
+// 				}
+// 			}
+// 			if rep != 0 {
+// 				def = addFields(def, def.StartField, def.FieldCount, rep)
+// 				n2000util.ReGroup(&def)
+// 			}
+// 		}
+// 	}
+// 	return def
+// }
+
+// // ExtendPgnDefEncode - Extends field definitions
+// func ExtendPgnDefEncode(def message.PgnDef, fields []message.Field) message.PgnDef {
+// 	switch def.Pgn {
+// 	case "126208":
+// 		chk := true
+// 		for i := 0; i < len(fields); i++ {
+// 			if fields[i].Field != uint16(i+1) {
+// 				chk = false
+// 				break
+// 			}
+// 		}
+// 		if (len(fields) > 4) && chk {
+// 			if pgn, ok := n2000util.CastField(fields[1]).(float64); ok {
+// 				def1 := def
+// 				def1.Fields = def1.Fields[:5]
+// 				def2, err := GetPgnDefinition(uint32(pgn), &[]byte{0, 0, 0, 0, 0})
+// 				if err == nil {
+// 					switch def.Function {
+// 					case "0", "1":
+// 						if rep, ok := n2000util.CastField(fields[4]).(float64); ok {
+// 							for i := 0; i < int(rep); i++ {
+// 								if fields[(i*2)+5].Field == uint16((i*2)+6) {
+// 									if fld, ok := n2000util.CastField(fields[(i*2)+5]).(float64); ok {
+// 										f := def.Fields[5]
+// 										f.Field = uint16((i * 2) + 6)
+// 										def1.Fields = append(def1.Fields, f)
+// 										f = def2.Fields[uint8(fld)-1]
+// 										f.Field = uint16((i * 2) + 7)
+// 										def1.Fields = append(def1.Fields, f)
+// 									}
+// 								}
+// 							}
+// 							n2000util.ReGroup(&def1)
+// 						}
+// 						return def1
+// 					}
+// 				}
+// 			}
+// 		}
+// 	case "126464":
+// 		chk := true
+// 		for i := 0; i < len(fields); i++ {
+// 			if fields[i].Field != uint16(i+1) {
+// 				chk = false
+// 				break
+// 			}
+// 		}
+// 		if (len(fields) > 2) && chk {
+// 			rep := len(fields) - 1
+// 			def = addFields(def, 2, 1, rep)
+// 			n2000util.ReGroup(&def)
+// 		}
+// 	default:
+// 		if (def.RepeatField != 0) && (def.StartField != 0) && (def.FieldCount != 0) {
+// 			chk := true
+// 			for i := 0; i < len(fields); i++ {
+// 				if fields[i].Field != uint16(i+1) {
+// 					chk = false
+// 					break
+// 				}
+// 			}
+// 			if (len(fields) >= def.StartField+def.FieldCount-1) && chk {
+// 				if fields[def.RepeatField-1].Field == uint16(def.RepeatField) {
+// 					if rep, ok := n2000util.CastField(fields[def.RepeatField-1]).(float64); ok {
+// 						if int(rep) != 0 {
+// 							def = addFields(def, def.StartField, def.FieldCount, int(rep))
+// 							n2000util.ReGroup(&def)
+// 						}
+// 					}
+// 				}
+// 			}
+// 		}
+// 	}
+// 	return def
+// }
 
 // NMEA data processing function
 function process(frm) {

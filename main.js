@@ -97,8 +97,8 @@ app.on('activate', function () {
 // code. You can also put them in separate files and require them here.
 // Data processing
 // FOR INIT ONLY
-// let tool = require('./src/tools/nmea.js');
-// tool.create();
+let tool = require('./src/tools/nmea.js');
+tool.create();
 // NMEA processing
 function proc(frm) {
   let msg = nmea.process(frm);
