@@ -1,7 +1,7 @@
 <script>
   import { Grid, Row, Column, ButtonSet, Button, DataTable,
     Toolbar, ToolbarContent, ToolbarSearch, ToolbarMenu,
-    ToolbarMenuItem, OverflowMenu, OverflowMenuItem } from "carbon-components-svelte";
+    ToolbarMenuItem, OverflowMenu, OverflowMenuItem, Pagination } from "carbon-components-svelte";
   import { push } from 'svelte-spa-router'
   import { name, data } from "../../stores/data.js";
 
@@ -12,13 +12,13 @@
     key: "manufacturer",
     value: "Manufacturer"
   },{
-    key: "modelID",
+    key: "productCode",
     value: "Product Code"
   },{
     key: "instance",
     value: "Instance"
   },{
-    key: "productDesc",
+    key: "modelID",
     value: "Description"
   },{
     key: "uniqueNumber",
@@ -28,21 +28,12 @@
     empty: true
   }];
 
-  let rows = [/*{
-    id: "412345",
-    addr: "0",
-    manufacturer: "Oceanic Systems",
-    productCode: "4291",
-    productDesc: "4291 4-20mA Fluid Sender",
-    instance: "0",
-  },{
-    id: "412346",
-    addr: "1",
-    manufacturer: "Oceanic Systems",
-    productCode: "4291",
-    productDesc: "4291 4-20mA Fluid Sender",
-    instance: "1",
-  }*/];
+  let rows = [];
+  let pagination = {
+    pageSize: 10,
+    page: 1,
+    totalItems: 0,
+  };
 
   function scan(e) {
     console.log(e)
@@ -50,18 +41,20 @@
 
   // Data getters, setters
   $: {
-    rows = new Array();
+    let tmp = new Array();
     for (const [key, val] of Object.entries($name)) {
       let nam = {
         id: key,
-        uniqueNumber: val.uniqueNumber,
-        manufacturer: val.manufacturer,
-        productCode: val.productCode,
-        modelID: val.modelID,
-        instance: val.deviceInstance,
+        uniqueNumber: val.uniqueNumber != null ? val.uniqueNumber : '',
+        manufacturer: val.manufacturer != null ? val.manufacturer : '',
+        productCode: val.productCode != null ? val.productCode : '',
+        modelID: val.modelID != null ? val.modelID : '',
+        instance: val.deviceInstance != null ? val.deviceInstance : '',
       };
-      rows.push(nam);
+      tmp.push(nam);
     }
+    rows = JSON.parse(JSON.stringify(tmp));
+    pagination.totalItems = rows.length;
   };
 
   window.pumaAPI.send('can-start');
@@ -81,7 +74,9 @@
       <DataTable 
         sortable
         {headers}
-        {rows}>
+        {rows}
+        pageSize={pagination.pageSize}
+        page={pagination.page}>
         <Toolbar>
           <ToolbarContent>
             <ToolbarSearch />
@@ -108,6 +103,15 @@
           {/if}
         </span>
       </DataTable>
+      {#if pagination.totalItems > pagination.pageSize}
+      <Pagination
+        pageSize={pagination.pageSize}
+        totalItems={pagination.totalItems}
+        bind:page={pagination.page}
+        pageSizeInputDisabled
+        pageInputDisabled
+      />
+      {/if}
     </Column>
   </Row>
 </Grid>

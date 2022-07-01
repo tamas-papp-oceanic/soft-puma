@@ -64,8 +64,8 @@
 
 	.content {
 		margin-top: 10vh;
-		overflow-x: hidden;
-		height: 87vh;
+		// overflow-x: hidden;
+		// height: 87vh;
 	}
 
 	@media (min-width: 48rem) {
