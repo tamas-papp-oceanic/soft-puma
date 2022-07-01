@@ -15657,7 +15657,7 @@
       {
         "field": 10,
         "title": "Name",
-        "type": "char8(x)",
+        "type": "chr(x)",
         "unit": null,
         "multiplier": null
       }
@@ -15856,7 +15856,7 @@
       {
         "field": 8,
         "title": "Name",
-        "type": "char8(x)",
+        "type": "chr(x)",
         "unit": null,
         "multiplier": null
       }
@@ -15920,7 +15920,7 @@
       {
         "field": 8,
         "title": "Name",
-        "type": "char8(x)",
+        "type": "chr(x)",
         "unit": null,
         "multiplier": null
       }
@@ -15984,7 +15984,7 @@
       {
         "field": 8,
         "title": "Album",
-        "type": "char8(x)",
+        "type": "chr(x)",
         "unit": null,
         "multiplier": null
       }
@@ -16119,7 +16119,7 @@
       {
         "field": 10,
         "title": "RDS",
-        "type": "char8(x)",
+        "type": "chr(x)",
         "unit": null,
         "multiplier": null
       }
@@ -16183,7 +16183,7 @@
       {
         "field": 8,
         "title": "Channel Name",
-        "type": "char8(x)",
+        "type": "chr(x)",
         "unit": null,
         "multiplier": null
       }
@@ -16375,7 +16375,7 @@
       {
         "field": 10,
         "title": "Name",
-        "type": "char8(x)",
+        "type": "chr(x)",
         "unit": null,
         "multiplier": null
       }
@@ -17115,7 +17115,7 @@
       {
         "field": 6,
         "title": "Name",
-        "type": "char8(x)",
+        "type": "chr(x)",
         "unit": null,
         "multiplier": null
       }
@@ -17500,7 +17500,7 @@
       {
         "field": 6,
         "title": "Text",
-        "type": "char8(x)",
+        "type": "chr(x)",
         "unit": null,
         "multiplier": null
       }
@@ -17550,7 +17550,7 @@
       {
         "field": 6,
         "title": "Text",
-        "type": "char8(x)",
+        "type": "chr(x)",
         "unit": null,
         "multiplier": null
       }
@@ -17607,7 +17607,7 @@
       {
         "field": 7,
         "title": "Name",
-        "type": "char8(x)",
+        "type": "chr(x)",
         "unit": null,
         "multiplier": null
       }

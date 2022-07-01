@@ -26,28 +26,23 @@ window.pumaAPI.recv('n2k-manu', (e, val) => {
 });
 // NMEA address claim message
 window.pumaAPI.recv('n2k-name', (e, val) => {
-  let src = val.raw[3];
-  let dat = get(name);
-  let nam = dat[src];
-  if (typeof nam === "undefined") {
-    nam = {
-      uniqueNumber: null,
-      manufacturer: null,
-      deviceInstance: null,
-      function: null,
-      class: null,
-      systemInstance: null,
-      industry: null,
-      databaseVersion: null,
-      productCode: null,
-      modelID: null,
-      softwareVersion: null,
-      modelVersion: null,
-      serialCode: null,
-      certification: null,
-      loadEquivalency: null,
-    };
-  }
+  let nam = {
+    uniqueNumber: null,
+    manufacturer: null,
+    deviceInstance: null,
+    function: null,
+    class: null,
+    systemInstance: null,
+    industry: null,
+    databaseVersion: null,
+    productCode: null,
+    modelID: null,
+    softwareVersion: null,
+    modelVersion: null,
+    serialCode: null,
+    certification: null,
+    loadEquivalency: null,
+  };
   let acl = get(clas);
   let afu = get(func);
   let ain = get(indu);
@@ -83,7 +78,7 @@ window.pumaAPI.recv('n2k-name', (e, val) => {
         nam.function = fld.value;
         if ((cla != null) && (typeof afu[cla] !== "undefined") &&
           (typeof afu[cla][fld.value] !== "undefined")) {
-          fnam.function += " - " + afu[cla][fld.value];
+          nam.function += " - " + afu[cla][fld.value];
         }
         break;
       case 7:
@@ -102,6 +97,18 @@ window.pumaAPI.recv('n2k-name', (e, val) => {
         }
         break;
     }
+  }
+  let src = val.raw[3];
+  let dat = get(name);
+  let tmp = dat[src];
+  if ((typeof tmp !== "undefined") && (
+    (tmp.uniqueNumber != nam.uniqueNumber) ||
+    (tmp.manufacturer != nam.manufacturer) ||
+    (tmp.function != nam.function) ||
+    (tmp.class != nam.class) ||
+    (tmp.industry != nam.industry))
+  ) {
+    delete dat[src];
   }
   dat[src] = nam;
   name.set(dat);

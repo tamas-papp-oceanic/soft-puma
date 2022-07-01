@@ -74,6 +74,9 @@ function create() {
           case "char8(n)":
             typ = "chr(" + fld.charSize + ")";
             break;
+          case "char8(x)":
+            typ = "chr(x)";
+            break;
         }
         let mul = null;
         if (fld.multiplier != null) {

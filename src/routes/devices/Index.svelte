@@ -99,7 +99,7 @@
           {#if cell.key === 'overflow'}
             <OverflowMenu flipped>
               <OverflowMenuItem text="Configure" on:click={() => push('/devices/'+row.id)} />
-              <OverflowMenuItem text="Monitor" />
+              <OverflowMenuItem text="Monitor" on:click={() => push('/monitor/'+row.id)} />
               <OverflowMenuItem disabled text="Test" />
               <OverflowMenuItem text="Check for Updates" />
             </OverflowMenu>

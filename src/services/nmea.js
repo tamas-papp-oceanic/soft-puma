@@ -72,6 +72,29 @@ function isSingle(frm) {
   return true;
 };
 
+function calcLenght(typ, val) {
+  let len = null;
+  if (typ.startsWith('bit(')) {
+    len = parseInt(typ.replace('bit(', '').replace(')', ''));
+  } else if (typ.startsWith('chr(')) {
+    let tmp = typ.replace('chr(', '').replace(')', '');
+    if (tmp != 'x') {
+      len = parseInt(tmp);
+    } else {
+      len = val + 1;
+    }
+  } else if (typ == 'str') {
+    len = val;
+  } else if (typ.startsWith('int')) {
+    len = parseInt(typ.replace('int', ''));
+  } else if (typ.startsWith('uint')) {
+    len = parseInt(typ.replace('uint', ''));
+  } else if (typ.startsWith('float')) {
+    len = parseInt(typ.replace('float', ''));
+  }
+  return len;
+}
+
 function findPgn(frm) {
   let pgn = getPgn(frm);
   let key = "nmea2000/" + pgn;
@@ -92,45 +115,12 @@ function findPgn(frm) {
   } else {
     key += "/-/-/-";
   }
-  let out = nmeadefs[key];
-  if (typeof out !== "undefined") {
+  if (typeof nmeadefs[key] !== "undefined") {
+    let out = JSON.parse(JSON.stringify(nmeadefs[key]));
     out.key = key;
-//     if (typeof out.repeat !== "undefined") {
-//       let tmp = new Array();
-//       let max = 0;
-//       for (let i in out.repeat) {
-//         if (out.repeat[i].field > max) {
-//           max = out.repeat[i].field;
-//         }
-//       }
-//       for (let i in out.fields) {
-//         if (out.fields[i].field <= max) {
-//           tmp.push(out.fields[i]);
-//         }
-//       }
-//       max++;
-//       for (let i in out.repeat) {
-//         let rep = out.repeat[i];
-//         for (let j in out.fields) {
-//           if (out.fields[j].field == rep.start) {
-//             for (let k = 0; k < rep.count; k++) {
-//               let fld = out.fields[(parseInt(j) + k)];
-//               fld.field = max++;
-//               tmp.push(fld);
-//             }
-//             break;
-//           }
-//         }
-//       }
-//       delete out.fields;
-//       out.fields = tmp;
-//       delete out.repeat;
-      
-// console.log(out)
-
-//     }  
+    return out;
   }    
-  return out;
+  return null;
 };
 
 
@@ -254,7 +244,7 @@ function setStatus(val, typ) {
 function decode(frm) {
   let msg = null;
   let def = findPgn(frm);
-  if (typeof def !== "undefined") {
+  if (def != null) {
     let raw = Buffer.alloc(4 + frm.data.length);
     let pgn = Buffer.from(frm.id.toString(16).padStart(8, '0'), "hex");
     pgn.copy(raw);
@@ -265,60 +255,72 @@ function decode(frm) {
       fields: new Array(),
       raw: raw,
     }
-    let ins = null;
-    let typ = null;
-    let pnt = 0;
-    let val = null;
     if (typeof def.repeat !== "undefined") {
+      let max = null;
       for (let i in def.repeat) {
-        let byt = 0;
+        let ptr = 0;
         for (let j in def.fields) {
           let fld = def.fields[j];
+          let len = 0;
           if (fld.field < def.repeat[i].field) {
-            if (fld.type.startsWith('bit(')) {
-              byt += parseInt(fld.type.replace('bit(', '').replace(')', ''));
-            } else if (fld.type.startsWith('chr(')) {
-              byt += parseInt(fld.type.replace('chr(', '').replace(')', ''));
-            } else if (fld.type == 'str') {
-              byt += frm.data.readUInt8(byt);
-            } else if (fld.type.startsWith('int')) {
-              byt += parseInt(fld.type.replace('int', ''));
-            } else if (fld.type.startsWith('uint')) {
-              byt += parseInt(fld.type.replace('uint', ''));
-            } else if (fld.type.startsWith('float')) {
-              byt += parseInt(fld.type.replace('float', ''));
+            if (fld.field > max) {
+              max = fld.field;
+            }
+            if ((fld.type == 'chr(x)') || (fld.type == 'str')) {
+              len = calcLenght(fld.type, frm.data.readUInt8(Math.floor(ptr / 8)));
+            } else {
+              len = calcLenght(fld.type);
+            }
+            if (len != null) {
+              ptr += len;
             }
           } else {
+            def.repeat[i].value = frm.data.readUInt8(Math.floor(ptr / 8));
+            max = fld.field;
             break;
           }
         }
-        def.repeat[i].byte = Math.ceil(byt / 8);
       }
+      let tmp = new Array();
+      for (let i in def.fields) {
+        let fld = def.fields[i];
+        if (fld.field <= max) {
+          tmp.push(fld);
+        }
+      }
+      for (let i in def.repeat) {
+        let rep = def.repeat[i];
+        if ((rep.value > 0) && (rep.value <= 252)) {
+          for (let j = 0; j < rep.value; j++) {
+            for (let k in def.fields) {
+              let fld = def.fields[k];
+              if ((fld.field >= rep.start) && (fld.field < (rep.start + rep.count))) {
+                fld.field = ++max;
+                tmp.push(fld);
+              }
+            }
+          }
+        }
+      }
+      delete def.repeat;
+      delete def.fields;
+      def.fields = tmp;
     }
-    for (let i in def.repeat) {
-
-console.log(def.repeat[i].byte)
-
-    }
+    let ins = null;
+    let typ = null;
+    let ptr = 0;
+    let val = null;
     for (let i in def.fields) {
       try {
         let fld = def.fields[i];
-        let byt = Math.floor(pnt / 8);
+        let byt = Math.floor(ptr / 8);
         let len = 0;
-        if (fld.type.startsWith('bit(')) {
-          len = parseInt(fld.type.replace('bit(', '').replace(')', ''));
-        } else if (fld.type.startsWith('chr(')) {
-          len = parseInt(fld.type.replace('chr(', '').replace(')', ''));
-        } else if (fld.type == 'str') {
-          len = frm.data.readUInt8(byt);
-        } else if (fld.type.startsWith('int')) {
-          len = parseInt(fld.type.replace('int', ''));
-        } else if (fld.type.startsWith('uint')) {
-          len = parseInt(fld.type.replace('uint', ''));
-        } else if (fld.type.startsWith('float')) {
-          len = parseInt(fld.type.replace('float', ''));
+        if ((fld.type == 'chr(x)') || (fld.type == 'str')) {
+          len = calcLenght(fld.type, frm.data.readUInt8(byt));
+        } else {
+          len = calcLenght(fld.type);
         }
-        if ((len > 0) && (frm.data.length >= (byt + len))) {
+        if ((len != null) && (len > 0) && (frm.data.length >= (byt + Math.ceil(len / 8)))) {
           fld.state = 'V';
           if (fld.type.startsWith('bit(')) {
             let cnt = Math.ceil(len / 8);
@@ -326,22 +328,29 @@ console.log(def.repeat[i].byte)
             frm.data.copy(buf, 0, byt, byt + cnt);
             let dat = buf.readBigUInt64LE(0);
             let msk = BigInt((1 << len) - 1)
-            let off = BigInt(pnt - (byt * 8));
+            let off = BigInt(ptr - (byt * 8));
             val = parseInt(((dat >> off) & msk).toString());
-            pnt += len;
+            ptr += len;
+          } else if (fld.type == 'chr(x)') {
+            if (len > 0) {
+              let buf = Buffer.alloc(len);
+              frm.data.copy(buf, 0, byt + 1);
+              val = buf.toString('utf8').replace(/[^\x01-\x7F]/g, "");
+            }
+            ptr += (len * 8);
           } else if (fld.type.startsWith('chr(')) {
             let buf = Buffer.alloc(len);
             frm.data.copy(buf, 0, byt);
-            val = buf.toString('utf8');
-            pnt += (len * 8);
+            val = buf.toString('utf8').replace(/[^\x01-\x7F]/g, "");
+            ptr += (len * 8);
           } else if (fld.type == 'str') {
             let asc = frm.data.readUInt8(byt + 1);
             if (len > 2) {
-              let buf = Buffer.alloc(len);
-              frm.data.copy(buf, 0, byt);
-              val = buf.toString(asc == 0 ? 'utf8' : 'utf16');
+              let buf = Buffer.alloc(len - 2);
+              frm.data.copy(buf, 0, byt + 2);
+              val = buf.toString(asc == 0 ? 'utf8' : 'ucs2').replace(/[^\x01-\x7F]/g, "");
             }
-            pnt += (len * 8);
+            ptr += (len * 8);
           } else {
             switch (fld.type) {
               case "int8":
@@ -389,9 +398,18 @@ console.log(def.repeat[i].byte)
             }
             fld.state = setStatus(val, fld.type);
             if (fld.multiplier != null) {
-              val *= fld.multiplier;
+              if (typeof val == 'bigint') {
+                if (fld.multiplier >= 1) {
+                  let mul = fld.multiplier;
+                  val *= BigInt(fld.multiplier);
+                } else {
+                  val /= BigInt(1 / fld.multiplier);
+                }
+              } else {
+                val *= fld.multiplier;
+              }
             }
-            pnt += (len * 8);
+            ptr += len;
           }
           fld.value = val;
           delete fld.multiplier;
@@ -405,7 +423,7 @@ console.log(def.repeat[i].byte)
           msg.fields.push(fld);
         }
       } catch (err) {
-// console.log("ERROR", pgn, frm, def, err)
+        console.log("ERROR", pgn, frm, def, err)
       }
     }
     if (ins != null) {

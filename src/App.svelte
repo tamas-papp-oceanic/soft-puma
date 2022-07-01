@@ -8,6 +8,7 @@
 	import NotFound from './routes/NotFound.svelte';
 	import Header from './components/Header.svelte';
 	import Devices from './routes/devices/Index.svelte';
+	import Monitor from './routes/Monitor.svelte';
 	import Simulate from './routes/Simulate.svelte';
 	import Configure from './routes/Configure.svelte';
 	import Program from './routes/program/Index.svelte';
@@ -53,6 +54,7 @@
 			}],
 		}),
 		"/devices/:address": Configure,
+		"/monitor/:address": Monitor,
 		"*": NotFound,
 	};
 </script>
