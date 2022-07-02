@@ -5,6 +5,7 @@ const serve = require('electron-serve');
 const loadURL = serve({ directory: 'public' });
 const can = require('./src/services/can.js');
 const ser = require('./src/services/serial.js');
+const com = require('./src/services/common.js');
 const nmea = require('./src/services/nmea.js');
 
 // const can = require('./src/services/can.js');
@@ -115,13 +116,13 @@ function proc(frm) {
   }
 }
 // Initialize NMEA translator
-nmea.init();
+com.init();
 // Load configurations
 ipcMain.on('n2k-ready', (e, ...args) => {
   const configs = ['classes', 'functions', 'industries', 'manufacturers'];
   for (let i in configs) {
     let cnf = configs[i];
-    let dat = nmea.load(cnf);
+    let dat = com.load(cnf);
     if (dat != null) {
       mainWindow.webContents.send('n2k-' + cnf.substring(0, 4), dat);
     }

@@ -65,7 +65,7 @@
         let obj = {
           id: key,
           msg: spl[1] + ' - ' + val.title,
-          ins: spl[5] != '-' ? spl[5] : '',
+          ins: (typeof val.header.ins !== 'undefined') ? val.header.ins : '-',
           raw: buf2hex(dat),
         };
         tmp.push(obj);
