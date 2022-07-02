@@ -1,82 +1,19 @@
 const com = require('./common.js');
 
 let fastbuff = {};
+let datrbuff = {};
 
 function unpack(frm) {
-  key = frm.id.toString(16).padStart(8, '0');
   if (com.isSingle(frm)) {
-    return frm;
+    let pgn = com.getPgn(frm);
+    switch (pgn) {
+      case 60160:
+        return decodeDataTransfer(frm);
+      case 60416:
+        return controlDataTransfer(frm);
+    }
   } else {
-    let fap = {};
-    let seq = parseInt(frm.data[0]) >> 5;
-    let cnt = parseInt(frm.data[0]) & 0x1F;
-    let min = 0;
-    if (typeof fastbuff[key] === "undefined") {
-      let len = parseInt(frm.data[1]);
-      fap = {
-        sequence: seq,
-        counter: cnt,
-        length: len,
-        index: 0,
-        start: Date.now(),
-        timeout: 750,
-        finished: false,
-        corrupted: cnt != 0,
-      };
-      if (len > 0) {
-        fap.data = Buffer.alloc(len);
-      } else {
-        fap.corrupted = true;
-      }
-      if (!fap.corrupted) {
-        min = Math.min(6, len);
-        let dat = Buffer.alloc(min);
-        for (let i = 0; i < min; i++) {
-          dat[i] = frm.data[i + 2];
-        }
-        dat.copy(fap.data);
-      }
-    } else {
-      fap = fastbuff[key];
-      min = Math.min(7, (fap.length - fap.index));
-      if (!fap.corrupted &&  (seq != fap.sequence)) {
-        fap.corrupted = true;
-      }
-      if (!fap.corrupted) {
-        if (cnt != (fap.counter + 1)) {
-          fap.corrupted = true;
-        } else {
-          fap.counter = cnt;
-        }
-      }
-      if (!fap.corrupted && ((Date.now() - fap.start) > fap.timeout)) {
-        fap.corrupted = true;
-      }
-      if (!fap.corrupted) {
-        let dat = Buffer.alloc(min);
-        for (let i = 0; i < min; i++) {
-          dat[i] = frm.data[i + 1];
-        }
-        dat.copy(fap.data, fap.index);
-      }
-    }
-    if (!fap.corrupted) {
-      fap.index += min;
-      fap.finished = (fap.index >= fap.length);
-    }
-    if (!fap.finished && !fap.corrupted) {
-      fastbuff[key] = fap;
-    } else {
-      delete fastbuff[key];
-    }
-    if (!fap.corrupted) {
-      if (fap.finished) {
-        delete frm.data;
-        frm.data = Buffer.alloc(fap.length);
-        fap.data.copy(frm.data);
-        return frm;
-      }
-    }
+    return decodeFastPacket(frm);
   }
   return null;
 };
@@ -287,6 +224,156 @@ function decode(frm) {
   }
   return msg;
 };
+
+// Controls data transfer
+function controlDataTransfer(frm) {
+  if (frm.raw.length < 8) {
+    return null;
+  }
+  let fun = frm.data.readUInt8(0);
+  switch (fun) {
+    case 0x10:
+    case 0x20:
+      let key = com.getSrc(frm);
+      if (typeof datrbuff[key] === "undefined") {
+        let len = frm.data.readUInt16LE(1);
+        let frs = frm.data.readUIntLE(5, 3);
+        tra = {
+          length: len,
+          frames: frs,
+          pgn: frm.data.readUIntLE(5, 3),
+          sequence: 0,
+          start: Date.now(),
+          timeout: frs * 200,
+          finished: false,
+          corrupted: false,
+        };
+        if (len > 0) {
+          fap.data = Buffer.alloc(len);
+        } else {
+          fap.corrupted = true;
+        }
+      }
+      break;
+  }
+  return null;
+}
+
+// Decodes data transfer messages
+function decodeDataTransfer(frm) {
+  let key = com.getSrc(frm);
+  let tra = datrbuff[key];
+  if (typeof tra !== "undefined") {
+    if (frm.raw.length < 8) {
+      tra.corrupted = true;
+    }
+    if (!tra,corupted) {
+      let seq = frm.data.readUInt8(0);
+      if (seq != (tra.sequence + 1)) {
+        tra.corrupted = true;
+      }
+    }
+    if (!tra,corupted) {
+      tra.sequence = seq;
+    }
+    if (!tra.corrupted && ((Date.now() - tra.start) > tra.timeout)) {
+      tra.corrupted = true;
+    }
+    if (!tra,corupted) {
+      frm.data.copy(tra.data, seq * 7, 1);
+      tra.finished = tra.sequence >= tra.frames;
+    }
+    if (!tra.finished && !tra.corrupted) {
+      datrbuff[key] = tra;
+    } else {
+      delete datrbuff[key];
+    }
+    if (!tra.corrupted) {
+      if (tra.finished) {
+        delete frm.data;
+        frm.data = Buffer.alloc(tra.length);
+        tra.data.copy(frm.data);
+        return frm;
+      }
+    }
+  }
+  return null;
+}
+
+function decodeFastPacket(frm) {
+  let fap = {};
+  let seq = parseInt(frm.data[0]) >> 5;
+  let cnt = parseInt(frm.data[0]) & 0x1F;
+  let min = 0;
+  let key = frm.id.toString(16).padStart(8, '0');
+  if (typeof fastbuff[key] === "undefined") {
+    let len = parseInt(frm.data[1]);
+    fap = {
+      sequence: seq,
+      counter: cnt,
+      length: len,
+      index: 0,
+      start: Date.now(),
+      timeout: 750,
+      finished: false,
+      corrupted: cnt != 0,
+    };
+    if (len > 0) {
+      fap.data = Buffer.alloc(len);
+    } else {
+      fap.corrupted = true;
+    }
+    if (!fap.corrupted) {
+      min = Math.min(6, len);
+      let dat = Buffer.alloc(min);
+      for (let i = 0; i < min; i++) {
+        dat[i] = frm.data[i + 2];
+      }
+      dat.copy(fap.data);
+    }
+  } else {
+    fap = fastbuff[key];
+    min = Math.min(7, (fap.length - fap.index));
+    if (!fap.corrupted &&  (seq != fap.sequence)) {
+      fap.corrupted = true;
+    }
+    if (!fap.corrupted) {
+      if (cnt != (fap.counter + 1)) {
+        fap.corrupted = true;
+      } else {
+        fap.counter = cnt;
+      }
+    }
+    if (!fap.corrupted && ((Date.now() - fap.start) > fap.timeout)) {
+      fap.corrupted = true;
+    }
+    if (!fap.corrupted) {
+      let dat = Buffer.alloc(min);
+      for (let i = 0; i < min; i++) {
+        dat[i] = frm.data[i + 1];
+      }
+      dat.copy(fap.data, fap.index);
+    }
+  }
+  if (!fap.corrupted) {
+    fap.index += min;
+    fap.finished = (fap.index >= fap.length);
+  }
+  if (!fap.finished && !fap.corrupted) {
+    fastbuff[key] = fap;
+  } else {
+    delete fastbuff[key];
+  }
+  if (!fap.corrupted) {
+    if (fap.finished) {
+      delete frm.data;
+      frm.data = Buffer.alloc(fap.length);
+      fap.data.copy(frm.data);
+      return frm;
+    }
+  }
+  return null;
+}
 
 module.exports = {
   unpack,
