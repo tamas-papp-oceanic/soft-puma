@@ -11,6 +11,8 @@ function unpack(frm) {
         return decodeDataTransfer(frm);
       case 60416:
         return controlDataTransfer(frm);
+      default:
+        return frm;
     }
   } else {
     return decodeFastPacket(frm);
