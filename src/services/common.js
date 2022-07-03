@@ -46,8 +46,8 @@ function load(cfg) {
 };
 
 // Returns with PGN value
-function getPgn(frm) {
-  let pgn = (frm.id & 0x1FFFF00) >> 8;
+function getPgn(par) {
+  let pgn = (par & 0x1FFFF00) >> 8;
 	if (((pgn >> 8) & 0xFF) < 0xF0)
 	{
 		pgn &= 0x1FF00;
@@ -56,13 +56,13 @@ function getPgn(frm) {
 };
 
 // Returns with CAN source
-function getSrc(frm) {
-  return frm.id & 0xFF;
+function getSrc(par) {
+  return par & 0xFF;
 };
 
 // Returns with CAN destination
-function getDst(frm) {
-  let pgn = (frm.id & 0x1FFFF00) >> 8;
+function getDst(par) {
+  let pgn = (par & 0x1FFFF00) >> 8;
 	if (((pgn >> 8) & 0xFF) < 0xF0)
 	{
 		return (pgn >> 8) & 0xFF;
@@ -71,8 +71,8 @@ function getDst(frm) {
 };
 
 // Returns with PGN definition
-function findPgn(frm) {
-  let pgn = getPgn(frm);
+function findDef(frm) {
+  let pgn = getPgn(frm.id);
   let key = "nmea2000/" + pgn.toString().padStart(6, '0');
   let cnv = nmeaconv[key];
   if (typeof cnv !== "undefined") {
@@ -100,15 +100,14 @@ function findPgn(frm) {
 
 // Returns true if proprietary
 function isProprietary(pgn) {
-  if ((pgn == "061184") || ((pgn >= "065280") && (pgn <= "065535")) || 
-    (pgn == "126720") || ((pgn >= "130816") && (pgn <= "131071"))) {
+  if ((pgn == 61184) || ((pgn >= 65280) && (pgn <= 65535)) || 
+    (pgn == 126720) || ((pgn >= 130816) && (pgn <= 131071))) {
     return true;
   }
   return false;
 }
 
-function isSingle(frm) {
-  let pgn = getPgn(frm);
+function isSingle(pgn) {
   if (isProprietary(pgn)) {
     return (pgn <= 65535);
   } else {
@@ -188,7 +187,7 @@ module.exports = {
   getPgn,
   getSrc,
   getDst,
-  findPgn,
+  findDef,
   isProprietary,
   isSingle,
   calcLength,
