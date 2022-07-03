@@ -239,7 +239,7 @@ function controlDataTransfer(frm) {
       let key = com.getSrc(frm);
       if (typeof datrbuff[key] === "undefined") {
         let len = frm.data.readUInt16LE(1);
-        let frs = frm.data.readUIntLE(5, 3);
+        let frs = frm.data.readUInt8(3);
         tra = {
           length: len,
           frames: frs,
@@ -250,10 +250,8 @@ function controlDataTransfer(frm) {
           finished: false,
           corrupted: false,
         };
-        if (len > 0) {
-          fap.data = Buffer.alloc(len);
-        } else {
-          fap.corrupted = true;
+        if ((len >= 9) && (len <= 1785)) {
+          tra.data = Buffer.alloc(len);
         }
       }
       break;
@@ -304,12 +302,12 @@ function decodeDataTransfer(frm) {
 
 function decodeFastPacket(frm) {
   let fap = {};
-  let seq = parseInt(frm.data[0]) >> 5;
-  let cnt = parseInt(frm.data[0]) & 0x1F;
+  let seq = frm.data.readUInt8(0) >> 5;
+  let cnt = frm.data.readUInt8(0) & 0x1F;
   let min = 0;
   let key = frm.id.toString(16).padStart(8, '0');
   if (typeof fastbuff[key] === "undefined") {
-    let len = parseInt(frm.data[1]);
+    let len = frm.data.readUInt8(1);
     fap = {
       sequence: seq,
       counter: cnt,
@@ -329,7 +327,7 @@ function decodeFastPacket(frm) {
       min = Math.min(6, len);
       let dat = Buffer.alloc(min);
       for (let i = 0; i < min; i++) {
-        dat[i] = frm.data[i + 2];
+        dat[i] = frm.data.readUInt8(i + 2);
       }
       dat.copy(fap.data);
     }
@@ -352,7 +350,7 @@ function decodeFastPacket(frm) {
     if (!fap.corrupted) {
       let dat = Buffer.alloc(min);
       for (let i = 0; i < min; i++) {
-        dat[i] = frm.data[i + 1];
+        dat[i] = frm.data.readUInt8(i + 1);
       }
       dat.copy(fap.data, fap.index);
     }
