@@ -128,7 +128,10 @@ ipcMain.on('n2k-ready', (e, ...args) => {
     }
   };
 });
-
+// Processing outgoing message
+ipcMain.on('n2k-data', (e, ...args) => {
+  nmea.send(args[0]);
+});
 // Start can processing
 ipcMain.on('can-start', (e, ...args) => {
   can.start(proc);

@@ -123,7 +123,7 @@ function decode(frm) {
             frm.data.copy(buf, 0, byt + 1);
             val = buf.toString('utf8').replace(/[^\x01-\x7F]/g, "");
           }
-          ptr += (len * 8);
+          ptr += ((len + 1) * 8);
         } else if (fld.type.startsWith('chr(')) {
           let buf = Buffer.alloc(len);
           frm.data.copy(buf, 0, byt);
@@ -182,7 +182,7 @@ function decode(frm) {
               val = frm.data.readDoubleLE(byt);
               break;
           }
-          fld.state = com.getStatus(val, fld.type);
+          fld.state = com.getStatus(fld.type, val);
           if (fld.multiplier != null) {
             if (typeof val == 'bigint') {
               if (fld.multiplier >= 1) {

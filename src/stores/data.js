@@ -7,6 +7,38 @@ export const manu = writable({});
 export const name = writable({});
 export const data = writable({});
 
+setTimeout(() => {
+
+  let msg = {
+    key: 'nmea2000/127501/-/-/-/0/-',
+    header: {
+      pgn: 127505,
+      src: 0,
+      dst: 255,
+    },
+    fields: new Array(
+      {
+        field: 1,
+        state: 'V',
+        type: 'bit(2)',
+        value: 0,
+      }
+    ),
+    raw: new Array(12),
+  }
+  for (let i = 1; i <= 28; i++) {
+    msg.fields.push({
+      field: i + 1,
+      state: 'V',
+      type: 'bit(2)',
+      value: 0,
+    });
+  }
+  window.pumaAPI.send('n2k-data', msg);
+}, 1000);
+
+
+
 window.pumaAPI.send('n2k-ready');
 
 window.pumaAPI.recv('n2k-clas', (e, val) => {

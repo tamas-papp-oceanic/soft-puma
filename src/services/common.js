@@ -70,6 +70,16 @@ function getDst(par) {
   return 0xFF;
 };
 
+// Makes PGN value
+function makePgn(par) {
+  let pgn = par.pgn;
+	if (((pgn >> 8) & 0xFF) < 0xF0)
+	{
+		pgn != par.dst;
+	}
+  return (pgn << 8) | par.src;
+};
+
 // Returns with PGN definition
 function findDef(frm) {
   let pgn = getPgn(frm.id);
@@ -95,6 +105,14 @@ function findDef(frm) {
     out.key = key;
     return out;
   }    
+  return null;
+};
+
+// Returns with PGN definition
+function getDef(key) {
+  if (typeof nmeadefs[key] !== "undefined") {
+    return JSON.parse(JSON.stringify(nmeadefs[key]));
+  }
   return null;
 };
 
@@ -145,7 +163,7 @@ function calcLength(typ, val) {
 }
 
 // Returns with field status
-function getStatus(val, typ) {
+function getStatus(typ, val) {
   let sts = 'V';
   if (typ.startsWith('int')) {
     let bit = parseInt(typ.replace('int', ''));
@@ -181,15 +199,28 @@ function getStatus(val, typ) {
   return sts;
 };
 
+// Returns with field
+function getField(fld, fls) {
+  for (let i in fls) {
+    if (fls[i].field == fld) {
+      return fls[i];
+    }
+  }
+  return null;
+};
+
 module.exports = {
   init,
   load,
   getPgn,
   getSrc,
   getDst,
+  makePgn,
   findDef,
+  getDef,
   isProprietary,
   isSingle,
   calcLength,
   getStatus,
+  getField,
 };

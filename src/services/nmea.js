@@ -1,4 +1,5 @@
 const dec = require('./decode.js');
+const enc = require('./encode.js');
 
 // NMEA data processing function
 function process(frm) {
@@ -12,6 +13,19 @@ function process(frm) {
   return null;
 }
 
+// NMEA data sending function
+function send(msg) {
+  let frm = enc.encode(msg);
+  if (frm != null) {
+    let tmp = enc.pack(frm);
+    if (tmp != null) {
+      return tmp;
+    }
+  }
+  return null;
+}
+
 module.exports = {
   process,
+  send,
 };
