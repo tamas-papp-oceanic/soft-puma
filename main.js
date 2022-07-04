@@ -104,14 +104,16 @@ tool.create();
 function proc(frm) {
   let msg = nmea.process(frm);
   if (msg != null) {
-    if (msg.key.startsWith('nmea2000/060928')) {
-      // Store as name field
-      mainWindow.webContents.send('n2k-name', msg);
-    } else if (msg.key.startsWith('nmea2000/126996')) {
-      // Store as product information
-      mainWindow.webContents.send('n2k-prod', msg);
-    } else {
-      mainWindow.webContents.send('n2k-data', msg);
+    switch (msg.header.pgn) {
+      case 60928:
+        mainWindow.webContents.send('n2k-name', msg);
+        break;
+      case 126996:
+        mainWindow.webContents.send('n2k-prod', msg);
+        break;
+      default:
+        mainWindow.webContents.send('n2k-data', msg);
+        break;
     }
   }
 }
@@ -130,10 +132,12 @@ ipcMain.on('n2k-ready', (e, ...args) => {
 });
 // Processing outgoing message
 ipcMain.on('n2k-data', (e, ...args) => {
-  let frm = nmea.create(args[0]);
-
-console.log(frm);
-
+  let frs = nmea.create(args[0]);
+  if ((frs != null) && Array.isArray(frs)) {
+    for (let i in frs) {
+      can.send(frs[i]);
+    }
+  }
 });
 // Start can processing
 ipcMain.on('can-start', (e, ...args) => {

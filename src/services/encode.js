@@ -215,24 +215,20 @@ function encodeFastPacket(fap) {
     ext: fap.ext,
     rtr: fap.rtr,
     data: Buffer.alloc(8),
-    t_sec: 0,
-    t_usec: 0,
   };
   for (let i in fap.data) {
     if ((cnt % 8) == 0) {
-      rec.data.writeUInt8((seq << 5) + frm, cnt);
+      rec.data.writeUInt8((seq << 5) + frm, (cnt % 8));
       if (cnt == 0) {
-        rec.data.writeUInt8(frm.data.length, ++cnt);
+        cnt++
+        rec.data.writeUInt8(frm.data.length, (cnt % 8));
       }
       frm++
       cnt++
     }
-    rec.data.writeUInt8(fap.data[i], cnt);
+    rec.data.writeUInt8(fap.data[i], (cnt % 8));
     cnt++
     if ((cnt % 8) == 0) {
-      let tim = Date.now() / 1000;
-      rec.t_sec = Math.floor(tim);
-      rec.t_usec = Math.round((tim - Math.floor(tim)) * 1000000);
       ret.push(rec);
       delete rec.data;
       rec.data = Buffer.alloc(8);

@@ -29,6 +29,12 @@ function start(fun) {
   }
 };
 
+function send(dat) {
+  if (cha != null) {
+    cha.send(dat);
+  }
+};
+
 function stop() {
   if (cha != null) {
     cha.stop();
@@ -37,5 +43,6 @@ function stop() {
 
 module.exports = {
   start,
+  send,
   stop,
 };
