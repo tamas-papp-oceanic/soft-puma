@@ -1,12 +1,11 @@
 const com = require('./common.js');
 
-// let fastbuff = {};
-// let datrbuff = {};
+let fastbuff = {};
 
 function pack(frm) {
   let pgn = com.getPgn(frm.id);
   if (com.isSingle(pgn)) {
-    return frm;
+    return [frm];
   } else {
     return encodeFastPacket(frm);
   }
@@ -22,7 +21,6 @@ function encode(msg) {
   if (def == null) {
     return null;
   }
-  let frm = null;
   if (typeof def.repeat !== "undefined") {
     let max = null;
     for (let i in def.repeat) {
@@ -80,13 +78,8 @@ function encode(msg) {
       ptr += len;
     }
   }
-  let raw = Buffer.alloc(4 + Math.ceil(ptr / 8));
-  let pgn = Buffer.from(com.makePgn(msg.header).toString(16).padStart(8, '0'), "hex");
-  pgn.copy(raw);
-  // let ins = null;
-  // let typ = null;
+  let raw = Buffer.alloc(Math.ceil(ptr / 8));
   ptr = 0;
-  // let val = null;
   for (let i in def.fields) {
     try {
       let fld = def.fields[i];
@@ -101,26 +94,29 @@ function encode(msg) {
       if ((len != null) && (len > 0)) {
         if (fld.type.startsWith('bit(')) {
           let cnt = Math.ceil(len / 8);
-          let val = BigInt(raw.readUIntLE(byt + 4, cnt));
+          let buf = Buffer.alloc(8);
+          raw.copy(buf, 0, byt, byt + cnt);
+          let dat = buf.readBigUInt64LE(0);
           let msk = BigInt((1 << len) - 1)
           let off = BigInt(ptr - (byt * 8));
-          val += ((BigInt(mfl.value) & msk) << off);
-          raw.writeUIntLE(val, byt + 4, cnt)
+          dat = dat | ((BigInt(mfl.value) & msk) << off);
+          buf.writeBigUInt64LE(dat);
+          buf.copy(raw, byt);
           ptr += len;
         } else if (fld.type == 'chr(x)') {
-          raw.writeUInt8LE(len, byt + 4,);
+          raw.writeUInt8LE(len, byt,);
           if (len > 0) {
-            raw.write(mfl.value, byt + 4 + 1, 'utf8');
+            raw.write(mfl.value, byt + 1, 'utf8');
           }
           ptr += ((len + 1) * 8);
         } else if (fld.type.startsWith('chr(')) {
-          raw.write(mfl.value, byt + 4, 'utf8');
+          raw.write(mfl.value, byt, 'utf8');
           ptr += (len * 8);
         } else if (fld.type == 'str') {
-          raw.writeUInt8LE(len, byt + 4,);
-          raw.writeUInt8LE(0, byt + 4 + 1,);
+          raw.writeUInt8LE(len, byt,);
+          raw.writeUInt8LE(0, byt + 1,);
           if (len > 0) {
-            raw.write(mfl.value, byt + 4, 'utf8');
+            raw.write(mfl.value, byt, 'utf8');
           }
           ptr += ((len + 2) * 8);
         } else {
@@ -137,146 +133,112 @@ function encode(msg) {
           }
           switch (fld.type) {
             case "int8":
-              raw.writeInt8(Math.round(mfl.value), byt + 4);
+              raw.writeInt8(Math.round(mfl.value), byt);
               break;
             case "uint8":
-              raw.writeUInt8(Math.round(mfl.value), byt + 4);
+              raw.writeUInt8(Math.round(mfl.value), byt);
               break;
             case "int16":
-              raw.writeInt16LE(Math.round(mfl.value), byt + 4);
+              raw.writeInt16LE(Math.round(mfl.value), byt);
               break;
             case "uint16":
-              raw.writeUInt16LE(Math.round(mfl.value), byt + 4);
+              raw.writeUInt16LE(Math.round(mfl.value), byt);
               break;
             case "int24":
-              raw.writeIntLE(Math.round(mfl.value), byt + 4, 3);
+              raw.writeIntLE(Math.round(mfl.value), byt, 3);
               break;
             case "uint24":
-              raw.writeUIntLE(Math.round(mfl.value), byt + 4, 3);
+              raw.writeUIntLE(Math.round(mfl.value), byt, 3);
               break;
             case "int32":
-              raw.writeInt32LE(Math.round(mfl.value), byt + 4);
+              raw.writeInt32LE(Math.round(mfl.value), byt);
               break;
             case "uint32":
-              raw.writeUInt32LE(Math.round(mfl.value), byt + 4);
+              raw.writeUInt32LE(Math.round(mfl.value), byt);
               break;
             case "float32":
-              raw.writeFloatLE(mfl.value, byt + 4);
+              raw.writeFloatLE(mfl.value, byt);
               break;
             case "int48":
-              raw.writeIntLE(Math.round(mfl.value), byt + 4, 6);
+              raw.writeIntLE(Math.round(mfl.value), byt, 6);
               break;
             case "uint48":
-              raw.writeUIntLE(Math.round(mfl.value), byt + 4, 6);
+              raw.writeUIntLE(Math.round(mfl.value), byt, 6);
               break;
             case "int64":
-              raw.writeBigInt64LE(Math.round(mfl.value), byt + 4);
+              raw.writeBigInt64LE(Math.round(mfl.value), byt);
               break;
             case "uint64":
-              raw.writeBigUInt64LE(Math.round(mfl.value), byt + 4);
+              raw.writeBigUInt64LE(Math.round(mfl.value), byt);
               break;
             case "float64":
-              raw.writeDoubleLE(mfl.value, byt + 4);
+              raw.writeDoubleLE(mfl.value, byt);
               break;
           }
           ptr += len;
         }
       }
     } catch (err) {
-      // console.log("ERROR", pgn, frm, def, err)
-      console.log(err)
+      console.log("ERROR", err);
     }
   }
-console.log(raw)
-  // if (ins != null) {
-  //   msg.key += "/" + ins;
-  // } else {
-  //   msg.key += "/-";
-  // }
-  // if (ins != null) {
-  //   msg.header.ins = ins;
-  // }
-  // if (typ != null) {
-  //   msg.key += "/" + typ;
-  // } else {
-  //   msg.key += "/-";
-  // }
-  // return msg;
+  let tim = Date.now() / 1000;
+  let frm = {
+    id: com.makePgn(msg.header),
+    ext: true,
+    rtr: false,
+    data: Buffer.alloc(raw.length),
+    t_sec: Math.floor(tim),
+    t_usec: Math.round((tim - Math.floor(tim)) * 1000000),
+  };
+  raw.copy(frm.data);
+  return frm;
 };
 
-function encodeFastPacket(frm) {
-  let fap = {};
-  let seq = frm.data.readUInt8(0) >> 5;
-  let cnt = frm.data.readUInt8(0) & 0x1F;
-  let min = 0;
+function encodeFastPacket(fap) {
+  if (fap.data.length == 0) {
+    return null;
+  }
+  let ret = new Array();
+  let seq = 0;
+  let frm = 0;
+  let cnt = 0;
   let key = frm.id.toString(16).padStart(8, '0');
-  if (typeof fastbuff[key] === "undefined") {
-    let len = frm.data.readUInt8(1);
-    fap = {
-      sequence: seq,
-      counter: cnt,
-      length: len,
-      index: 0,
-      start: Date.now(),
-      timeout: 750,
-      finished: false,
-      corrupted: cnt != 0,
-    };
-    if (len > 0) {
-      fap.data = Buffer.alloc(len);
-    } else {
-      fap.corrupted = true;
-    }
-    if (!fap.corrupted) {
-      min = Math.min(6, len);
-      let dat = Buffer.alloc(min);
-      for (let i = 0; i < min; i++) {
-        dat[i] = frm.data.readUInt8(i + 2);
+  if (typeof fastbuff[key] !== "undefined") {
+    seq = fastbuff[key];
+  }
+  seq++
+  seq &= 0b111;
+  fastbuff[key] = seq;
+  let rec = {
+    id: fap.id,
+    ext: fap.ext,
+    rtr: fap.rtr,
+    data: Buffer.alloc(8),
+    t_sec: 0,
+    t_usec: 0,
+  };
+  for (let i in fap.data) {
+    if ((cnt % 8) == 0) {
+      rec.data.writeUInt8((seq << 5) + frm, cnt);
+      if (cnt == 0) {
+        rec.data.writeUInt8(frm.data.length, ++cnt);
       }
-      dat.copy(fap.data);
+      frm++
+      cnt++
     }
-  } else {
-    fap = fastbuff[key];
-    min = Math.min(7, (fap.length - fap.index));
-    if (!fap.corrupted &&  (seq != fap.sequence)) {
-      fap.corrupted = true;
-    }
-    if (!fap.corrupted) {
-      if (cnt != (fap.counter + 1)) {
-        fap.corrupted = true;
-      } else {
-        fap.counter = cnt;
-      }
-    }
-    if (!fap.corrupted && ((Date.now() - fap.start) > fap.timeout)) {
-      fap.corrupted = true;
-    }
-    if (!fap.corrupted) {
-      let dat = Buffer.alloc(min);
-      for (let i = 0; i < min; i++) {
-        dat[i] = frm.data.readUInt8(i + 1);
-      }
-      dat.copy(fap.data, fap.index);
+    rec.data.writeUInt8(fap.data[i], cnt);
+    cnt++
+    if ((cnt % 8) == 0) {
+      let tim = Date.now() / 1000;
+      rec.t_sec = Math.floor(tim);
+      rec.t_usec = Math.round((tim - Math.floor(tim)) * 1000000);
+      ret.push(rec);
+      delete rec.data;
+      rec.data = Buffer.alloc(8);
     }
   }
-  if (!fap.corrupted) {
-    fap.index += min;
-    fap.finished = (fap.index >= fap.length);
-  }
-  if (!fap.finished && !fap.corrupted) {
-    fastbuff[key] = fap;
-  } else {
-    delete fastbuff[key];
-  }
-  if (!fap.corrupted) {
-    if (fap.finished) {
-      delete frm.data;
-      frm.data = Buffer.alloc(fap.length);
-      fap.data.copy(frm.data);
-      return frm;
-    }
-  }
-  return null;
+  return ret;
 }
 
 module.exports = {

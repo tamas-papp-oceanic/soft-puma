@@ -130,7 +130,10 @@ ipcMain.on('n2k-ready', (e, ...args) => {
 });
 // Processing outgoing message
 ipcMain.on('n2k-data', (e, ...args) => {
-  nmea.send(args[0]);
+  let frm = nmea.create(args[0]);
+
+console.log(frm);
+
 });
 // Start can processing
 ipcMain.on('can-start', (e, ...args) => {

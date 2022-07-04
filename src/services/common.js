@@ -75,7 +75,7 @@ function makePgn(par) {
   let pgn = par.pgn;
 	if (((pgn >> 8) & 0xFF) < 0xF0)
 	{
-		pgn != par.dst;
+		pgn |= par.dst;
 	}
   return (pgn << 8) | par.src;
 };

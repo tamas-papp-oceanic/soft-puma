@@ -13,8 +13,8 @@ function process(frm) {
   return null;
 }
 
-// NMEA data sending function
-function send(msg) {
+// NMEA data creating function
+function create(msg) {
   let frm = enc.encode(msg);
   if (frm != null) {
     let tmp = enc.pack(frm);
@@ -27,5 +27,5 @@ function send(msg) {
 
 module.exports = {
   process,
-  send,
+  create,
 };

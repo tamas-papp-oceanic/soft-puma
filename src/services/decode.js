@@ -208,7 +208,7 @@ function decode(frm) {
         msg.fields.push(fld);
       }
     } catch (err) {
-      console.log("ERROR", pgn, frm, def, err)
+      console.log("ERROR", err)
     }
   }
   if (ins != null) {

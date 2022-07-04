@@ -10,9 +10,9 @@ export const data = writable({});
 setTimeout(() => {
 
   let msg = {
-    key: 'nmea2000/127501/-/-/-/0/-',
+    key: 'nmea2000/059904/-/-/-/-/-',
     header: {
-      pgn: 127505,
+      pgn: 59904,
       src: 0,
       dst: 255,
     },
@@ -20,20 +20,11 @@ setTimeout(() => {
       {
         field: 1,
         state: 'V',
-        type: 'bit(2)',
-        value: 0,
+        type: 'uint24',
+        value: 60928,
       }
     ),
-    raw: new Array(12),
-  }
-  for (let i = 1; i <= 28; i++) {
-    msg.fields.push({
-      field: i + 1,
-      state: 'V',
-      type: 'bit(2)',
-      value: 0,
-    });
-  }
+  };
   window.pumaAPI.send('n2k-data', msg);
 }, 1000);
 

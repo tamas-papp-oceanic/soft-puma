@@ -8,21 +8,7 @@
   const headers = [{
     key: "msg",
     value: "Message",
-    sort: (a, b) => {
-      if (a.msg < b.msg) {
-        return -1;
-      } else if (a.msg > b.msg) {
-        return 1;
-      } else {
-        if (a.ins < b.ins) {
-          return -1;
-        } else if (a.ins > b.ins) {
-          return 1;
-        } else {
-          return 0;
-        }
-      }
-    }
+    sort: (a, b) => a.key - b.key,
   },{
     key: "ins",
     value: "Instance",
@@ -53,8 +39,18 @@
   };
 
   // Data getters, setters
-  $: title = 'Messages of ' + $name[parseInt(params["address"])].manufacturer;
-  $: description = $name[parseInt(params["address"])].modelID != null ? $name[parseInt(params["address"])].modelID : '';
+  $: {
+    let nam = $name[parseInt(params["address"])];
+    if (typeof nam !== "undefined") {
+      title = 'Messages of ' + nam.manufacturer;
+      description = nam.modelID != null ? nam.modelID : '';
+    } else {
+      title = 'Messages';
+      description = '';
+    }
+  
+  console.log(title, description)
+  }
   $: {
     let tmp = new Array();
     for (const [key, val] of Object.entries($data)) {
@@ -66,6 +62,7 @@
           id: key,
           msg: spl[1] + ' - ' + val.title,
           ins: (typeof val.header.ins !== 'undefined') ? val.header.ins : '-',
+          key: (parseInt(spl[1]) * 10) + ((typeof val.header.ins !== 'undefined') ? parseInt(val.header.ins) : 0),
           raw: buf2hex(dat),
         };
         tmp.push(obj);
