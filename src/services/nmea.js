@@ -2,6 +2,12 @@ const dec = require('./decode.js');
 const enc = require('./encode.js');
 const com = require('./common.js');
 const adr = require('./address.js');
+const can = require('./can.js');
+
+// Initializes NMEA engine
+function init() {
+  adr.start(send);
+};
 
 // NMEA data processing function
 function process(frm) {
@@ -20,7 +26,7 @@ function process(frm) {
           break;
         case 65240:
           // ISO Commanded Address
-          proc065240(msg);
+          adr.proc065240(msg);
           break;
         case 65280:
           // Proprietary Command
@@ -55,6 +61,16 @@ function create(msg) {
     if (tmp != null) {
       return tmp;
     }
+  }
+  return null;
+};
+
+// NMEA data sending function
+function send(msg) {
+  let frs = create(msg);
+  for (let i in frs) {
+    let j = can.send(frs[i]);
+    console.log(j)
   }
   return null;
 };
@@ -99,6 +115,8 @@ function proc126208(msg) {};
 function proc126996(msg) {};
 
 module.exports = {
+  init,
   process,
   create,
+  send,
 };

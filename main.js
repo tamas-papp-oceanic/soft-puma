@@ -98,8 +98,8 @@ app.on('activate', function () {
 // code. You can also put them in separate files and require them here.
 // Data processing
 // FOR INIT ONLY
-let tool = require('./src/tools/nmea.js');
-tool.create();
+// let tool = require('./src/tools/nmea.js');
+// tool.create();
 // NMEA processing
 function proc(frm) {
   let msg = nmea.process(frm);
@@ -119,6 +119,8 @@ function proc(frm) {
 }
 // Initialize NMEA translator
 com.init();
+// Initialize NMEA engine
+nmea.init();
 // Load configurations
 ipcMain.on('n2k-ready', (e, ...args) => {
   const configs = ['classes', 'functions', 'industries', 'manufacturers'];
