@@ -25,8 +25,6 @@ const s5 = asm.createState('Valid', false, s5Entry);
 const s6 = asm.createState('WaitForDelay6', false, s6Entry);
 const s7 = asm.createState('TransmitNew7', false, s7Entry);
 const s8 = asm.createState('WaitForCommand', false, s8Entry);
-
-
 const s9 = asm.createState('TransmitNew9', false, s9Entry);
 const s10 = asm.createState( "Final", true, final); 
 
@@ -35,12 +33,19 @@ s0.addTransition('next', s1);
 s1.addTransition('next', s2);
 s2.addTransition('succ', s3);
 s2.addTransition('fail', s1);
-s3.addTransition('win', s5);
+s3.addTransition('next', s5);
+s3.addTransition('win', s2);
+s3.addTransition('cmd', s2);
+s3.addTransition('loose', s4);
 s4.addTransition('succ', s2);
 s4.addTransition('fail', s6);
+s5.addTransition('win', s9);
+s5.addTransition('loose', s4);
+s5.addTransition('cmd', s2);
 s6.addTransition('next', s7);
 s7.addTransition('succ', s8);
 s7.addTransition('fail', s6);
+s8.addTransition('cmd', s2);
 s9.addTransition('succ', s5);
 s9.addTransition('fail', s1);
 
@@ -83,7 +88,7 @@ function s3Entry(state, context) {
   console.log(state.name)
 
   timeout = setTimeout(() => {
-    state.trigger('win');
+    state.trigger('next');
   }, 251);
 };
 // FetchNext
@@ -151,9 +156,6 @@ function s9Entry(state, context) {
   // state.trigger('fail');
 };
 
-function entryAction(state, context) {
-  console.log(state.name, asm.currentState.name)
-};
 function final(state, context) {
   console.log(state.name, asm.currentState.name)
 };
@@ -178,15 +180,11 @@ function proc060928(msg) {
       our.swap64()
       if (raw.compare(our, 0, 7, 0, 7) == -1) {
         // Iwin
-        if (asm.currentState.name == 'WaitForContention') {
-          asm.trigger('transmit-new-2');
-        } else {
-          asm.trigger('transmit-new-9');
-        }
+        asm.currentState.trigger('win');
         return
       }
       // Ilose
-      asm.trigger('FetchNext');
+      asm.currentState.trigger('loose');
   }
   return;
 };
@@ -203,7 +201,7 @@ function proc065240(msg) {
       }
       if (msg.raw.compare(ourname, 0, 7, 0, 7) == 0) {
         our = msg.raw.readUInt8(8);
-        asm.trigger('transmit-new-2');
+        asm.currentState.trigger('cmd');
       }
   }
   return;

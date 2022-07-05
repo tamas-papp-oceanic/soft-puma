@@ -72,7 +72,7 @@ function send(msg) {
     let j = can.send(frs[i]);
     console.log(j)
   }
-  return null;
+  return true;
 };
 
 // Process ISO Request message
