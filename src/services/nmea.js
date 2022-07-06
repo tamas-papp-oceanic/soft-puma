@@ -6,7 +6,7 @@ const can = require('./can.js');
 
 // Initializes NMEA engine
 function init() {
-  adr.start(send);
+  adr.start(sendRaw);
 };
 
 // NMEA data processing function
@@ -65,14 +65,29 @@ function create(msg) {
   return null;
 };
 
-// NMEA data sending function
-function send(msg) {
+// NMEA message sending function
+function sendMsg(msg) {
   let frs = create(msg);
   for (let i in frs) {
-    let j = can.send(frs[i]);
-    console.log(j)
+    try {
+      can.send(frs[i]);
+    } catch (err) {
+      console.log(err);
+      return false;
+    }
   }
   return true;
+};
+
+// NMEA raw sending function
+function sendRaw(frm) {
+  try {
+    can.send(frm);
+    return true;
+  } catch (err) {
+    console.log(err);
+    return false;
+  }
 };
 
 // Process ISO Request message
@@ -118,5 +133,6 @@ module.exports = {
   init,
   process,
   create,
-  send,
+  sendMsg,
+  sendRaw,
 };

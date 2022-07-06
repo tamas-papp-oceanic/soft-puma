@@ -4,18 +4,22 @@ let fastbuff = {};
 let datrbuff = {};
 
 function unpack(frm) {
-  let pgn = com.getPgn(frm.id);
-  if (com.isSingle(pgn)) {
-    switch (pgn) {
-      case 60160:
-        return decodeDataTransfer(frm);
-      case 60416:
-        return controlDataTransfer(frm);
-      default:
-        return frm;
+  if (frm.data.length > 0) {
+    let pgn = com.getPgn(frm.id);
+    if (com.isSingle(pgn)) {
+      switch (pgn) {
+        case 60160:
+          return decodeDataTransfer(frm);
+        case 60416:
+          return controlDataTransfer(frm);
+        default:
+          return frm;
+      }
+    } else {
+      return decodeFastPacket(frm);
     }
   } else {
-    return decodeFastPacket(frm);
+    return null;
   }
 };
 
@@ -34,6 +38,7 @@ function decode(frm) {
     key: def.key,
     header: {
       pgn: com.getPgn(frm.id),
+      pri: com.getPri(frm.id),
       src: com.getSrc(frm.id),
       dst: com.getDst(frm.id),
     },

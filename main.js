@@ -134,12 +134,7 @@ ipcMain.on('n2k-ready', (e, ...args) => {
 });
 // Processing outgoing message
 ipcMain.on('n2k-data', (e, ...args) => {
-  let frs = nmea.create(args[0]);
-  if ((frs != null) && Array.isArray(frs)) {
-    for (let i in frs) {
-      can.send(frs[i]);
-    }
-  }
+  nmea.sendMsg(args[0]);
 });
 // Start can processing
 ipcMain.on('can-start', (e, ...args) => {

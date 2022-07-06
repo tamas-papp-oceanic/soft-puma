@@ -48,8 +48,6 @@
       title = 'Messages';
       description = '';
     }
-  
-  console.log(title, description)
   }
   $: {
     let tmp = new Array();

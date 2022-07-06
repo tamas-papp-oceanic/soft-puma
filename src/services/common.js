@@ -55,6 +55,11 @@ function getPgn(par) {
   return pgn;
 };
 
+// Returns with priority
+function getPri(par) {
+  return (par >> 26) & 0x0F;
+};
+
 // Returns with CAN source
 function getSrc(par) {
   return par & 0xFF;
@@ -73,11 +78,10 @@ function getDst(par) {
 // Makes PGN value
 function makePgn(par) {
   let pgn = par.pgn;
-	if (((pgn >> 8) & 0xFF) < 0xF0)
-	{
-		pgn |= par.dst;
+	if (((pgn >> 8) & 0xFF) < 0xF0) {
+    pgn |= (par.dst | 0xFF);
 	}
-  return (pgn << 8) | par.src;
+  return (pgn << 8) | ((par.pri & 0x0F) << 26) | (par.src & 0xF);
 };
 
 // Returns with PGN definition
@@ -213,6 +217,7 @@ module.exports = {
   init,
   load,
   getPgn,
+  getPri,
   getSrc,
   getDst,
   makePgn,

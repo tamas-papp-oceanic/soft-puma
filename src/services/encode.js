@@ -21,6 +21,7 @@ function encode(msg) {
   if (def == null) {
     return null;
   }
+  msg.header.pri = def.priority;
   if (typeof def.repeat !== "undefined") {
     let max = null;
     for (let i in def.repeat) {
@@ -60,7 +61,6 @@ function encode(msg) {
         }
       }
     }
-    delete def.repeat;
     delete def.fields;
     def.fields = tmp;
   }
@@ -182,14 +182,11 @@ function encode(msg) {
       console.log("ERROR", err);
     }
   }
-  let tim = Date.now() / 1000;
   let frm = {
     id: com.makePgn(msg.header),
     ext: true,
     rtr: false,
     data: Buffer.alloc(raw.length),
-    t_sec: Math.floor(tim),
-    t_usec: Math.round((tim - Math.floor(tim)) * 1000000),
   };
   raw.copy(frm.data);
   return frm;
