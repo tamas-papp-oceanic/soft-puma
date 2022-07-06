@@ -41,7 +41,7 @@ s3.addTransition('loose', s4);
 s4.addTransition('succ', s2);
 s4.addTransition('fail', s6);
 s5.addTransition('win', s9);
-s5.addTransition('loose', s4);4
+s5.addTransition('loose', s4);
 s5.addTransition('cmd', s2);
 s6.addTransition('next', s7);
 s7.addTransition('succ', s8);
