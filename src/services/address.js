@@ -41,7 +41,7 @@ s3.addTransition('loose', s4);
 s4.addTransition('succ', s2);
 s4.addTransition('fail', s6);
 s5.addTransition('win', s9);
-s5.addTransition('loose', s4);
+s5.addTransition('loose', s4);4
 s5.addTransition('cmd', s2);
 s6.addTransition('next', s7);
 s7.addTransition('succ', s8);
@@ -57,70 +57,19 @@ function start(par) {
   send = par;
   let frm = enc.encode({
     key: 'nmea2000/060928/-/-/-/-/-',
-    header: {
-      pgn: 60928,
-      src: address,
-      dst: 0xFF,
-    },
-    fields: [{
-      field: 1,
-      state: 'V',
-      value: 123456,
-    },
-    {
-      field: 2,
-      title: "Manufacturer Code",
-      state: 'V',
-      value: 161,
-    },
-    {
-      field: 3,
-      title: "Device Instance Lower (ISO ECU Instance)",
-      state: 'V',
-      value: 0,
-    },
-    {
-      field: 4,
-      title: "Device Instance Upper (ISO Function Instance)",
-      state: 'V',
-      value: 0,
-    },
-    {
-      field: 5,
-      title: "Device Function (ISO Function)",
-      state: 'V',
-      value: 135,
-    },
-    {
-      field: 6,
-      title: "NMEA Reserved",
-      state: 'V',
-      value: 0,
-    },
-    {
-      field: 7,
-      title: "Device Class",
-      state: 'V',
-      value: 120,
-    },
-    {
-      field: 8,
-      title: "System Instance (ISO Device Class Instance)",
-      state: 'V',
-      value: 0,
-    },
-    {
-      field: 9,
-      title: "Industry Group",
-      state: 'V',
-      value: 4,
-    },
-    {
-      field: 10,
-      title: "NMEA Reserved (ISO Self Configurable)",
-      state: 'V',
-      value: 1,
-    }],
+    header: { pgn: 60928, src: address, dst: 0xFF },
+    fields: [
+      { field: 1, title: "Unique Number (ISO Identity Number)", state: 'V', value: 123456 },
+      { field: 2, title: "Manufacturer Code", state: 'V', value: 161 },
+      { field: 3, title: "Device Instance Lower (ISO ECU Instance)", state: 'V', value: 0 },
+      { field: 4, title: "Device Instance Upper (ISO Function Instance)", state: 'V', value: 0 },
+      { field: 5, title: "Device Function (ISO Function)", state: 'V', value: 135 },
+      { field: 6, title: "NMEA Reserved", state: 'V', value: 0 },
+      { field: 7, title: "Device Class", state: 'V', value: 120 },
+      { field: 8, title: "System Instance (ISO Device Class Instance)", state: 'V', value: 0 },
+      { field: 9, title: "Industry Group", state: 'V', value: 4 },
+      { field: 10, title: "NMEA Reserved (ISO Self Configurable)", state: 'V', value: 1 },
+    ],
   });
   frm.data.copy(ourname);
   s0.trigger('next');
