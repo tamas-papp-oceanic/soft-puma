@@ -70,7 +70,7 @@ function getDst(par) {
   let pgn = (par & 0x1FFFF00) >> 8;
 	if (((pgn >> 8) & 0xFF) < 0xF0)
 	{
-		return (pgn >> 8) & 0xFF;
+		return pgn & 0xFF;
 	}
   return 0xFF;
 };

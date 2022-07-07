@@ -4,6 +4,9 @@ const com = require('./common.js');
 const adr = require('./address.js');
 const can = require('./can.js');
 
+const tranList = [60928, 126993];
+const recvList = [60928];
+
 // Initializes NMEA engine
 function init() {
   adr.start(sendRaw);
@@ -92,26 +95,31 @@ function sendRaw(frm) {
 
 // Process ISO Request message
 function proc059904(msg) {
-	let pgn = com.getField(1, msg.fields);
-  switch (pgn) {
-    case 60928:
-      // Send ISO Address Claim message
-      break;
-    case 126464:
-      if (msg.header.dst == address) {
-        // Send PGN Transmit List message
-        // Send PGN Receive List message
-      }
-      break;
-    case 126996:
-      // Send Product Info message
-      break;
-    case 126998:
-      // Send Configuration Info message
-      break;
-    default:
-      // Send ISO Actnowledge message with negative acknowledgement
-      break;
+	let fld = com.getField(1, msg.fields);
+  if (fld != null) {
+    switch (fld.value) {
+      case 60928:
+        // Send ISO Address Claim message
+        adr.send060928();
+        break;
+      case 126464:
+        if (msg.header.dst == adr.getAddress()) {
+          // Send PGN Transmit List message
+          send126464(0, msg.header.src);
+          // Send PGN Receive List message
+          send126464(1, msg.header.src);
+        }
+        break;
+      case 126996:
+        // Send Product Info message
+        break;
+      case 126998:
+        // Send Configuration Info message
+        break;
+      default:
+        // Send ISO Actnowledge message with negative acknowledgement
+        break;
+    }
   }
 };
 
@@ -128,6 +136,38 @@ function proc065445(msg) {};
 function proc126208(msg) {};
 // Processes Product Information message
 function proc126996(msg) {};
+// Sends PGN Transmit / Receive Lists
+function send126464(par, dst) {
+  let frm = null;
+  if ((par == 0) && (tranList.length > 0)) {
+    let msg = {
+      key: 'nmea2000/126464/0/-/-/-/-',
+      header: { pgn: 126464, src: adr.getAddress(), dst: dst },
+      fields: [
+        { field: 1, title: 'Transmitted PGN Group Function Code', state: 'V', value: par },
+      ],
+    };
+    for (let i = 0; i < tranList.length; i++) {
+      msg.fields.push({ field: i + 2, title: 'PGN supported (' + (i + 1) + ')', state: 'V', value: tranList[i] });
+    }
+    frm = enc.encode(msg);
+  } else if ((par == 1) && (recvList.length > 0)) {
+    let msg = {
+      key: 'nmea2000/126464/0/-/-/-/-',
+      header: { pgn: 126464, src: adr.getAddress(), dst: dst },
+      fields: [
+        { field: 1, title: 'Transmitted PGN Group Function Code', state: 'V', value: par },
+      ],
+    };
+    for (let i = 0; i < recvList.length; i++) {
+      msg.fields.push({ field: i + 2, title: 'PGN supported (' + (i + 1) + ')', state: 'V', value: recvList[i] });
+    }
+    frm = enc.encode(msg);
+  }
+
+  console.log(frm)
+};
+
 
 module.exports = {
   init,

@@ -182,13 +182,14 @@ function encode(msg) {
       console.log("ERROR", err);
     }
   }
+  let dlc = Math.ceil(ptr / 8);
   let frm = {
     id: com.makePgn(msg.header),
     ext: true,
     rtr: false,
-    data: Buffer.alloc(raw.length),
+    data: Buffer.alloc(dlc),
   };
-  raw.copy(frm.data);
+  raw.copy(frm.data, 0, 0, dlc);
   return frm;
 };
 

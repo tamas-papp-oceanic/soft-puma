@@ -50,7 +50,7 @@ s8.addTransition('cmd', s2);
 s9.addTransition('succ', s5);
 s9.addTransition('fail', s1);
 
-// Start the state machine
+// Starts the state machine
 asm.start(s0);
 
 function start(par) {
@@ -73,6 +73,10 @@ function start(par) {
   });
   frm.data.copy(ourname);
   s0.trigger('next');
+}
+// Gets our address
+function getAddress() {
+  return address;
 }
 // Idle
 function s0Entry(state, context) {
@@ -220,6 +224,8 @@ function proc065240(msg) {
 
 module.exports = {
   start,
+  getAddress,
   proc060928,
+  send060928,
   proc065240,
 };
