@@ -22,7 +22,18 @@ function encode(msg) {
     return null;
   }
   msg.header.pri = def.priority;
-  if (typeof def.repeat !== "undefined") {
+  if (msg.header.pgn == 126464) {
+    let tmp = new Array();
+    tmp.push(com.getField(1, def.fields));
+    let fld = com.getField(2, def.fields)
+    for (let i = 0; i < msg.fields.length - 1; i++) {
+      fld.field = i + 2;
+      fld.title = 'PGN supported (' + (i + 1) + ')';
+      tmp.push(fld);
+    }
+    delete def.fields;
+    def.fields = tmp;
+  } else if (typeof def.repeat !== "undefined") {
     let max = null;
     for (let i in def.repeat) {
       for (let j in def.fields) {

@@ -46,7 +46,16 @@ function decode(frm) {
     fields: new Array(),
     raw: raw,
   }
-  if (typeof def.repeat !== "undefined") {
+  if (pgn == 126464) {
+    msg.fields.push(com.getField(1, def.fields));
+    let fld = com.getField(2, def.fields)
+    let cnt = Math.ceil((raw.length - 1) / 3);
+    for (let i = 0; i < cnt; i++) {
+      fld.field = i + 2;
+      fld.title = 'PGN supported (' + (i + 1) + ')';
+      msg.fields.push(fld);
+    }
+  } else if (typeof def.repeat !== "undefined") {
     let max = null;
     for (let i in def.repeat) {
       let ptr = 0;
