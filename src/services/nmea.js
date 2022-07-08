@@ -7,6 +7,9 @@ const can = require('./can.js');
 const tranList = [60928, 126993];
 const recvList = [60928];
 
+// Serial number can be loaded from configuration
+let serial = 123456;
+
 // Initializes NMEA engine
 function init() {
   adr.start(sendRaw);
@@ -95,39 +98,67 @@ function sendRaw(frm) {
 
 // Process ISO Request message
 function proc059904(msg) {
-  if (msg.header.dst == adr.getAddress()) {
-    let fld = com.getField(1, msg.fields);
-    if (fld != null) {
-      switch (fld.value) {
-        case 60928:
-          // Send ISO Address Claim message
-          adr.send060928();
-        break;
-        case 126464:
+  let fld = com.getField(1, msg.fields);
+  if (fld != null) {
+    switch (fld.value) {
+      case 60928:
+        // Send ISO Address Claim message
+        adr.send060928();
+      break;
+      case 126464:
+        if (msg.header.dst == adr.getAddress()) {
           // Send PGN Transmit List message
           send126464(0, msg.header.src);
           // Send PGN Receive List message
           send126464(1, msg.header.src);
-          break;
-        case 126996:
+        }
+        break;
+      case 126996:
+        if (msg.header.dst == adr.getAddress()) {
           // Send Product Info message
           send126996();
-          break;
-        case 126998:
+        }
+        break;
+      case 126998:
+        if (msg.header.dst == adr.getAddress()) {
           // Send Configuration Info message
-          break;
-        default:
+          send126998();
+        }
+        break;
+      default:
+        if (msg.header.dst == adr.getAddress()) {
           // Send ISO Acknowledge message with negative acknowledgement
-          break;
-      }
+          send059392(1, 0xFF, fld.value, msg.header.src);
+        }
+        break;
     }
   }
 };
 
-// Processes ISO Commanded Address message
-function proc065240(msg) {};
 // Processes Proprietary Command message
-function proc065280(msg) {};
+// Set Serial Number
+function proc065280(msg) {
+  // This PGN should be 061184 (addressable)
+  // if (msg.header.dst == adr.getAddress()) {
+    let fld = com.getField(1, msg.fields);
+    if ((fld == null) || (fld.value != 161)) {
+      return;
+    }
+    fld = com.getField(3, msg.fields);
+    if ((fld == null) || (fld.value != 4)) {
+      return;
+    }
+    fld = com.getField(4, msg.fields);
+    if ((fld == null) || (fld.value != 0xBC)) {
+      return;
+    }
+    fld = com.getField(5, msg.fields);
+    if (fld != null) {
+      serial = fld.value;
+    }
+    console.log(serial);
+  // }
+};
 // Processes Proprietary Request message
 function proc065445(msg) {};
 // Processes NMEA Group Function messages
@@ -170,19 +201,48 @@ function send126464(par, dst) {
 };
 
 // Sends Product Information message
-function send126996(par, dst) {
+function send126996() {
   let msg = {
     key: 'nmea2000/126996/-/-/-/-/-',
     header: { pgn: 126996, src: adr.getAddress(), dst: 0xFF },
     fields: [
-      { field: 1,title: 'NMEA Network Message Database Version',state: 'V',value: 2101 },
-      { field: 2,title: 'NMEA Manufacturer\'s Product Code',state: 'V',value: 1111 },
-      { field: 3,title: 'Manufacturer\'s Model ID',state: 'V',value: 'Puma' },
-      { field: 4,title: 'Manufacturer\'s Software Version Code',state: 'V',value: 'v1.0.0' },
-      { field: 5,title: 'Manufacturer\'s Model Version',state: 'V',value: '2222' },
-      { field: 6,title: 'Manufacturer\'s Model Serial Code',state: 'V',value: '123456' },
-      { field: 7,title: 'NMEA 2000 Certification Level',state: 'V',value: 2 },
-      { field: 8,title: 'Load Equivalency',state: 'V',value: 1 },
+      { field: 1,title: 'NMEA Network Message Database Version', state: 'V', value: 2101 },
+      { field: 2,title: 'NMEA Manufacturer\'s Product Code', state: 'V', value: 1111 },
+      { field: 3,title: 'Manufacturer\'s Model ID', state: 'V', value: 'Puma' },
+      { field: 4,title: 'Manufacturer\'s Software Version Code', state: 'V', value: 'v1.0.0' },
+      { field: 5,title: 'Manufacturer\'s Model Version', state: 'V', value: '2222' },
+      { field: 6,title: 'Manufacturer\'s Model Serial Code', state: 'V', value: serial.toString() },
+      { field: 7,title: 'NMEA 2000 Certification Level', state: 'V', value: 2 },
+      { field: 8,title: 'Load Equivalency', state: 'V', value: 1 },
+    ],
+  };
+  return sendMsg(msg);
+};
+
+// Sends Configuration Information message
+function send126998() {
+  let msg = {
+    key: 'nmea2000/126998/-/-/-/-/-',
+    header: { pgn: 126998, src: adr.getAddress(), dst: 0xFF },
+    fields: [
+      { field: 1,title: 'Installation Description, Field 1', state: 'V', value: 'PUMA' },
+      { field: 2,title: 'Installation Description, Field 2', state: 'V', value: '' },
+      { field: 3,title: 'Manufacturer Information, Field 3', state: 'V', value: 'Puma' },
+    ],
+  };
+  return sendMsg(msg);
+};
+
+// Sends ISO Acknowledgement message
+function send059392(ctr, grp, pgn, dst) {
+  let msg = {
+    key: 'nmea2000/059392/-/-/-/-/-',
+    header: { pgn: 59392, src: adr.getAddress(), dst: dst },
+    fields: [
+      { field: 1,title: 'Control Byte', state: 'V', value: ctr },
+      { field: 2,title: 'Group Function Value', state: 'V', value: grp },
+      { field: 3,title: 'NMEA Reserved', state: 'V', value: 0xFFFFFF },
+      { field: 4,title: 'PGN of Requested Information', state: 'V', value: pgn },
     ],
   };
   return sendMsg(msg);

@@ -80,10 +80,10 @@ function encode(msg) {
   let ptr = 0;
   for (let i in def.fields) {
     let fld = def.fields[i];
+    let mfl = com.getField(fld.field, msg.fields);
     let len = null;
-    if (fld.type == 'chr(x)') {
-      let mfl = getField(fld.field, msg.fields);
-      len = com.calcLength(fld.type, mfl != null ? mfl.value : 0);
+    if ((fld.type == 'chr(x)') || (fld.type == 'str')) {
+      len = com.calcLength(fld.type, mfl != null ? mfl.value.length : 0);
     } else {
       len = com.calcLength(fld.type);
     }
@@ -91,6 +91,9 @@ function encode(msg) {
       ptr += len;
     }
   }
+
+
+
   let raw = Buffer.alloc(Math.ceil(ptr / 8));
   ptr = 0;
   for (let i in def.fields) {
@@ -99,8 +102,8 @@ function encode(msg) {
       let mfl = com.getField(fld.field, msg.fields);
       let byt = Math.floor(ptr / 8);
       let len = 0;
-      if (fld.type == 'chr(x)') {
-        len = com.calcLength(fld.type, mfl != null ? mfl.value : 0);
+      if ((fld.type == 'chr(x)') || (fld.type == 'str')) {
+        len = com.calcLength(fld.type, mfl != null ? mfl.value.length : 0);
       } else {
         len = com.calcLength(fld.type);
       }
@@ -115,23 +118,19 @@ function encode(msg) {
           dat = dat | ((BigInt(mfl.value) & msk) << off);
           buf.writeBigUInt64LE(dat);
           buf.copy(raw, byt);
-          ptr += len;
         } else if (fld.type == 'chr(x)') {
-          raw.writeUInt8LE(len, byt,);
-          if (len > 0) {
-            raw.write(mfl.value.padEnd(len, ' '), byt + 1, 'utf8');
+          raw.writeUInt8(Math.ceil((len - 1) / 8), byt,);
+          if (len > 8) {
+            raw.write(mfl.value, byt + 1, 'utf8');
           }
-          ptr += ((len + 1) * 8);
         } else if (fld.type.startsWith('chr(')) {
           raw.write(mfl.value.padEnd(Math.ceil(len / 8), ' '), byt, 'utf8');
-          ptr += len;
         } else if (fld.type == 'str') {
-          raw.writeUInt8LE(len, byt,);
-          raw.writeUInt8LE(0, byt + 1,);
-          if (len > 0) {
-            raw.write(mfl.value.padEnd(len, ' '), byt, 'utf8');
+          raw.writeUInt8(Math.ceil((len - 2) / 8), byt);
+          raw.writeUInt8(0, byt + 1);
+          if (len > 16) {
+            raw.write(mfl.value, byt + 2, 'utf8');
           }
-          ptr += ((len + 2) * 8);
         } else {
           if (fld.multiplier != null) {
             if (typeof val == 'bigint') {
@@ -188,8 +187,8 @@ function encode(msg) {
               raw.writeDoubleLE(mfl.value, byt);
               break;
           }
-          ptr += len;
         }
+        ptr += len;
       }
     } catch (err) {
       console.log("ERROR", err);

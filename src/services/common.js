@@ -68,8 +68,7 @@ function getSrc(par) {
 // Returns with CAN destination
 function getDst(par) {
   let pgn = (par & 0x1FFFF00) >> 8;
-	if (((pgn >> 8) & 0xFF) < 0xF0)
-	{
+	if (((pgn >> 8) & 0xFF) < 0xF0)	{
 		return pgn & 0xFF;
 	}
   return 0xFF;
@@ -89,20 +88,16 @@ function findDef(frm) {
   let pgn = getPgn(frm.id);
   let key = "nmea2000/" + pgn.toString().padStart(6, '0');
   let cnv = nmeaconv[key];
-  if (typeof cnv !== "undefined") {
-    if (typeof cnv.function !== "undefined") {
-      key += "/" + frm.data[cnv.function];
-    } else {
-      key += "/-";
-    }
-    if (isProprietary(pgn)) {
-      let val = (parseInt(frm.data[1]) * 256) + parseInt(frm.data[0])
-      key += "/" + (val & 0x7FF) + "/" + ((val >> 13) & 7);
-    } else {
-      key += "/-/-";
-    }
+  if ((typeof cnv !== "undefined") && (typeof cnv.function !== "undefined")) {
+    key += "/" + frm.data[cnv.function];
   } else {
-    key += "/-/-/-";
+    key += "/-";
+  }
+  if (isProprietary(pgn)) {
+    let val = (parseInt(frm.data[1]) * 256) + parseInt(frm.data[0])
+    key += "/" + (val & 0x7FF) + "/" + ((val >> 13) & 7);
+  } else {
+    key += "/-/-";
   }
   if (typeof nmeadefs[key] !== "undefined") {
     let out = JSON.parse(JSON.stringify(nmeadefs[key]));
@@ -152,10 +147,10 @@ function calcLength(typ, val) {
     if (tmp != 'x') {
       len = parseInt(tmp) * 8;
     } else {
-      len = val + 1;
+      len = (val + 1) * 8;
     }
   } else if (typ == 'str') {
-    len = val;
+    len = (val + 2) * 8;
   } else if (typ.startsWith('int')) {
     len = parseInt(typ.replace('int', ''));
   } else if (typ.startsWith('uint')) {

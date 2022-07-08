@@ -132,12 +132,12 @@ function decode(frm) {
           val = parseInt(((dat >> off) & msk).toString());
           ptr += len;
         } else if (fld.type == 'chr(x)') {
-          if (len > 0) {
+          if (len > 1) {
             let buf = Buffer.alloc(len);
             frm.data.copy(buf, 0, byt + 1);
             val = buf.toString('utf8').replace(/[^\x01-\x7F]/g, "");
           }
-          ptr += ((len + 1) * 8);
+          ptr += (len * 8);
         } else if (fld.type.startsWith('chr(')) {
           let buf = Buffer.alloc(len);
           frm.data.copy(buf, 0, byt);
