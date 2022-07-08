@@ -95,30 +95,31 @@ function sendRaw(frm) {
 
 // Process ISO Request message
 function proc059904(msg) {
-	let fld = com.getField(1, msg.fields);
-  if (fld != null) {
-    switch (fld.value) {
-      case 60928:
-        // Send ISO Address Claim message
-        adr.send060928();
+  if (msg.header.dst == adr.getAddress()) {
+    let fld = com.getField(1, msg.fields);
+    if (fld != null) {
+      switch (fld.value) {
+        case 60928:
+          // Send ISO Address Claim message
+          adr.send060928();
         break;
-      case 126464:
-        if (msg.header.dst == adr.getAddress()) {
+        case 126464:
           // Send PGN Transmit List message
           send126464(0, msg.header.src);
           // Send PGN Receive List message
           send126464(1, msg.header.src);
-        }
-        break;
-      case 126996:
-        // Send Product Info message
-        break;
-      case 126998:
-        // Send Configuration Info message
-        break;
-      default:
-        // Send ISO Actnowledge message with negative acknowledgement
-        break;
+          break;
+        case 126996:
+          // Send Product Info message
+          send126996();
+          break;
+        case 126998:
+          // Send Configuration Info message
+          break;
+        default:
+          // Send ISO Acknowledge message with negative acknowledgement
+          break;
+      }
     }
   }
 };
@@ -138,9 +139,9 @@ function proc126208(msg) {};
 function proc126996(msg) {};
 // Sends PGN Transmit / Receive Lists
 function send126464(par, dst) {
-  let frm = null;
+  let msg = null;
   if ((par == 0) && (tranList.length > 0)) {
-    let msg = {
+    msg = {
       key: 'nmea2000/126464/0/-/-/-/-',
       header: { pgn: 126464, src: adr.getAddress(), dst: dst },
       fields: [
@@ -150,10 +151,9 @@ function send126464(par, dst) {
     for (let i = 0; i < tranList.length; i++) {
       msg.fields.push({ field: i + 2, title: 'PGN supported (' + (i + 1) + ')', state: 'V', value: tranList[i] });
     }
-    frm = enc.encode(msg);
   } else if ((par == 1) && (recvList.length > 0)) {
-    let msg = {
-      key: 'nmea2000/126464/0/-/-/-/-',
+    msg = {
+      key: 'nmea2000/126464/1/-/-/-/-',
       header: { pgn: 126464, src: adr.getAddress(), dst: dst },
       fields: [
         { field: 1, title: 'Transmitted PGN Group Function Code', state: 'V', value: par },
@@ -162,12 +162,31 @@ function send126464(par, dst) {
     for (let i = 0; i < recvList.length; i++) {
       msg.fields.push({ field: i + 2, title: 'PGN supported (' + (i + 1) + ')', state: 'V', value: recvList[i] });
     }
-    frm = enc.encode(msg);
   }
-
-  console.log(frm)
+  if (msg != null) {
+    return sendMsg(msg);
+  }
+  return false;
 };
 
+// Sends Product Information message
+function send126996(par, dst) {
+  let msg = {
+    key: 'nmea2000/126996/-/-/-/-/-',
+    header: { pgn: 126996, src: adr.getAddress(), dst: 0xFF },
+    fields: [
+      { field: 1,title: 'NMEA Network Message Database Version',state: 'V',value: 2101 },
+      { field: 2,title: 'NMEA Manufacturer\'s Product Code',state: 'V',value: 1111 },
+      { field: 3,title: 'Manufacturer\'s Model ID',state: 'V',value: 'Puma' },
+      { field: 4,title: 'Manufacturer\'s Software Version Code',state: 'V',value: 'v1.0.0' },
+      { field: 5,title: 'Manufacturer\'s Model Version',state: 'V',value: '2222' },
+      { field: 6,title: 'Manufacturer\'s Model Serial Code',state: 'V',value: 123456 },
+      { field: 7,title: 'NMEA 2000 Certification Level',state: 'V',value: 2 },
+      { field: 8,title: 'Load Equivalency',state: 'V',value: 1 },
+    ],
+  };
+  return sendMsg(msg);
+};
 
 module.exports = {
   init,

@@ -79,7 +79,7 @@ function getDst(par) {
 function makePgn(par) {
   let pgn = par.pgn;
 	if (((pgn >> 8) & 0xFF) < 0xF0) {
-    pgn |= (par.dst | 0xFF);
+    pgn |= (par.dst & 0xFF);
 	}
   return (pgn << 8) | ((par.pri & 0x0F) << 26) | (par.src & 0xF);
 };
@@ -207,7 +207,7 @@ function getStatus(typ, val) {
 function getField(fld, fls) {
   for (let i in fls) {
     if (fls[i].field == fld) {
-      return fls[i];
+      return JSON.parse(JSON.stringify(fls[i]));
     }
   }
   return null;

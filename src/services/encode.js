@@ -25,11 +25,13 @@ function encode(msg) {
   if (msg.header.pgn == 126464) {
     let tmp = new Array();
     tmp.push(com.getField(1, def.fields));
-    let fld = com.getField(2, def.fields)
-    for (let i = 0; i < msg.fields.length - 1; i++) {
-      fld.field = i + 2;
-      fld.title = 'PGN supported (' + (i + 1) + ')';
-      tmp.push(fld);
+    let fld = com.getField(2, def.fields);
+    for (let i in msg.fields) {
+      if (i > 0) {
+        fld.field = parseInt(i) + 1;
+        fld.title = 'PGN supported (' + parseInt(i) + ')';
+        tmp.push(JSON.parse(JSON.stringify(fld)));
+      }
     }
     delete def.fields;
     def.fields = tmp;
@@ -79,9 +81,9 @@ function encode(msg) {
   for (let i in def.fields) {
     let fld = def.fields[i];
     let len = 0;
-    if ((fld.type == 'chr(x)') || (fld.type == 'str')) {
+    if (fld.type == 'chr(x)') {
       let mfl = getField(fld.field, msg.fields);
-      len = mfl != null ? mfl.length : 0;
+      len = com.calcLength(fld.type, mfl != null ? mfl.value : 0);
     } else {
       len = com.calcLength(fld.type);
     }
@@ -90,6 +92,10 @@ function encode(msg) {
     }
   }
   let raw = Buffer.alloc(Math.ceil(ptr / 8));
+
+console.log(raw.length)
+
+
   ptr = 0;
   for (let i in def.fields) {
     try {
@@ -97,7 +103,7 @@ function encode(msg) {
       let mfl = com.getField(fld.field, msg.fields);
       let byt = Math.floor(ptr / 8);
       let len = 0;
-      if ((fld.type == 'chr(x)') || (fld.type == 'str')) {
+      if (fld.type == 'chr(x)') {
         len = com.calcLength(fld.type, mfl != null ? mfl.value : 0);
       } else {
         len = com.calcLength(fld.type);
@@ -117,17 +123,17 @@ function encode(msg) {
         } else if (fld.type == 'chr(x)') {
           raw.writeUInt8LE(len, byt,);
           if (len > 0) {
-            raw.write(mfl.value, byt + 1, 'utf8');
+            raw.write(mfl.value.padEnd(len, ' '), byt + 1, 'utf8');
           }
           ptr += ((len + 1) * 8);
         } else if (fld.type.startsWith('chr(')) {
-          raw.write(mfl.value, byt, 'utf8');
+          raw.write(mfl.value.padEnd(len, ' '), byt, 'utf8');
           ptr += (len * 8);
         } else if (fld.type == 'str') {
           raw.writeUInt8LE(len, byt,);
           raw.writeUInt8LE(0, byt + 1,);
           if (len > 0) {
-            raw.write(mfl.value, byt, 'utf8');
+            raw.write(mfl.value.padEnd(len, ' '), byt, 'utf8');
           }
           ptr += ((len + 2) * 8);
         } else {
@@ -209,39 +215,51 @@ function encodeFastPacket(fap) {
     return null;
   }
   let ret = new Array();
-  let seq = 0;
+  let seq = -1;
   let frm = 0;
   let cnt = 0;
-  let key = frm.id.toString(16).padStart(8, '0');
+  let key = fap.id.toString(16).padStart(8, '0');
   if (typeof fastbuff[key] !== "undefined") {
     seq = fastbuff[key];
   }
   seq++
   seq &= 0b111;
   fastbuff[key] = seq;
-  let rec = {
-    id: fap.id,
-    ext: fap.ext,
-    rtr: fap.rtr,
-    data: Buffer.alloc(8),
-  };
-  for (let i in fap.data) {
+  let dat = Buffer.alloc(8);
+  dat.fill(0xFF);
+  for (let i = 0; i < fap.data.length; i++) {
     if ((cnt % 8) == 0) {
-      rec.data.writeUInt8((seq << 5) + frm, (cnt % 8));
+      dat.writeUInt8((seq << 5) + frm, (cnt % 8));
       if (cnt == 0) {
         cnt++
-        rec.data.writeUInt8(frm.data.length, (cnt % 8));
+        dat.writeUInt8(fap.data.length, (cnt % 8));
       }
       frm++
       cnt++
     }
-    rec.data.writeUInt8(fap.data[i], (cnt % 8));
+    dat.writeUInt8(fap.data[i], (cnt % 8));
     cnt++
     if ((cnt % 8) == 0) {
+      let rec = {
+        id: fap.id,
+        ext: fap.ext,
+        rtr: fap.rtr,
+        data: Buffer.alloc(8),
+      };
+      dat.copy(rec.data);
       ret.push(rec);
-      delete rec.data;
-      rec.data = Buffer.alloc(8);
+      dat.fill(0xFF);
     }
+  }
+  if ((cnt % 8) != 0) {
+    let rec = {
+      id: fap.id,
+      ext: fap.ext,
+      rtr: fap.rtr,
+      data: Buffer.alloc(8),
+    };
+    dat.copy(rec.data);
+    ret.push(rec);
   }
   return ret;
 }
