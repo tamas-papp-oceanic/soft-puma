@@ -180,7 +180,7 @@ function send126996(par, dst) {
       { field: 3,title: 'Manufacturer\'s Model ID',state: 'V',value: 'Puma' },
       { field: 4,title: 'Manufacturer\'s Software Version Code',state: 'V',value: 'v1.0.0' },
       { field: 5,title: 'Manufacturer\'s Model Version',state: 'V',value: '2222' },
-      { field: 6,title: 'Manufacturer\'s Model Serial Code',state: 'V',value: 123456 },
+      { field: 6,title: 'Manufacturer\'s Model Serial Code',state: 'V',value: '123456' },
       { field: 7,title: 'NMEA 2000 Certification Level',state: 'V',value: 2 },
       { field: 8,title: 'Load Equivalency',state: 'V',value: 1 },
     ],

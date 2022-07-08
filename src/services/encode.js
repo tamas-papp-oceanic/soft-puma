@@ -80,7 +80,7 @@ function encode(msg) {
   let ptr = 0;
   for (let i in def.fields) {
     let fld = def.fields[i];
-    let len = 0;
+    let len = null;
     if (fld.type == 'chr(x)') {
       let mfl = getField(fld.field, msg.fields);
       len = com.calcLength(fld.type, mfl != null ? mfl.value : 0);
@@ -92,10 +92,6 @@ function encode(msg) {
     }
   }
   let raw = Buffer.alloc(Math.ceil(ptr / 8));
-
-console.log(raw.length)
-
-
   ptr = 0;
   for (let i in def.fields) {
     try {
@@ -127,8 +123,8 @@ console.log(raw.length)
           }
           ptr += ((len + 1) * 8);
         } else if (fld.type.startsWith('chr(')) {
-          raw.write(mfl.value.padEnd(len, ' '), byt, 'utf8');
-          ptr += (len * 8);
+          raw.write(mfl.value.padEnd(Math.ceil(len / 8), ' '), byt, 'utf8');
+          ptr += len;
         } else if (fld.type == 'str') {
           raw.writeUInt8LE(len, byt,);
           raw.writeUInt8LE(0, byt + 1,);
@@ -197,6 +193,7 @@ console.log(raw.length)
       }
     } catch (err) {
       console.log("ERROR", err);
+      return null;
     }
   }
   let dlc = Math.ceil(ptr / 8);

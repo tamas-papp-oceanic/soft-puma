@@ -223,6 +223,7 @@ function decode(frm) {
       }
     } catch (err) {
       console.log("ERROR", err)
+      return null;
     }
   }
   if (ins != null) {
