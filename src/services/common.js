@@ -140,23 +140,25 @@ function isSingle(pgn) {
 // Returns with field length
 function calcLength(typ, val) {
   let len = null;
-  if (typ.startsWith('bit(')) {
-    len = parseInt(typ.replace('bit(', '').replace(')', ''));
-  } else if (typ.startsWith('chr(')) {
-    let tmp = typ.replace('chr(', '').replace(')', '');
-    if (tmp != 'x') {
-      len = parseInt(tmp) * 8;
-    } else {
-      len = (val + 1) * 8;
+  if (typ != null) {
+    if (typ.startsWith('bit(')) {
+      len = parseInt(typ.replace('bit(', '').replace(')', ''));
+    } else if (typ.startsWith('chr(')) {
+      let tmp = typ.replace('chr(', '').replace(')', '');
+      if (tmp != 'x') {
+        len = parseInt(tmp) * 8;
+      } else {
+        len = (val + 1) * 8;
+      }
+    } else if (typ == 'str') {
+      len = (val + 2) * 8;
+    } else if (typ.startsWith('int')) {
+      len = parseInt(typ.replace('int', ''));
+    } else if (typ.startsWith('uint')) {
+      len = parseInt(typ.replace('uint', ''));
+    } else if (typ.startsWith('float')) {
+      len = parseInt(typ.replace('float', ''));
     }
-  } else if (typ == 'str') {
-    len = (val + 2) * 8;
-  } else if (typ.startsWith('int')) {
-    len = parseInt(typ.replace('int', ''));
-  } else if (typ.startsWith('uint')) {
-    len = parseInt(typ.replace('uint', ''));
-  } else if (typ.startsWith('float')) {
-    len = parseInt(typ.replace('float', ''));
   }
   return len;
 }

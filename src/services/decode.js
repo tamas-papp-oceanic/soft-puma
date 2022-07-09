@@ -46,6 +46,23 @@ function decode(frm) {
     fields: new Array(),
     raw: raw,
   }
+  if (pgn == 126208) {
+    let fld = com.getField(2, def.fields)
+    if (fld != null) {
+      let fnd = {
+        id: (fld.value << 8),
+        data: Buffer.Alloc(2),
+      };
+      fnd.data.fill(0);
+      if (com.isProprietary(pgn)) {
+        raw.copy(fnd.data, 0, 0, 2);
+      }
+      let de2 = com.findDef(fnd);
+      if (de2 != null) {
+        console.log(de2)
+      }
+    }
+  }
   if (pgn == 126464) {
     msg.fields.push(com.getField(1, def.fields));
     let fld = com.getField(2, def.fields)

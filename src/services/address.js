@@ -53,26 +53,43 @@ s9.addTransition('fail', s1);
 // Starts the state machine
 asm.start(s0);
 
+const name = {
+  1: 123456,  // Unique Number (ISO Identity Number)
+  2: 161,     // Manufacturer Code
+  3: 0,       // Device Instance Lower (ISO ECU Instance)
+  4: 0,       // Device Instance Upper (ISO Function Instance)
+  5: 135,     // Device Function (ISO Function)
+  6: 0,       // NMEA Reserved
+  7: 120,     // Device Class
+  8: 0,       // System Instance (ISO Device Class Instance)
+  9: 4,       // Industry Group
+  10: 1,      // NMEA Reserved (ISO Self Configurable)
+};
+
 function start(par) {
   send = par;
   let frm = enc.encode({
     key: 'nmea2000/060928/-/-/-/-/-',
     header: { pgn: 60928, src: address, dst: 0xFF },
     fields: [
-      { field: 1, title: "Unique Number (ISO Identity Number)", state: 'V', value: 123456 },
-      { field: 2, title: "Manufacturer Code", state: 'V', value: 161 },
-      { field: 3, title: "Device Instance Lower (ISO ECU Instance)", state: 'V', value: 0 },
-      { field: 4, title: "Device Instance Upper (ISO Function Instance)", state: 'V', value: 0 },
-      { field: 5, title: "Device Function (ISO Function)", state: 'V', value: 135 },
-      { field: 6, title: "NMEA Reserved", state: 'V', value: 0 },
-      { field: 7, title: "Device Class", state: 'V', value: 120 },
-      { field: 8, title: "System Instance (ISO Device Class Instance)", state: 'V', value: 0 },
-      { field: 9, title: "Industry Group", state: 'V', value: 4 },
-      { field: 10, title: "NMEA Reserved (ISO Self Configurable)", state: 'V', value: 1 },
+      { field: 1, title: "Unique Number (ISO Identity Number)", state: 'V', value: name[1] },
+      { field: 2, title: "Manufacturer Code", state: 'V', value: name[2] },
+      { field: 3, title: "Device Instance Lower (ISO ECU Instance)", state: 'V', value: name[3] },
+      { field: 4, title: "Device Instance Upper (ISO Function Instance)", state: 'V', value: name[4] },
+      { field: 5, title: "Device Function (ISO Function)", state: 'V', value: name[5] },
+      { field: 6, title: "NMEA Reserved", state: 'V', value: name[6] },
+      { field: 7, title: "Device Class", state: 'V', value: name[7] },
+      { field: 8, title: "System Instance (ISO Device Class Instance)", state: 'V', value: name[8] },
+      { field: 9, title: "Industry Group", state: 'V', value: name[9] },
+      { field: 10, title: "NMEA Reserved (ISO Self Configurable)", state: 'V', value: name[10] },
     ],
   });
   frm.data.copy(ourname);
   s0.trigger('next');
+}
+// Gets name record
+function getName() {
+  return name;
 }
 // Gets our address
 function getAddress() {
@@ -224,6 +241,7 @@ function proc065240(msg) {
 
 module.exports = {
   start,
+  getName,
   getAddress,
   proc060928,
   send060928,
