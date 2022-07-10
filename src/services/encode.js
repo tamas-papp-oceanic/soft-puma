@@ -44,7 +44,7 @@ function encode(msg) {
       let fld = def.fields[i];
       let mfl = com.getFld(fld.field, msg.fields);
       let byt = Math.floor(ptr / 8);
-      let len = 0;
+      let len = null;
       if ((fld.type == 'chr(x)') || (fld.type == 'str')) {
         len = com.calcLength(fld.type, mfl != null ? mfl.value.length : 0);
       } else {

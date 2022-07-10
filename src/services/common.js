@@ -90,6 +90,17 @@ function findCnv(key) {
 
 // Returns with PGN definition
 function findDef(frm) {
+  let key = getKey(frm);
+  if (typeof nmeadefs[key] !== "undefined") {
+    let out = JSON.parse(JSON.stringify(nmeadefs[key]));
+    out.key = key;
+    return out;
+  }    
+  return null;
+};
+
+// Returns with PGN key
+function getKey(frm) {
   let pgn = getPgn(frm.id);
   let key = "nmea2000/" + pgn.toString().padStart(6, '0');
   let cnv = nmeaconv[key];
@@ -104,12 +115,7 @@ function findDef(frm) {
   } else {
     key += "/-/-";
   }
-  if (typeof nmeadefs[key] !== "undefined") {
-    let out = JSON.parse(JSON.stringify(nmeadefs[key]));
-    out.key = key;
-    return out;
-  }    
-  return null;
+  return key;
 };
 
 // Returns with PGN definition
@@ -235,6 +241,7 @@ module.exports = {
   makePgn,
   findCnv,
   findDef,
+  getKey,
   getDef,
   isProprietary,
   isSingle,
