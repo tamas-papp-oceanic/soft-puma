@@ -25,19 +25,21 @@ function unpack(frm) {
 
 // Convert can frame to message
 function decode(frm) {
+  let pgn = com.getPgn(frm.id);
   let def = com.findDef(frm);
   if (def == null) {
     return null;
   }
+  def = extend(pgn, def, frm);
   let msg = null;
   let raw = Buffer.alloc(4 + frm.data.length);
-  let pgn = Buffer.from(frm.id.toString(16).padStart(8, '0'), "hex");
-  pgn.copy(raw);
+  let did = Buffer.from(frm.id.toString(16).padStart(8, '0'), "hex");
+  did.copy(raw);
   frm.data.copy(raw, 4);
   msg = {
     key: def.key,
     header: {
-      pgn: com.getPgn(frm.id),
+      pgn: pgn,
       pri: com.getPri(frm.id),
       src: com.getSrc(frm.id),
       dst: com.getDst(frm.id),
@@ -45,83 +47,6 @@ function decode(frm) {
     title: def.title,
     fields: new Array(),
     raw: raw,
-  }
-  if (pgn == 126208) {
-    let fld = com.getField(2, def.fields)
-    if (fld != null) {
-      let fnd = {
-        id: (fld.value << 8),
-        data: Buffer.Alloc(2),
-      };
-      fnd.data.fill(0);
-      if (com.isProprietary(pgn)) {
-        raw.copy(fnd.data, 0, 0, 2);
-      }
-      let de2 = com.findDef(fnd);
-      if (de2 != null) {
-        console.log(de2)
-      }
-    }
-  }
-  if (pgn == 126464) {
-    msg.fields.push(com.getField(1, def.fields));
-    let fld = com.getField(2, def.fields)
-    let cnt = Math.ceil((raw.length - 1) / 3);
-    for (let i = 0; i < cnt; i++) {
-      fld.field = i + 2;
-      fld.title = 'PGN supported (' + (i + 1) + ')';
-      msg.fields.push(fld);
-    }
-  } else if (typeof def.repeat !== "undefined") {
-    let max = null;
-    for (let i in def.repeat) {
-      let ptr = 0;
-      for (let j in def.fields) {
-        let fld = def.fields[j];
-        let len = 0;
-        if (fld.field < def.repeat[i].field) {
-          if (fld.field > max) {
-            max = fld.field;
-          }
-          if ((fld.type == 'chr(x)') || (fld.type == 'str')) {
-            len = com.calcLength(fld.type, frm.data.readUInt8(Math.floor(ptr / 8)));
-          } else {
-            len = com.calcLength(fld.type);
-          }
-          if (len != null) {
-            ptr += len;
-          }
-        } else {
-          def.repeat[i].value = frm.data.readUInt8(Math.floor(ptr / 8));
-          max = fld.field;
-          break;
-        }
-      }
-    }
-    let tmp = new Array();
-    for (let i in def.fields) {
-      let fld = def.fields[i];
-      if (fld.field <= max) {
-        tmp.push(fld);
-      }
-    }
-    for (let i in def.repeat) {
-      let rep = def.repeat[i];
-      if ((rep.value > 0) && (rep.value <= 252)) {
-        for (let j = 0; j < rep.value; j++) {
-          for (let k in def.fields) {
-            let fld = def.fields[k];
-            if ((fld.field >= rep.start) && (fld.field < (rep.start + rep.count))) {
-              fld.field = ++max;
-              tmp.push(fld);
-            }
-          }
-        }
-      }
-    }
-    delete def.repeat;
-    delete def.fields;
-    def.fields = tmp;
   }
   let ins = null;
   let typ = null;
@@ -405,6 +330,73 @@ function decodeFastPacket(frm) {
     }
   }
   return null;
+}
+
+function extend(pgn, def, frm) {
+  if (pgn == 126464) {
+    let tmp = new Array();
+    tmp.push(com.getFld(1, def.fields));
+    let fld = com.getFld(2, def.fields)
+    let cnt = Math.ceil((frm.data.length - 1) / 3);
+    for (let i = 0; i < cnt; i++) {
+      fld.field = i + 2;
+      fld.title = 'PGN supported (' + (i + 1) + ')';
+      tmp.push(JSON.parse(JSON.stringify(fld)));
+    }
+    delete def.fields;
+    def.fields = tmp;
+  } else if (typeof def.repeat !== "undefined") {
+    let max = null;
+    for (let i in def.repeat) {
+      let ptr = 0;
+      for (let j in def.fields) {
+        let fld = def.fields[j];
+        let len = 0;
+        if (fld.field < def.repeat[i].field) {
+          if (fld.field > max) {
+            max = fld.field;
+          }
+          if ((fld.type == 'chr(x)') || (fld.type == 'str')) {
+            len = com.calcLength(fld.type, frm.data.readUInt8(Math.floor(ptr / 8)));
+          } else {
+            len = com.calcLength(fld.type);
+          }
+          if (len != null) {
+            ptr += len;
+          }
+        } else {
+          def.repeat[i].value = frm.data.readUInt8(Math.floor(ptr / 8));
+          max = fld.field;
+          break;
+        }
+      }
+    }
+    let tmp = new Array();
+    for (let i in def.fields) {
+      let fld = def.fields[i];
+      if (fld.field <= max) {
+        tmp.push(fld);
+      }
+    }
+    for (let i in def.repeat) {
+      let rep = def.repeat[i];
+      if ((rep.value > 0) && (rep.value <= 252)) {
+        for (let j = 0; j < rep.value; j++) {
+          for (let k in def.fields) {
+            let fld = def.fields[k];
+            if ((fld.field >= rep.start) && (fld.field < (rep.start + rep.count))) {
+              fld.field = ++max;
+              tmp.push(fld);
+            }
+          }
+        }
+      }
+    }
+    delete def.repeat;
+    delete def.fields;
+    def.fields = tmp;
+  }
+  return JSON.parse(JSON.stringify(def));
 }
 
 module.exports = {

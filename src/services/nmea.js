@@ -112,7 +112,7 @@ function sendRaw(frm) {
 
 // Process ISO Request message
 function proc059904(msg) {
-  let fld = com.getField(1, msg.fields);
+  let fld = com.getFld(1, msg.fields);
   if (fld != null) {
     switch (fld.value) {
       case 60928:
@@ -154,22 +154,22 @@ function proc059904(msg) {
 function proc065280(msg) {
   // This PGN should be 061184 (addressable)
   // if (msg.header.dst == adr.getAddress()) {
-      let fld = com.getField(1, msg.fields);
+      let fld = com.getFld(1, msg.fields);
       if (fld == null) {
         return;
       }
       switch (fld.value) {
         case 161:
           // Oceanic Systems
-          fld = com.getField(3, msg.fields);
+          fld = com.getFld(3, msg.fields);
           if ((fld == null) || (fld.value != 4)) {
             return;
           }
-          fld = com.getField(4, msg.fields);
+          fld = com.getFld(4, msg.fields);
           if ((fld == null) || (fld.value != 0xBC)) {
             return;
           }
-          fld = com.getField(5, msg.fields);
+          fld = com.getFld(5, msg.fields);
           if (fld != null) {
             serial = fld.value;
           }
@@ -213,37 +213,37 @@ function proc065280(msg) {
 function proc065445(msg) {
   // This PGN should be 061184 (addressable)
   // if (msg.header.dst == adr.getAddress()) {
-    let fld = com.getField(1, msg.fields);
+    let fld = com.getFld(1, msg.fields);
     if (fld == null) {
       return;
     }
     switch (fld.value) {
       case 161:
         // Oceanic Systems
-        fld = com.getField(3, msg.fields);
+        fld = com.getFld(3, msg.fields);
         if ((fld == null) || (fld.value != 4)) {
           return;
         }
         // Type ID (0xFF = all IDs)
-        fld = com.getField(4, msg.fields);
+        fld = com.getFld(4, msg.fields);
         if (fld == null) {
           return;
         }
         let tid = fld.value;
         // Instance (0xFF = all instances)
-        fld = com.getField(5, msg.fields);
+        fld = com.getFld(5, msg.fields);
         if (fld == null) {
           return;
         }
         let ins = fld.value;
         // Data ID (0xFF = Request, all other = Command)
-        fld = com.getField(6, msg.fields);
+        fld = com.getFld(6, msg.fields);
         if (fld == null) {
           return;
         }
         let did = fld.value;
         // Data Content
-        fld = com.getField(7, msg.fields);
+        fld = com.getFld(7, msg.fields);
         if (fld == null) {
           return;
         }
@@ -270,13 +270,13 @@ function proc065445(msg) {
 // NMEA - Write Fields, Write Fields Reply - Group Function
 function proc126208(msg) {
   // Request Group Function Code
-  let fld = com.getField(1, msg.fields);
+  let fld = com.getFld(1, msg.fields);
   if (fld == null) {
     return;
   }
   let grp = fld.value;
   // Requested PGN
-  fld = com.getField(2, msg.fields);
+  fld = com.getFld(2, msg.fields);
   if (fld == null) {
     return;
   }
@@ -285,19 +285,19 @@ function proc126208(msg) {
     case 0:
       // REQUEST
       // Transmission Interval
-      fld = com.getField(3, msg.fields);
+      fld = com.getFld(3, msg.fields);
       if (fld == null) {
         return;
       }
       let tri = fld.value;
       // Transmission Interval Offset
-      fld = com.getField(4, msg.fields);
+      fld = com.getFld(4, msg.fields);
       if (fld == null) {
         return;
       }
       let tio = fld.value;
       // Number of Pairs of Request Parameters
-      fld = com.getField(5, msg.fields);
+      fld = com.getFld(5, msg.fields);
       if (fld == null) {
         return;
       }
@@ -310,19 +310,18 @@ function proc126208(msg) {
             let ack = false;
             let per = 0x00;
             let ter = 0x00;
-            let fer = Buffer.alloc(10);
-            fer.fill(0);
+            let fer = Buffer.alloc(10).fill(0);
             if ((tri == 0xFFFFFFFF) && ((tio == 0xFFFF) || (tio == 0))) {
               // Loop through the parameters
               for (let i = 0; i < nop; i++) {
-                fld = com.getField((i * 2) + 6, msg.fields);
+                fld = com.getFld((i * 2) + 6, msg.fields);
                 if (fld == null) {
                   fer.writeUint8(0x01, i);
                   ack = true;
                   break;
                 }
                 let fln = fld.value;
-                fld = com.getField((i * 2) + 7, msg.fields);
+                fld = com.getFld((i * 2) + 7, msg.fields);
                 if (fld == null) {
                   fer.writeUint8(0x01, i);
                   ack = true;
@@ -389,19 +388,18 @@ function proc126208(msg) {
             let ack = false;
             let per = 0x00;
             let ter = 0x00;
-            let fer = Buffer.alloc(1);
-            fer.fill(0);
+            let fer = Buffer.alloc(1).fill(0);
             if ((tri == 0xFFFFFFFF) && ((tio == 0xFFFF) || (tio == 0))) {
               // Loop through the parameters
               for (let i = 0; i < nop; i++) {
-                fld = com.getField((i * 2) + 6, msg.fields);
+                fld = com.getFld((i * 2) + 6, msg.fields);
                 if (fld == null) {
                   fer.writeUint8(0x01, i);
                   ack = true;
                   break;
                 }
                 let fln = fld.value;
-                fld = com.getField((i * 2) + 7, msg.fields);
+                fld = com.getFld((i * 2) + 7, msg.fields);
                 if (fld == null) {
                   fer.writeUint8(0x01, i);
                   ack = true;
@@ -465,19 +463,18 @@ function proc126208(msg) {
           let ack = false;
           let per = 0x00;
           let ter = 0x00;
-          let fer = Buffer.alloc(8);
-          fer.fill(0);
+          let fer = Buffer.alloc(8).fill(0);
           if ((tri == 0xFFFFFFFF) && ((tio == 0xFFFF) || (tio == 0))) {
             // Loop through the parameters
             for (let i = 0; i < nop; i++) {
-              fld = com.getField((i * 2) + 6, msg.fields);
+              fld = com.getFld((i * 2) + 6, msg.fields);
               if (fld == null) {
                 fer.writeUint8(0x01, i);
                 ack = true;
                 break;
               }
               let fln = fld.value;
-              fld = com.getField((i * 2) + 7, msg.fields);
+              fld = com.getFld((i * 2) + 7, msg.fields);
               if (fld == null) {
                 fer.writeUint8(0x01, i);
                 ack = true;
@@ -671,6 +668,96 @@ function send059392(ctr, grp, pgn, dst) {
   };
   return sendMsg(msg);
 };
+
+
+  // if (pgn == 126208) {
+  //   let pg2 = frm.data.readUIntLE(1, 3);
+  //   if (com.isProprietary(pg2)) {
+  //     return null;
+  //   }
+  //   let sta = null;
+  //   let fst = null;
+  //   let spl = msg.key.split("/");
+  //   let fun = parseInt(spl[2]);
+  //   switch (fun) {
+  //     case 0: // Request
+  //       sta = 10;
+  //       fst = 6;
+  //       break;
+  //     case 1: // Command
+  //       sta = 5;
+  //       fst = 6;
+  //       break;
+  //     case 2: // Acknowledge
+  //       sta = 5;
+  //       fst = 6;
+  //       break;
+  //     case 3: // Read Fields
+  //       sta = 7;
+  //       fst = 9;
+  //       break;
+  //     case 4: // Read Fields Reply
+  //       sta = 7;
+  //       fst = 10;
+  //       break;
+  //     case 5: // Write Fields
+  //       sta = 7;
+  //       fst = 9;
+  //       break;
+  //     case 6: // Write Fields Reply
+  //       sta = 7;
+  //       fst = 10;
+  //       break;
+  //   }
+  //   if (sta != null) {
+  //     let cnt = frm.data.readUInt8(sta++);
+  //     ptr = sta * 8;
+  //     if ((cnt != null) && (cnt != 0xFF)) {
+  //       let qry = { id: (pg2 << 8) };
+  //       let off = 0;
+  //       let cnv = com.findCnv(spl[0] + '/' + pg2.toString().padStart(6, '0'));
+  //       if ((typeof cnv !== "undefined") && (typeof cnv.function !== "undefined")) {
+  //         off = cnv.function
+  //       }
+  //       qry.data = Buffer.alloc(off + 1).fill(0),
+  //       frm.data.copy(qry.data, off, 12 + (off * 2));
+  //       let de2 = com.findDef(qry);
+  //       if (de2 != null) {
+  //         // Looping through the parameters
+  //         for (let i = 0; i < cnt; i++) {
+  //           let fld = frm.data.readUInt8(Math.ceil(ptr / 8));
+  //           let fl2 = com.getFld(fld, de2.fields);
+  //           if (fl2 != null) {
+  //             let fl3 = com.getFld(fst + i, def.fields);
+
+  //             console.log(fld, fl2, fl3)
+
+
+  //             if (fl3 != null) {
+  //               fl3.type = fl2.type;
+
+
+
+
+  //               com.setFld(fl3, def.fields)
+  //               let len = 0;
+  //               if ((fl2.type == 'chr(x)') || (fl2.type == 'str')) {
+  //                 len = com.calcLength(fl2.type, frm.data.readUInt8(Math.ceil((ptr + 1) / 8)));
+  //               } else {
+  //                 len = com.calcLength(fl2.type);
+  //               }
+  //               if (len != null) {
+  //                 ptr += len;
+  //               }
+  //             }
+  //           }
+  //         }
+  //       }
+  //     }
+  //   }
+  // }
+  // console.log(def)
+
 
 module.exports = {
   init,

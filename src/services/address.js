@@ -2,7 +2,7 @@ const com = require('./common.js');
 const enc = require('./encode.js');
 const { StateMachine } = require('@edium/fsm');
 
-let ourname = new Buffer.alloc(8);
+let ourname = new Buffer.alloc(8).fill(0);
 let address = 0;
 let savaddr = 0;
 let timeout = null;

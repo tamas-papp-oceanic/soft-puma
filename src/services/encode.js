@@ -22,65 +22,11 @@ function encode(msg) {
     return null;
   }
   msg.header.pri = def.priority;
-  if (msg.header.pgn == 126464) {
-    let tmp = new Array();
-    tmp.push(com.getField(1, def.fields));
-    let fld = com.getField(2, def.fields);
-    for (let i in msg.fields) {
-      if (i > 0) {
-        fld.field = parseInt(i) + 1;
-        fld.title = 'PGN supported (' + parseInt(i) + ')';
-        tmp.push(JSON.parse(JSON.stringify(fld)));
-      }
-    }
-    delete def.fields;
-    def.fields = tmp;
-  } else if (typeof def.repeat !== "undefined") {
-    let max = null;
-    for (let i in def.repeat) {
-      for (let j in def.fields) {
-        let fld = def.fields[j];
-        let len = 0;
-        if (fld.field < def.repeat[i].field) {
-          if (fld.field > max) {
-            max = fld.field;
-          }
-        } else {
-          let mfl = com.getField(fld.field, msg.fields);
-          def.repeat[i].value = mfl != null ? mfl.value : 0;
-          max = fld.field;
-          break;
-        }
-      }
-    }
-    let tmp = new Array();
-    for (let i in def.fields) {
-      let fld = def.fields[i];
-      if (fld.field <= max) {
-        tmp.push(fld);
-      }
-    }
-    for (let i in def.repeat) {
-      let rep = def.repeat[i];
-      if ((rep.value > 0) && (rep.value <= 252)) {
-        for (let j = 0; j < rep.value; j++) {
-          for (let k in def.fields) {
-            let fld = def.fields[k];
-            if ((fld.field >= rep.start) && (fld.field < (rep.start + rep.count))) {
-              fld.field = ++max;
-              tmp.push(fld);
-            }
-          }
-        }
-      }
-    }
-    delete def.fields;
-    def.fields = tmp;
-  }
+  def = extend(def, msg);
   let ptr = 0;
   for (let i in def.fields) {
     let fld = def.fields[i];
-    let mfl = com.getField(fld.field, msg.fields);
+    let mfl = com.getFld(fld.field, msg.fields);
     let len = null;
     if ((fld.type == 'chr(x)') || (fld.type == 'str')) {
       len = com.calcLength(fld.type, mfl != null ? mfl.value.length : 0);
@@ -91,15 +37,12 @@ function encode(msg) {
       ptr += len;
     }
   }
-
-
-
   let raw = Buffer.alloc(Math.ceil(ptr / 8));
   ptr = 0;
   for (let i in def.fields) {
     try {
       let fld = def.fields[i];
-      let mfl = com.getField(fld.field, msg.fields);
+      let mfl = com.getFld(fld.field, msg.fields);
       let byt = Math.floor(ptr / 8);
       let len = 0;
       if ((fld.type == 'chr(x)') || (fld.type == 'str')) {
@@ -221,8 +164,7 @@ function encodeFastPacket(fap) {
   seq++
   seq &= 0b111;
   fastbuff[key] = seq;
-  let dat = Buffer.alloc(8);
-  dat.fill(0xFF);
+  let dat = Buffer.alloc(8).fill(0xFF);
   for (let i = 0; i < fap.data.length; i++) {
     if ((cnt % 8) == 0) {
       dat.writeUInt8((seq << 5) + frm, (cnt % 8));
@@ -258,6 +200,65 @@ function encodeFastPacket(fap) {
     ret.push(rec);
   }
   return ret;
+}
+
+function extend(def, msg) {
+  if (msg.header.pgn == 126464) {
+    let tmp = new Array();
+    tmp.push(com.getFld(1, def.fields));
+    let fld = com.getFld(2, def.fields);
+    for (let i in msg.fields) {
+      if (i > 0) {
+        fld.field = parseInt(i) + 1;
+        fld.title = 'PGN supported (' + parseInt(i) + ')';
+        tmp.push(JSON.parse(JSON.stringify(fld)));
+      }
+    }
+    delete def.fields;
+    def.fields = tmp;
+  } else if (typeof def.repeat !== "undefined") {
+    let max = null;
+    for (let i in def.repeat) {
+      for (let j in def.fields) {
+        let fld = def.fields[j];
+        let len = 0;
+        if (fld.field < def.repeat[i].field) {
+          if (fld.field > max) {
+            max = fld.field;
+          }
+        } else {
+          let mfl = com.getFld(fld.field, msg.fields);
+          def.repeat[i].value = mfl != null ? mfl.value : 0;
+          max = fld.field;
+          break;
+        }
+      }
+    }
+    let tmp = new Array();
+    for (let i in def.fields) {
+      let fld = def.fields[i];
+      if (fld.field <= max) {
+        tmp.push(fld);
+      }
+    }
+    for (let i in def.repeat) {
+      let rep = def.repeat[i];
+      if ((rep.value > 0) && (rep.value <= 252)) {
+        for (let j = 0; j < rep.value; j++) {
+          for (let k in def.fields) {
+            let fld = def.fields[k];
+            if ((fld.field >= rep.start) && (fld.field < (rep.start + rep.count))) {
+              fld.field = ++max;
+              tmp.push(fld);
+            }
+          }
+        }
+      }
+    }
+    delete def.fields;
+    def.fields = tmp;
+  }
+  return JSON.parse(JSON.stringify(def));
 }
 
 module.exports = {

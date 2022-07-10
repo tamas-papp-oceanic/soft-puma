@@ -83,6 +83,11 @@ function makePgn(par) {
   return (pgn << 8) | ((par.pri & 0x0F) << 26) | (par.src & 0xF);
 };
 
+// Returns with function field
+function findCnv(key) {
+  return nmeaconv[key];
+}
+
 // Returns with PGN definition
 function findDef(frm) {
   let pgn = getPgn(frm.id);
@@ -94,7 +99,7 @@ function findDef(frm) {
     key += "/-";
   }
   if (isProprietary(pgn)) {
-    let val = (parseInt(frm.data[1]) * 256) + parseInt(frm.data[0])
+    let val = frm.data.readUInt16LE(0);
     key += "/" + (val & 0x7FF) + "/" + ((val >> 13) & 7);
   } else {
     key += "/-/-";
@@ -201,13 +206,23 @@ function getStatus(typ, val) {
 };
 
 // Returns with field
-function getField(fld, fls) {
+function getFld(fld, fls) {
   for (let i in fls) {
     if (fls[i].field == fld) {
       return JSON.parse(JSON.stringify(fls[i]));
     }
   }
   return null;
+};
+
+// Sets field
+function setFld(fld, fls) {
+  for (let i in fls) {
+    if (fls[i].field == fld.field) {
+      fls[i] = JSON.parse(JSON.stringify(fld));
+      return;
+    }
+  }
 };
 
 module.exports = {
@@ -218,11 +233,13 @@ module.exports = {
   getSrc,
   getDst,
   makePgn,
+  findCnv,
   findDef,
   getDef,
   isProprietary,
   isSingle,
   calcLength,
   getStatus,
-  getField,
+  getFld,
+  setFld,
 };
