@@ -312,21 +312,23 @@ function proc126208(msg) {
               let ack = false;
               let per = 0x00;
               let ter = 0x00;
-              let fer = Buffer.alloc(10).fill(0);
+              let fer = Buffer.alloc(nop).fill(0);
               if ((tri.state == '-') && ((tio.state == '-') || (tio.value == 0))) {
                 // Loop through the parameters
                 for (let i = 0; i < nop; i++) {
                   fld = com.getFld((i * 2) + 6, msg.fields);
-                  if (fld == null) {
+                  if (typeof fld === "undefined") {
                     fer.writeUint8(0x01, i);
                     ack = true;
+                    snd = false;
                     break;
                   }
                   let fln = fld.value;
                   fld = com.getFld((i * 2) + 7, msg.fields);
-                  if (fld == null) {
+                  if (typeof fld === "undefined") {
                     fer.writeUint8(0x01, i);
                     ack = true;
+                    snd = false;
                     break;
                   }
                   let flv = fld.value;
@@ -342,15 +344,12 @@ function proc126208(msg) {
                       if (flv == nam[fln]) {
                         fer.writeUint8(0x00, i);
                         ack = true;
-                        snd = false;
                       } else {
-                        if (msg.header.dst == 0xFF) {
-                          snd = false;
-                        } else {
+                        if (msg.header.dst != 0xFF) {
                           fer.writeUint8(0x03, i);
                           ack = true;
-                          snd = false;
                         }
+                        snd = false;
                       } 
                       break;
                     case 6: // NMEA Reserved
@@ -478,74 +477,88 @@ function proc126208(msg) {
           break;
         case 126996:
           {
-            let pif = getProductInfo();
             let snd = true;
-            let ack = false;
-            let per = 0x00;
-            let ter = 0x00;
-            let fer = Buffer.alloc(8).fill(0);
-            if ((tri.state == '-') && ((tio.state == '-') || (tio.value == 0))) {
-              // Loop through the parameters
-              for (let i = 0; i < nop; i++) {
-                fld = com.getFld((i * 2) + 6, msg.fields);
-                if (fld == null) {
-                  fer.writeUint8(0x01, i);
-                  ack = true;
-                  break;
-                }
-                let fln = fld.value;
-                fld = com.getFld((i * 2) + 7, msg.fields);
-                if (fld == null) {
-                  fer.writeUint8(0x01, i);
-                  ack = true;
-                  break;
-                }
-                let flv = fld.value;
-                switch (fln) {
-                  case 1: // NMEA Network Message Database Version
-                  case 3: // Manufacturer's Model ID
-                  case 4: // Manufacturer's Software Version Code
-                  case 5: // Manufacturer's Model Version
-                  case 6: // Manufacturer's Model Serial Code
-                  case 7: // NMEA 2000 Certification Level
-                  case 8: // Load Equivalency
-                    fer.writeUint8(0x01, i);
-                    ack = true;
-                    break;
-                  case 2: // Manufacturer's Product Code
-                    if ((flv) != pif[fln]) {
-                      snd = false;
-                      fer.writeUint8(0x03, i);
+              let ack = false;
+              let per = 0x00;
+              let ter = 0x00;
+              let pif = getProductInfo();
+              let fer = Buffer.alloc(8).fill(0);
+              if ((nop == 0xFF) && (msg.header.dst == 0xFF)) {
+                per = 0x04;
+                snd = false;
+                ack = true;
+              } else if ((nop == 0xFF) && (msg.header.dst == adr.getAddress())) {
+              } else if ((nop != 0xFF) && (msg.header.dst == 0xFF)) {
+                if ((tri.state == '-') && ((tio.state == '-') || (tio.value == 0))) {
+                  // Loop through the parameters
+                  for (let i = 0; i < nop; i++) {
+                    fld = com.getFld((i * 2) + 6, msg.fields);
+                    if (fld == null) {
+                      fer.writeUint8(0x01, i);
                       ack = true;
+                      snd = false;
+                      break;
                     }
-                    break;
-                  default:
-                    ack = true;
-                    break;
+                    let fln = fld.value;
+                    fld = com.getFld((i * 2) + 7, msg.fields);
+                    if (fld == null) {
+                      fer.writeUint8(0x01, i);
+                      ack = true;
+                      snd = false;
+                      break;
+                    }
+                    let flv = fld.value;
+                    switch (fln) {
+                      case 1: // NMEA Network Message Database Version
+                      case 3: // Manufacturer's Model ID
+                      case 2: // Manufacturer's Product Code
+                      case 4: // Manufacturer's Software Version Code
+                      case 5: // Manufacturer's Model Version
+                      case 6: // Manufacturer's Model Serial Code
+                      case 7: // NMEA 2000 Certification Level
+                      case 8: // Load Equivalency
+                        if (flv == pif[fln]) {
+                          fer.writeUint8(0x00, i);
+                          ack = true;
+                        } else {
+                          if (msg.header.dst != 0xFF) {
+                            fer.writeUint8(0x03, i);
+                            ack = true;
+                          }
+                          snd = false;
+                        } 
+                        break;
+                      default:
+                        fer.writeUint8(0x05, i);
+                        ack = true;
+                        snd = false;
+                        break;
+                    }
+                  }
+                } else {
+                  ter = 0x01;
+                  ack = true;
                 }
               }
-            } else {
-              ter = 0x01;
-              ack = true;
-            }
-            if (ack) {
-              let rep = {
-                key: 'nmea2000/126208/2/-/-/-/-',
-                priority: 3,
-                header: { pgn: 126208, src: adr.getAddress(), dst: msg.header.src },
-                fields: [
-                  { field: 1, title: "Acknowledgment Group Function Code", state: 'V', value: 0x02 },
-                  { field: 2, title: "PGN beingacknowledged", state: 'V', value: pgn },
-                  { field: 3, title: "PGN error code", state: 'V', value: per },
-                  { field: 4, title: "Transmission Interval / Priority error code", state: 'V', value: ter },
-                  { field: 5, title: "Number of Pairs of Request Parameters to follow", state: 'V', value: nop },
-                ]
-              };
-              for (let i = 0; i < fer.length; i++) {
-                rep.fields.push({ field: i + 6, title: "Result (" + (i + 1) + ")", state: 'V', value: fer.readUInt8(i) });
-              };
-              send126208(rep);
-              snd = false;
+              if (ack) {
+                let rep = {
+                  key: 'nmea2000/126208/2/-/-/-/-',
+                  priority: 3,
+                  header: { pgn: 126208, src: adr.getAddress(), dst: msg.header.src },
+                  fields: [
+                    { field: 1, title: "Acknowledgment Group Function Code", state: 'V', value: 0x02 },
+                    { field: 2, title: "PGN beingacknowledged", state: 'V', value: pgn },
+                    { field: 3, title: "PGN error code", state: 'V', value: per },
+                    { field: 4, title: "Transmission Interval / Priority error code", state: 'V', value: ter },
+                    { field: 5, title: "Number of Pairs of Request Parameters to follow", state: 'V', value: nop },
+                  ]
+                };
+                for (let i = 0; i < fer.length; i++) {
+                  rep.fields.push({ field: i + 6, title: "Result (" + (i + 1) + ")", state: 'V', value: fer.readUInt8(i) });
+                };
+                send126208(rep);
+                snd = false;
+              }
             }
             if (snd) {
               // Send Product Info message
