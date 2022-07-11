@@ -30,9 +30,13 @@ function decode(frm) {
   if (def == null) {
     return null;
   }
-  def = extend(pgn, def, frm);
   if (pgn == 126208) {
     def = proc126208(def, frm);
+  } else {
+    def = extend(pgn, def, frm);
+  }
+  if (def == null) {
+    return null;
   }
   let msg = null;
   let raw = Buffer.alloc(4 + frm.data.length);
@@ -279,7 +283,7 @@ function decodeFastPacket(frm) {
       corrupted: cnt != 0,
     };
     if (len > 0) {
-      fap.data = Buffer.alloc(len);
+      fap.data = Buffer.alloc(len).fill(0xFF);
     } else {
       fap.corrupted = true;
     }
@@ -308,6 +312,7 @@ function decodeFastPacket(frm) {
       fap.corrupted = true;
     }
     if (!fap.corrupted) {
+      fap.start = Date.now();
       let dat = Buffer.alloc(min);
       for (let i = 0; i < min; i++) {
         dat[i] = frm.data.readUInt8(i + 1);
@@ -413,79 +418,94 @@ const fun126208 = {
 }
 
 function proc126208(def, frm) {
+  delete def.repeat;
   let pg2 = frm.data.readUIntLE(1, 3);
-  if (com.isProprietary(pg2)) {
-    return null;
-  }
   let rep = null;
   let fst = null;
   let fun = fun126208[frm.data.readUInt8(0)];
   if (typeof fun !== "undefined") {
     rep = fun.repeat;
     fst = fun.field;
-    let cnt = frm.data.readUInt8(rep);
-    let ptr = (rep + 1) * 8;
-    if ((cnt != null) && (cnt != 0xFF)) {
-      let qry = { id: (pg2 << 8) };
-      let off = 0;
-      let cnv = com.findCnv('nmea2000/' + pg2.toString().padStart(6, '0'));
-      if ((typeof cnv !== "undefined") && (typeof cnv.function !== "undefined")) {
-        off = cnv.function
-      }
-      qry.data = Buffer.alloc(off + 1).fill(0),
-      frm.data.copy(qry.data, off, 12 + (off * 2));
-      let de2 = com.findDef(qry);
-      if (de2 != null) {
-        if (pg2 == 126464) {
-          let fld = com.getFld(fun.field, def);
-          let fl2 = com.getFld(1, de2);
-          fld.type = fl2.type;
-          com.setFld(fun.field, def);
-        } else {
-
+    if (fst != null) {
+      let cnt = frm.data.readUInt8(rep);
+      let ptr = (rep + 1) * 8;
+      if ((cnt != null) && (cnt != 0xFF)) {
+        let qry = { id: (pg2 << 8) };
+        let off = 0;
+        let cnv = com.findCnv('nmea2000/' + pg2.toString().padStart(6, '0'));
+        if ((typeof cnv !== "undefined") && (typeof cnv.function !== "undefined")) {
+          off = cnv.function
         }
-  //         // Looping through the parameters
-  //         for (let i = 0; i < cnt; i++) {
-  //           let fld = frm.data.readUInt8(Math.ceil(ptr / 8));
-  //           let fl2 = com.getFld(fld, de2.fields);
-  //           if (fl2 != null) {
-  //             let fl3 = com.getFld(fst + i, def.fields);
-
-  //             console.log(fld, fl2, fl3)
-
-
-  //             if (fl3 != null) {
-  //               fl3.type = fl2.type;
-
-
-
-
-  //               com.setFld(fl3, def.fields)
-  //               let len = 0;
-  //               if ((fl2.type == 'chr(x)') || (fl2.type == 'str')) {
-  //                 len = com.calcLength(fl2.type, frm.data.readUInt8(Math.ceil((ptr + 1) / 8)));
-  //               } else {
-  //                 len = com.calcLength(fl2.type);
-  //               }
-  //               if (len != null) {
-  //                 ptr += len;
-  //               }
-  //             }
-  //           }
-  //         }
-  //       }
-  //     }
+        qry.data = Buffer.alloc(off + 1).fill(0),
+        frm.data.copy(qry.data, off, 12 + (off * 2));
+        let de2 = com.findDef(qry);
+        if (de2 != null) {
+          if (pg2 == 126464) {
+            let fld = com.getFld(fun.field, def);
+            let fl2 = com.getFld(1, de2);
+            fld.type = fl2.type;
+            com.setFld(fun.field, def);
+          } else {
+            // Definitions with repeat field(s) aren't supported
+            if (typeof de2.repeat !== "undefined") {
+              return null;
+            }
+            // Template fields          
+            let tp1 = com.getFld(fst, def.fields);
+            let tp2 = com.getFld(fst + 1, def.fields);
+            if ((tp1 != null) && (tp2 != null)) {
+              let tmp = new Array();
+              for (let i = 0; i < def.fields.length; i++) {
+                if (def.fields[i].field < fst) {
+                  tmp.push(JSON.parse(JSON.stringify(def.fields[i])));
+                }
+              }
+              delete def.fields;
+              def.fields = tmp;
+              // Looping through the parameters
+              for (let i = 0; i < cnt; i++) {
+                // Get field number
+                let fln = frm.data.readUInt8(Math.ceil(ptr / 8));
+                ptr += 8;
+                // Get requested field
+                let fld = com.getFld(fln, de2.fields);
+                if (fld != null) {
+                  let fl1 = JSON.parse(JSON.stringify(tp1));
+                  fl1.field = fst + (i * 2);
+                  fl1.title = 'Field Number (' + fln + ')';
+                  let fl2 = JSON.parse(JSON.stringify(tp2));
+                  fl2.field = fst + (i * 2) + 1;
+                  fl2.title = fld.title;
+                  let typ = fld.type;
+                  if (fld.type.startsWith('bit(')) {
+                    let tmp = Math.ceil(parseInt(typ.replace('bit(', '').replace(')', '')) / 8) * 8;
+                    typ = 'uint' + tmp;
+                  }
+                  fl2.type = typ;
+                  def.fields.push(fl1);
+                  def.fields.push(fl2);
+                  let len = null;
+                  if ((fld.type == 'chr(x)') || (fld.type == 'str')) {
+                    len = com.calcLength(fld.type, frm.data.readUInt8(Math.ceil((ptr + 1) / 8)));
+                  } else {
+                    len = com.calcLength(fld.type);
+                  }
+                  if (len != null) {
+                    len = Math.ceil(len / 8) * 8;
+                    ptr += len;
+                  }
+                }
+              }
+            }
+          }
+        }
       }
     }
   }
-
-  console.log(def);
-
   return JSON.parse(JSON.stringify(def));
 }
 
-
-  module.exports = {
+module.exports = {
   unpack,
   decode,
 };

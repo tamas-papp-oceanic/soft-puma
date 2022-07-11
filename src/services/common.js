@@ -57,7 +57,7 @@ function getPgn(par) {
 
 // Returns with priority
 function getPri(par) {
-  return (par >> 26) & 0x0F;
+  return (par >> 26) & 0x07;
 };
 
 // Returns with CAN source
@@ -80,7 +80,7 @@ function makePgn(par) {
 	if (((pgn >> 8) & 0xFF) < 0xF0) {
     pgn |= (par.dst & 0xFF);
 	}
-  return (pgn << 8) | ((par.pri & 0x0F) << 26) | (par.src & 0xF);
+  return (pgn << 8) | ((par.pri & 0x07) << 26) | (par.src & 0xFF);
 };
 
 // Returns with function field
