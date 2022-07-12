@@ -92,7 +92,9 @@ app.on('window-all-closed', function () {
 app.on('activate', function () {
   // On macOS it's common to re-create a window in the app when the
   // dock icon is clicked and there are no other windows open.
-  if (mainWindow === null) createWindow()
+  if (mainWindow === null) {
+    createWindow();
+  }
 });
 // In this file you can include the rest of your app's specific main process
 // code. You can also put them in separate files and require them here.
@@ -102,18 +104,20 @@ app.on('activate', function () {
 // tool.create();
 // NMEA processing
 function proc(frm) {
-  let msg = nmea.process(frm);
-  if (msg != null) {
-    switch (msg.header.pgn) {
-      case 60928:
-        mainWindow.webContents.send('n2k-name', msg);
-        break;
-      case 126996:
-        mainWindow.webContents.send('n2k-prod', msg);
-        break;
-      default:
-        mainWindow.webContents.send('n2k-data', msg);
-        break;
+  if (typeof mainWindow.webContents !== "undefined") {
+    let msg = nmea.process(frm);
+    if (msg != null) {
+      switch (msg.header.pgn) {
+        case 60928:
+          mainWindow.webContents.send('n2k-name', msg);
+          break;
+        case 126996:
+          mainWindow.webContents.send('n2k-prod', msg);
+          break;
+        default:
+          mainWindow.webContents.send('n2k-data', msg);
+          break;
+      }
     }
   }
 }
@@ -123,18 +127,23 @@ com.init();
 nmea.init();
 // Load configurations
 ipcMain.on('n2k-ready', (e, ...args) => {
-  const configs = ['classes', 'functions', 'industries', 'manufacturers'];
-  for (let i in configs) {
-    let cnf = configs[i];
-    let dat = com.load(cnf);
-    if (dat != null) {
-      mainWindow.webContents.send('n2k-' + cnf.substring(0, 4), dat);
+  if (typeof mainWindow.webContents !== "undefined") {
+    const configs = ['classes', 'functions', 'industries', 'manufacturers'];
+    for (let i in configs) {
+      let cnf = configs[i];
+      let dat = com.load(cnf);
+      if (dat != null) {
+        mainWindow.webContents.send('n2k-' + cnf.substring(0, 4), dat);
+      }
     }
-  };
+  }
 });
 // Processing outgoing message
 ipcMain.on('n2k-data', (e, ...args) => {
   nmea.sendMsg(args[0]);
+});
+ipcMain.on('n2k-addr', (e, ...args) => {
+  nmea.send059904(60928, 0xFF);
 });
 // Start can processing
 ipcMain.on('can-start', (e, ...args) => {

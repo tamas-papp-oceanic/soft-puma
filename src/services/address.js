@@ -273,6 +273,7 @@ module.exports = {
   start,
   getName,
   getAddress,
+  send059904,
   proc060928,
   send060928,
   proc065240,

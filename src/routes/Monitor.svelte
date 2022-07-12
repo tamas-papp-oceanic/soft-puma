@@ -1,6 +1,7 @@
 <script>
   import { Grid, Row, Column, DataTable, Toolbar, ToolbarContent,
     Button, Pagination } from "carbon-components-svelte";
+  import { pop } from 'svelte-spa-router'
   import { name, data } from "../stores/data.js";
 
   export let params;
@@ -35,7 +36,7 @@
   } 
 
   function back(e) {
-
+    pop();
   };
 
   // Data getters, setters
@@ -67,7 +68,13 @@
       }
     }
     tmp.sort((a, b) => {
-      return a.id < b.id;
+      if (a.id < b.id) {
+        return -1;
+      }
+      if (a.id > b.id) {
+        return 1;
+      }
+      return 0;
     });
     rows = JSON.parse(JSON.stringify(tmp));
     pagination.totalItems = rows.length;
@@ -86,7 +93,8 @@
         page={pagination.page}>
         <strong slot="title">{title}</strong>
         <span slot="description" style="font-size: 1rem;">{description}</span>
-        <Toolbar size="sm">
+        <!-- <Toolbar size="sm"> -->
+        <Toolbar>
           <ToolbarContent>
             <Button on:click={(e) => back(e)}>&larr;&nbsp;Back</Button>
           </ToolbarContent>

@@ -147,6 +147,11 @@ function proc059904(msg) {
   }
 };
 
+// Sends ISO Request message
+function send059904(pgn, dst) {
+  adr.send059904(pgn, dst);
+};
+
 // Processes Proprietary Command message
 // Set Serial Number
 function proc065280(msg) {
@@ -721,10 +726,12 @@ function send059392(ctr, grp, pgn, dst) {
   return sendMsg(msg);
 };
 
+
 module.exports = {
   init,
   process,
   create,
   sendMsg,
   sendRaw,
+  send059904,
 };

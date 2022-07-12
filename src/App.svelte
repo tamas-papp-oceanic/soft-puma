@@ -1,6 +1,6 @@
 <script>
   import Router from 'svelte-spa-router';
-	import {location, push, pop, replace, link} from 'svelte-spa-router'
+	import { location, push, pop, replace, link } from 'svelte-spa-router'
 	import { wrap } from 'svelte-spa-router/wrap';
 	import Login from './routes/Login.svelte';
 	import Logout from './routes/Logout.svelte';
@@ -59,32 +59,6 @@
 	};
 </script>
 
-<style lang="scss" global>
-	@import "~carbon-components-svelte/css/g100.css";
-
-	.content {
-		margin-top: 10vh;
-		// overflow-x: hidden;
-		// height: 87vh;
-	}
-
-	@media (min-width: 48rem) {
-		.bx--header__nav {
-			display: block;
-		}
-	}
-
-	html {
-		height: 100%;
-	}
-
-	body {
-		height: 100%;
-		overflow-y: hidden;
-	}
-</style>
-
-
 <svelte:head>
 	<title>{appName} [v{version}]</title>
 </svelte:head>
@@ -93,3 +67,22 @@
 <main class="content">
 	<Router {routes} restoreScrollState={true} />
 </main>
+
+<style lang="scss" global>
+	@import "~carbon-components-svelte/css/g100.css";
+	.content {
+		margin-top: 10vh;
+	}
+	@media (min-width: 48rem) {
+		.bx--header__nav {
+			display: block;
+		}
+	}
+	html {
+		height: 100%;
+	}
+	body {
+		height: 100%;
+		overflow-y: hidden;
+	}
+</style>
