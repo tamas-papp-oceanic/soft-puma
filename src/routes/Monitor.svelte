@@ -8,7 +8,7 @@
   const headers = [{
     key: "msg",
     value: "Message",
-    sort: (a, b) => a.key - b.key,
+    sort: false
   },{
     key: "ins",
     value: "Instance",

@@ -7,6 +7,7 @@ let address = 0;
 let savaddr = 0;
 let timeout = null;
 let send = null;
+let timers = {};
 
 const context = {
   randomize: () => Math.floor(Math.random() * 2),
@@ -139,6 +140,7 @@ function s4Entry(state, context) {
 };
 // Valid
 function s5Entry(state, context) {
+  send059904(60928, 0xFF);
 };
 // WaitForDelay6
 function s6Entry(state, context) {
@@ -171,8 +173,39 @@ function s9Entry(state, context) {
 function final(state, context) {
 };
 
+// Sends ISO Request message
+function send059904(pgn, dst) {
+  if (send != null) {
+    let frm = {
+      id: com.makePgn({
+        pgn: 59904,
+        pri: 6,
+        src: address,
+        dst: dst,
+      }),
+      ext: true,
+      rtr: false,
+      data: Buffer.alloc(3),
+    };
+    frm.data.writeUintLE(pgn, 0, 3);
+    return send(frm);
+  } else {
+    return false;
+  }
+};
+
 // Processes ISO Address Claim message
 function proc060928(msg) {
+  let nam = msg.raw.toString('hex', 4);
+  if (typeof timers[nam] !== "undefined") {
+    clearTimeout(timers[nam]);
+    delete timers[nam];
+  } else {
+    timers[nam] = setTimeout((key, src) => {
+      send059904(126996, src);
+      delete timers[key];
+    }, 3000, nam, msg.header.src);
+  }
   switch (asm.currentState.name) {
     case 'WaitForContention':
     case 'Valid':
@@ -183,13 +216,9 @@ function proc060928(msg) {
         clearTimeout(timeout);
         timeout = null;
       }
-      let raw = Buffer.alloc(8);
-      msg.raw.copy(raw, 0, 4);
-      raw.swap64();
-      let our = Buffer.alloc(8);
-      ourname.copy(our);
-      our.swap64()
-      if (raw.compare(our, 0, 7, 0, 7) == -1) {
+      let fnr = msg.raw.readUInt64LE(4);
+      let our = ourname.readUint64LE(0);
+      if (our < fnr) {
         // Iwin
         asm.currentState.trigger('win');
         return

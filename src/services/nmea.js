@@ -35,6 +35,10 @@ function process(frm) {
   if (tmp != null) {
     let msg = dec.decode(tmp);
     if (msg != null) {
+
+console.log(msg)
+
+
       switch (msg.header.pgn) {
         case 59904:
           // ISO Request
@@ -58,8 +62,6 @@ function process(frm) {
           break;
         case 126208:
           // NMEA - Request, Command, Acknowledge - Group Function
-          // NMEA - Read Fields, Read Fields Reply - Group Function
-          // NMEA - Write Fields, Write Fields Reply - Group Function
           proc126208(msg);
           break;
         case 126996:
@@ -266,8 +268,6 @@ function proc065445(msg) {
   // }
 };
 // NMEA - Request, Command, Acknowledge - Group Function
-// NMEA - Read Fields, Read Fields Reply - Group Function
-// NMEA - Write Fields, Write Fields Reply - Group Function
 function proc126208(msg) {
   // Request Group Function Code
   let fld = com.getFld(1, msg.fields);
@@ -284,306 +284,320 @@ function proc126208(msg) {
   switch (grp) {
     case 0:
       // REQUEST
-      // Transmission Interval
-      fld = com.getFld(3, msg.fields);
-      if (fld == null) {
-        return;
-      }
-      let tri = fld;
-      // Transmission Interval Offset
-      fld = com.getFld(4, msg.fields);
-      if (fld == null) {
-        return;
-      }
-      let tio = fld;
-      // Number of Pairs of Request Parameters
-      fld = com.getFld(5, msg.fields);
-      if (fld == null) {
-        return;
-      }
-      let nop = fld.value;
-      switch (pgn) {
-        case 60928:
-          if ((msg.header.dst == adr.getAddress()) || (msg.header.dst == 0xFF)) {
-            let snd = true;
-            if (nop != 0xFF) {
-              let gbl = msg.header.dst == 0xFF;
-              let nam = adr.getName();
+      {
+        // Transmission Interval
+        fld = com.getFld(3, msg.fields);
+        if (fld == null) {
+          return;
+        }
+        let tri = fld;
+        // Transmission Interval Offset
+        fld = com.getFld(4, msg.fields);
+        if (fld == null) {
+          return;
+        }
+        let tio = fld;
+        // Number of Pairs of Request Parameters
+        fld = com.getFld(5, msg.fields);
+        if (fld == null) {
+          return;
+        }
+        let nop = fld.value;
+        switch (pgn) {
+          case 60928:
+            if ((msg.header.dst == adr.getAddress()) || (msg.header.dst == 0xFF)) {
+              let snd = true;
+              if (nop != 0xFF) {
+                let gbl = msg.header.dst == 0xFF;
+                let nam = adr.getName();
+                let ack = false;
+                let per = 0x00;
+                let ter = 0x00;
+                let fer = Buffer.alloc(nop).fill(0);
+                if ((tri.state == '-') && ((tio.state == '-') || (tio.value == 0))) {
+                  // Loop through the parameters
+                  for (let i = 0; i < nop; i++) {
+                    fld = com.getFld((i * 2) + 6, msg.fields);
+                    if (typeof fld === "undefined") {
+                      fer.writeUint8(0x01, i);
+                      ack = true;
+                      snd = false;
+                      break;
+                    }
+                    let fln = fld.value;
+                    fld = com.getFld((i * 2) + 7, msg.fields);
+                    if (typeof fld === "undefined") {
+                      fer.writeUint8(0x01, i);
+                      ack = true;
+                      snd = false;
+                      break;
+                    }
+                    let flv = fld.value;
+                    switch (fln) {
+                      case 1: // Unique Number (ISO Identity Number)
+                      case 2: // Manufacturer Code
+                      case 3: // Device Instance Lower (ISO ECU Instance)
+                      case 4: // Device Instance Upper (ISO Function Instance)
+                      case 5: // Device Function (ISO Function)
+                      case 7: // Device Class
+                      case 8: // System Instance (ISO Device Class Instance)
+                      case 9: // Industry Group
+                        if (flv == nam[fln]) {
+                          fer.writeUint8(0x00, i);
+                          ack = true;
+                        } else {
+                          if (msg.header.dst != 0xFF) {
+                            fer.writeUint8(0x03, i);
+                            ack = true;
+                          }
+                          snd = false;
+                        } 
+                        break;
+                      case 6: // NMEA Reserved
+                      case 10: // NMEA Reserved (ISO Self Configurable)
+                      default:
+                        fer.writeUint8(0x05, i);
+                        ack = true;
+                        snd = false;
+                        break;
+                    }
+                  }
+                } else {
+                  ter = 0x01;
+                  ack = true;
+                }
+                if (ack) {
+                  // Send Acknowledge Group message
+                  send126208(msg.header.src, pgn, per, ter, nop, fer);
+                  snd = false;
+                }
+              }
+              if (snd) {
+                // Send ISO Address Claim message
+                adr.send060928();
+              }
+            }
+            break;
+          case 126464:
+            if (msg.header.dst == adr.getAddress()) {
+              let sn1 = false;
+              let sn2 = false;
               let ack = false;
               let per = 0x00;
               let ter = 0x00;
-              let fer = Buffer.alloc(nop).fill(0);
-              if ((tri.state == '-') && ((tio.state == '-') || (tio.value == 0))) {
-                // Loop through the parameters
-                for (let i = 0; i < nop; i++) {
-                  fld = com.getFld((i * 2) + 6, msg.fields);
-                  if (typeof fld === "undefined") {
-                    fer.writeUint8(0x01, i);
+              if (nop == 0xFF) {
+                sn1 = true;
+                sn2 = true;
+              } else if (nop > 1) {
+                per = 0x04;
+                ack = true;
+              } else {
+                let fer = Buffer.alloc(1).fill(0);
+                if ((tri.state == '-') && ((tio.state == '-') || (tio.value == 0))) {
+                  fld = com.getFld(6, msg.fields);
+                  if (fld == null) {
+                    fer.writeUint8(0x01, 0);
                     ack = true;
-                    snd = false;
                     break;
                   }
                   let fln = fld.value;
-                  fld = com.getFld((i * 2) + 7, msg.fields);
-                  if (typeof fld === "undefined") {
-                    fer.writeUint8(0x01, i);
+                  fld = com.getFld(7, msg.fields);
+                  if (fld == null) {
+                    fer.writeUint8(0x01, 0);
                     ack = true;
-                    snd = false;
                     break;
                   }
                   let flv = fld.value;
                   switch (fln) {
-                    case 1: // Unique Number (ISO Identity Number)
-                    case 2: // Manufacturer Code
-                    case 3: // Device Instance Lower (ISO ECU Instance)
-                    case 4: // Device Instance Upper (ISO Function Instance)
-                    case 5: // Device Function (ISO Function)
-                    case 7: // Device Class
-                    case 8: // System Instance (ISO Device Class Instance)
-                    case 9: // Industry Group
-                      if (flv == nam[fln]) {
-                        fer.writeUint8(0x00, i);
-                        ack = true;
-                      } else {
-                        if (msg.header.dst != 0xFF) {
-                          fer.writeUint8(0x03, i);
+                    case 1: // Function Code
+                      switch (flv) {
+                        case 0:
+                          sn1 = true;
+                          break;
+                        case 1:
+                          sn2 = true;
+                          break;
+                        default:
+                          fer.writeUint8(0x01, 0);
                           ack = true;
-                        }
-                        snd = false;
-                      } 
+                          break;
+                      }
                       break;
-                    case 6: // NMEA Reserved
-                    case 10: // NMEA Reserved (ISO Self Configurable)
                     default:
-                      fer.writeUint8(0x05, i);
+                      ack = true;
+                      break;
+                  }
+                } else {
+                  ter = 0x01;
+                  ack = true;
+                }
+                if (ack) {
+                  // Send Acknowledge Group message
+                  send126208(msg.header.src, pgn, per, ter, nop, fer);
+                }
+              }
+              if (sn1) {
+                // Send PGN Transmit List message
+                send126464(0, msg.header.src);
+              }
+              if (sn2) {
+                // Send PGN Receive List message
+                send126464(1, msg.header.src);
+              }
+            }
+            break;
+          case 126996:
+            if (msg.header.dst == adr.getAddress()) {
+              let snd = true;
+              let ack = false;
+              let per = 0x00;
+              let ter = 0x00;
+              let pif = getProductInfo();
+              let fer = Buffer.alloc(8).fill(0);
+              if (nop != 0xFF) {
+                if ((tri.state == '-') && ((tio.state == '-') || (tio.value == 0))) {
+                  // Loop through the parameters
+                  for (let i = 0; i < nop; i++) {
+                    fld = com.getFld((i * 2) + 6, msg.fields);
+                    if (fld == null) {
+                      fer.writeUint8(0x01, i);
                       ack = true;
                       snd = false;
                       break;
-                  }
-                }
-              } else {
-                ter = 0x01;
-                ack = true;
-              }
-              if (ack) {
-                let rep = {
-                  key: 'nmea2000/126208/2/-/-/-/-',
-                  header: { pgn: 126208, src: adr.getAddress(), dst: msg.header.src },
-                  fields: [
-                    { field: 1, title: "Acknowledgment Group Function Code", state: 'V', value: 0x02 },
-                    { field: 2, title: "PGN beingacknowledged", state: 'V', value: pgn },
-                    { field: 3, title: "PGN error code", state: 'V', value: per },
-                    { field: 4, title: "Transmission Interval / Priority error code", state: 'V', value: ter },
-                    { field: 5, title: "Number of Pairs of Request Parameters to follow", state: 'V', value: nop },
-                  ]
-                };
-                for (let i = 0; i < fer.length; i++) {
-                  rep.fields.push({ field: i + 6, title: "Result (" + (i + 1) + ")", state: 'V', value: fer.readUInt8(i) });
-                };
-                send126208(rep);
-                snd = false;
-              }
-            }
-            if (snd) {
-              // Send ISO Address Claim message
-              adr.send060928();
-            }
-          }
-          break;
-        case 126464:
-          if (msg.header.dst == adr.getAddress()) {
-            let sn1 = false;
-            let sn2 = false;
-            let ack = false;
-            let per = 0x00;
-            let ter = 0x00;
-            if (nop == 0xFF) {
-              sn1 = true;
-              sn2 = true;
-            } else if (nop > 1) {
-              per = 0x04;
-              ack = true;
-            } else {
-              let fer = Buffer.alloc(1).fill(0);
-              if ((tri.state == '-') && ((tio.state == '-') || (tio.value == 0))) {
-                fld = com.getFld(6, msg.fields);
-                if (fld == null) {
-                  fer.writeUint8(0x01, 0);
-                  ack = true;
-                  break;
-                }
-                let fln = fld.value;
-                fld = com.getFld(7, msg.fields);
-                if (fld == null) {
-                  fer.writeUint8(0x01, 0);
-                  ack = true;
-                  break;
-                }
-                let flv = fld.value;
-                switch (fln) {
-                  case 1: // Function Code
-                    switch (flv) {
-                      case 0:
-                        sn1 = true;
-                        break;
-                      case 1:
-                        sn2 = true;
+                    }
+                    let fln = fld.value;
+                    fld = com.getFld((i * 2) + 7, msg.fields);
+                    if (fld == null) {
+                      fer.writeUint8(0x01, i);
+                      ack = true;
+                      snd = false;
+                      break;
+                    }
+                    let flv = fld.value;
+                    switch (fln) {
+                      case 1: // NMEA Network Message Database Version
+                      case 2: // Manufacturer's Product Code
+                      case 3: // Manufacturer's Model ID
+                      case 4: // Manufacturer's Software Version Code
+                      case 5: // Manufacturer's Model Version
+                      case 6: // Manufacturer's Model Serial Code
+                      case 7: // NMEA 2000 Certification Level
+                      case 8: // Load Equivalency
+                        if (flv == pif[fln]) {
+                          fer.writeUint8(0x00, i);
+                          ack = true;
+                        } else {
+                          if (msg.header.dst != 0xFF) {
+                            fer.writeUint8(0x03, i);
+                            ack = true;
+                          }
+                          snd = false;
+                        } 
                         break;
                       default:
-                        fer.writeUint8(0x01, 0);
+                        fer.writeUint8(0x05, i);
                         ack = true;
+                        snd = false;
                         break;
                     }
-                    break;
-                  default:
-                    ack = true;
-                    break;
+                  }
+                } else {
+                  ter = 0x01;
+                  ack = true;
                 }
-              } else {
-                ter = 0x01;
-                ack = true;
               }
               if (ack) {
-                let rep = {
-                  key: 'nmea2000/126208/2/-/-/-/-',
-                  header: { pgn: 126208, src: adr.getAddress(), dst: msg.header.src },
-                  fields: [
-                    { field: 1, title: "Acknowledgment Group Function Code", state: 'V', value: 0x02 },
-                    { field: 2, title: "PGN beingacknowledged", state: 'V', value: pgn },
-                    { field: 3, title: "PGN error code", state: 'V', value: per },
-                    { field: 4, title: "Transmission Interval / Priority error code", state: 'V', value: ter },
-                    { field: 5, title: "Number of Pairs of Request Parameters to follow", state: 'V', value: nop },
-                  ]
-                };
-                for (let i = 0; i < fer.length; i++) {
-                  rep.fields.push({ field: i + 6, title: "Result (" + (i + 1) + ")", state: 'V', value: fer.readUInt8(i) });
-                };
-                send126208(rep);
+                // Send Acknowledge Group message
+                send126208(msg.header.src, pgn, per, ter, nop, fer);
+                snd = false;
+              }
+              if (snd) {
+                // Send Product Info message
+                send126996();
               }
             }
-            if (sn1) {
-              // Send PGN Transmit List message
-              send126464(0, msg.header.src);
-            }
-            if (sn2) {
-              // Send PGN Receive List message
-              send126464(1, msg.header.src);
-            }
-          }
-          break;
-        case 126996:
-          {
-            let snd = true;
-            let ack = false;
-            let per = 0x00;
-            let ter = 0x00;
-            let pif = getProductInfo();
-            let fer = Buffer.alloc(8).fill(0);
-            if ((nop == 0xFF) && (msg.header.dst == 0xFF)) {
-              // per = 0x04;
-              // ack = true;
-              snd = false;
-            } else if (nop != 0xFF) {
-              if ((tri.state == '-') && ((tio.state == '-') || (tio.value == 0))) {
-                // Loop through the parameters
-                for (let i = 0; i < nop; i++) {
-                  fld = com.getFld((i * 2) + 6, msg.fields);
-                  if (fld == null) {
-                    fer.writeUint8(0x01, i);
-                    ack = true;
-                    snd = false;
-                    break;
-                  }
-                  let fln = fld.value;
-                  fld = com.getFld((i * 2) + 7, msg.fields);
-                  if (fld == null) {
-                    fer.writeUint8(0x01, i);
-                    ack = true;
-                    snd = false;
-                    break;
-                  }
-                  let flv = fld.value;
-                  switch (fln) {
-                    case 1: // NMEA Network Message Database Version
-                    case 3: // Manufacturer's Model ID
-                    case 2: // Manufacturer's Product Code
-                    case 4: // Manufacturer's Software Version Code
-                    case 5: // Manufacturer's Model Version
-                    case 6: // Manufacturer's Model Serial Code
-                    case 7: // NMEA 2000 Certification Level
-                    case 8: // Load Equivalency
-                      if (flv == pif[fln]) {
-                        fer.writeUint8(0x00, i);
-                        ack = true;
-                      } else {
-                        if (msg.header.dst != 0xFF) {
-                          fer.writeUint8(0x03, i);
-                          ack = true;
-                        }
-                        snd = false;
-                      } 
-                      break;
-                    default:
-                      fer.writeUint8(0x05, i);
-                      ack = true;
-                      snd = false;
-                      break;
-                  }
-                }
-              } else {
-                ter = 0x01;
-                ack = true;
-              }
-            }
-            if (ack) {
-              let rep = {
-                key: 'nmea2000/126208/2/-/-/-/-',
-                priority: 3,
-                header: { pgn: 126208, src: adr.getAddress(), dst: msg.header.src },
-                fields: [
-                  { field: 1, title: "Acknowledgment Group Function Code", state: 'V', value: 0x02 },
-                  { field: 2, title: "PGN beingacknowledged", state: 'V', value: pgn },
-                  { field: 3, title: "PGN error code", state: 'V', value: per },
-                  { field: 4, title: "Transmission Interval / Priority error code", state: 'V', value: ter },
-                  { field: 5, title: "Number of Pairs of Request Parameters to follow", state: 'V', value: nop },
-                ]
-              };
-              for (let i = 0; i < fer.length; i++) {
-                rep.fields.push({ field: i + 6, title: "Result (" + (i + 1) + ")", state: 'V', value: fer.readUInt8(i) });
-              };
-              send126208(rep);
-              snd = false;
-            }
-            if (snd) {
-              // Send Product Info message
-              send126996();
-            }
-          }
-          break;
-        default:
-          // Send Acknowledge Group message with PGN error code - Not supported (0x01)
-          let rep = {
-            key: 'nmea2000/126208/2/-/-/-/-',
-            header: { pgn: 126208, src: adr.getAddress(), dst: msg.header.src },
-            fields: [
-              { field: 1, title: "Acknowledgment Group Function Code", state: 'V', value: 0x02 },
-              { field: 2, title: "PGN beingacknowledged", state: 'V', value: pgn },
-              { field: 3, title: "PGN error code", state: 'V', value: 0x01 },
-              { field: 4, title: "Transmission Interval / Priority error code", state: 'V', value: 0x00 },
-              { field: 5, title: "Number of Pairs of Request Parameters to follow", state: 'V', value: 0xFF },
-            ],
-          };
-          send126208(rep);
-          break;
+            break;
+          default:
+            send126208(msg.header.src, pgn, 0x01, 0x00, 0xFF);
+            break;
+        }
       }
       break;
     case 1:
-      // Command Message
-      if (msg.header.dst == adr.getAddress()) {
+      // COMMAND
+      {
+        // Priority
+        fld = com.getFld(3, msg.fields);
+        if (fld == null) {
+          return;
+        }
+        let pri = fld.value;
+        // Number of Pairs of Request Parameters
+        fld = com.getFld(5, msg.fields);
+        if (fld == null) {
+          return;
+        }
+        let nop = fld.value;
         switch (pgn) {
           case 126996:
             // Process Command Group for Product Info message
-            comg126996();
+            if (msg.header.dst == adr.getAddress()) {
+              let ack = false;
+              let per = 0x00;
+              let ter = 0x00;
+              let fer = Buffer.alloc(8).fill(0);
+              if (nop != 0xFF) {
+                if (pri == 0x08) {
+                  // Loop through the parameters
+                  for (let i = 0; i < nop; i++) {
+                    fld = com.getFld((i * 2) + 6, msg.fields);
+                    if (fld == null) {
+                      fer.writeUint8(0x01, i);
+                      ack = true;
+                      snd = false;
+                      break;
+                    }
+                    let fln = fld.value;
+                    fld = com.getFld((i * 2) + 7, msg.fields);
+                    if (fld == null) {
+                      fer.writeUint8(0x01, i);
+                      ack = true;
+                      snd = false;
+                      break;
+                    }
+                    let flv = fld.value;
+                    switch (fln) {
+                      case 1: // NMEA Network Message Database Version
+                      case 2: // Manufacturer's Product Code
+                      case 3: // Manufacturer's Model ID
+                      case 4: // Manufacturer's Software Version Code
+                      case 5: // Manufacturer's Model Version
+                      case 6: // Manufacturer's Model Serial Code
+                      case 7: // NMEA 2000 Certification Level
+                      case 8: // Load Equivalency
+                        fer.writeUint8(0x01, i);
+                        ack = true;
+                        break;
+                      default:
+                        fer.writeUint8(0x05, i);
+                        ack = true;
+                        break;
+                    }
+                  }
+                } else {
+                  ter = 0x03;
+                  ack = true;                
+                }
+              }
+              if (ack) {
+                // Send Acknowledge Group message
+                send126208(msg.header.src, pgn, per, ter, nop, fer);
+              }
+            }
+            break;
+          default:
+            // Send Acknowledge Group message with PGN error code - Not supported (0x01)
+            send126208(msg.header.src, pgn, 0x01, 0x00, 0xFF);
             break;
         }
       }
@@ -607,16 +621,28 @@ function proc126208(msg) {
 };
 // Processes Product Information message
 function proc126996(msg) {};
-// Processes Command Group for Product Information message
-function comg126996(msg) {};
 // NMEA - Acknowledge - Group Function
-// NMEA - Read Fields Reply - Group Function
-// NMEA - Write Fields Reply - Group Function
-function send126208(msg) {
-  if (msg != null) {
-    return sendMsg(msg);
+function send126208(src, pgn, per, ter, nop, fer) {
+  let rep = {
+    key: 'nmea2000/126208/2/-/-/-/-',
+    priority: 3,
+    header: { pgn: 126208, src: adr.getAddress(), dst: src },
+    fields: [
+      { field: 1, title: "Acknowledgment Group Function Code", state: 'V', value: 0x02 },
+      { field: 2, title: "PGN beingacknowledged", state: 'V', value: pgn },
+      { field: 3, title: "PGN error code", state: 'V', value: per },
+      { field: 4, title: "Transmission Interval / Priority error code", state: 'V', value: ter },
+    ]
+  };
+  if ((per != 0x00) || (ter != 0x00)) {
+    rep.fields.push({ field: 5, title: "Number of Pairs of Request Parameters to follow", state: 'V', value: 0xFF });
+  } else {
+    rep.fields.push({ field: 5, title: "Number of Pairs of Request Parameters to follow", state: 'V', value: nop });
+    for (let i = 0; i < fer.length; i++) {
+      rep.fields.push({ field: i + 6, title: "Result (" + (i + 1) + ")", state: 'V', value: fer.readUInt8(i) });
+    }
   }
-  return false;
+  return sendMsg(rep);
 }
 // Sends PGN Transmit / Receive Lists
 function send126464(par, dst) {
