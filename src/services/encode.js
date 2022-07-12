@@ -50,6 +50,9 @@ function encode(msg) {
     try {
       let fld = def.fields[i];
       let mfl = com.getFld(fld.field, msg.fields);
+      if (mfl == null) {
+        return null;
+      }
       let byt = Math.floor(ptr / 8);
       let len = null;
       if ((fld.type == 'chr(x)') || (fld.type == 'str')) {
@@ -214,8 +217,8 @@ function extend(def, msg) {
     let tmp = new Array();
     tmp.push(com.getFld(1, def.fields));
     let fld = com.getFld(2, def.fields);
-    for (let i in msg.fields) {
-      if (i > 0) {
+    for (let i = 0; i < msg.fields.length; i++) {
+      if (msg.fields[i].field > 1) {
         fld.field = parseInt(i) + 1;
         fld.title = 'PGN supported (' + parseInt(i) + ')';
         tmp.push(JSON.parse(JSON.stringify(fld)));
@@ -318,40 +321,33 @@ function proc126208(def, msg) {
     if (de2 == null) {
       return null;
     }
-    if (pg2 == 126464) {
-      let fl1 = com.getFld(fun.field, def);
-      let fl2 = com.getFld(1, de2);
-      fl1.type = fl2.type;
-      com.setFld(fl1, def);
-    } else {
-      // Definitions with repeat field(s) aren't supported
-      if (typeof de2.repeat !== "undefined") {
+    // Definitions with repeat field(s) aren't supported
+    if ((pg2 != 126464) && (typeof de2.repeat !== "undefined")) {
         return null;
-      }
-      // Template fields          
-      let tpl = com.getFld(fst, def.fields);
-      if (tpl != null) {
-        let tmp = new Array();
-        for (let i = 0; i < def.fields.length; i++) {
-          if (def.fields[i].field < fst) {
-            tmp.push(JSON.parse(JSON.stringify(def.fields[i])));
-          }
+    }
+    // Template fields          
+    let tpl = com.getFld(fst, def.fields);
+    if (tpl != null) {
+      let tmp = new Array();
+      for (let i = 0; i < def.fields.length; i++) {
+        if (def.fields[i].field < fst) {
+          tmp.push(JSON.parse(JSON.stringify(def.fields[i])));
         }
-        delete def.fields;
-        def.fields = tmp;
-        // Looping through the parameters
-        for (let i = 0; i < cnt; i++) {
-          // Get field number
-          let fln = msg.fields[i].field;
-          // Get requested field
-          let fld = com.getFld(fln, de2.fields);
-          if (fld != null) {
-            let flt = JSON.parse(JSON.stringify(tpl));
-            flt.field = fst + i;
-            flt.title = 'Result (' + fln + ')';
-            flt.type = 'bit(4)';
-            def.fields.push(flt);
-          }
+      }
+      delete def.fields;
+      def.fields = tmp;
+      // Looping through the parameters
+      for (let i = 0; i < cnt; i++) {
+        // Get field number
+        let fln = msg.fields[i].field;
+        // Get requested field
+        let fld = com.getFld(fln, de2.fields);
+        if (fld != null) {
+          let flt = JSON.parse(JSON.stringify(tpl));
+          flt.field = fst + i;
+          flt.title = 'Result (' + fln + ')';
+          flt.type = 'bit(4)';
+          def.fields.push(flt);
         }
       }
     }

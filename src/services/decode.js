@@ -446,60 +446,53 @@ function proc126208(def, frm) {
     if (de2 == null) {
       return null;
     }
-    if (pg2 == 126464) {
-      let fl1 = com.getFld(fun.field, def);
-      let fl2 = com.getFld(1, de2);
-      fl1.type = fl2.type;
-      com.setFld(fl1, def);
-    } else {
-      // Definitions with repeat field(s) aren't supported
-      if (typeof de2.repeat !== "undefined") {
+    // Definitions with repeat field(s) aren't supported
+    if ((pg2 != 126464) && (typeof de2.repeat !== "undefined")) {
         return null;
-      }
-      // Template fields          
-      let tp1 = com.getFld(fst, def.fields);
-      let tp2 = com.getFld(fst + 1, def.fields);
-      if ((tp1 != null) && (tp2 != null)) {
-        let tmp = new Array();
-        for (let i = 0; i < def.fields.length; i++) {
-          if (def.fields[i].field < fst) {
-            tmp.push(JSON.parse(JSON.stringify(def.fields[i])));
-          }
+    }
+    // Template fields          
+    let tp1 = com.getFld(fst, def.fields);
+    let tp2 = com.getFld(fst + 1, def.fields);
+    if ((tp1 != null) && (tp2 != null)) {
+      let tmp = new Array();
+      for (let i = 0; i < def.fields.length; i++) {
+        if (def.fields[i].field < fst) {
+          tmp.push(JSON.parse(JSON.stringify(def.fields[i])));
         }
-        delete def.fields;
-        def.fields = tmp;
-        // Looping through the parameters
-        for (let i = 0; i < cnt; i++) {
-          // Get field number
-          let fln = frm.data.readUInt8(Math.ceil(ptr / 8));
-          ptr += 8;
-          // Get requested field
-          let fld = com.getFld(fln, de2.fields);
-          if (fld != null) {
-            let fl1 = JSON.parse(JSON.stringify(tp1));
-            fl1.field = fst + (i * 2);
-            fl1.title = 'Field Number (' + fln + ')';
-            let fl2 = JSON.parse(JSON.stringify(tp2));
-            fl2.field = fst + (i * 2) + 1;
-            fl2.title = fld.title;
-            let typ = fld.type;
-            if (fld.type.startsWith('bit(')) {
-              let tmp = Math.ceil(parseInt(typ.replace('bit(', '').replace(')', '')) / 8) * 8;
-              typ = 'uint' + tmp;
-            }
-            fl2.type = typ;
-            def.fields.push(fl1);
-            def.fields.push(fl2);
-            let len = null;
-            if ((fld.type == 'chr(x)') || (fld.type == 'str')) {
-              len = com.calcLength(fld.type, frm.data.readUInt8(Math.ceil((ptr + 1) / 8)));
-            } else {
-              len = com.calcLength(fld.type);
-            }
-            if (len != null) {
-              len = Math.ceil(len / 8) * 8;
-              ptr += len;
-            }
+      }
+      delete def.fields;
+      def.fields = tmp;
+      // Looping through the parameters
+      for (let i = 0; i < cnt; i++) {
+        // Get field number
+        let fln = frm.data.readUInt8(Math.ceil(ptr / 8));
+        ptr += 8;
+        // Get requested field
+        let fld = com.getFld(fln, de2.fields);
+        if (fld != null) {
+          let fl1 = JSON.parse(JSON.stringify(tp1));
+          fl1.field = fst + (i * 2);
+          fl1.title = 'Field Number (' + fln + ')';
+          let fl2 = JSON.parse(JSON.stringify(tp2));
+          fl2.field = fst + (i * 2) + 1;
+          fl2.title = fld.title;
+          let typ = fld.type;
+          if (fld.type.startsWith('bit(')) {
+            let tmp = Math.ceil(parseInt(typ.replace('bit(', '').replace(')', '')) / 8) * 8;
+            typ = 'uint' + tmp;
+          }
+          fl2.type = typ;
+          def.fields.push(fl1);
+          def.fields.push(fl2);
+          let len = null;
+          if ((fld.type == 'chr(x)') || (fld.type == 'str')) {
+            len = com.calcLength(fld.type, frm.data.readUInt8(Math.ceil((ptr + 1) / 8)));
+          } else {
+            len = com.calcLength(fld.type);
+          }
+          if (len != null) {
+            len = Math.ceil(len / 8) * 8;
+            ptr += len;
           }
         }
       }
