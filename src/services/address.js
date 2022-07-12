@@ -212,19 +212,22 @@ function proc060928(msg) {
       if (msg.header.src != address) {
         return;
       }
-      if (timeout != null) {
-        clearTimeout(timeout);
-        timeout = null;
+      if (msg.raw.length == 12) {
+        if (timeout != null) {
+          clearTimeout(timeout);
+          timeout = null;
+        }
+        let fnr = msg.raw.readUInt64LE(4);
+        let our = ourname.readUint64LE(0);
+        if (our < fnr) {
+          // Iwin
+          asm.currentState.trigger('win');
+          return
+        }
+        // Ilose
+        asm.currentState.trigger('loose');
       }
-      let fnr = msg.raw.readUInt64LE(4);
-      let our = ourname.readUint64LE(0);
-      if (our < fnr) {
-        // Iwin
-        asm.currentState.trigger('win');
-        return
-      }
-      // Ilose
-      asm.currentState.trigger('loose');
+      break;
   }
   return;
 };

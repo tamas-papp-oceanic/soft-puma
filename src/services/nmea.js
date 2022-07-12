@@ -35,10 +35,6 @@ function process(frm) {
   if (tmp != null) {
     let msg = dec.decode(tmp);
     if (msg != null) {
-
-console.log(msg)
-
-
       switch (msg.header.pgn) {
         case 59904:
           // ISO Request

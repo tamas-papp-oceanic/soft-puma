@@ -13,41 +13,41 @@ function pack(frm) {
 
 // Convert message to can frame
 function encode(msg) {
-  if ((typeof msg.header === "undefined") || (typeof msg.fields === "undefined")) {
-    return null;
-  }
-  let spl = msg.key.split('/');
-  let def = com.getDef(spl.splice(0, spl.length - 2).join('/'));
-  if (def == null) {
-    return null;
-  }
-  if (msg.header.pgn == 126208) {
-    def = proc126208(def, msg);
-  } else {
-    def = extend(def, msg);
-  }
-  if (def == null) {
-    return null;
-  }
-  msg.header.pri = def.priority;
-  let ptr = 0;
-  for (let i in def.fields) {
-    let fld = def.fields[i];
-    let mfl = com.getFld(fld.field, msg.fields);
-    let len = null;
-    if ((fld.type == 'chr(x)') || (fld.type == 'str')) {
-      len = com.calcLength(fld.type, mfl != null ? mfl.value.length : 0);
+  try {
+    if ((typeof msg.header === "undefined") || (typeof msg.fields === "undefined")) {
+      return null;
+    }
+    let spl = msg.key.split('/');
+    let def = com.getDef(spl.splice(0, spl.length - 2).join('/'));
+    if (def == null) {
+      return null;
+    }
+    if (msg.header.pgn == 126208) {
+      def = proc126208(def, msg);
     } else {
-      len = com.calcLength(fld.type);
+      def = extend(def, msg);
     }
-    if (len != null) {
-      ptr += len;
+    if (def == null) {
+      return null;
     }
-  }
-  let raw = Buffer.alloc(Math.ceil(ptr / 8));
-  ptr = 0;
-  for (let i in def.fields) {
-    try {
+    msg.header.pri = def.priority;
+    let ptr = 0;
+    for (let i in def.fields) {
+      let fld = def.fields[i];
+      let mfl = com.getFld(fld.field, msg.fields);
+      let len = null;
+      if ((fld.type == 'chr(x)') || (fld.type == 'str')) {
+        len = com.calcLength(fld.type, mfl != null ? mfl.value.length : 0);
+      } else {
+        len = com.calcLength(fld.type);
+      }
+      if (len != null) {
+        ptr += len;
+      }
+    }
+    let raw = Buffer.alloc(Math.ceil(ptr / 8));
+    ptr = 0;
+    for (let i in def.fields) {
       let fld = def.fields[i];
       let mfl = com.getFld(fld.field, msg.fields);
       if (mfl == null) {
@@ -143,10 +143,6 @@ function encode(msg) {
         }
         ptr += len;
       }
-    } catch (err) {
-      console.log("ERROR", err);
-      return null;
-    }
   }
   let dlc = Math.ceil(ptr / 8);
   let frm = {
@@ -157,37 +153,54 @@ function encode(msg) {
   };
   raw.copy(frm.data, 0, 0, dlc);
   return frm;
+} catch (err) {
+  console.log("ERROR", err);
+  return null;
+}
 };
 
 function encodeFastPacket(fap) {
-  if (fap.data.length == 0) {
-    return null;
-  }
-  let ret = new Array();
-  let seq = -1;
-  let frm = 0;
-  let cnt = 0;
-  let key = fap.id.toString(16).padStart(8, '0');
-  if (typeof fastbuff[key] !== "undefined") {
-    seq = fastbuff[key];
-  }
-  seq++
-  seq &= 0b111;
-  fastbuff[key] = seq;
-  let dat = Buffer.alloc(8).fill(0xFF);
-  for (let i = 0; i < fap.data.length; i++) {
-    if ((cnt % 8) == 0) {
-      dat.writeUInt8((seq << 5) + frm, (cnt % 8));
-      if (cnt == 0) {
-        cnt++
-        dat.writeUInt8(fap.data.length, (cnt % 8));
-      }
-      frm++
-      cnt++
+  try {
+    if (fap.data.length == 0) {
+      return null;
     }
-    dat.writeUInt8(fap.data[i], (cnt % 8));
-    cnt++
-    if ((cnt % 8) == 0) {
+    let ret = new Array();
+    let seq = -1;
+    let frm = 0;
+    let cnt = 0;
+    let key = fap.id.toString(16).padStart(8, '0');
+    if (typeof fastbuff[key] !== "undefined") {
+      seq = fastbuff[key];
+    }
+    seq++
+    seq &= 0b111;
+    fastbuff[key] = seq;
+    let dat = Buffer.alloc(8).fill(0xFF);
+    for (let i = 0; i < fap.data.length; i++) {
+      if ((cnt % 8) == 0) {
+        dat.writeUInt8((seq << 5) + frm, (cnt % 8));
+        if (cnt == 0) {
+          cnt++
+          dat.writeUInt8(fap.data.length, (cnt % 8));
+        }
+        frm++
+        cnt++
+      }
+      dat.writeUInt8(fap.data[i], (cnt % 8));
+      cnt++
+      if ((cnt % 8) == 0) {
+        let rec = {
+          id: fap.id,
+          ext: fap.ext,
+          rtr: fap.rtr,
+          data: Buffer.alloc(8),
+        };
+        dat.copy(rec.data);
+        ret.push(rec);
+        dat.fill(0xFF);
+      }
+    }
+    if ((cnt % 8) != 0) {
       let rec = {
         id: fap.id,
         ext: fap.ext,
@@ -196,79 +209,77 @@ function encodeFastPacket(fap) {
       };
       dat.copy(rec.data);
       ret.push(rec);
-      dat.fill(0xFF);
     }
+    return ret;
+  } catch (err) {
+    console.log("ERROR", err);
+    return null;
   }
-  if ((cnt % 8) != 0) {
-    let rec = {
-      id: fap.id,
-      ext: fap.ext,
-      rtr: fap.rtr,
-      data: Buffer.alloc(8),
-    };
-    dat.copy(rec.data);
-    ret.push(rec);
-  }
-  return ret;
 }
 
 function extend(def, msg) {
-  if (msg.header.pgn == 126464) {
-    let tmp = new Array();
-    tmp.push(com.getFld(1, def.fields));
-    let fld = com.getFld(2, def.fields);
-    for (let i = 0; i < msg.fields.length; i++) {
-      if (msg.fields[i].field > 1) {
-        fld.field = parseInt(i) + 1;
-        fld.title = 'PGN supported (' + parseInt(i) + ')';
-        tmp.push(JSON.parse(JSON.stringify(fld)));
-      }
-    }
-    delete def.fields;
-    def.fields = tmp;
-  } else if (typeof def.repeat !== "undefined") {
-    let max = null;
-    for (let i in def.repeat) {
-      for (let j in def.fields) {
-        let fld = def.fields[j];
-        let len = 0;
-        if (fld.field < def.repeat[i].field) {
-          if (fld.field > max) {
-            max = fld.field;
-          }
-        } else {
-          let mfl = com.getFld(fld.field, msg.fields);
-          def.repeat[i].value = mfl != null ? mfl.value : 0;
-          max = fld.field;
-          break;
+  try {
+    if (msg.header.pgn == 126464) {
+      let tmp = new Array();
+      tmp.push(com.getFld(1, def.fields));
+      let fld = com.getFld(2, def.fields);
+      for (let i = 0; i < msg.fields.length; i++) {
+        if (msg.fields[i].field > 1) {
+          fld.field = parseInt(i) + 1;
+          fld.title = 'PGN supported (' + parseInt(i) + ')';
+          tmp.push(JSON.parse(JSON.stringify(fld)));
         }
       }
-    }
-    let tmp = new Array();
-    for (let i in def.fields) {
-      let fld = def.fields[i];
-      if (fld.field <= max) {
-        tmp.push(fld);
+      delete def.fields;
+      def.fields = tmp;
+    } else if (typeof def.repeat !== "undefined") {
+      let max = null;
+      for (let i in def.repeat) {
+        for (let j in def.fields) {
+          let fld = def.fields[j];
+          let len = 0;
+          if (fld.field < def.repeat[i].field) {
+            if (fld.field > max) {
+              max = fld.field;
+            }
+          } else {
+            let mfl = com.getFld(fld.field, msg.fields);
+            def.repeat[i].value = mfl != null ? mfl.value : 0;
+            max = fld.field;
+            break;
+          }
+        }
       }
-    }
-    for (let i in def.repeat) {
-      let rep = def.repeat[i];
-      if ((rep.value > 0) && (rep.value <= 252)) {
-        for (let j = 0; j < rep.value; j++) {
-          for (let k in def.fields) {
-            let fld = def.fields[k];
-            if ((fld.field >= rep.start) && (fld.field < (rep.start + rep.count))) {
-              fld.field = ++max;
-              tmp.push(fld);
+      let tmp = new Array();
+      for (let i in def.fields) {
+        let fld = def.fields[i];
+        if (fld.field <= max) {
+          tmp.push(fld);
+        }
+      }
+      for (let i in def.repeat) {
+        let rep = def.repeat[i];
+        if ((rep.value > 0) && (rep.value <= 252)) {
+          for (let j = 0; j < rep.value; j++) {
+            for (let k in def.fields) {
+              let fld = def.fields[k];
+              if ((fld.field >= rep.start) && (fld.field < (rep.start + rep.count))) {
+                fld.field = ++max;
+                tmp.push(fld);
+              }
             }
           }
         }
       }
+      delete def.fields;
+      def.fields = tmp;
     }
-    delete def.fields;
-    def.fields = tmp;
+    return JSON.parse(JSON.stringify(def));
+  } catch (err) {
+    console.log("ERROR", err);
+    return null;
   }
-  return JSON.parse(JSON.stringify(def));
+
 }
 
 const fun126208 = {
@@ -282,77 +293,82 @@ const fun126208 = {
 }
 
 function proc126208(def, msg) {
-  delete def.repeat;
-  let fld = com.getFld(1, msg.fields);
-  if (fld == null) {
-    return null;
-  }
-  let fun = fun126208[fld.value];
-  if (typeof fun === "undefined") {
-    return null;
-  }
-  let rep = fun.repeat;
-  let fst = fun.field;
-  fld = com.getFld(2, msg.fields);
-  if (fld == null) {
-    return null;
-  }
-  let pg2 = fld.value;
-  fld = com.getFld(rep, msg.fields);
-  if (fld == null) {
-    return null;
-  }
-  let cnt = fld.value;
-  if ((cnt != null) && (cnt != 0xFF)) {
-    let qry = { id: (pg2 << 8) };
-    let fu2 = null;
-    let key = 'nmea2000/' + pg2.toString().padStart(6, '0');
-    let cnv = com.findCnv(key);
-    if ((typeof cnv !== "undefined") && (typeof cnv.function !== "undefined")) {
-      fu2 = cnv.function
-    }
-    if (fu2 != null) {
-      key += '/' + fu2;
-    } else {
-      key += '/-';
-    }
-    key += '/-/-';
-    let de2 = com.getDef(key);
-    if (de2 == null) {
+  try {
+    delete def.repeat;
+    let fld = com.getFld(1, msg.fields);
+    if (fld == null) {
       return null;
     }
-    // Definitions with repeat field(s) aren't supported
-    if ((pg2 != 126464) && (typeof de2.repeat !== "undefined")) {
+    let fun = fun126208[fld.value];
+    if (typeof fun === "undefined") {
+      return null;
+    }
+    let rep = fun.repeat;
+    let fst = fun.field;
+    fld = com.getFld(2, msg.fields);
+    if (fld == null) {
+      return null;
+    }
+    let pg2 = fld.value;
+    fld = com.getFld(rep, msg.fields);
+    if (fld == null) {
+      return null;
+    }
+    let cnt = fld.value;
+    if ((cnt != null) && (cnt != 0xFF)) {
+      let qry = { id: (pg2 << 8) };
+      let fu2 = null;
+      let key = 'nmea2000/' + pg2.toString().padStart(6, '0');
+      let cnv = com.findCnv(key);
+      if ((typeof cnv !== "undefined") && (typeof cnv.function !== "undefined")) {
+        fu2 = cnv.function
+      }
+      if (fu2 != null) {
+        key += '/' + fu2;
+      } else {
+        key += '/-';
+      }
+      key += '/-/-';
+      let de2 = com.getDef(key);
+      if (de2 == null) {
         return null;
-    }
-    // Template fields          
-    let tpl = com.getFld(fst, def.fields);
-    if (tpl != null) {
-      let tmp = new Array();
-      for (let i = 0; i < def.fields.length; i++) {
-        if (def.fields[i].field < fst) {
-          tmp.push(JSON.parse(JSON.stringify(def.fields[i])));
+      }
+      // Definitions with repeat field(s) aren't supported
+      if ((pg2 != 126464) && (typeof de2.repeat !== "undefined")) {
+          return null;
+      }
+      // Template fields          
+      let tpl = com.getFld(fst, def.fields);
+      if (tpl != null) {
+        let tmp = new Array();
+        for (let i = 0; i < def.fields.length; i++) {
+          if (def.fields[i].field < fst) {
+            tmp.push(JSON.parse(JSON.stringify(def.fields[i])));
+          }
+        }
+        delete def.fields;
+        def.fields = tmp;
+        // Looping through the parameters
+        for (let i = 0; i < cnt; i++) {
+          // Get field number
+          let fln = msg.fields[i].field;
+          // Get requested field
+          let fld = com.getFld(fln, de2.fields);
+          if (fld != null) {
+            let flt = JSON.parse(JSON.stringify(tpl));
+            flt.field = fst + i;
+            flt.title = 'Result (' + fln + ')';
+            flt.type = 'bit(4)';
+            def.fields.push(flt);
+          }
         }
       }
-      delete def.fields;
-      def.fields = tmp;
-      // Looping through the parameters
-      for (let i = 0; i < cnt; i++) {
-        // Get field number
-        let fln = msg.fields[i].field;
-        // Get requested field
-        let fld = com.getFld(fln, de2.fields);
-        if (fld != null) {
-          let flt = JSON.parse(JSON.stringify(tpl));
-          flt.field = fst + i;
-          flt.title = 'Result (' + fln + ')';
-          flt.type = 'bit(4)';
-          def.fields.push(flt);
-        }
-      }
     }
+    return JSON.parse(JSON.stringify(def));
+  } catch (err) {
+    console.log("ERROR", err);
+    return null;
   }
-  return JSON.parse(JSON.stringify(def));
 }
 
 module.exports = {
