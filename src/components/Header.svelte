@@ -35,7 +35,7 @@
   export let version;
   
   let isSideNavOpen = false;
-  let isOpen = false;
+  let open = false;
   let platform = product + " v" + version;
   let routeParsed;
   let re = /(\/[A-z]+)/;
@@ -45,12 +45,16 @@
   };
 
   function close(e) {
-    isOpen = false;
+    open = false;
     window.close();
   };  
 
+  function show(e) {
+    open = true;
+  };  
+
   function cancel(e) {
-    isOpen = false;
+    open = false;
   };  
   
   $: platform = product + " v" + version
@@ -66,11 +70,11 @@
     </HeaderNav>
     <HeaderUtilities>
       <HeaderGlobalAction on:click={(e) => login(e)} aria-label="Login" icon={Login20} text="Login" />
-      <HeaderGlobalAction on:click={(e) => { isOpen = true }} id="close-btn" aria-label="Exit" icon={Close20} />
+      <HeaderGlobalAction on:click={(e) => show(e)} id="close-btn" aria-label="Exit" icon={Close20} />
     </HeaderUtilities>
   </Header>
-  <ComposedModal bind:isOpen on:submit={(e) => close(e)}>
-    <ModalHeader label="Changes" title="Confirm changes" />
+  <ComposedModal bind:open on:submit={(e) => close(e)} size="xs">
+    <ModalHeader label="Exit" title="Confirm exit" />
     <ModalFooter
       primaryButtonText="Proceed"
       secondaryButtons={[{ text: "Cancel" }]}
