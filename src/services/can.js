@@ -11,6 +11,7 @@ const fs = require('fs');
 const can = require('socketcan');
 
 let cha = null;
+let started = false;
 
 try {
   cha = can.createRawChannel("can0", true);
@@ -20,23 +21,28 @@ try {
 }
 
 function start(fun) {
-  if (cha != null) {
+  if ((cha != null) && !started) {
     cha.addListener("onMessage", (msg) => {
       // console.log('(' + (msg.ts_sec + msg.ts_usec / 1000000).toFixed(6) + ') ' + msg.id.toString(16).toUpperCase().padStart(8, '0') + '#' + msg.data.toString('hex').toUpperCase());
       fun(msg);
     });
+    cha.addListener("onStopped", (msg) => {
+      console.log('CAN stopped.');
+      started = false;
+    });
     cha.start();
+    started = true;
   }
 };
 
 function send(dat) {
-  if (cha != null) {
+  if ((cha != null) && started) {
     cha.send(dat);
   }
 };
 
 function stop() {
-  if (cha != null) {
+  if ((cha != null) && started) {
     cha.stop();
   }
 };

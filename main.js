@@ -83,8 +83,6 @@ app.on('window-all-closed', function () {
   // On macOS it is common for applications and their menu bar
   // to stay active until the user quits explicitly with Cmd + Q
   if (process.platform !== 'darwin') {
-    can.stop();
-    ser.stop();
     app.quit();
   }
 });
@@ -164,4 +162,14 @@ ipcMain.on('ser-start', (e, ...args) => {
 ipcMain.on('ser-stop', (e, ...args) => {
   ser.stop();
   mainWindow.webContents.send('ser-running', false);
+});
+// Close the application
+ipcMain.on('app-quit', (e, ...args) => {
+  console.log("Stopping CAN...")
+  can.stop();
+  console.log("Stopping Serial...")
+  ser.stop();
+  console.log("Serial stopped.")
+  console.log("Quit...")
+  app.quit();
 });

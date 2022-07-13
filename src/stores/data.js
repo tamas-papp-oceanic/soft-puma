@@ -175,6 +175,12 @@ window.pumaAPI.recv('n2k-data', (e, val) => {
     let key = val.key;
     delete val.key;
     let dat = get(data);
+    if (typeof dat[key] === "undefined") {
+      val.cnt = 0;
+    } else {
+      val.cnt = dat[key].cnt;
+    }
+    val.cnt++;
     dat[key] = val;
     data.set(dat);
   }

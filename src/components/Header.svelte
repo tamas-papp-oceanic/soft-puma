@@ -1,32 +1,7 @@
 <script>
-  import {location, push, pop, replace, link} from 'svelte-spa-router'
-  import {
-    Header,
-    HeaderNav,
-    HeaderNavItem,
-    HeaderNavMenu,
-    SkipToContent,
-    SideNav,
-    SideNavItems,
-    SideNavMenu,
-    SideNavMenuItem,
-    SideNavLink,
-    HeaderUtilities,
-    HeaderAction,
-    HeaderGlobalAction,
-    HeaderPanelLinks,
-    HeaderPanelDivider,
-    HeaderPanelLink,
-    Tabs, Tab, TabContent,
-    Content,
-    Grid,
-    Row,
-    Column,
-    ComposedModal,
-    ModalHeader,
-    ModalFooter,
-  } from "carbon-components-svelte";
-  import User20 from "carbon-icons-svelte/lib/User20";
+  import { location, push } from 'svelte-spa-router'
+  import { Header, HeaderNav, HeaderNavItem, HeaderUtilities, HeaderGlobalAction,
+    ComposedModal, ModalHeader, ModalFooter } from "carbon-components-svelte";
   import Login20 from "carbon-icons-svelte/lib/Login20";
   import Close20 from "carbon-icons-svelte/lib/Close20";
   
@@ -46,7 +21,8 @@
 
   function close(e) {
     open = false;
-    window.close();
+    // window.close();
+    window.pumaAPI.send('app-quit');
   };  
 
   function show(e) {

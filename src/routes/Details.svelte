@@ -6,6 +6,9 @@
 
   export let params;
 
+console.log(params)
+
+
   const headers = [{
     key: "msg",
     value: "Message",
@@ -108,22 +111,22 @@
         </Toolbar>
         <span slot="cell" let:cell let:row>
           {#if cell.key === 'overflow'}
-            <OverflowMenu flipped>
-              <OverflowMenuItem text="Details" on:click={(e) => push('/details/'+row.id)} />
-            </OverflowMenu>
-          {:else}
-            {cell.value}
-          {/if}
+          <OverflowMenu flipped>
+            <OverflowMenuItem text="Details" on:click={() => push('/detail/'+row.id)} />
+          </OverflowMenu>
+        {:else}
+          {cell.value}
+        {/if}
       </span>
     </DataTable>
       {#if pagination.totalItems > pagination.pageSize}
-        <Pagination
-          pageSize={pagination.pageSize}
-          totalItems={pagination.totalItems}
-          bind:page={pagination.page}
-          pageSizeInputDisabled
-          pageInputDisabled
-        />
+      <Pagination
+        pageSize={pagination.pageSize}
+        totalItems={pagination.totalItems}
+        bind:page={pagination.page}
+        pageSizeInputDisabled
+        pageInputDisabled
+      />
       {/if}
     </Column>
   </Row>
