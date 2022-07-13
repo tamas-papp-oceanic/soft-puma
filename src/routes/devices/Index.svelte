@@ -1,9 +1,9 @@
 <script>
-  import { Grid, Row, Column, ButtonSet, Button, DataTable,
-    Toolbar, ToolbarContent, ToolbarSearch, ToolbarMenu,
-    ToolbarMenuItem, OverflowMenu, OverflowMenuItem, Pagination } from "carbon-components-svelte";
+  import { Grid, Row, Column, Button, DataTable, Toolbar,
+    ToolbarContent, ToolbarSearch,  OverflowMenu, 
+    OverflowMenuItem, Pagination } from "carbon-components-svelte";
   import { push } from 'svelte-spa-router'
-  import { name, data } from "../../stores/data.js";
+  import { name } from "../../stores/data.js";
 
   const headers = [{
     key: "id",
@@ -104,13 +104,13 @@
         </span>
       </DataTable>
       {#if pagination.totalItems > pagination.pageSize}
-      <Pagination
-        pageSize={pagination.pageSize}
-        totalItems={pagination.totalItems}
-        bind:page={pagination.page}
-        pageSizeInputDisabled
-        pageInputDisabled
-      />
+        <Pagination
+          pageSize={pagination.pageSize}
+          totalItems={pagination.totalItems}
+          bind:page={pagination.page}
+          pageSizeInputDisabled
+          pageInputDisabled
+        />
       {/if}
     </Column>
   </Row>

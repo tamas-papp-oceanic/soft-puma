@@ -109,7 +109,7 @@
         <span slot="cell" let:cell let:row>
           {#if cell.key === 'overflow'}
             <OverflowMenu flipped>
-              <OverflowMenuItem text="Details" on:click={(e) => push('/details/'+row.id)} />
+              <OverflowMenuItem text="Details" on:click={(e) => { push('/details/'+row.id); }} />
             </OverflowMenu>
           {:else}
             {cell.value}

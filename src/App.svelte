@@ -56,7 +56,7 @@
 		}),
 		"/devices/:address": Configure,
 		"/monitor/:address": Monitor,
-		"/details/:address": Details,
+		"/details/:protocol/:pgn/:function/:manufacturer/:industry/:instance/:type": Details,
 		"*": NotFound,
 	};
 </script>
