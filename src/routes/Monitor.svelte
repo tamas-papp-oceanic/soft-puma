@@ -49,7 +49,7 @@
   // Data getters, setters
   $: {
     let nam = $name[parseInt(params["address"])];
-    if (typeof nam !== "undefined") {
+    if (typeof nam !== 'undefined') {
       title = 'Messages of ' + nam.manufacturer;
       description = nam.modelID != null ? nam.modelID : '';
     } else {
@@ -96,35 +96,52 @@
         sortable
         {headers}
         {rows}
-        size="medium"
+        size="short"
         pageSize={pagination.pageSize}
         page={pagination.page}>
-        <strong slot="title">{title}</strong>
-        <span slot="description" style="font-size: 1rem;">{description}</span>
+        <!-- <strong slot="title">{title}</strong>
+        <span slot="description" style="font-size: 1rem;">{description}</span> -->
         <Toolbar>
           <ToolbarContent>
+            <div class="title">
+              <div>{title}</div>
+              <div>{description}</div>
+            </div>
             <Button on:click={(e) => back(e)}>&larr;&nbsp;Back</Button>
           </ToolbarContent>
         </Toolbar>
         <span slot="cell" let:cell let:row>
           {#if cell.key === 'overflow'}
             <OverflowMenu flipped>
-              <OverflowMenuItem text="Details" on:click={(e) => { push('/details/'+row.id); }} />
+              <OverflowMenuItem text="Content" on:click={(e) => { push('/messages/'+row.id); }} />
             </OverflowMenu>
           {:else}
             {cell.value}
           {/if}
-      </span>
-    </DataTable>
+        </span>
+      </DataTable>
       {#if pagination.totalItems > pagination.pageSize}
         <Pagination
           pageSize={pagination.pageSize}
           totalItems={pagination.totalItems}
           bind:page={pagination.page}
-          pageSizeInputDisabled
           pageInputDisabled
+          pageSizeInputDisabled
         />
       {/if}
     </Column>
   </Row>
 </Grid>
+
+<style lang="scss">
+  .title {
+    display: flex;
+    align-items: center;
+    justify-content: flex-start;
+    width: inherit;
+  }
+  .title div {
+    padding: 0 1rem;
+    font-size: 1rem;
+  }
+</style>

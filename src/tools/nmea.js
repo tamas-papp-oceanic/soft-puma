@@ -35,20 +35,20 @@ function create() {
         priority: pgn.priority,
         interval: pgn.interval,
       };
-      if (typeof pgn.repeatField !== "undefined") {
+      if (typeof pgn.repeatField !== 'undefined') {
         obj.repeat = [{
           field: pgn.repeatField,
           start: pgn.startField,
           count: pgn.fieldCount,
         }];
-      } else if (typeof pgn.repeatField1 !== "undefined") {
+      } else if (typeof pgn.repeatField1 !== 'undefined') {
         obj.repeat = [{
           field: pgn.repeatField1,
           start: pgn.startField1,
           count: pgn.fieldCount1,
         }];
       }
-      if (typeof pgn.repeatField2 !== "undefined") {
+      if (typeof pgn.repeatField2 !== 'undefined') {
         obj.repeat.push({
           field: pgn.repeatField2,
           start: pgn.startField2,
@@ -92,7 +92,7 @@ function create() {
           unit: fld.unit,
           multiplier: mul,
         };
-        if (typeof fld.instance !== "undefined") {
+        if (typeof fld.instance !== 'undefined') {
           tmp.instance = true;
         }
         obj.fields.push(tmp);

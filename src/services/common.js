@@ -91,7 +91,7 @@ function findCnv(key) {
 // Returns with PGN definition
 function findDef(frm) {
   let key = getKey(frm);
-  if (typeof nmeadefs[key] !== "undefined") {
+  if (typeof nmeadefs[key] !== 'undefined') {
     let out = JSON.parse(JSON.stringify(nmeadefs[key]));
     out.key = key;
     return out;
@@ -104,7 +104,7 @@ function getKey(frm) {
   let pgn = getPgn(frm.id);
   let key = "nmea2000/" + pgn.toString().padStart(6, '0');
   let cnv = nmeaconv[key];
-  if ((typeof cnv !== "undefined") && (typeof cnv.function !== "undefined")) {
+  if ((typeof cnv !== 'undefined') && (typeof cnv.function !== 'undefined')) {
     key += "/" + frm.data[cnv.function];
   } else {
     key += "/-";
@@ -120,7 +120,7 @@ function getKey(frm) {
 
 // Returns with PGN definition
 function getDef(key) {
-  if (typeof nmeadefs[key] !== "undefined") {
+  if (typeof nmeadefs[key] !== 'undefined') {
     return JSON.parse(JSON.stringify(nmeadefs[key]));
   }
   return null;

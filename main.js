@@ -102,7 +102,7 @@ app.on('activate', function () {
 // tool.create();
 // NMEA processing
 function proc(frm) {
-  if (typeof mainWindow.webContents !== "undefined") {
+  if (typeof mainWindow.webContents !== 'undefined') {
     let msg = nmea.process(frm);
     if (msg != null) {
       switch (msg.header.pgn) {
@@ -125,7 +125,7 @@ com.init();
 nmea.init();
 // Load configurations
 ipcMain.on('n2k-ready', (e, ...args) => {
-  if (typeof mainWindow.webContents !== "undefined") {
+  if (typeof mainWindow.webContents !== 'undefined') {
     const configs = ['classes', 'functions', 'industries', 'manufacturers'];
     for (let i in configs) {
       let cnf = configs[i];

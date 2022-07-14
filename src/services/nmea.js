@@ -319,7 +319,7 @@ function proc126208(msg) {
                   // Loop through the parameters
                   for (let i = 0; i < nop; i++) {
                     fld = com.getFld((i * 2) + 6, msg.fields);
-                    if (typeof fld === "undefined") {
+                    if (typeof fld === 'undefined') {
                       fer.writeUint8(0x01, i);
                       ack = true;
                       snd = false;
@@ -327,7 +327,7 @@ function proc126208(msg) {
                     }
                     let fln = fld.value;
                     fld = com.getFld((i * 2) + 7, msg.fields);
-                    if (typeof fld === "undefined") {
+                    if (typeof fld === 'undefined') {
                       fer.writeUint8(0x01, i);
                       ack = true;
                       snd = false;

@@ -197,7 +197,7 @@ function send059904(pgn, dst) {
 // Processes ISO Address Claim message
 function proc060928(msg) {
   let nam = msg.raw.toString('hex', 4);
-  if (typeof timers[nam] !== "undefined") {
+  if (typeof timers[nam] !== 'undefined') {
     clearTimeout(timers[nam]);
     delete timers[nam];
   } else {

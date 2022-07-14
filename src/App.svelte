@@ -9,7 +9,8 @@
 	import Header from './components/Header.svelte';
 	import Devices from './routes/devices/Index.svelte';
 	import Monitor from './routes/Monitor.svelte';
-	import Details from './routes/Details.svelte';
+	import Messages from './routes/Messages.svelte';
+	// import Details from './routes/Details.svelte';
 	import Simulate from './routes/Simulate.svelte';
 	import Configure from './routes/Configure.svelte';
 	import Program from './routes/program/Index.svelte';
@@ -56,7 +57,8 @@
 		}),
 		"/devices/:address": Configure,
 		"/monitor/:address": Monitor,
-		"/details/:protocol/:pgn/:function/:manufacturer/:industry/:instance/:type": Details,
+		"/messages/:protocol/:pgn/:function/:manufacturer/:industry/:instance/:type": Messages,
+		// "/details/:protocol/:pgn/:function/:manufacturer/:industry/:instance/:type": Details,
 		"*": NotFound,
 	};
 </script>

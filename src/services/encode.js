@@ -14,7 +14,7 @@ function pack(frm) {
 // Convert message to can frame
 function encode(msg) {
   try {
-    if ((typeof msg.header === "undefined") || (typeof msg.fields === "undefined")) {
+    if ((typeof msg.header === 'undefined') || (typeof msg.fields === 'undefined')) {
       return null;
     }
     let spl = msg.key.split('/');
@@ -169,7 +169,7 @@ function encodeFastPacket(fap) {
     let frm = 0;
     let cnt = 0;
     let key = fap.id.toString(16).padStart(8, '0');
-    if (typeof fastbuff[key] !== "undefined") {
+    if (typeof fastbuff[key] !== 'undefined') {
       seq = fastbuff[key];
     }
     seq++
@@ -232,7 +232,7 @@ function extend(def, msg) {
       }
       delete def.fields;
       def.fields = tmp;
-    } else if (typeof def.repeat !== "undefined") {
+    } else if (typeof def.repeat !== 'undefined') {
       let max = null;
       for (let i in def.repeat) {
         for (let j in def.fields) {
@@ -300,7 +300,7 @@ function proc126208(def, msg) {
       return null;
     }
     let fun = fun126208[fld.value];
-    if (typeof fun === "undefined") {
+    if (typeof fun === 'undefined') {
       return null;
     }
     let rep = fun.repeat;
@@ -320,7 +320,7 @@ function proc126208(def, msg) {
       let fu2 = null;
       let key = 'nmea2000/' + pg2.toString().padStart(6, '0');
       let cnv = com.findCnv(key);
-      if ((typeof cnv !== "undefined") && (typeof cnv.function !== "undefined")) {
+      if ((typeof cnv !== 'undefined') && (typeof cnv.function !== 'undefined')) {
         fu2 = cnv.function
       }
       if (fu2 != null) {
@@ -334,7 +334,7 @@ function proc126208(def, msg) {
         return null;
       }
       // Definitions with repeat field(s) aren't supported
-      if ((pg2 != 126464) && (typeof de2.repeat !== "undefined")) {
+      if ((pg2 != 126464) && (typeof de2.repeat !== 'undefined')) {
           return null;
       }
       // Template fields          

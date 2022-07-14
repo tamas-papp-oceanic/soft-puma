@@ -1,11 +1,14 @@
 import { writable, get } from 'svelte/store';
 
+const qlimit = 1024;
+
 export const clas = writable({});
 export const func = writable({});
 export const indu = writable({});
 export const manu = writable({});
 export const name = writable({});
 export const data = writable({});
+export const dque = writable({});
 
 window.pumaAPI.send('n2k-ready');
 
@@ -63,9 +66,10 @@ window.pumaAPI.recv('n2k-name', (e, val) => {
         nam.uniqueNumber = fld.value;
         break;
       case 2:
-        nam.manufacturer = fld.value;
-        if (typeof ama[fld.value] !== "undefined") {
-          nam.manufacturer += " - " + ama[fld.value];
+        if (typeof ama[fld.value] !== 'undefined') {
+          nam.manufacturer = ama[fld.value];
+        } else {
+          nam.manufacturer = fld.value;
         }
         break;
       case 3:
@@ -75,25 +79,28 @@ window.pumaAPI.recv('n2k-name', (e, val) => {
         nam.deviceInstance += (fld.value << 3);
         break;
       case 5:
-        nam.function = fld.value;
-        if ((cla != null) && (typeof afu[cla] !== "undefined") &&
-          (typeof afu[cla][fld.value] !== "undefined")) {
-          nam.function += " - " + afu[cla][fld.value];
-        }
+        if ((cla != null) && (typeof afu[cla] !== 'undefined') &&
+          (typeof afu[cla][fld.value] !== 'undefined')) {
+          nam.function = afu[cla][fld.value];
+        } else {
+          nam.function = fld.value;
+      }
         break;
       case 7:
-        nam.class = fld.value;
-        if (typeof acl[fld.value] !== "undefined") {
-          nam.class += " - " + acl[fld.value];
+        if (typeof acl[fld.value] !== 'undefined') {
+          nam.class = acl[fld.value];
+        } else {
+          nam.class = fld.value;
         }
         break;
       case 8:
         nam.systemInstance = fld.value;
         break;
       case 9:
-        nam.industry = fld.value;
-        if (typeof ain[fld.value] !== "undefined") {
-          nam.industry += " - " + ain[fld.value];
+        if (typeof ain[fld.value] !== 'undefined') {
+          nam.industry = ain[fld.value];
+        } else {
+          nam.industry = fld.value;
         }
         break;
     }
@@ -101,7 +108,7 @@ window.pumaAPI.recv('n2k-name', (e, val) => {
   let src = val.raw[3];
   let dat = get(name);
   let tmp = dat[src];
-  if ((typeof tmp !== "undefined") && (
+  if ((typeof tmp !== 'undefined') && (
     (tmp.uniqueNumber != nam.uniqueNumber) ||
     (tmp.manufacturer != nam.manufacturer) ||
     (tmp.function != nam.function) ||
@@ -118,7 +125,7 @@ window.pumaAPI.recv('n2k-prod', (e, val) => {
   let src = val.raw[3];
   let dat = get(name);
   let nam = dat[src];
-  if (typeof nam === "undefined") {
+  if (typeof nam === 'undefined') {
     nam = {
       uniqueNumber: null,
       manufacturer: null,
@@ -169,19 +176,40 @@ window.pumaAPI.recv('n2k-prod', (e, val) => {
   dat[src] = nam;
   name.set(dat);
 });
+// Restart capture
+export function restart(key) {
+  let que = get(dque);
+  if (typeof que[key] !== 'undefined') {
+    delete que[key];
+    dque.set(que);
+  }
+}
 // NMEA other messages
 window.pumaAPI.recv('n2k-data', (e, val) => {
-  if (typeof val.key !== "undefined") {
+  if (typeof val.key !== 'undefined') {
     let key = val.key;
     delete val.key;
     let dat = get(data);
-    if (typeof dat[key] === "undefined") {
-      val.cnt = 0;
+    if (typeof dat[key] === 'undefined') {
+        val.cnt = 0;
     } else {
       val.cnt = dat[key].cnt;
     }
     val.cnt++;
     dat[key] = val;
     data.set(dat);
+    let que = get(dque);
+    let cnt = 0;
+    if (typeof que[key] === 'undefined') {
+      que[key] = new Array();
+    } else {
+      cnt = que[key][que[key].length - 1].cnt;
+    }
+    cnt++;
+    if (que[key].length <= qlimit) {
+      val.cnt = cnt;
+      que[key].push(val);
+    }
+    dque.set(que);
   }
 });

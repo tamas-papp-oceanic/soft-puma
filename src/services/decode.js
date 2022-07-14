@@ -1,3 +1,4 @@
+const cri = require('crypto');
 const com = require('./common.js');
 
 let fastbuff = {};
@@ -46,6 +47,7 @@ function decode(frm) {
     frm.data.copy(raw, 4);
     msg = {
       key: def.key,
+      id: cri.randomBytes(16).toString('hex'),
       header: {
         pgn: pgn,
         pri: com.getPri(frm.id),
@@ -161,7 +163,7 @@ function decode(frm) {
         }
         fld.value = val;
         delete fld.multiplier;
-        if (typeof fld.instance !== "undefined") {
+        if (typeof fld.instance !== 'undefined') {
           ins = val;
           delete fld.instance;
         }
@@ -202,7 +204,7 @@ function controlDataTransfer(frm) {
       case 0x10:
       case 0x20:
         let key = com.getSrc(frm);
-        if (typeof datrbuff[key] === "undefined") {
+        if (typeof datrbuff[key] === 'undefined') {
           let len = frm.data.readUInt16LE(1);
           let frs = frm.data.readUInt8(3);
           tra = {
@@ -233,7 +235,7 @@ function decodeDataTransfer(frm) {
   try {
     let key = com.getSrc(frm);
     let tra = datrbuff[key];
-    if (typeof tra !== "undefined") {
+    if (typeof tra !== 'undefined') {
       if (frm.raw.length < 8) {
         tra.corrupted = true;
       }
@@ -281,7 +283,7 @@ function decodeFastPacket(frm) {
     let cnt = frm.data.readUInt8(0) & 0x1F;
     let min = 0;
     let key = frm.id.toString(16).padStart(8, '0');
-    if (typeof fastbuff[key] === "undefined") {
+    if (typeof fastbuff[key] === 'undefined') {
       let len = frm.data.readUInt8(1);
       fap = {
         sequence: seq,
@@ -369,7 +371,7 @@ function extend(pgn, def, frm) {
       }
       delete def.fields;
       def.fields = tmp;
-    } else if (typeof def.repeat !== "undefined") {
+    } else if (typeof def.repeat !== 'undefined') {
       let max = null;
       for (let i in def.repeat) {
         let ptr = 0;
@@ -444,7 +446,7 @@ function proc126208(def, frm) {
     let rep = null;
     let fst = null;
     let fun = fun126208[frm.data.readUInt8(0)];
-    if (typeof fun === "undefined") {
+    if (typeof fun === 'undefined') {
       return null;
     }
     rep = fun.repeat;
@@ -458,7 +460,7 @@ function proc126208(def, frm) {
       let qry = { id: (pg2 << 8) };
       let off = 0;
       let cnv = com.findCnv('nmea2000/' + pg2.toString().padStart(6, '0'));
-      if ((typeof cnv !== "undefined") && (typeof cnv.function !== "undefined")) {
+      if ((typeof cnv !== 'undefined') && (typeof cnv.function !== 'undefined')) {
         off = cnv.function
       }
       qry.data = Buffer.alloc(off + 1).fill(0),
@@ -468,7 +470,7 @@ function proc126208(def, frm) {
         return null;
       }
       // Definitions with repeat field(s) aren't supported
-      if ((pg2 != 126464) && (typeof de2.repeat !== "undefined")) {
+      if ((pg2 != 126464) && (typeof de2.repeat !== 'undefined')) {
           return null;
       }
       // Template fields          
