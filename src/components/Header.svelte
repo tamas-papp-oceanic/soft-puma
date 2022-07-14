@@ -50,7 +50,7 @@
     </HeaderUtilities>
   </Header>
   <ComposedModal bind:open on:submit={(e) => close(e)} size="xs">
-    <ModalHeader label="Exit" title="Confirm exit" />
+    <ModalHeader title="Confirm exit" />
     <ModalFooter
       primaryButtonText="Proceed"
       secondaryButtons={[{ text: "Cancel" }]}
@@ -58,7 +58,7 @@
     />
   </ComposedModal></div>
 
-<style global>
+<!-- <style global>
   .bx--header {
     -webkit-user-select: none;
     -webkit-app-region: drag;
@@ -74,4 +74,4 @@
   .bx--table-sort.bx--table-sort--active, .bx--table-sort:hover {
     background: #4e4e4e;
   }
-</style>
+</style> -->

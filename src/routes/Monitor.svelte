@@ -96,7 +96,6 @@
         sortable
         {headers}
         {rows}
-        size="short"
         pageSize={pagination.pageSize}
         page={pagination.page}>
         <!-- <strong slot="title">{title}</strong>

@@ -2,7 +2,7 @@
   import { onMount } from "svelte";
   import { Grid, Row, Column, DataTable, Toolbar, ToolbarContent,
     Button, Pagination, OverflowMenu, OverflowMenuItem } from "carbon-components-svelte";
-  import Restart24 from "carbon-icons-svelte/lib/Restart24";
+  import Restart32 from "carbon-icons-svelte/lib/Restart32";
   import { push, pop } from 'svelte-spa-router'
   import { manu, dque, restart } from "../stores/data.js";
 
@@ -118,14 +118,13 @@
           sortable
           {headers}
           {rows}
-          size="short"
           pageSize={pagination.pageSize}
           page={pagination.page}>
           <strong slot="title">{title}</strong>
           <span slot="description" style="font-size: 1rem;">{description}</span>
           <Toolbar size="normal">
             <ToolbarContent>
-              <Button on:click={(e) => rest(e)}><Restart24 /></Button>
+              <Button icon={Restart32} on:click={(e) => rest(e)}></Button>
               <Button on:click={(e) => back(e)}>&larr;&nbsp;Back</Button>
             </ToolbarContent>
           </Toolbar>

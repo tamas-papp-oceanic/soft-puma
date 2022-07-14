@@ -71,7 +71,7 @@
 <Grid>
   <Row>
     <Column>
-      <DataTable 
+      <DataTable
         sortable
         {headers}
         {rows}
@@ -115,3 +115,11 @@
     </Column>
   </Row>
 </Grid>
+
+<!-- <style lang="scss">
+  .table {
+    display: block;
+    overflow-x: auto;
+    white-space: nowrap;
+  }
+</style> -->
