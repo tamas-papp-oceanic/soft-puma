@@ -2,6 +2,7 @@
   import { Grid, Row, Column, Button, DataTable, Toolbar,
     ToolbarContent, ToolbarSearch,  OverflowMenu, 
     OverflowMenuItem, Pagination } from "carbon-components-svelte";
+  import Scan from "carbon-icons-svelte/lib/SearchLocate16";
   import { push } from 'svelte-spa-router'
   import { name } from "../../stores/data.js";
 
@@ -28,6 +29,7 @@
     empty: true
   }];
 
+  let height;
   let rows = [];
   let pagination = {
     pageSize: 10,
@@ -56,18 +58,10 @@
     rows = JSON.parse(JSON.stringify(tmp));
     pagination.totalItems = rows.length;
   };
-
-  window.pumaAPI.send('can-start');
-  // setTimeout(() => {
-  //   window.pumaAPI.send('can-stop');
-  // }, 20000);
-
-  window.pumaAPI.send('ser-start');
-  // setTimeout(() => {
-  //   window.pumaAPI.send('ser-stop');
-  // }, 20000);
+  $: pagination.pageSize = Math.round(((height * 0.9) / getComputedStyle(document.documentElement).fontSize.replace('px', '')) / 3) - 4;
 </script>
 
+<svelte:window bind:innerHeight={height} />
 <Grid>
   <Row>
     <Column>
@@ -87,7 +81,7 @@
               </ToolbarMenuItem>
               <ToolbarMenuItem danger>Stop all</ToolbarMenuItem>
             </ToolbarMenu> -->
-            <Button on:click={(e) => scan(e)}>Scan</Button>
+            <Button icon={Scan} on:click={(e) => scan(e)}>Scan</Button>
           </ToolbarContent>
         </Toolbar>
         <span slot="cell" let:cell let:row>
@@ -105,7 +99,8 @@
       </DataTable>
       {#if pagination.totalItems > pagination.pageSize}
         <Pagination
-          pageSize={pagination.pageSize}
+          pageSizes={pagination.pageSizes}
+          bind:pageSize={pagination.pageSize}
           totalItems={pagination.totalItems}
           bind:page={pagination.page}
           pageSizeInputDisabled
@@ -115,11 +110,3 @@
     </Column>
   </Row>
 </Grid>
-
-<!-- <style lang="scss">
-  .table {
-    display: block;
-    overflow-x: auto;
-    white-space: nowrap;
-  }
-</style> -->

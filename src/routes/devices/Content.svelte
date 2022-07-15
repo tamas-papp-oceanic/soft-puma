@@ -1,18 +1,19 @@
 <script>
   import { onMount } from "svelte";
-  import { Grid, Row, Column, DataTable, Toolbar, ToolbarContent,
+  import { Grid, Row, Column, DataTable, Toolbar, ToolbarContent, Tile,
     Button, Pagination, OverflowMenu, OverflowMenuItem } from "carbon-components-svelte";
-  import Restart32 from "carbon-icons-svelte/lib/Restart32";
+  import Restart from "carbon-icons-svelte/lib/Restart16";
+  import SkipBack from "carbon-icons-svelte/lib/SkipBack16";
   import { push, pop } from 'svelte-spa-router'
-  import { manu, dque, restart } from "../stores/data.js";
+  import { dque, restart } from "../../stores/data.js";
 
   export let params;
 
+  let height;
   let key = null;
   let first = true;
   let rows = [];
   let title = null;
-  let description = null;
   let pagination = {
     pageSize: 10,
     page: 1,
@@ -25,33 +26,6 @@
       params.manufacturer + '/' + params.industry + '/' + params.instance + '/' +
       params.type;
     title = 'Content of PGN' + params.pgn;
-    if (params.manufacturer != '-') {
-      let man = $manu[parseInt(params.manufacturer)];
-      if (typeof man !== 'undefined') {
-        if (description != null) {
-          description += ', ';
-        } else {
-        description = ''
-        }
-        description += 'Manufacturer - ' + man;
-      }
-    }
-    if (params.instance != '-') {
-      if (description != null) {
-        description += ', ';  
-      } else {
-        description = ''
-      }
-      description += 'Instance - ' + params.instance;
-    }
-    if (params.type != '-') {
-      if (description != null) {
-        description += ', ';  
-      } else {
-        description = ''
-      }
-      description += 'Type - ' + params.type;
-    }
   }); 
 
   function rest(e) {
@@ -77,11 +51,13 @@
       });
       for (let i in dat.fields) {
         let fld = dat.fields[i];
-        tmp.push({
-          key: 'fld' + fld.field,
-          value: fld.title,
-          sort: false,
-        });
+        if (fld.reserved == null) {
+          tmp.push({
+            key: 'fld' + fld.field,
+            value: fld.title,
+            sort: false,
+          });
+        }
       }
       tmp.push({
         key: "overflow",
@@ -101,15 +77,17 @@
       };
       for (let i in dat.fields) {
         let fld = dat.fields[i];
-        obj['fld' + fld.field] = fld.value;
+        obj['fld' + fld.field] = (fld.state == 'V') ? fld.value : '-';
       }
       tmp.push(obj);
     }
     rows = JSON.parse(JSON.stringify(tmp));
     pagination.totalItems = rows.length;
   }
+  $: pagination.pageSize = Math.round(((height * 0.9) / getComputedStyle(document.documentElement).fontSize.replace('px', '')) / 3) - 4;
 </script>
 
+<svelte:window bind:innerHeight={height} />
 <Grid>
   <Row>
     <Column>
@@ -120,18 +98,17 @@
           {rows}
           pageSize={pagination.pageSize}
           page={pagination.page}>
-          <strong slot="title">{title}</strong>
-          <span slot="description" style="font-size: 1rem;">{description}</span>
-          <Toolbar size="normal">
+          <Toolbar>
+            <Tile>{title}</Tile>
             <ToolbarContent>
-              <Button icon={Restart32} on:click={(e) => rest(e)}></Button>
-              <Button on:click={(e) => back(e)}>&larr;&nbsp;Back</Button>
+              <Button icon={Restart} on:click={(e) => rest(e)}>Restart</Button>
+              <Button icon={SkipBack} on:click={(e) => back(e)}>Back</Button>
             </ToolbarContent>
           </Toolbar>
           <span slot="cell" let:cell let:row>
             {#if cell.key === 'overflow'}
-              <OverflowMenu flipped>
-                <OverflowMenuItem text="Details" on:click={() => push('/details/'+ row.key)} />
+            <OverflowMenu flipped>
+              <OverflowMenuItem text="Details" disabled on:click={() => push('/details/'+ row.key)} />
               </OverflowMenu>
             {:else}
               {cell.value}
@@ -141,7 +118,7 @@
       {/if}
       {#if pagination.totalItems > pagination.pageSize}
         <Pagination
-          pageSize={pagination.pageSize}
+          bind:pageSize={pagination.pageSize}
           totalItems={pagination.totalItems}
           bind:page={pagination.page}
           pageSizeInputDisabled

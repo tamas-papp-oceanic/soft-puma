@@ -85,12 +85,21 @@ function create() {
         if (fld.divider != null) {
           mul = (mul != null ? mul : 1) / fld.divider;
         }
+        let res = null;
+        if ((fld.dictionary != null) && (
+          (fld.dictionary == 'DD001') ||
+          (fld.dictionary == 'DD002') ||
+          (fld.dictionary == 'DD003') 
+        )) {
+          res = fld.dictionary;
+        }
         let tmp = {
           field: fld.field,
           title: fld.description,
           type: typ,
           unit: fld.unit,
           multiplier: mul,
+          reserved: res,
         };
         if (typeof fld.instance !== 'undefined') {
           tmp.instance = true;

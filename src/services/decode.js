@@ -81,6 +81,21 @@ function decode(frm) {
           let msk = BigInt((1 << len) - 1)
           let off = BigInt(ptr - (byt * 8));
           val = parseInt(((dat >> off) & msk).toString());
+          if (fld.reserved != null) {
+            switch (fld.reserved) {
+              case 'DD001':
+              case 'DD003':
+                fld.state = '-';
+                break;
+              case 'DD002':
+                if (val == 2) {
+                  fld.state = 'E';
+                } else if (val == 3) {
+                  fld.state = '-';
+                }
+                break;
+            }
+          }
           ptr += len;
         } else if (fld.type == 'chr(x)') {
           if (len > 8) {
@@ -148,7 +163,7 @@ function decode(frm) {
               break;
           }
           fld.state = com.getStatus(fld.type, val);
-          if (fld.multiplier != null) {
+          if ((fld.state == 'V') && (fld.multiplier != null)) {
             if (typeof val == 'bigint') {
               if (fld.multiplier >= 1) {
                 val *= BigInt(fld.multiplier);
@@ -158,6 +173,7 @@ function decode(frm) {
             } else {
               val *= fld.multiplier;
             }
+            val = Math.round(val * 100000) / 100000;
           }
           ptr += len;
         }

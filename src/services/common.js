@@ -179,33 +179,17 @@ function getStatus(typ, val) {
   let sts = 'V';
   if (typ.startsWith('int')) {
     let bit = parseInt(typ.replace('int', ''));
-    if (bit < 64) {
-      if (val == (2 ** (bit - 1)) - 1) {
-        sts = '-';
-      } else if (val == (2 ** (bit - 1)) - 2) {
-        sts = 'E';
-      }
-    } else {
-      if (BigInt(val) == (2n ** BigInt(bit - 1)) - 1n) {
-        sts = '-';
-      } else if (BigInt(val) == (2n ** BigInt(bit - 1)) - 2n) {
-        sts = 'E';
-      }
+    if (BigInt(val) == (2n ** BigInt(bit - 1)) - 1n) {
+      sts = '-';
+    } else if (BigInt(val) == (2n ** BigInt(bit - 1)) - 2n) {
+      sts = 'E';
     }
   } else if (typ.startsWith('uint')) {
     let bit = parseInt(typ.replace('uint', ''));
-    if (bit < 64) {
-      if (val == (2 ** bit) - 1) {
-        sts = '-';
-      } else if (val == (2 ** bit) - 2) {
-        sts = 'E';
-      }
-    } else {
-      if (BigInt(val) == (2n ** BigInt(bit)) - 1n) {
-        sts = '-';
-      } else if (BigInt(val) == (2n ** BigInt(bit)) - 2n) {
-        sts = 'E';
-      }
+    if (BigInt(val) == (2n ** BigInt(bit)) - 1n) {
+      sts = '-';
+    } else if (BigInt(val) == (2n ** BigInt(bit)) - 2n) {
+      sts = 'E';
     }
   }
   return sts;

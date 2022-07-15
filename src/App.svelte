@@ -8,8 +8,8 @@
 	import NotFound from './routes/NotFound.svelte';
 	import Header from './components/Header.svelte';
 	import Devices from './routes/devices/Index.svelte';
-	import Monitor from './routes/Monitor.svelte';
-	import Messages from './routes/Messages.svelte';
+	import Monitor from './routes/devices/Monitor.svelte';
+	import Content from './routes/devices/Content.svelte';
 	// import Details from './routes/Details.svelte';
 	import Simulate from './routes/Simulate.svelte';
 	import Configure from './routes/Configure.svelte';
@@ -57,10 +57,13 @@
 		}),
 		"/devices/:address": Configure,
 		"/monitor/:address": Monitor,
-		"/messages/:protocol/:pgn/:function/:manufacturer/:industry/:instance/:type": Messages,
+		"/messages/:protocol/:pgn/:function/:manufacturer/:industry/:instance/:type": Content,
 		// "/details/:protocol/:pgn/:function/:manufacturer/:industry/:instance/:type": Details,
 		"*": NotFound,
 	};
+
+  window.pumaAPI.send('can-start');
+  window.pumaAPI.send('ser-start');
 </script>
 
 <svelte:head>

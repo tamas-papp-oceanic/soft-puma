@@ -1,8 +1,9 @@
 <script>
-  import { Grid, Row, Column, DataTable, Toolbar, ToolbarContent,
+  import { Grid, Row, Column, DataTable, Toolbar, ToolbarContent, Tile,
     Button, Pagination, OverflowMenu, OverflowMenuItem } from "carbon-components-svelte";
+  import SkipBack from "carbon-icons-svelte/lib/SkipBack16";
   import { push, pop } from 'svelte-spa-router'
-  import { name, data } from "../stores/data.js";
+  import { name, data } from "../../stores/data.js";
 
   export let params;
 
@@ -27,9 +28,9 @@
     empty: true,
   }];
 
+  let height;
   let rows = [];
   let title = '';
-  let description = '';
   let pagination = {
     pageSize: 10,
     page: 1,
@@ -38,8 +39,8 @@
 
   function buf2hex(buffer) {
     return [...new Uint8Array(buffer)]
-      .map((elm, idx) => idx < 30 ? elm.toString(16).padStart(2, '0').toUpperCase() + ' ' : '')
-      .join('') + (buffer.length > 30 ? '...' : '');
+      .map((elm, idx) => idx < 25 ? elm.toString(16).padStart(2, '0').toUpperCase() + ' ' : '')
+      .join('') + (buffer.length > 25 ? '...' : '');
   } 
 
   function back(e) {
@@ -50,11 +51,9 @@
   $: {
     let nam = $name[parseInt(params["address"])];
     if (typeof nam !== 'undefined') {
-      title = 'Messages of ' + nam.manufacturer;
-      description = nam.modelID != null ? nam.modelID : '';
+      title = 'Messages of ' + nam.manufacturer + (nam.modelID != null ? ' - ' + nam.modelID : '');
     } else {
       title = 'Messages';
-      description = '';
     }
   }
   $: {
@@ -87,8 +86,10 @@
     rows = JSON.parse(JSON.stringify(tmp));
     pagination.totalItems = rows.length;
   };
+  $: pagination.pageSize = Math.round(((height * 0.9) / getComputedStyle(document.documentElement).fontSize.replace('px', '')) / 3) - 4;
 </script>
 
+<svelte:window bind:innerHeight={height} />
 <Grid>
   <Row>
     <Column>
@@ -98,15 +99,10 @@
         {rows}
         pageSize={pagination.pageSize}
         page={pagination.page}>
-        <!-- <strong slot="title">{title}</strong>
-        <span slot="description" style="font-size: 1rem;">{description}</span> -->
         <Toolbar>
+          <Tile>{title}</Tile>
           <ToolbarContent>
-            <div class="title">
-              <div>{title}</div>
-              <div>{description}</div>
-            </div>
-            <Button on:click={(e) => back(e)}>&larr;&nbsp;Back</Button>
+            <Button icon={SkipBack} on:click={(e) => back(e)}>Back</Button>
           </ToolbarContent>
         </Toolbar>
         <span slot="cell" let:cell let:row>
@@ -121,26 +117,14 @@
       </DataTable>
       {#if pagination.totalItems > pagination.pageSize}
         <Pagination
-          pageSize={pagination.pageSize}
+          pageSizes={pagination.pageSizes}
+          bind:pageSize={pagination.pageSize}
           totalItems={pagination.totalItems}
           bind:page={pagination.page}
-          pageInputDisabled
           pageSizeInputDisabled
+          pageInputDisabled
         />
       {/if}
     </Column>
   </Row>
 </Grid>
-
-<style lang="scss">
-  .title {
-    display: flex;
-    align-items: center;
-    justify-content: flex-start;
-    width: inherit;
-  }
-  .title div {
-    padding: 0 1rem;
-    font-size: 1rem;
-  }
-</style>

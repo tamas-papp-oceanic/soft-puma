@@ -206,7 +206,7 @@ window.pumaAPI.recv('n2k-data', (e, val) => {
       cnt = que[key][que[key].length - 1].cnt;
     }
     cnt++;
-    if (que[key].length <= qlimit) {
+    if (que[key].length < qlimit) {
       val.cnt = cnt;
       que[key].push(val);
     }

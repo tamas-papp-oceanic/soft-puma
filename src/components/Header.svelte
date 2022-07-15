@@ -58,7 +58,7 @@
     />
   </ComposedModal></div>
 
-<!-- <style global>
+<style global>
   .bx--header {
     -webkit-user-select: none;
     -webkit-app-region: drag;
@@ -74,4 +74,4 @@
   .bx--table-sort.bx--table-sort--active, .bx--table-sort:hover {
     background: #4e4e4e;
   }
-</style> -->
+</style>
