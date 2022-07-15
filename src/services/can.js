@@ -12,15 +12,26 @@ const can = require('socketcan');
 
 let cha = null;
 let started = false;
+let timer = null;
 
-try {
-  cha = can.createRawChannel("can0", true);
-} catch (err) {
-  cha = null;
-  console.log(err);
+function create() {
+  try {
+    cha = can.createRawChannel("can0", true);
+    return true;
+  } catch (err) {
+    cha = null;
+    console.log(err);
+    return false;
+  }
 }
 
 function start(fun) {
+  timer = setInterval(() => {
+    if (create()) {
+      clearInterval(timer);
+      timer = null;
+    }
+  }, 1000);
   if ((cha != null) && !started) {
     cha.addListener("onMessage", (msg) => {
       // console.log('(' + (msg.ts_sec + msg.ts_usec / 1000000).toFixed(6) + ') ' + msg.id.toString(16).toUpperCase().padStart(8, '0') + '#' + msg.data.toString('hex').toUpperCase());
@@ -42,6 +53,10 @@ function send(dat) {
 };
 
 function stop() {
+  if (timer != null) {
+    clearInterval(timer);
+    timer = null;
+  }
   if ((cha != null) && started) {
     cha.stop();
   }

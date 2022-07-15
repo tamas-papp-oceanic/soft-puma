@@ -146,22 +146,18 @@ ipcMain.on('n2k-addr', (e, ...args) => {
 // Start can processing
 ipcMain.on('can-start', (e, ...args) => {
   can.start(proc);
-  mainWindow.webContents.send('can-running', true);
 });
 // Stop can processing
 ipcMain.on('can-stop', (e, ...args) => {
   can.stop();
-  mainWindow.webContents.send('can-running', false);
 });
 // Start serial processing
 ipcMain.on('ser-start', (e, ...args) => {
   ser.start(proc);
-  mainWindow.webContents.send('ser-running', true);
 });
 // Stop serial processing
 ipcMain.on('ser-stop', (e, ...args) => {
   ser.stop();
-  mainWindow.webContents.send('ser-running', false);
 });
 // Close the application
 ipcMain.on('app-quit', (e, ...args) => {

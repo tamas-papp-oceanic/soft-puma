@@ -5,7 +5,7 @@
     "program": "true",
     "configure": "true",
     "simulate": "true",
-    "analyse": "true",
+    "analyse": "true"
   },
   "Production": {
     "serial": "true",
@@ -13,7 +13,7 @@
     "program": "true",
     "configure": "true",
     "simulate": "true",
-    "analyse": "true",
+    "analyse": "true"
   },
   "Customer": {
     "serial": "false",
@@ -21,7 +21,7 @@
     "program": "true",
     "configure": "true",
     "simulate": "true",
-    "analyse": "true",
+    "analyse": "true"
   },
   "Guest": {
     "serial": "false",
@@ -29,6 +29,6 @@
     "program": "false",
     "configure": "true",
     "simulate": "false",
-    "analyse": "true",
+    "analyse": "true"
   }
 }
