@@ -165,11 +165,13 @@ ipcMain.on('ser-stop', (e, ...args) => {
 });
 // Close the application
 ipcMain.on('app-quit', (e, ...args) => {
-  console.log("Stopping CAN...")
+  console.log("Stopping CAN...");
   can.stop();
-  console.log("Stopping Serial...")
+  console.log("Stopping Serial...");
   ser.stop();
-  console.log("Serial stopped.")
+  console.log("Serial stopped.");
+  console.log("Stopping NMEA engine...");
+  nmea.destroy();
   console.log("Quit...")
   app.quit();
 });

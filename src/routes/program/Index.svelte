@@ -53,14 +53,14 @@
                 <div class="product-card" on:click={() => push('/program/5185')}>
                   <div class="product-number">5185</div>
                   <div class="product-title">Poseidon 7</div>
-                  <div class="product-image"><img src="images/P7.webp" /></div>
+                  <div class="product-image"><img src="images/P7.webp" alt="P7" /></div>
                 </div>
               </Column>
               <Column sm={4} md={3} lg={4}>
                 <div class="product-card">
                   <div class="product-number">5189</div>
                   <div class="product-title">Poseidon 10</div>
-                  <div class="product-image"><img src="images/P7.webp" /></div>
+                  <div class="product-image"><img src="images/P7.webp" alt="P10" /></div>
                 </div>
               </Column>
               <Column sm={3} md={3} lg={4}>

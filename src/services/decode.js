@@ -78,8 +78,8 @@ function decode(frm) {
           let buf = Buffer.alloc(8);
           frm.data.copy(buf, 0, byt, byt + cnt);
           let dat = buf.readBigUInt64LE(0);
-          let msk = BigInt((1 << len) - 1)
-          let off = BigInt(ptr - (byt * 8));
+          let msk = (BigInt(1) << BigInt(len)) - BigInt(1);
+          let off = BigInt(ptr) - BigInt(byt * 8);
           val = parseInt(((dat >> off) & msk).toString());
           if (fld.reserved != null) {
             switch (fld.reserved) {

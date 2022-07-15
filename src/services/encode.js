@@ -66,9 +66,9 @@ function encode(msg) {
           let buf = Buffer.alloc(8);
           raw.copy(buf, 0, byt, byt + cnt);
           let dat = buf.readBigUInt64LE(0);
-          let msk = BigInt((1 << len) - 1)
-          let off = BigInt(ptr - (byt * 8));
-          dat = dat | ((BigInt(mfl.value) & msk) << off);
+          let msk = (BigInt(1) << BigInt(len)) - BigInt(1);
+          let off = BigInt(ptr) - BigInt(byt * 8);
+          dat |= ((BigInt(mfl.value) & msk) << off);
           buf.writeBigUInt64LE(dat);
           buf.copy(raw, byt);
         } else if (fld.type == 'chr(x)') {

@@ -7,12 +7,29 @@ const can = require('./can.js');
 const tranList = [60928, 126993];
 const recvList = [60928];
 
+let heartbeat = {
+  sequence: 0,
+  can1State: 0,
+  can2State: 0,
+  equState: 0,
+};
+
 // Serial number can be loaded from configuration
 let serial = 123456;
 
 // Initializes NMEA engine
 function init() {
   adr.start(sendRaw);
+  timer = setInterval(() => {
+    send126993();
+  }, 60000);
+};
+
+// Destroys NMEA engine
+function destroy() {
+  adr.stop();
+  clearInterval(timer);
+  delete timer;
 };
 
 // Get Product info function
@@ -726,9 +743,28 @@ function send059392(ctr, grp, pgn, dst) {
   return sendMsg(msg);
 };
 
+// Sends Heartbeat message
+function send126993() {
+  let msg = {
+    key: 'nmea2000/126993/-/-/-/-/-',
+    header: { pgn: 126993, src: adr.getAddress(), dst: 0xFF },
+    fields: [
+      { field: 1,title: 'Update Rate', state: 'V', value: 60 },
+      { field: 2,title: 'Heartbeat Sequence Counter', state: 'V', value: heartbeat.sequence },
+      { field: 3,title: 'Class 1 CAN Controller State', state: 'V', value: heartbeat.can1State },
+      { field: 4,title: 'Class 2 Second CAN Controller State', state: 'V', value: heartbeat.can1State },
+      { field: 5,title: 'Equipment Status', state: 'V', value: heartbeat.equState },
+      { field: 6,title: 'NMEA Reserved', state: 'V', value: 0x3FFFFFFFF },
+    ],
+  };
+  heartbeat.sequence++;
+  heartbeat.sequence %= 252;
+  return sendMsg(msg);
+};
 
 module.exports = {
   init,
+  destroy,
   process,
   create,
   sendMsg,

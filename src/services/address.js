@@ -13,6 +13,19 @@ const context = {
   randomize: () => Math.floor(Math.random() * 2),
 };
 
+const name = {
+  1: 123456,  // Unique Number (ISO Identity Number)
+  2: 161,     // Manufacturer Code
+  3: 0,       // Device Instance Lower (ISO ECU Instance)
+  4: 0,       // Device Instance Upper (ISO Function Instance)
+  5: 135,     // Device Function (ISO Function)
+  6: 0,       // NMEA Reserved
+  7: 120,     // Device Class
+  8: 0,       // System Instance (ISO Device Class Instance)
+  9: 4,       // Industry Group
+  10: 1,      // NMEA Reserved (ISO Self Configurable)
+};
+
 function random() {
   return Math.floor(Math.random() * 255 * 0.6);
 }
@@ -28,8 +41,6 @@ const s6 = asm.createState('WaitForDelay6', false, s6Entry);
 const s7 = asm.createState('TransmitNew7', false, s7Entry);
 const s8 = asm.createState('WaitForCommand', false, s8Entry);
 const s9 = asm.createState('TransmitNew9', false, s9Entry);
-const s10 = asm.createState( "Final", true, final); 
-
 // Define all state transitions
 s0.addTransition('next', s1);
 s1.addTransition('next', s2);
@@ -50,23 +61,9 @@ s7.addTransition('fail', s6);
 s8.addTransition('cmd', s2);
 s9.addTransition('succ', s5);
 s9.addTransition('fail', s1);
-
 // Starts the state machine
 asm.start(s0);
-
-const name = {
-  1: 123456,  // Unique Number (ISO Identity Number)
-  2: 161,     // Manufacturer Code
-  3: 0,       // Device Instance Lower (ISO ECU Instance)
-  4: 0,       // Device Instance Upper (ISO Function Instance)
-  5: 135,     // Device Function (ISO Function)
-  6: 0,       // NMEA Reserved
-  7: 120,     // Device Class
-  8: 0,       // System Instance (ISO Device Class Instance)
-  9: 4,       // Industry Group
-  10: 1,      // NMEA Reserved (ISO Self Configurable)
-};
-
+// Starts address manager
 function start(par) {
   send = par;
   let frm = enc.encode({
@@ -87,15 +84,19 @@ function start(par) {
   });
   frm.data.copy(ourname);
   s0.trigger('next');
-}
+};
+// Stops address manager
+function stop() {
+  asm.reset(false);
+};
 // Gets name record
 function getName() {
   return name;
-}
+};
 // Gets our address
 function getAddress() {
   return address;
-}
+};
 // Idle
 function s0Entry(state, context) {
 };
@@ -271,6 +272,7 @@ function proc065240(msg) {
 
 module.exports = {
   start,
+  stop,
   getName,
   getAddress,
   send059904,
