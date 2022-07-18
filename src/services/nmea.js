@@ -40,10 +40,10 @@ class NMEAEngine {
   // Initializes NMEA engine
   init() {
     this.#addrMngr = new Address();
-    this.#addrMngr.start(this.sendRaw);
-    this.#timer = setInterval((ins) => {
-      ins.send126993();
-    }, 60000, this);
+    this.#addrMngr.start(this._sendRaw.bind(this));
+    this.#timer = setInterval((fun) => {
+      fun();
+    }, 60000, this._send126993.bind(this));
   };
   // Destroys NMEA engine
   destroy() {
@@ -67,7 +67,7 @@ class NMEAEngine {
         switch (msg.header.pgn) {
           case 59904:
             // ISO Request
-            this.proc059904(msg);
+            this._proc059904(msg);
             break;
           case 60928:
             // ISO Address Claim
@@ -79,19 +79,19 @@ class NMEAEngine {
             break;
           case 65280:
             // Proprietary Set Serial Command
-            this.proc065280(msg);
+            this._proc065280(msg);
             break;
           case 65445:
             // Proprietary SF Request / Command
-            this.proc065445(msg);
+            this._proc065445(msg);
             break;
           case 126208:
             // NMEA - Request, Command, Acknowledge - Group Function
-            this.proc126208(msg);
+            this._proc126208(msg);
             break;
           case 126996:
             // Product Information
-            this.proc126996(msg);
+            this._proc126996(msg);
             break;
         }
         return msg;
@@ -100,7 +100,7 @@ class NMEAEngine {
     return null;
   };
   // NMEA data creating function
-  static createMsg(msg) {
+  _createMsg(msg) {
     let frm = enc.encode(msg);
     if (frm != null) {
       let tmp = enc.pack(frm);
@@ -112,11 +112,10 @@ class NMEAEngine {
   };
   // NMEA message sending function
   sendMsg(msg) {
-    let frs = this.createMsg(msg);
+    let frs = this._createMsg(msg);
     for (let i in frs) {
       try {
-        can.send(frs[i]);
-        ser.send(frs[i]);
+        this.#device.send(frs[i]);
       } catch (err) {
         console.log(err);
         return false;
@@ -125,10 +124,9 @@ class NMEAEngine {
     return true;
   };
   // NMEA raw sending function
-  static sendRaw(frm) {
+  _sendRaw(frm) {
     try {
-      can.send(frm);
-      ser.send(frm);
+      this.#device.send(frm);
       return true;
     } catch (err) {
       console.log(err);
@@ -136,7 +134,7 @@ class NMEAEngine {
     }
   };
   // Process ISO Request message
-  static proc059904(msg) {
+  _proc059904(msg) {
     let fld = com.getFld(1, msg.fields);
     if (fld != null) {
       switch (fld.value) {
@@ -147,62 +145,61 @@ class NMEAEngine {
         case 126464:
           if (msg.header.dst == this.#addrMngr.address) {
             // Send PGN Transmit List message
-            this.send126464(0, msg.header.src);
+            this._send126464(0, msg.header.src);
             // Send PGN Receive List message
-            this.send126464(1, msg.header.src);
+            this._send126464(1, msg.header.src);
           }
           break;
         case 126996:
           if (msg.header.dst == this.#addrMngr.address) {
             // Send Product Info message
-            this.send126996();
+            this._send126996();
           }
           break;
         case 126998:
           if (msg.header.dst == this.#addrMngr.address) {
             // Send Configuration Info message
-            this.send126998();
+            this._send126998();
           }
           break;
         default:
           if (msg.header.dst == this.#addrMngr.address) {
             // Send ISO Acknowledge message with negative acknowledgement
-            this.send059392(1, 0xFF, fld.value, msg.header.src);
+            this._send059392(1, 0xFF, fld.value, msg.header.src);
           }
           break;
       }
     }
   };
   // Sends ISO Request message
-  static send059904(pgn, dst) {
+  _send059904(pgn, dst) {
     this.#addrMngr.send059904(pgn, dst);
   };
   // Processes Proprietary Command message
   // Set Serial Number
-  static proc065280(msg) {
+  _proc065280(msg) {
     // This PGN should be 061184 (addressable)
     // if (msg.header.dst == this.#addrMngr.address) {
-        let fld = com.getFld(1, msg.fields);
-        if (fld == null) {
-          return;
-        }
-        switch (fld.value) {
-          case 161:
-            // Oceanic Systems
-            fld = com.getFld(3, msg.fields);
-            if ((fld == null) || (fld.value != 4)) {
-              return;
-            }
-            fld = com.getFld(4, msg.fields);
-            if ((fld == null) || (fld.value != 0xBC)) {
-              return;
-            }
-            fld = com.getFld(5, msg.fields);
-            if (fld != null) {
-              this.#productInfo[6] = fld.value.toString();
-            }
-            console.log(this.#productInfo[6]);
-            break;
+      let fld = com.getFld(1, msg.fields);
+      if (fld == null) {
+        return;
+      }
+      switch (fld.value) {
+        case 161:
+          // Oceanic Systems
+          fld = com.getFld(3, msg.fields);
+          if ((fld == null) || (fld.value != 4)) {
+            return;
+          }
+          fld = com.getFld(4, msg.fields);
+          if ((fld == null) || (fld.value != 0xBC)) {
+            return;
+          }
+          fld = com.getFld(5, msg.fields);
+          if (fld != null) {
+            this.#productInfo[6] = fld.value.toString();
+          }
+          break;
       }
     // }
   };
@@ -238,7 +235,7 @@ class NMEAEngine {
     0x18 	5906 6 Channel Load Controller
     0x19 	3165 Rudder Angle Adapter
   */
-  static proc065445(msg) {
+  _proc065445(msg) {
     // This PGN should be 061184 (addressable)
     // if (msg.header.dst == this.#addrMngr.address) {
       let fld = com.getFld(1, msg.fields);
@@ -294,7 +291,7 @@ class NMEAEngine {
     // }
   };
   // NMEA - Request, Command, Acknowledge - Group Function
-  static proc126208(msg) {
+  _proc126208(msg) {
     // Request Group Function Code
     let fld = com.getFld(1, msg.fields);
     if (fld == null) {
@@ -394,7 +391,7 @@ class NMEAEngine {
                   }
                   if (ack) {
                     // Send Acknowledge Group message
-                    this.send126208(msg.header.src, pgn, per, ter, nop, fer);
+                    this._send126208(msg.header.src, pgn, per, ter, nop, fer);
                     snd = false;
                   }
                 }
@@ -459,16 +456,16 @@ class NMEAEngine {
                   }
                   if (ack) {
                     // Send Acknowledge Group message
-                    this.send126208(msg.header.src, pgn, per, ter, nop, fer);
+                    this._send126208(msg.header.src, pgn, per, ter, nop, fer);
                   }
                 }
                 if (sn1) {
                   // Send PGN Transmit List message
-                  this.send126464(0, msg.header.src);
+                  this._send126464(0, msg.header.src);
                 }
                 if (sn2) {
                   // Send PGN Receive List message
-                  this.send126464(1, msg.header.src);
+                  this._send126464(1, msg.header.src);
                 }
               }
               break;
@@ -534,17 +531,17 @@ class NMEAEngine {
                 }
                 if (ack) {
                   // Send Acknowledge Group message
-                  this.send126208(msg.header.src, pgn, per, ter, nop, fer);
+                  this._send126208(msg.header.src, pgn, per, ter, nop, fer);
                   snd = false;
                 }
                 if (snd) {
                   // Send Product Info message
-                  this.send126996();
+                  this._send126996();
                 }
               }
               break;
             default:
-              this.send126208(msg.header.src, pgn, 0x01, 0x00, 0xFF);
+              this._send126208(msg.header.src, pgn, 0x01, 0x00, 0xFF);
               break;
           }
         }
@@ -617,13 +614,13 @@ class NMEAEngine {
                 }
                 if (ack) {
                   // Send Acknowledge Group message
-                  this.send126208(msg.header.src, pgn, per, ter, nop, fer);
+                  this._send126208(msg.header.src, pgn, per, ter, nop, fer);
                 }
               }
               break;
             default:
               // Send Acknowledge Group message with PGN error code - Not supported (0x01)
-              this.send126208(msg.header.src, pgn, 0x01, 0x00, 0xFF);
+              this._send126208(msg.header.src, pgn, 0x01, 0x00, 0xFF);
               break;
           }
         }
@@ -646,128 +643,145 @@ class NMEAEngine {
     }
   };
   // Processes Product Information message
-  static proc126996(msg) {};
+  _proc126996(msg) {};
   // NMEA - Acknowledge - Group Function
-  static send126208(src, pgn, per, ter, nop, fer) {
-    let rep = {
-      key: 'nmea2000/126208/2/-/-/-/-',
-      priority: 3,
-      header: { pgn: 126208, src: this.#addrMngr.address, dst: src },
-      fields: [
-        { field: 1, title: "Acknowledgment Group Function Code", state: 'V', value: 0x02 },
-        { field: 2, title: "PGN beingacknowledged", state: 'V', value: pgn },
-        { field: 3, title: "PGN error code", state: 'V', value: per },
-        { field: 4, title: "Transmission Interval / Priority error code", state: 'V', value: ter },
-      ]
-    };
-    if ((per != 0x00) || (ter != 0x00)) {
-      rep.fields.push({ field: 5, title: "Number of Pairs of Request Parameters to follow", state: 'V', value: 0xFF });
-    } else {
-      rep.fields.push({ field: 5, title: "Number of Pairs of Request Parameters to follow", state: 'V', value: nop });
-      for (let i = 0; i < fer.length; i++) {
-        rep.fields.push({ field: i + 6, title: "Result (" + (i + 1) + ")", state: 'V', value: fer.readUInt8(i) });
+  _send126208(src, pgn, per, ter, nop, fer) {
+    if (this.#addrMngr.state == 'Valid') {
+      let rep = {
+        key: 'nmea2000/126208/2/-/-/-/-',
+        priority: 3,
+        header: { pgn: 126208, src: this.#addrMngr.address, dst: src },
+        fields: [
+          { field: 1, title: "Acknowledgment Group Function Code", state: 'V', value: 0x02 },
+          { field: 2, title: "PGN beingacknowledged", state: 'V', value: pgn },
+          { field: 3, title: "PGN error code", state: 'V', value: per },
+          { field: 4, title: "Transmission Interval / Priority error code", state: 'V', value: ter },
+        ]
+      };
+      if ((per != 0x00) || (ter != 0x00)) {
+        rep.fields.push({ field: 5, title: "Number of Pairs of Request Parameters to follow", state: 'V', value: 0xFF });
+      } else {
+        rep.fields.push({ field: 5, title: "Number of Pairs of Request Parameters to follow", state: 'V', value: nop });
+        for (let i = 0; i < fer.length; i++) {
+          rep.fields.push({ field: i + 6, title: "Result (" + (i + 1) + ")", state: 'V', value: fer.readUInt8(i) });
+        }
       }
+      return this.sendMsg(rep);
     }
-    return this.sendMsg(rep);
+    return false;
   }
   // Sends PGN Transmit / Receive Lists
-  static send126464(par, dst) {
-    let msg = null;
-    if ((par == 0) && (tranList.length > 0)) {
-      msg = {
-        key: 'nmea2000/126464/0/-/-/-/-',
-        header: { pgn: 126464, src: this.#addrMngr.address, dst: dst },
-        fields: [
-          { field: 1, title: 'Transmitted PGN Group Function Code', state: 'V', value: par },
-        ],
-      };
-      for (let i = 0; i < tranList.length; i++) {
-        msg.fields.push({ field: i + 2, title: 'PGN supported (' + (i + 1) + ')', state: 'V', value: tranList[i] });
+  _send126464(par, dst) {
+    if (this.#addrMngr.state == 'Valid') {
+      let msg = null;
+      if ((par == 0) && (tranList.length > 0)) {
+        msg = {
+          key: 'nmea2000/126464/0/-/-/-/-',
+          header: { pgn: 126464, src: this.#addrMngr.address, dst: dst },
+          fields: [
+            { field: 1, title: 'Transmitted PGN Group Function Code', state: 'V', value: par },
+          ],
+        };
+        for (let i = 0; i < tranList.length; i++) {
+          msg.fields.push({ field: i + 2, title: 'PGN supported (' + (i + 1) + ')', state: 'V', value: tranList[i] });
+        }
+      } else if ((par == 1) && (recvList.length > 0)) {
+        msg = {
+          key: 'nmea2000/126464/1/-/-/-/-',
+          header: { pgn: 126464, src: this.#addrMngr.address, dst: dst },
+          fields: [
+            { field: 1, title: 'Transmitted PGN Group Function Code', state: 'V', value: par },
+          ],
+        };
+        for (let i = 0; i < recvList.length; i++) {
+          msg.fields.push({ field: i + 2, title: 'PGN supported (' + (i + 1) + ')', state: 'V', value: recvList[i] });
+        }
       }
-    } else if ((par == 1) && (recvList.length > 0)) {
-      msg = {
-        key: 'nmea2000/126464/1/-/-/-/-',
-        header: { pgn: 126464, src: this.#addrMngr.address, dst: dst },
-        fields: [
-          { field: 1, title: 'Transmitted PGN Group Function Code', state: 'V', value: par },
-        ],
-      };
-      for (let i = 0; i < recvList.length; i++) {
-        msg.fields.push({ field: i + 2, title: 'PGN supported (' + (i + 1) + ')', state: 'V', value: recvList[i] });
+      if (msg != null) {
+        return this.sendMsg(msg);
       }
-    }
-    if (msg != null) {
-      return this.sendMsg(msg);
     }
     return false;
   };
 
   // Sends Product Information message
-  static send126996() {
-    let pinf = this.getProductInfo();
-    let msg = {
-      key: 'nmea2000/126996/-/-/-/-/-',
-      header: { pgn: 126996, src: this.#addrMngr.address, dst: 0xFF },
-      fields: [
-        { field: 1,title: 'NMEA Network Message Database Version', state: 'V', value: pinf[1] },
-        { field: 2,title: 'NMEA Manufacturer\'s Product Code', state: 'V', value: pinf[2] },
-        { field: 3,title: 'Manufacturer\'s Model ID', state: 'V', value: pinf[3] },
-        { field: 4,title: 'Manufacturer\'s Software Version Code', state: 'V', value: pinf[4] },
-        { field: 5,title: 'Manufacturer\'s Model Version', state: 'V', value: pinf[5] },
-        { field: 6,title: 'Manufacturer\'s Model Serial Code', state: 'V', value: pinf[6] },
-        { field: 7,title: 'NMEA 2000 Certification Level', state: 'V', value: pinf[7] },
-        { field: 8,title: 'Load Equivalency', state: 'V', value: pinf[8] },
-      ],
-    };
-    return this.sendMsg(msg);
+  _send126996() {
+    if (this.#addrMngr.state == 'Valid') {
+      let pinf = this.getProductInfo();
+      let msg = {
+        key: 'nmea2000/126996/-/-/-/-/-',
+        header: { pgn: 126996, src: this.#addrMngr.address, dst: 0xFF },
+        fields: [
+          { field: 1,title: 'NMEA Network Message Database Version', state: 'V', value: pinf[1] },
+          { field: 2,title: 'NMEA Manufacturer\'s Product Code', state: 'V', value: pinf[2] },
+          { field: 3,title: 'Manufacturer\'s Model ID', state: 'V', value: pinf[3] },
+          { field: 4,title: 'Manufacturer\'s Software Version Code', state: 'V', value: pinf[4] },
+          { field: 5,title: 'Manufacturer\'s Model Version', state: 'V', value: pinf[5] },
+          { field: 6,title: 'Manufacturer\'s Model Serial Code', state: 'V', value: pinf[6] },
+          { field: 7,title: 'NMEA 2000 Certification Level', state: 'V', value: pinf[7] },
+          { field: 8,title: 'Load Equivalency', state: 'V', value: pinf[8] },
+        ],
+      };
+      return this.sendMsg(msg);
+    }
+    return false;
   };
 
   // Sends Configuration Information message
-  static send126998() {
-    let msg = {
-      key: 'nmea2000/126998/-/-/-/-/-',
-      header: { pgn: 126998, src: this.#addrMngr.address, dst: 0xFF },
-      fields: [
-        { field: 1,title: 'Installation Description, Field 1', state: 'V', value: 'PUMA' },
-        { field: 2,title: 'Installation Description, Field 2', state: 'V', value: '' },
-        { field: 3,title: 'Manufacturer Information, Field 3', state: 'V', value: 'Puma' },
-      ],
-    };
-    return this.sendMsg(msg);
+  _send126998() {
+    if (this.#addrMngr.state == 'Valid') {
+      let msg = {
+        key: 'nmea2000/126998/-/-/-/-/-',
+        header: { pgn: 126998, src: this.#addrMngr.address, dst: 0xFF },
+        fields: [
+          { field: 1,title: 'Installation Description, Field 1', state: 'V', value: 'PUMA' },
+          { field: 2,title: 'Installation Description, Field 2', state: 'V', value: '' },
+          { field: 3,title: 'Manufacturer Information, Field 3', state: 'V', value: 'Puma' },
+        ],
+      };
+      return this.sendMsg(msg);
+    }
+    return false;
   };
-
+  
   // Sends ISO Acknowledgement message
-  static send059392(ctr, grp, pgn, dst) {
-    let msg = {
-      key: 'nmea2000/059392/-/-/-/-/-',
-      header: { pgn: 59392, src: this.#addrMngr.address, dst: dst },
-      fields: [
-        { field: 1,title: 'Control Byte', state: 'V', value: ctr },
-        { field: 2,title: 'Group Function Value', state: 'V', value: grp },
-        { field: 3,title: 'NMEA Reserved', state: 'V', value: 0xFFFFFF },
-        { field: 4,title: 'PGN of Requested Information', state: 'V', value: pgn },
-      ],
-    };
-    return this.sendMsg(msg);
+  _send059392(ctr, grp, pgn, dst) {
+    if (this.#addrMngr.state == 'Valid') {
+      let msg = {
+        key: 'nmea2000/059392/-/-/-/-/-',
+        header: { pgn: 59392, src: this.#addrMngr.address, dst: dst },
+        fields: [
+          { field: 1,title: 'Control Byte', state: 'V', value: ctr },
+          { field: 2,title: 'Group Function Value', state: 'V', value: grp },
+          { field: 3,title: 'NMEA Reserved', state: 'V', value: 0xFFFFFF },
+          { field: 4,title: 'PGN of Requested Information', state: 'V', value: pgn },
+        ],
+      };
+      return this.sendMsg(msg);
+    }
+    return false;
   };
 
   // Sends Heartbeat message
-  static send126993() {
-    let msg = {
+  _send126993() {
+    if (this.#addrMngr.state == 'Valid') {
+      let msg = {
       key: 'nmea2000/126993/-/-/-/-/-',
-      header: { pgn: 126993, src: this.#addrMngr.address, dst: 0xFF },
-      fields: [
-        { field: 1,title: 'Update Rate', state: 'V', value: 60 },
-        { field: 2,title: 'Heartbeat Sequence Counter', state: 'V', value: heartbeat.sequence },
-        { field: 3,title: 'Class 1 CAN Controller State', state: 'V', value: heartbeat.can1State },
-        { field: 4,title: 'Class 2 Second CAN Controller State', state: 'V', value: heartbeat.can1State },
-        { field: 5,title: 'Equipment Status', state: 'V', value: heartbeat.equState },
-        { field: 6,title: 'NMEA Reserved', state: 'V', value: 0x3FFFFFFFF },
-      ],
-    };
-    this.#heartbeat.sequence++;
-    this.#heartbeat.sequence %= 252;
-    return this.sendMsg(msg);
+        header: { pgn: 126993, src: this.#addrMngr.address, dst: 0xFF },
+        fields: [
+          { field: 1,title: 'Update Rate', state: 'V', value: 60 },
+          { field: 2,title: 'Heartbeat Sequence Counter', state: 'V', value: this.#heartbeat.sequence },
+          { field: 3,title: 'Class 1 CAN Controller State', state: 'V', value: this.#heartbeat.can1State },
+          { field: 4,title: 'Class 2 Second CAN Controller State', state: 'V', value: this.#heartbeat.can1State },
+          { field: 5,title: 'Equipment Status', state: 'V', value: this.#heartbeat.equState },
+          { field: 6,title: 'NMEA Reserved', state: 'V', value: 0x3FFFFFFFF },
+        ],
+      };
+      this.#heartbeat.sequence++;
+      this.#heartbeat.sequence %= 252;
+      return this.sendMsg(msg);
+    }
+    return false;
   };
 };
 
