@@ -62,8 +62,7 @@
 		"*": NotFound,
 	};
 
-  window.pumaAPI.send('can-start');
-  window.pumaAPI.send('ser-start');
+  window.pumaAPI.send('dev-start');
 </script>
 
 <svelte:head>

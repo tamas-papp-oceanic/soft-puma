@@ -38,7 +38,8 @@
   };
 
   function scan(e) {
-    window.pumaAPI.send('n2k-addr');
+    window.pumaAPI.send('n2k-addr', 'can');
+    window.pumaAPI.send('n2k-addr', 'ser');
   };
 
   // Data getters, setters

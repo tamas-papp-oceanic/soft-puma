@@ -6,7 +6,7 @@ const loadURL = serve({ directory: 'public' });
 const can = require('./src/services/can.js');
 const ser = require('./src/services/serial.js');
 const com = require('./src/services/common.js');
-const nmea = require('./src/services/nmea.js');
+const NMEAEngine = require('./src/services/nmea.js');
 
 // const can = require('./src/services/can.js');
 // const serial = require('./src/services/serial.js');
@@ -14,6 +14,7 @@ const nmea = require('./src/services/nmea.js');
 // Keep a global reference of the window object, if you don't, the window will
 // be closed automatically when the JavaScript object is garbage collected.
 let mainWindow;
+let engines = {};
 
 function isDev() {
   return !app.isPackaged;
@@ -101,9 +102,9 @@ app.on('activate', function () {
 // let tool = require('./src/tools/nmea.js');
 // tool.create();
 // NMEA processing
-function proc(frm) {
+function proc(dev, frm) {
   if (typeof mainWindow.webContents !== 'undefined') {
-    let msg = nmea.process(frm);
+    let msg = engines[dev].engine.process(frm);
     if (msg != null) {
       switch (msg.header.pgn) {
         case 60928:
@@ -121,8 +122,13 @@ function proc(frm) {
 }
 // Initialize NMEA translator
 com.init();
-// Initialize NMEA engine
-nmea.init();
+// Initialize NMEA engines
+console.log('Starting NMEA engines...')
+engines[can.device()] = { engine: new NMEAEngine(can), process: proc };
+engines[ser.device()] = { engine: new NMEAEngine(ser), process: proc };
+for (const [key, val] of Object.entries(engines)) {
+  val.engine.init();
+}
 // Load configurations
 ipcMain.on('n2k-ready', (e, ...args) => {
   if (typeof mainWindow.webContents !== 'undefined') {
@@ -138,36 +144,39 @@ ipcMain.on('n2k-ready', (e, ...args) => {
 });
 // Processing outgoing message
 ipcMain.on('n2k-data', (e, ...args) => {
-  nmea.sendMsg(args[0]);
+  let eng = engines[args[0]];
+  if (typeof eng !== 'undefined') {
+    eng.sendMsg(args[1]);
+  }
 });
 ipcMain.on('n2k-addr', (e, ...args) => {
-  nmea.send059904(60928, 0xFF);
+  let eng = engines[args[0]];
+  if (typeof eng !== 'undefined') {
+    eng.send059904(60928, 0xFF);
+  }
 });
-// Start can processing
-ipcMain.on('can-start', (e, ...args) => {
-  can.start(proc);
+// Start device processing
+ipcMain.on('dev-start', (e, ...args) => {
+  for (const [key, val] of Object.entries(engines)) {
+    val.engine.device.start(val.process);  
+  }
 });
-// Stop can processing
-ipcMain.on('can-stop', (e, ...args) => {
-  can.stop();
-});
-// Start serial processing
-ipcMain.on('ser-start', (e, ...args) => {
-  ser.start(proc);
-});
-// Stop serial processing
-ipcMain.on('ser-stop', (e, ...args) => {
-  ser.stop();
+// Stop device processing
+ipcMain.on('dev-stop', (e, ...args) => {
+  for (const [key, val] of Object.entries(engines)) {
+    val.engine.device.stop();  
+  }
 });
 // Close the application
 ipcMain.on('app-quit', (e, ...args) => {
-  console.log("Stopping CAN...");
+  console.log('Stopping CAN...');
   can.stop();
-  console.log("Stopping Serial...");
+  console.log('Closing Serial...');
   ser.stop();
-  console.log("Serial stopped.");
-  console.log("Stopping NMEA engine...");
-  nmea.destroy();
-  console.log("Quit...")
+  console.log('Stopping NMEA engines...');
+  for (const [key, val] of Object.entries(engines)) {
+    val.engine.destroy();
+  }
+  console.log('Quit...')
   app.quit();
 });
