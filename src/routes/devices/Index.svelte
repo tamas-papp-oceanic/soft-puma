@@ -4,7 +4,7 @@
     OverflowMenuItem, Pagination, Dropdown, Tag } from "carbon-components-svelte";
   import Scan from "carbon-icons-svelte/lib/SearchLocate16";
   import { push } from 'svelte-spa-router'
-  import { name } from "../../stores/data.js";
+  import { name, devices, device } from "../../stores/data.js";
 
   const headers = [{
     key: "id",
@@ -29,12 +29,26 @@
     empty: true
   }];
 
+  let items = new Array();
+  let selected;
   let height;
-  let rows = [];
+  let rows = new Array();
   let pagination = {
     pageSize: 10,
     page: 1,
     totalItems: 0,
+  };
+
+  function getSelected() {
+    if ($device != null) {
+      for (let i in $devices) {
+        if ($devices[i] == $device) {
+          selected = i.toString();
+        }
+      }
+    } else {
+      selected = '0';
+    }
   };
 
   function scan(e) {
@@ -42,19 +56,36 @@
     window.pumaAPI.send('n2k-addr', 'ser');
   };
 
+  function select(e) {
+    $device = e.detail.selectedItem.text;
+  }
+
+  getSelected();
+
   // Data getters, setters
   $: {
     let tmp = new Array();
-    for (const [key, val] of Object.entries($name)) {
-      let nam = {
-        id: key,
-        uniqueNumber: val.uniqueNumber != null ? val.uniqueNumber : '',
-        manufacturer: val.manufacturer != null ? val.manufacturer : '',
-        productCode: val.productCode != null ? val.productCode : '',
-        modelID: val.modelID != null ? val.modelID : '',
-        instance: val.deviceInstance != null ? val.deviceInstance : '',
-      };
-      tmp.push(nam);
+    for (let i in $devices) {
+      tmp.push(
+        { id: i.toString(), text: $devices[i] },
+      );
+    }
+    items = JSON.parse(JSON.stringify(tmp));
+  };
+  $: {
+    let tmp = new Array();
+    if (typeof $name[$device] !== "undefined") {
+      for (const [key, val] of Object.entries($name[$device])) {
+        let nam = {
+          id: key,
+          uniqueNumber: val.uniqueNumber != null ? val.uniqueNumber : '',
+          manufacturer: val.manufacturer != null ? val.manufacturer : '',
+          productCode: val.productCode != null ? val.productCode : '',
+          modelID: val.modelID != null ? val.modelID : '',
+          instance: val.deviceInstance != null ? val.deviceInstance : '',
+        };
+        tmp.push(nam);
+      }
     }
     rows = JSON.parse(JSON.stringify(tmp));
     pagination.totalItems = rows.length;
@@ -73,15 +104,14 @@
         pageSize={pagination.pageSize}
         page={pagination.page}>
         <Toolbar>
-          <Tag size="default" type="outline">{'Interface'}</Tag>
           <Dropdown
+            style="margin-left: 1rem; grid-gap: 0 1rem;"
+            titleText="Interface"
             type="inline"
             size="xl"
-            selectedId="0"
-            items={[
-              { id: '0', text: 'can0' },
-              { id: '1', text: '/dev/ttyACM0' },
-            ]}
+            bind:selectedId={selected}
+            items={items}
+            on:select={(e) => select(e)}
           />
           <ToolbarContent>
             <ToolbarSearch />

@@ -2,6 +2,8 @@ import { writable, get } from 'svelte/store';
 
 const qlimit = 1024;
 
+export const devices = writable(new Array());
+export const device = writable(null);
 export const clas = writable({});
 export const func = writable({});
 export const indu = writable({});
@@ -11,6 +13,10 @@ export const data = writable({});
 export const dque = writable({});
 
 window.pumaAPI.send('n2k-ready');
+
+window.pumaAPI.recv('n2k-devs', (e, val) => {
+  devices.set(val);
+});
 
 window.pumaAPI.recv('n2k-clas', (e, val) => {
   clas.set(val);
@@ -28,7 +34,8 @@ window.pumaAPI.recv('n2k-manu', (e, val) => {
   manu.set(val);
 });
 // NMEA address claim message
-window.pumaAPI.recv('n2k-name', (e, val) => {
+window.pumaAPI.recv('n2k-name', (e, args) => {
+  const [ dev, msg ] = args;
   let nam = {
     uniqueNumber: null,
     manufacturer: null,
@@ -51,16 +58,16 @@ window.pumaAPI.recv('n2k-name', (e, val) => {
   let ain = get(indu);
   let ama = get(manu);
   let cla = null;
-  for (let i in val.fields) {
-    let fld = val.fields[i];
+  for (let i in msg.fields) {
+    let fld = msg.fields[i];
     switch (fld.field) {
       case 7:
         cla = fld.value;
         break;
     }
   }
-  for (let i in val.fields) {
-    let fld = val.fields[i];
+  for (let i in msg.fields) {
+    let fld = msg.fields[i];
     switch (fld.field) {
       case 1:
         nam.uniqueNumber = fld.value;
@@ -105,9 +112,12 @@ window.pumaAPI.recv('n2k-name', (e, val) => {
         break;
     }
   }
-  let src = val.raw[3];
+  let src = msg.raw[3];
   let dat = get(name);
-  let tmp = dat[src];
+  if (typeof dat[dev] === "undefined") {
+    dat[dev] = {};
+  }
+  let tmp = dat[dev][src];
   if ((typeof tmp !== 'undefined') && (
     (tmp.uniqueNumber != nam.uniqueNumber) ||
     (tmp.manufacturer != nam.manufacturer) ||
@@ -115,16 +125,20 @@ window.pumaAPI.recv('n2k-name', (e, val) => {
     (tmp.class != nam.class) ||
     (tmp.industry != nam.industry))
   ) {
-    delete dat[src];
+    delete dat[dev][src];
   }
-  dat[src] = nam;
+  dat[dev][src] = nam;
   name.set(dat);
 });
 // NMEA product info message
-window.pumaAPI.recv('n2k-prod', (e, val) => {
-  let src = val.raw[3];
+window.pumaAPI.recv('n2k-prod', (e, args) => {
+  const [ dev, msg ] = args;
+  let src = msg.raw[3];
   let dat = get(name);
-  let nam = dat[src];
+  if (dat[dev] === "undefined") {
+    dat[dev] = {};
+  }
+  let nam = dat[dev][src];
   if (typeof nam === 'undefined') {
     nam = {
       uniqueNumber: null,
@@ -144,8 +158,8 @@ window.pumaAPI.recv('n2k-prod', (e, val) => {
       loadEquivalency: null,
     };
   }
-  for (let i in val.fields) {
-    let fld = val.fields[i];
+  for (let i in msg.fields) {
+    let fld = msg.fields[i];
     switch (fld.field) {
       case 1:
         nam.databaseVersion = fld.value;
@@ -173,42 +187,50 @@ window.pumaAPI.recv('n2k-prod', (e, val) => {
         break;
     }
   }
-  dat[src] = nam;
+  dat[dev][src] = nam;
   name.set(dat);
 });
 // Restart capture
-export function restart(key) {
+export function restart(dev, key) {
   let que = get(dque);
-  if (typeof que[key] !== 'undefined') {
-    delete que[key];
+  if ((typeof que[dev] !== 'undefined') && (typeof que[dev][key] !== 'undefined')) {
+    delete que[dev][key];
     dque.set(que);
   }
 }
 // NMEA other messages
-window.pumaAPI.recv('n2k-data', (e, val) => {
-  if (typeof val.key !== 'undefined') {
-    let key = val.key;
-    delete val.key;
+window.pumaAPI.recv('n2k-data', (e, args) => {
+  const [ dev, msg ] = args;
+  if (typeof msg.key !== 'undefined') {
+    let key = msg.key;
+    delete msg.key;
     let dat = get(data);
-    if (typeof dat[key] === 'undefined') {
-        val.cnt = 0;
-    } else {
-      val.cnt = dat[key].cnt;
+    if (typeof dat[dev] === 'undefined') {
+      dat[dev] = {};
     }
-    val.cnt++;
-    dat[key] = val;
+    if (typeof dat[dev][key] === 'undefined') {
+        dat[dev][key] = {};
+        msg.cnt = 0;
+    } else {
+      msg.cnt = dat[dev][key].cnt;
+    }
+    msg.cnt++;
+    dat[dev][key] = msg;
     data.set(dat);
     let que = get(dque);
     let cnt = 0;
-    if (typeof que[key] === 'undefined') {
-      que[key] = new Array();
+    if (typeof que[dev] === 'undefined') {
+      que[dev] = {};
+    }
+    if (typeof que[dev][key] === 'undefined') {
+      que[dev][key] = new Array();
     } else {
-      cnt = que[key][que[key].length - 1].cnt;
+      cnt = que[dev][key][que[dev][key].length - 1].cnt;
     }
     cnt++;
-    if (que[key].length < qlimit) {
-      val.cnt = cnt;
-      que[key].push(val);
+    if (que[dev][key].length < qlimit) {
+      msg.cnt = cnt;
+      que[dev][key].push(msg);
     }
     dque.set(que);
   }

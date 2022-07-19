@@ -3,7 +3,7 @@
     Button, Pagination, OverflowMenu, OverflowMenuItem } from "carbon-components-svelte";
   import SkipBack from "carbon-icons-svelte/lib/SkipBack16";
   import { push, pop } from 'svelte-spa-router'
-  import { name, data } from "../../stores/data.js";
+  import { device, name, data } from "../../stores/data.js";
 
   export let params;
 
@@ -49,40 +49,46 @@
 
   // Data getters, setters
   $: {
-    let nam = $name[parseInt(params["address"])];
-    if (typeof nam !== 'undefined') {
-      title = 'Messages of ' + nam.manufacturer + (nam.modelID != null ? ' - ' + nam.modelID : '');
+    if (typeof $name[$device] !== "undefined") {
+      let nam = $name[$device][parseInt(params["address"])];
+      if (typeof nam !== 'undefined') {
+        title = 'Messages of ' + nam.manufacturer + (nam.modelID != null ? ' - ' + nam.modelID : '');
+      } else {
+        title = 'Messages';
+      }
     } else {
       title = 'Messages';
     }
   }
   $: {
     let tmp = new Array();
-    for (const [key, val] of Object.entries($data)) {
-      let add = parseInt(params["address"]);
-      if (val.raw[3] == add) {
-        let dat = new Uint8Array(val.raw.slice(4));
-        let spl = key.split("/");
-        let obj = {
-          id: key,
-          msg: spl[1] + ' - ' + val.title,
-          ins: (typeof val.header.ins !== 'undefined') ? val.header.ins : '-',
-          cnt: val.cnt,
-          key: (parseInt(spl[1]) * 10) + ((typeof val.header.ins !== 'undefined') ? parseInt(val.header.ins) : 0),
-          raw: buf2hex(dat),
-        };
-        tmp.push(obj);
+    if (typeof $data[$device] !== "undefined") {
+      for (const [key, val] of Object.entries($data[$device])) {
+        let add = parseInt(params["address"]);
+        if (val.raw[3] == add) {
+          let dat = new Uint8Array(val.raw.slice(4));
+          let spl = key.split("/");
+          let obj = {
+            id: key,
+            msg: spl[1] + ' - ' + val.title,
+            ins: (typeof val.header.ins !== 'undefined') ? val.header.ins : '-',
+            cnt: val.cnt,
+            key: (parseInt(spl[1]) * 10) + ((typeof val.header.ins !== 'undefined') ? parseInt(val.header.ins) : 0),
+            raw: buf2hex(dat),
+          };
+          tmp.push(obj);
+        }
       }
+      tmp.sort((a, b) => {
+        if (a.id < b.id) {
+          return -1;
+        }
+        if (a.id > b.id) {
+          return 1;
+        }
+        return 0;
+      });
     }
-    tmp.sort((a, b) => {
-      if (a.id < b.id) {
-        return -1;
-      }
-      if (a.id > b.id) {
-        return 1;
-      }
-      return 0;
-    });
     rows = JSON.parse(JSON.stringify(tmp));
     pagination.totalItems = rows.length;
   };

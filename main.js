@@ -103,18 +103,18 @@ app.on('activate', function () {
 // tool.create();
 // NMEA processing
 function proc(dev, frm) {
-  if (typeof mainWindow.webContents !== 'undefined') {
+  if ((typeof mainWindow !== 'undefined') && (typeof mainWindow.webContents !== 'undefined')) {
     let msg = engines[dev].engine.process(frm);
     if (msg != null) {
       switch (msg.header.pgn) {
         case 60928:
-          mainWindow.webContents.send('n2k-name', msg);
+          mainWindow.webContents.send('n2k-name', [ dev, msg ]);
           break;
         case 126996:
-          mainWindow.webContents.send('n2k-prod', msg);
+          mainWindow.webContents.send('n2k-prod', [ dev, msg ]);
           break;
         default:
-          mainWindow.webContents.send('n2k-data', msg);
+          mainWindow.webContents.send('n2k-data', [ dev, msg ]);
           break;
       }
     }
@@ -150,7 +150,12 @@ SerialPort.list().then((pts) => {
 // engines[can.device()] = { engine: new NMEAEngine(can), process: proc };
 // Load configurations
 ipcMain.on('n2k-ready', (e, ...args) => {
-  if (typeof mainWindow.webContents !== 'undefined') {
+  if ((typeof mainWindow !== 'undefined') && (typeof mainWindow.webContents !== 'undefined')) {
+    let dev = [];
+    for (let i in devices) {
+      dev.push(devices[i].device);
+    }
+    mainWindow.webContents.send('n2k-devs', dev);
     const configs = ['classes', 'functions', 'industries', 'manufacturers'];
     for (let i in configs) {
       let cnf = configs[i];

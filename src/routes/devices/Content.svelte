@@ -5,7 +5,7 @@
   import Restart from "carbon-icons-svelte/lib/Restart16";
   import SkipBack from "carbon-icons-svelte/lib/SkipBack16";
   import { push, pop } from 'svelte-spa-router'
-  import { dque, restart } from "../../stores/data.js";
+  import { device, dque, restart } from "../../stores/data.js";
 
   export let params;
 
@@ -29,7 +29,7 @@
   }); 
 
   function rest(e) {
-    restart(key);
+    restart($device, key);
   };
 
   function back(e) {
@@ -37,8 +37,9 @@
   };
 
   // Data getters, setters
-  $: if (first && (key != null) && (typeof $dque[key] !== 'undefined') && ($dque[key].length > 0)) {
-    let dat = $dque[key].at(0);
+  $: if (first && (key != null) && (typeof $dque[$device] !== 'undefined') &&
+    (typeof $dque[$device][key] !== 'undefined') && ($dque[$device][key].length > 0)) {
+    let dat = $dque[$device][key].at(0);
     if (title != null) {
       title += ' - ' + dat.title;
     }
@@ -67,10 +68,11 @@
       first = false;
     }
   }
-  $: if ((key != null) && (typeof $dque[key] !== 'undefined')) {
+  $: if ((key != null) && (typeof $dque[$device] !== 'undefined') &&
+    (typeof $dque[$device][key] !== 'undefined')) {
     let tmp = new Array();
-    for (let i in $dque[key]) {
-      let dat = $dque[key][i];
+    for (let i in $dque[$device][key]) {
+      let dat = $dque[$device][key][i];
       let obj = {
         id: dat.id,
         cnt: dat.cnt,
