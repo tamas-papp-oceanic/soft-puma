@@ -86,12 +86,13 @@ function encode(msg) {
           }
         } else {
           if (fld.multiplier != null) {
-            if (typeof val == 'bigint') {
+            if (typeof mfl.value == 'bigint') {
               if (fld.multiplier >= 1) {
                 mfl.value /= BigInt(fld.multiplier);
               } else {
                 mfl.value *= BigInt(1 / fld.multiplier);
               }
+              mfl.value = Number(mfl.value);
             } else {
               mfl.value /= fld.multiplier;
             }

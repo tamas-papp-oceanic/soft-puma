@@ -47,16 +47,16 @@ class Address {
     this.#timers = {};
     // Define final state machine
     this.#asm = new StateMachine('ASM', context);
-    this.#s0 = this.#asm.createState('Idle', false, this._s0Entry.bind(this));
-    this.#s1 = this.#asm.createState('WaitForDelay1', false, this._s1Entry.bind(this));
-    this.#s2 = this.#asm.createState('TransmitNew2', false, this._s2Entry.bind(this));
-    this.#s3 = this.#asm.createState('WaitForContention', false, this._s3Entry.bind(this));
-    this.#s4 = this.#asm.createState('FetchNext', false, this._s4Entry.bind(this));
-    this.#s5 = this.#asm.createState('Valid', false, this._s5Entry.bind(this));
-    this.#s6 = this.#asm.createState('WaitForDelay6', false, this._s6Entry.bind(this));
-    this.#s7 = this.#asm.createState('TransmitNew7', false, this._s7Entry.bind(this));
-    this.#s8 = this.#asm.createState('WaitForCommand', false, this._s8Entry.bind(this));
-    this.#s9 = this.#asm.createState('TransmitNew9', false, this._s9Entry.bind(this));
+    this.#s0 = this.#asm.createState('Idle', false, this.#s0Entry.bind(this));
+    this.#s1 = this.#asm.createState('WaitForDelay1', false, this.#s1Entry.bind(this));
+    this.#s2 = this.#asm.createState('TransmitNew2', false, this.#s2Entry.bind(this));
+    this.#s3 = this.#asm.createState('WaitForContention', false, this.#s3Entry.bind(this));
+    this.#s4 = this.#asm.createState('FetchNext', false, this.#s4Entry.bind(this));
+    this.#s5 = this.#asm.createState('Valid', false, this.#s5Entry.bind(this));
+    this.#s6 = this.#asm.createState('WaitForDelay6', false, this.#s6Entry.bind(this));
+    this.#s7 = this.#asm.createState('TransmitNew7', false, this.#s7Entry.bind(this));
+    this.#s8 = this.#asm.createState('WaitForCommand', false, this.#s8Entry.bind(this));
+    this.#s9 = this.#asm.createState('TransmitNew9', false, this.#s9Entry.bind(this));
     // Define all state transitions
     this.#s0.addTransition('next', this.#s1);
     this.#s1.addTransition('next', this.#s2);
@@ -123,17 +123,17 @@ class Address {
     return this.#asm.currentState.name;
   };
   // Idle
-  _s0Entry(state, context) {
+  #s0Entry(state, context) {
   };
   // WaitForDelay1
-  _s1Entry(state, context) {
+  #s1Entry(state, context) {
     let tio = this.rnd();
     this.#timeout = setTimeout(() => {
       state.trigger('next');
     }, tio);
   };
   // TransmitNew2
-  _s2Entry(state, context) {
+  #s2Entry(state, context) {
     // Send ISO Address Claim
     if (this.send060928()) {
       state.trigger('succ');
@@ -142,13 +142,13 @@ class Address {
     }
   };
   // WaitForContention
-  _s3Entry(state, context) {
+  #s3Entry(state, context) {
     this.#timeout = setTimeout(() => {
       state.trigger('next');
     }, 251);
   };
   // FetchNext
-  _s4Entry(state, context) {
+  #s4Entry(state, context) {
     let our = this.#address;
     let sav = this.#savaddr;
     our++
@@ -166,17 +166,17 @@ class Address {
     }
   };
   // Valid
-  _s5Entry(state, context) {
+  #s5Entry(state, context) {
     this.send059904(60928, 0xFF);
   };
   // WaitForDelay6
-  _s6Entry(state, context) {
+  #s6Entry(state, context) {
     setTimeout(() => {
       state.trigger('next');
     }, this.timeout());
   };
   // TransmitNew7
-  _s7Entry(state, context) {
+  #s7Entry(state, context) {
     // Send ISO Address Claim
     if (this.send060928()) {
       state.trigger('succ');
@@ -185,10 +185,10 @@ class Address {
     }
   };
   // WaitForCommand
-  _s8Entry(state, context) {
+  #s8Entry(state, context) {
   };
   // TransmitNew9
-  _s9Entry(state, context) {
+  #s9Entry(state, context) {
     // Send ISO Address Claim
     if (this.send060928()) {
       state.trigger('succ');

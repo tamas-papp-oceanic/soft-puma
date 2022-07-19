@@ -1,5 +1,6 @@
 const { SerialPort } = require('serialport')
 const { ReadlineParser } = require("@serialport/parser-readline");
+const { DelimiterParser } = require("@serialport/parser-delimiter");
 
 const sdev = '/dev/ttyACM0';
 const baud = 115200;
@@ -10,7 +11,7 @@ let running = false;
 let timer = null;
 let logged = {
   open: false,
-  err: false,
+  error: false,
 }
 // On open event
 port.on('open', () => {
@@ -46,9 +47,9 @@ function stop() {
   }
 };
 // Sends data to serial port
-function send(dat) {
+function send(frm) {
   if (port.isOpen) {
-    let msg = fromCanFrame(dat);
+    let msg = fromCanFrame(frm);
     if (msg != null) {
       port.write(msg);
     }
@@ -73,13 +74,17 @@ function tick(fun) {
         }
         return;
       } else {
-        const parser = port.pipe(new ReadlineParser({ delimiter: '\n' }));
+        // const parser = port.pipe(new ReadlineParser({ delimiter: '\n' }));
+        const parser = port.pipe(new DelimiterParser({ delimiter: '\n' }));
         parser.on('data', (dat) => {
+
+console.log(dat.toString())
+
           // let msg = fun(sdev, toCanFrame(dat));
           // if (msg != null) {
           //   ipcRenderer.send('ser-data', msg)
           // }
-          fun(sdev, toCanFrame(dat));
+          fun(sdev, toCanFrame(dat.toString()));
         });
       }
     });
@@ -109,7 +114,7 @@ function fromCanFrame(frm) {
   let msg = frm.id.toString(16).padStart(8, '0') + ' ';
   msg += frm.data.length.toString() + ' ';
   msg += frm.data.toString('hex');
-  return msg;
+  return msg.toUpperCase();
 };
 // Module exports
 module.exports = {

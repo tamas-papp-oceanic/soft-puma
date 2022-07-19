@@ -124,7 +124,7 @@ function proc(dev, frm) {
 com.init();
 // Initialize NMEA engines
 console.log('Starting NMEA engines...')
-engines[can.device()] = { engine: new NMEAEngine(can), process: proc };
+// engines[can.device()] = { engine: new NMEAEngine(can), process: proc };
 engines[ser.device()] = { engine: new NMEAEngine(ser), process: proc };
 for (const [key, val] of Object.entries(engines)) {
   val.engine.init();
@@ -146,13 +146,13 @@ ipcMain.on('n2k-ready', (e, ...args) => {
 ipcMain.on('n2k-data', (e, ...args) => {
   let eng = engines[args[0]];
   if (typeof eng !== 'undefined') {
-    eng.sendMsg(args[1]);
+    eng.engine.sendMsg(args[1]);
   }
 });
 ipcMain.on('n2k-addr', (e, ...args) => {
   let eng = engines[args[0]];
   if (typeof eng !== 'undefined') {
-    eng.send059904(60928, 0xFF);
+    eng.engine.send059904(60928, 0xFF);
   }
 });
 // Start device processing

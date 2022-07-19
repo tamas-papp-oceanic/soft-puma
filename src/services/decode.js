@@ -170,6 +170,7 @@ function decode(frm) {
               } else {
                 val /= BigInt(1 / fld.multiplier);
               }
+              val = Number(val);
             } else {
               val *= fld.multiplier;
             }

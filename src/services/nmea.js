@@ -40,10 +40,10 @@ class NMEAEngine {
   // Initializes NMEA engine
   init() {
     this.#addrMngr = new Address();
-    this.#addrMngr.start(this._sendRaw.bind(this));
+    this.#addrMngr.start(this.#sendRaw.bind(this));
     this.#timer = setInterval((fun) => {
       fun();
-    }, 60000, this._send126993.bind(this));
+    }, 60000, this.#send126993.bind(this));
   };
   // Destroys NMEA engine
   destroy() {
@@ -67,7 +67,7 @@ class NMEAEngine {
         switch (msg.header.pgn) {
           case 59904:
             // ISO Request
-            this._proc059904(msg);
+            this.#proc059904(msg);
             break;
           case 60928:
             // ISO Address Claim
@@ -79,19 +79,19 @@ class NMEAEngine {
             break;
           case 65280:
             // Proprietary Set Serial Command
-            this._proc065280(msg);
+            this.#proc065280(msg);
             break;
           case 65445:
             // Proprietary SF Request / Command
-            this._proc065445(msg);
+            this.#proc065445(msg);
             break;
           case 126208:
             // NMEA - Request, Command, Acknowledge - Group Function
-            this._proc126208(msg);
+            this.#proc126208(msg);
             break;
           case 126996:
             // Product Information
-            this._proc126996(msg);
+            this.#proc126996(msg);
             break;
         }
         return msg;
@@ -124,7 +124,7 @@ class NMEAEngine {
     return true;
   };
   // NMEA raw sending function
-  _sendRaw(frm) {
+  #sendRaw(frm) {
     try {
       this.#device.send(frm);
       return true;
@@ -134,7 +134,7 @@ class NMEAEngine {
     }
   };
   // Process ISO Request message
-  _proc059904(msg) {
+  #proc059904(msg) {
     let fld = com.getFld(1, msg.fields);
     if (fld != null) {
       switch (fld.value) {
@@ -145,39 +145,39 @@ class NMEAEngine {
         case 126464:
           if (msg.header.dst == this.#addrMngr.address) {
             // Send PGN Transmit List message
-            this._send126464(0, msg.header.src);
+            this.#send126464(0, msg.header.src);
             // Send PGN Receive List message
-            this._send126464(1, msg.header.src);
+            this.#send126464(1, msg.header.src);
           }
           break;
         case 126996:
           if (msg.header.dst == this.#addrMngr.address) {
             // Send Product Info message
-            this._send126996();
+            this.#send126996();
           }
           break;
         case 126998:
           if (msg.header.dst == this.#addrMngr.address) {
             // Send Configuration Info message
-            this._send126998();
+            this.#send126998();
           }
           break;
         default:
           if (msg.header.dst == this.#addrMngr.address) {
             // Send ISO Acknowledge message with negative acknowledgement
-            this._send059392(1, 0xFF, fld.value, msg.header.src);
+            this.#send059392(1, 0xFF, fld.value, msg.header.src);
           }
           break;
       }
     }
   };
   // Sends ISO Request message
-  _send059904(pgn, dst) {
+  send059904(pgn, dst) {
     this.#addrMngr.send059904(pgn, dst);
   };
   // Processes Proprietary Command message
   // Set Serial Number
-  _proc065280(msg) {
+  #proc065280(msg) {
     // This PGN should be 061184 (addressable)
     // if (msg.header.dst == this.#addrMngr.address) {
       let fld = com.getFld(1, msg.fields);
@@ -235,7 +235,7 @@ class NMEAEngine {
     0x18 	5906 6 Channel Load Controller
     0x19 	3165 Rudder Angle Adapter
   */
-  _proc065445(msg) {
+  #proc065445(msg) {
     // This PGN should be 061184 (addressable)
     // if (msg.header.dst == this.#addrMngr.address) {
       let fld = com.getFld(1, msg.fields);
@@ -291,7 +291,7 @@ class NMEAEngine {
     // }
   };
   // NMEA - Request, Command, Acknowledge - Group Function
-  _proc126208(msg) {
+  #proc126208(msg) {
     // Request Group Function Code
     let fld = com.getFld(1, msg.fields);
     if (fld == null) {
@@ -391,7 +391,7 @@ class NMEAEngine {
                   }
                   if (ack) {
                     // Send Acknowledge Group message
-                    this._send126208(msg.header.src, pgn, per, ter, nop, fer);
+                    this.#send126208(msg.header.src, pgn, per, ter, nop, fer);
                     snd = false;
                   }
                 }
@@ -456,16 +456,16 @@ class NMEAEngine {
                   }
                   if (ack) {
                     // Send Acknowledge Group message
-                    this._send126208(msg.header.src, pgn, per, ter, nop, fer);
+                    this.#send126208(msg.header.src, pgn, per, ter, nop, fer);
                   }
                 }
                 if (sn1) {
                   // Send PGN Transmit List message
-                  this._send126464(0, msg.header.src);
+                  this.#send126464(0, msg.header.src);
                 }
                 if (sn2) {
                   // Send PGN Receive List message
-                  this._send126464(1, msg.header.src);
+                  this.#send126464(1, msg.header.src);
                 }
               }
               break;
@@ -475,7 +475,7 @@ class NMEAEngine {
                 let ack = false;
                 let per = 0x00;
                 let ter = 0x00;
-                let pif = this.getProductInfo();
+                let pif = this.#productInfo;
                 let fer = Buffer.alloc(8).fill(0);
                 if (nop != 0xFF) {
                   if ((tri.state == '-') && ((tio.state == '-') || (tio.value == 0))) {
@@ -531,17 +531,17 @@ class NMEAEngine {
                 }
                 if (ack) {
                   // Send Acknowledge Group message
-                  this._send126208(msg.header.src, pgn, per, ter, nop, fer);
+                  this.#send126208(msg.header.src, pgn, per, ter, nop, fer);
                   snd = false;
                 }
                 if (snd) {
                   // Send Product Info message
-                  this._send126996();
+                  this.#send126996();
                 }
               }
               break;
             default:
-              this._send126208(msg.header.src, pgn, 0x01, 0x00, 0xFF);
+              this.#send126208(msg.header.src, pgn, 0x01, 0x00, 0xFF);
               break;
           }
         }
@@ -614,13 +614,13 @@ class NMEAEngine {
                 }
                 if (ack) {
                   // Send Acknowledge Group message
-                  this._send126208(msg.header.src, pgn, per, ter, nop, fer);
+                  this.#send126208(msg.header.src, pgn, per, ter, nop, fer);
                 }
               }
               break;
             default:
               // Send Acknowledge Group message with PGN error code - Not supported (0x01)
-              this._send126208(msg.header.src, pgn, 0x01, 0x00, 0xFF);
+              this.#send126208(msg.header.src, pgn, 0x01, 0x00, 0xFF);
               break;
           }
         }
@@ -643,9 +643,9 @@ class NMEAEngine {
     }
   };
   // Processes Product Information message
-  _proc126996(msg) {};
+  #proc126996(msg) {};
   // NMEA - Acknowledge - Group Function
-  _send126208(src, pgn, per, ter, nop, fer) {
+  #send126208(src, pgn, per, ter, nop, fer) {
     if (this.#addrMngr.state == 'Valid') {
       let rep = {
         key: 'nmea2000/126208/2/-/-/-/-',
@@ -671,7 +671,7 @@ class NMEAEngine {
     return false;
   }
   // Sends PGN Transmit / Receive Lists
-  _send126464(par, dst) {
+  #send126464(par, dst) {
     if (this.#addrMngr.state == 'Valid') {
       let msg = null;
       if ((par == 0) && (tranList.length > 0)) {
@@ -705,9 +705,9 @@ class NMEAEngine {
   };
 
   // Sends Product Information message
-  _send126996() {
+  #send126996() {
     if (this.#addrMngr.state == 'Valid') {
-      let pinf = this.getProductInfo();
+      let pinf = this.#productInfo;
       let msg = {
         key: 'nmea2000/126996/-/-/-/-/-',
         header: { pgn: 126996, src: this.#addrMngr.address, dst: 0xFF },
@@ -728,7 +728,7 @@ class NMEAEngine {
   };
 
   // Sends Configuration Information message
-  _send126998() {
+  #send126998() {
     if (this.#addrMngr.state == 'Valid') {
       let msg = {
         key: 'nmea2000/126998/-/-/-/-/-',
@@ -745,7 +745,7 @@ class NMEAEngine {
   };
   
   // Sends ISO Acknowledgement message
-  _send059392(ctr, grp, pgn, dst) {
+  #send059392(ctr, grp, pgn, dst) {
     if (this.#addrMngr.state == 'Valid') {
       let msg = {
         key: 'nmea2000/059392/-/-/-/-/-',
@@ -763,7 +763,7 @@ class NMEAEngine {
   };
 
   // Sends Heartbeat message
-  _send126993() {
+  #send126993() {
     if (this.#addrMngr.state == 'Valid') {
       let msg = {
       key: 'nmea2000/126993/-/-/-/-/-',

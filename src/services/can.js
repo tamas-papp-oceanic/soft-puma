@@ -32,9 +32,9 @@ function stop() {
   }
 };
 // Sends data to CAN port
-function send(dat) {
+function send(frm) {
   if ((cha != null) && running) {
-    cha.send(dat);
+    cha.send(frm);
   }
 };
 // Timer tick event
@@ -44,9 +44,9 @@ function tick(fun) {
       console.log('Starting CAN port (' + cdev + ')...');
       cha = can.createRawChannel(cdev, true);
       if (cha != null) {
-        cha.addListener('onMessage', (msg) => {
+        cha.addListener('onMessage', (frm) => {
           // console.log('(' + (msg.ts_sec + msg.ts_usec / 1000000).toFixed(6) + ') ' + msg.id.toString(16).toUpperCase().padStart(8, '0') + '#' + msg.data.toString('hex').toUpperCase());
-          fun(cdev, msg);
+          fun(cdev, frm);
         });
         cha.addListener('onStopped', () => {
           console.log('CAN port (' + cdev + ') stopped.');
@@ -61,8 +61,8 @@ function tick(fun) {
     }
   } catch (err) {
     running = false;
-    cha = null;
     console.log(err);
+    cha = null;
   }
 };
 // Gets device string
