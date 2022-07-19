@@ -1,7 +1,7 @@
 <script>
   import { Grid, Row, Column, Button, DataTable, Toolbar,
     ToolbarContent, ToolbarSearch,  OverflowMenu, 
-    OverflowMenuItem, Pagination } from "carbon-components-svelte";
+    OverflowMenuItem, Pagination, Dropdown, Tag } from "carbon-components-svelte";
   import Scan from "carbon-icons-svelte/lib/SearchLocate16";
   import { push } from 'svelte-spa-router'
   import { name } from "../../stores/data.js";
@@ -73,6 +73,16 @@
         pageSize={pagination.pageSize}
         page={pagination.page}>
         <Toolbar>
+          <Tag size="default" type="outline">{'Interface'}</Tag>
+          <Dropdown
+            type="inline"
+            size="xl"
+            selectedId="0"
+            items={[
+              { id: '0', text: 'can0' },
+              { id: '1', text: '/dev/ttyACM0' },
+            ]}
+          />
           <ToolbarContent>
             <ToolbarSearch />
             <!-- <ToolbarMenu>

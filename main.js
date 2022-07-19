@@ -1,16 +1,14 @@
 // Modules to control application life and create native browser window
-const { app, BrowserWindow, ipcMain, MessageChannelMain } = require('electron');
+const { app, BrowserWindow, ipcMain } = require('electron');
 const path = require('path');
 const serve = require('electron-serve');
-const { SerialPort } = require('serialport')
 const loadURL = serve({ directory: 'public' });
-const can = require('./src/services/can.js');
+const { SerialPort } = require('serialport');
+const fs = require('fs');
+const Can = require('./src/services/can.js');
 const Serial = require('./src/services/serial.js');
 const com = require('./src/services/common.js');
 const NMEAEngine = require('./src/services/nmea.js');
-
-// const can = require('./src/services/can.js');
-// const serial = require('./src/services/serial.js');
 
 // Keep a global reference of the window object, if you don't, the window will
 // be closed automatically when the JavaScript object is garbage collected.
@@ -125,22 +123,29 @@ function proc(dev, frm) {
 // Initialize NMEA translator
 com.init();
 // Discover serial devices
+console.log('Discovering devices...')
 SerialPort.list().then((pts) => {
   for (let i in pts) {
     if (pts[i].path.startsWith('/dev/ttyACM')) {
       devices.push({ device: pts[i].path, driver: new Serial(pts[i].path, 115200) });
     }
   }
+  let dir = fs.readdirSync('/sys/class/net');
+  for (let i in dir) {
+    if (dir[i].startsWith('can')) {
+      devices.push({ device: dir[i], driver: new Can(dir[i]) });
+    }
+  }
   // Initialize NMEA engines
   console.log('Starting NMEA engines...')
   for (let i in devices) {
-    if (devices[i].device.startsWith('/dev/ttyACM')) {
-      engines[devices[i].device] = { engine: new NMEAEngine(devices[i].driver), process: proc };
-    }
+    engines[devices[i].device] = { engine: new NMEAEngine(devices[i].driver), process: proc };
   }
   for (const [key, val] of Object.entries(engines)) {
     val.engine.init();
   }
+}).catch((err) => {
+  console.log(err);
 });
 // engines[can.device()] = { engine: new NMEAEngine(can), process: proc };
 // Load configurations
