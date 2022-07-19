@@ -1,6 +1,5 @@
 const { SerialPort } = require('serialport')
 const { ReadlineParser } = require("@serialport/parser-readline");
-const { DelimiterParser } = require("@serialport/parser-delimiter");
 
 const sdev = '/dev/ttyACM0';
 const baud = 115200;
@@ -74,17 +73,13 @@ function tick(fun) {
         }
         return;
       } else {
-        // const parser = port.pipe(new ReadlineParser({ delimiter: '\n' }));
-        const parser = port.pipe(new DelimiterParser({ delimiter: '\n' }));
+        const parser = port.pipe(new ReadlineParser({ delimiter: '\n' }));
         parser.on('data', (dat) => {
-
-console.log(dat.toString())
-
           // let msg = fun(sdev, toCanFrame(dat));
           // if (msg != null) {
           //   ipcRenderer.send('ser-data', msg)
           // }
-          fun(sdev, toCanFrame(dat.toString()));
+          fun(sdev, toCanFrame(dat));
         });
       }
     });
