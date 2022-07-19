@@ -75,10 +75,6 @@ function tick(fun) {
       } else {
         const parser = port.pipe(new ReadlineParser({ delimiter: '\n' }));
         parser.on('data', (dat) => {
-          // let msg = fun(sdev, toCanFrame(dat));
-          // if (msg != null) {
-          //   ipcRenderer.send('ser-data', msg)
-          // }
           fun(sdev, toCanFrame(dat));
         });
       }
