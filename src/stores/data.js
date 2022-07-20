@@ -10,7 +10,8 @@ export const indu = writable({});
 export const manu = writable({});
 export const name = writable({});
 export const data = writable({});
-export const dque = writable({});
+export const queue = writable({});
+export const filter = writable(null);
 
 window.pumaAPI.send('n2k-ready');
 
@@ -190,13 +191,18 @@ window.pumaAPI.recv('n2k-prod', (e, args) => {
   dat[dev][src] = nam;
   name.set(dat);
 });
-// Restart capture
-export function restart(dev, key) {
-  let que = get(dque);
-  if ((typeof que[dev] !== 'undefined') && (typeof que[dev][key] !== 'undefined')) {
-    delete que[dev][key];
-    dque.set(que);
-  }
+// Starts capture
+export function start(key) {
+  queue.set(new Array());
+  filter.set(key);
+}
+// Restarts capture
+export function restart() {
+  queue.set(new Array());
+}
+// Stops capture
+export function stop(key) {
+  filter.set(null);
 }
 // NMEA other messages
 window.pumaAPI.recv('n2k-data', (e, args) => {
@@ -209,29 +215,25 @@ window.pumaAPI.recv('n2k-data', (e, args) => {
       dat[dev] = {};
     }
     if (typeof dat[dev][key] === 'undefined') {
-        dat[dev][key] = {};
-        msg.cnt = 0;
+      dat[dev][key] = { header: { tim: msg.header.tim }};
+      msg.cnt = 0;
     } else {
       msg.cnt = dat[dev][key].cnt;
     }
+    msg.int = Math.round((msg.header.tim - dat[dev][key].header.tim) * 1000);
     msg.cnt++;
     dat[dev][key] = msg;
     data.set(dat);
-    let que = get(dque);
-    let cnt = 0;
-    if (typeof que[dev] === 'undefined') {
-      que[dev] = {};
+    // Queue handling
+    let flt = get(filter);
+    let de2 = get(device);
+    if ((flt != null) && (de2 == dev) && (key == flt)) {
+      let que = get(queue);
+      if (que.length < qlimit) {
+        msg.cnt = que.length + 1;
+        que.push(msg);
+      }
+      queue.set(que);
     }
-    if (typeof que[dev][key] === 'undefined') {
-      que[dev][key] = new Array();
-    } else {
-      cnt = que[dev][key][que[dev][key].length - 1].cnt;
-    }
-    cnt++;
-    if (que[dev][key].length < qlimit) {
-      msg.cnt = cnt;
-      que[dev][key].push(msg);
-    }
-    dque.set(que);
   }
 });

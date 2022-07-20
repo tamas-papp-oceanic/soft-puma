@@ -3,8 +3,6 @@ const { app, BrowserWindow, ipcMain } = require('electron');
 const path = require('path');
 const serve = require('electron-serve');
 const loadURL = serve({ directory: 'public' });
-const { SerialPort } = require('serialport');
-const fs = require('fs');
 const Can = require('./src/services/can.js');
 const Serial = require('./src/services/serial.js');
 const com = require('./src/services/common.js');
@@ -13,8 +11,8 @@ const NMEAEngine = require('./src/services/nmea.js');
 // Keep a global reference of the window object, if you don't, the window will
 // be closed automatically when the JavaScript object is garbage collected.
 let mainWindow;
-let devices = [];
-let engines = {};
+let devices = {};
+let timer = null;
 
 function isDev() {
   return !app.isPackaged;
@@ -101,61 +99,67 @@ app.on('activate', function () {
 // FOR INIT ONLY
 // let tool = require('./src/tools/nmea.js');
 // tool.create();
+// Discovering interfaces
+function discover() {
+  Serial.discover().then((sls) => {
+    for (let i in sls) {
+      if (sls[i].path.startsWith('/dev/ttyACM')) {
+        if (typeof devices[sls[i].path] === "undefined") {
+          console.log('New serial interface (' + sls[i].path + ')')
+          let dev = new Serial(sls[i].path, 115200);
+          let eng = new NMEAEngine(dev);
+          eng.init();
+          devices[sls[i].path] = { device: dev, engine: eng, process: proc };
+        }
+      }
+    }
+    let cls = Can.discover();
+    for (let i in cls) {
+      if (cls[i].startsWith('can')) {
+        if (typeof devices[cls[i]] === "undefined") {
+          console.log('New CAN interface (' + cls[i] + ')')
+          let dev = new Can(cls[i]);
+          let eng = new NMEAEngine(dev);
+          eng.init();
+          devices[cls[i]] = { device: dev, engine: eng, process: proc };
+        }
+      }
+    }
+  }).catch((err) => {
+    console.log(err);
+  });
+}
 // NMEA processing
 function proc(dev, frm) {
   if ((typeof mainWindow !== 'undefined') && (typeof mainWindow.webContents !== 'undefined')) {
-    let msg = engines[dev].engine.process(frm);
+    let msg = devices[dev].engine.process(frm);
     if (msg != null) {
       switch (msg.header.pgn) {
-        case 60928:
-          mainWindow.webContents.send('n2k-name', [ dev, msg ]);
-          break;
-        case 126996:
-          mainWindow.webContents.send('n2k-prod', [ dev, msg ]);
-          break;
-        default:
-          mainWindow.webContents.send('n2k-data', [ dev, msg ]);
-          break;
+      case 60928:
+        mainWindow.webContents.send('n2k-name', [ dev, msg ]);
+        break;
+      case 126996:
+        mainWindow.webContents.send('n2k-prod', [ dev, msg ]);
+        break;
+      default:
+        mainWindow.webContents.send('n2k-data', [ dev, msg ]);
+        break;
       }
     }
   }
 }
 // Initialize NMEA translator
 com.init();
-// Discover serial devices
-console.log('Discovering devices...')
-SerialPort.list().then((pts) => {
-  for (let i in pts) {
-    if (pts[i].path.startsWith('/dev/ttyACM')) {
-      devices.push({ device: pts[i].path, driver: new Serial(pts[i].path, 115200) });
-    }
-  }
-  let dir = fs.readdirSync('/sys/class/net');
-  for (let i in dir) {
-    if (dir[i].startsWith('can')) {
-      devices.push({ device: dir[i], driver: new Can(dir[i]) });
-    }
-  }
-  // Initialize NMEA engines
-  console.log('Starting NMEA engines...')
-  for (let i in devices) {
-    engines[devices[i].device] = { engine: new NMEAEngine(devices[i].driver), process: proc };
-  }
-  for (const [key, val] of Object.entries(engines)) {
-    val.engine.init();
-  }
-}).catch((err) => {
-  console.log(err);
-});
-// engines[can.device()] = { engine: new NMEAEngine(can), process: proc };
+// Start discovery loop
+console.log('Discovering interfaces...')
+discover();
+timer = setInterval(() => {
+  discover();
+}, 10000);
 // Load configurations
 ipcMain.on('n2k-ready', (e, ...args) => {
   if ((typeof mainWindow !== 'undefined') && (typeof mainWindow.webContents !== 'undefined')) {
-    let dev = [];
-    for (let i in devices) {
-      dev.push(devices[i].device);
-    }
-    mainWindow.webContents.send('n2k-devs', dev);
+    mainWindow.webContents.send('n2k-devs', Object.keys(devices));
     const configs = ['classes', 'functions', 'industries', 'manufacturers'];
     for (let i in configs) {
       let cnf = configs[i];
@@ -168,41 +172,44 @@ ipcMain.on('n2k-ready', (e, ...args) => {
 });
 // Processing outgoing message
 ipcMain.on('n2k-data', (e, ...args) => {
-  let eng = engines[args[0]];
-  if (typeof eng !== 'undefined') {
-    eng.engine.sendMsg(args[1]);
+  let dev = devices[args[0]];
+  if ((typeof dev !== 'undefined') && (typeof dev.engine !== 'undefined')) {
+    dev.engine.sendMsg(args[1]);
   }
 });
-ipcMain.on('n2k-addr', (e, ...args) => {
-  let eng = engines[args[0]];
-  if (typeof eng !== 'undefined') {
-    eng.engine.send059904(60928, 0xFF);
+ipcMain.on('n2k-scan', (e) => {
+  for (const [key, val] of Object.entries(devices)) {
+    val.engine.send059904(60928, 0xFF);
   }
 });
 // Start device processing
 ipcMain.on('dev-start', (e, ...args) => {
-  for (const [key, val] of Object.entries(engines)) {
-    val.engine.device.start(val.process);  
+  for (const [key, val] of Object.entries(devices)) {
+    val.device.start(val.process);  
   }
 });
 // Stop device processing
 ipcMain.on('dev-stop', (e, ...args) => {
-  for (const [key, val] of Object.entries(engines)) {
-    val.engine.device.stop();  
+  for (const [key, val] of Object.entries(devices)) {
+    val.device.stop();  
   }
 });
 // Close the application
 ipcMain.on('app-quit', (e, ...args) => {
-  for (let i in devices) {
-    if (devices[i].device.startsWith('can')) {
-      console.log('Stopping CAN (' + devices[i].device + ')...');
-    } else if (devices[i].device.startsWith('/dev/ttyACM')) {
-      console.log('Closing Serial (' + devices[i].device + ')...');
+  if (timer != null) {
+    clearInterval(timer);
+    timer = null;
+  }
+  for (const [key, val] of Object.entries(devices)) {
+    if (key.startsWith('can')) {
+      console.log('Stopping CAN (' + key + ')...');
+    } else if (key.startsWith('/dev/ttyACM')) {
+      console.log('Closing Serial (' + key + ')...');
     }
-    devices[i].driver.stop();
+    val.device.stop();
   }
   console.log('Stopping NMEA engines...');
-  for (const [key, val] of Object.entries(engines)) {
+  for (const [key, val] of Object.entries(devices)) {
     val.engine.destroy();
   }
   console.log('Quit...')

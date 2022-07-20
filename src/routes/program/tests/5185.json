@@ -5,7 +5,7 @@
     "variables": {
       "deviceDetected": false
     },
-    "script": {
+    "scripts": {
       "1": {
         "action": "nmea-scan"
       },

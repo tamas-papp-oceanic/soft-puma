@@ -20,6 +20,10 @@
     value: "Count",
     sort: false,
   },{
+    key: "int",
+    value: "Interval",
+    sort: false,
+  },{
     key: "raw",
     value: "Raw data",
     sort: false,
@@ -39,8 +43,8 @@
 
   function buf2hex(buffer) {
     return [...new Uint8Array(buffer)]
-      .map((elm, idx) => idx < 25 ? elm.toString(16).padStart(2, '0').toUpperCase() + ' ' : '')
-      .join('') + (buffer.length > 25 ? '...' : '');
+      .map((elm, idx) => idx < 20 ? elm.toString(16).padStart(2, '0').toUpperCase() + ' ' : '')
+      .join('') + (buffer.length > 20 ? '...' : '');
   } 
 
   function back(e) {
@@ -73,6 +77,7 @@
             msg: spl[1] + ' - ' + val.title,
             ins: (typeof val.header.ins !== 'undefined') ? val.header.ins : '-',
             cnt: val.cnt,
+            int: val.int,
             key: (parseInt(spl[1]) * 10) + ((typeof val.header.ins !== 'undefined') ? parseInt(val.header.ins) : 0),
             raw: buf2hex(dat),
           };

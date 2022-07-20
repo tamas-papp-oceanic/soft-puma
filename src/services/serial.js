@@ -65,6 +65,10 @@ class Serial {
   device() {
     return this.#device;
   }
+  // Discovers serial devices
+  static discover() {
+    return SerialPort.list();
+  }
   // Timer tick event
   #tick(fun) {
     if (!this.#port.isOpen) {
@@ -100,8 +104,8 @@ class Serial {
       ext: true,
       rtr: false,
       data : (len > 0 && len < 64) ? Buffer.alloc(len) : Buffer.alloc(64),
-      t_sec: Math.floor(tim),
-      t_usec: Math.round((tim - Math.floor(tim)) * 1000000),
+      ts_sec: Math.floor(tim),
+      ts_usec: Math.round((tim - Math.floor(tim)) * 1000000),
     };
     frm.data.fill(0); // should be 0xFF for j1939 message def.
     dat.copy(frm.data);

@@ -1,35 +1,44 @@
 <script>
-  import { onMount } from "svelte";
+  import { onMount, onDestroy } from "svelte";
   import { Grid, Row, Column, DataTable, Toolbar, ToolbarContent, Tile,
     Button, Pagination, OverflowMenu, OverflowMenuItem } from "carbon-components-svelte";
   import Restart from "carbon-icons-svelte/lib/Restart16";
   import SkipBack from "carbon-icons-svelte/lib/SkipBack16";
   import { push, pop } from 'svelte-spa-router'
-  import { device, dque, restart } from "../../stores/data.js";
+  import { queue, start, stop, restart } from "../../stores/data.js";
 
   export let params;
 
   let height;
   let key = null;
   let first = true;
-  let rows = [];
+  let rows = new Array();
   let title = null;
   let pagination = {
     pageSize: 10,
     page: 1,
     totalItems: 0,
   };
-  let headers = new Array();
+  let headers = new Array({
+    key: 'wait',
+    value: 'Waiting for first record...',
+    sort: false
+  });
 
   onMount(() => {
     key = params.protocol + '/' + params.pgn + '/' + params.function + '/' +
       params.manufacturer + '/' + params.industry + '/' + params.instance + '/' +
       params.type;
     title = 'Content of PGN' + params.pgn;
+    start(key);
   }); 
 
+  onDestroy(() => {
+    stop();
+  });
+
   function rest(e) {
-    restart($device, key);
+    restart();
   };
 
   function back(e) {
@@ -37,9 +46,8 @@
   };
 
   // Data getters, setters
-  $: if (first && (key != null) && (typeof $dque[$device] !== 'undefined') &&
-    (typeof $dque[$device][key] !== 'undefined') && ($dque[$device][key].length > 0)) {
-    let dat = $dque[$device][key].at(0);
+  $: if (first && (key != null) && ($queue.length > 0)) {
+    let dat = $queue.at(0);
     if (title != null) {
       title += ' - ' + dat.title;
     }
@@ -68,11 +76,10 @@
       first = false;
     }
   }
-  $: if ((key != null) && (typeof $dque[$device] !== 'undefined') &&
-    (typeof $dque[$device][key] !== 'undefined')) {
+  $: if (key != null) {
     let tmp = new Array();
-    for (let i in $dque[$device][key]) {
-      let dat = $dque[$device][key][i];
+    for (let i in $queue) {
+      let dat = $queue[i];
       let obj = {
         id: dat.id,
         cnt: dat.cnt,

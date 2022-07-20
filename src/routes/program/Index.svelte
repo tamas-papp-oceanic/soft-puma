@@ -9,33 +9,7 @@
   } from "carbon-components-svelte";
   import {push, pop} from 'svelte-spa-router'
 </script>
-<style>
-.product-card {
-  padding: 1rem;
-  width: 100%;
-  height: 100%;
-  border: 1px solid gray;
-  background-color: #222222;
-  cursor: pointer;
-}
-.product-card:hover {
-  border: 1px solid white;
-  background-color: #262626;
-  cursor: pointer;
-}
-.product-number {
-  font-weight: 800;
-  font-size: 22px;
-}
-.product-title {
-  padding-top: 0.5rem;
-  font-weight: 400;
-  font-size: 18px;
-}
-.product-image > img {
-  width: 100%;
-}
-</style>
+
 <Grid>
   <Row>
     <Column>
@@ -75,3 +49,32 @@
   </Column>
   </Row>
 </Grid>
+
+<style>
+  .product-card {
+    padding: 1rem;
+    width: 100%;
+    height: 100%;
+    border: 1px solid gray;
+    background-color: #222222;
+    cursor: pointer;
+  }
+  .product-card:hover {
+    border: 1px solid white;
+    background-color: #262626;
+    cursor: pointer;
+  }
+  .product-number {
+    font-weight: 800;
+    font-size: 22px;
+  }
+  .product-title {
+    padding-top: 0.5rem;
+    font-weight: 400;
+    font-size: 18px;
+  }
+  .product-image > img {
+    width: 100%;
+  }
+  </style>
+  

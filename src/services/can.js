@@ -6,6 +6,7 @@ HOME=~/.electron-gyp node-gyp rebuild --target=19.0.0 --arch=x64 --dist-url=http
 
 */
 const { app } = require('electron');
+const fs = require('fs');
 const path = require('path');
 const can = require('socketcan');
 
@@ -48,6 +49,10 @@ class Can {
   // Gets device string
   device() {
     return this.#device;
+  }
+  // Discovers can devices
+  static discover() {
+    return fs.readdirSync('/sys/class/net');
   }
   // Timer tick event
   #tick(fun) {

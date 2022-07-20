@@ -1,4 +1,4 @@
-const cri = require('crypto');
+const cry = require('crypto');
 const com = require('./common.js');
 
 let fastbuff = {};
@@ -47,12 +47,13 @@ function decode(frm) {
     frm.data.copy(raw, 4);
     msg = {
       key: def.key,
-      id: cri.randomBytes(16).toString('hex'),
+      id: cry.randomBytes(16).toString('hex'),
       header: {
         pgn: pgn,
         pri: com.getPri(frm.id),
         src: com.getSrc(frm.id),
         dst: com.getDst(frm.id),
+        tim: ((frm.ts_sec * 1000000) + frm.ts_usec) / 1000000,
       },
       title: def.title,
       fields: new Array(),

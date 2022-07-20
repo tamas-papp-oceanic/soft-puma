@@ -52,8 +52,8 @@
   };
 
   function scan(e) {
-    window.pumaAPI.send('n2k-addr', 'can');
-    window.pumaAPI.send('n2k-addr', 'ser');
+    rows = new Array();
+    window.pumaAPI.send('n2k-scan');
   };
 
   function select(e) {

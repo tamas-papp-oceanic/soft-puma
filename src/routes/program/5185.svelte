@@ -12,7 +12,8 @@
     push,
     pop
   } from 'svelte-spa-router'
-  import TestContainer from './partials/TestContainer.svelte'
+  import TestContainer from './partials/TestContainer.svelte';
+  import steps from './tests/5185.json';
 </script>
 
 <Grid>
@@ -25,7 +26,7 @@
         title="Programming of this device is performed outside of Puma."
         subtitle="Please refer to the SOP."
       />
-      <TestContainer />
+      <TestContainer steps={steps} />
     </Column>
   </Row>
 </Grid>
