@@ -11,34 +11,52 @@
 
 class Runner {
   #steps;
+  #actions;
   #current;
-  constructor(stp) {
-    this.#steps = JSON.parse(JSON.stringify(stp));
+  constructor(steps, actions) {
+    this.#steps = steps;
+    this.#actions = {
+      'set-var': this.#setStoreValue,
+      'get-var': this.#getStoreValue,
+    };
+    this.#actions = Object.assign(this.#actions, actions);
     this.#current = 1;
+
+
+console.log(this.#actions)
+
   }
 
   start() {
 
   }
 
-  getStep() {
-    for (const [key, val] of Object.entries(this.#steps)) {
-      if (val.index == this.#current) {
-        return val;
-      }
-    }
-    return null;
+  currStep() {
+    return this.#steps[this.#current];
   }
 
-  async nextStep(){}
+  async nextStep() {
+    this.#current++;
+  };
 
-  async runScript(){}
+  async runStep(stp) {
+    if (typeof stp.scripts !== "undefined") {
+      for (const [key, val] of Object.entries(stp.scripts)) {
+        await this.#runScript(val)
+      }
+    }
+  }
 
-  async executeScriptStep(){}
+  async #runScript(stp) {
+    let act = this.#actions[stp.action];
+    if (typeof act !== "undefined") {
+      await act();
+    }
+  }
 
-  async updateStoreValue(variable, value){}
+  #setStoreValue(variable, value){}
 
-  getStoreValue(variable){}
+  #getStoreValue(variable){}
 
   enableNextStep(){}
 

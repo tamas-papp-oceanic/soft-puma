@@ -1,19 +1,20 @@
 {
   "steps": {
-    "index": 1,
-    "blurb": "Connect the device to the NMEA network and power before continuing",
-    "variables": {
-      "deviceDetected": false
-    },
-    "scripts": {
-      "1": {
-        "action": "nmea-scan"
+    "1":{
+      "blurb": "Connect the device to the NMEA network and power before continuing...",
+      "variables": {
+        "deviceDetected": false
       },
-      "2": {
-        "action": "nmea-await-device",
-        "product-code": 5185,
-        "timeout": 300,
-        "onSuccess": {"action":"set-var", "var":"deviceDetected", "value": "true"}
+      "scripts": {
+        "1": {
+          "action": "scan-device"
+        },
+        "2": {
+          "action": "wait-device",
+          "product-code": 5185,
+          "timeout": 300,
+          "onSuccess": { "action": "set-var", "var": "deviceDetected", "value": true }
+        }
       }
     }
   }
