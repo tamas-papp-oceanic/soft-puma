@@ -8,6 +8,7 @@
   export let style;
   
   let step = initRun(steps, actions);
+  // let result;
 
   onMount(async () => {
     await runStep();
@@ -31,12 +32,19 @@
       <div class="descr"><span>{step ? step.blurb : ''}</span></div>
     </Tile>
     {#if step && step.image}
-      <ImageLoader src={step.image}>
-        <svelte:fragment slot="loading">
-          <InlineLoading />
-        </svelte:fragment>
-        <svelte:fragment slot="error">An error occurred.</svelte:fragment>
-      </ImageLoader>
+      <div class="imgHolder">
+        <ImageLoader src={step.image}>
+          <svelte:fragment slot="loading">
+            <InlineLoading />
+          </svelte:fragment>
+          <svelte:fragment slot="error">An error occurred.</svelte:fragment>
+        </ImageLoader>
+      </div>
+    {/if}
+    {#if step && step.scanner}
+      <div class="imgHolder">
+        <!-- <Scanner bind:result></Scanner> -->
+      </div>
     {/if}
     <ButtonSet style="justify-content: flex-end;">
       <Button kind="secondary" on:click={(e) => fail(e)}>Fail</Button>
@@ -63,6 +71,9 @@
     white-space: normal;
     font-size: 1.25rem;
     text-align: justify;
+  }
+  .imgHolder {
+    max-height: 100%;
   }
   </style>
   

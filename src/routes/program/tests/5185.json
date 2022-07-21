@@ -24,6 +24,7 @@
     },
     "3": {
       "blurb": "3. Scan S/N label.",
+      "scanner": true,
       "variables": {
         "serial": ""
       },
