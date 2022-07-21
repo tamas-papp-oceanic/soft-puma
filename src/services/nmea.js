@@ -4,7 +4,7 @@ const com = require('./common.js');
 const can = require('./can.js');
 const ser = require('./serial.js');
 const Address = require('./address.js');
-
+// Class definition
 class NMEAEngine {
   // Static variables
   #device;

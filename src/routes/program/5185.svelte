@@ -2,14 +2,13 @@
   import { Row, Grid, Column, InlineNotification } from "carbon-components-svelte";
   import TestContainer from './partials/TestContainer.svelte';
   import test from './tests/5185.json';
-  import proc from './tests/5185.js';
+  import { start, scanDevice, scanSerial } from './tests/5185.js';
 
   let actions = {
-    "scan-device": proc.scanDevice,
-    "wait-device": proc.waitDevice,
+    "start": start,
+    "scan-device": scanDevice,
+    "scan-serial": scanSerial,
   }
-
-
 </script>
 
 <Grid>

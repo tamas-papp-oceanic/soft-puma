@@ -9,7 +9,7 @@ const { app } = require('electron');
 const fs = require('fs');
 const path = require('path');
 const can = require('socketcan');
-
+// Class definition
 class Can {
   // Local variables
   #device;

@@ -1,24 +1,28 @@
 <script>
-  import { Form, Tile, ButtonSet, Button } from "carbon-components-svelte";
-  import Runner from '../tests/runner.js'
+  import { onMount } from "svelte";
+  import { Form, Tile, ButtonSet, Button, ImageLoader, InlineLoading } from "carbon-components-svelte";
+  import { initRun, currStep, runStep, nextStep } from "../tests/runner.js"
 
   export let steps;
   export let actions;
   export let style;
   
-  let step;
+  let step = initRun(steps, actions);
 
-  let runner = new Runner(steps, actions);
+  onMount(async () => {
+    await runStep();
+    step = currStep();
+  });
 
   async function next(e) {
-    await runner.runStep(step);
+    step = await nextStep();
+    await runStep();
+    step = currStep();
   }
 
   function fail(e) {
     console.log(e)
   }
-
-$: step = runner.currStep();
 </script>
 
 <div class="container" style={style}>
@@ -26,9 +30,17 @@ $: step = runner.currStep();
     <Tile style="height: -webkit-fill-available;">
       <div class="descr"><span>{step ? step.blurb : ''}</span></div>
     </Tile>
+    {#if step && step.image}
+      <ImageLoader src={step.image}>
+        <svelte:fragment slot="loading">
+          <InlineLoading />
+        </svelte:fragment>
+        <svelte:fragment slot="error">An error occurred.</svelte:fragment>
+      </ImageLoader>
+    {/if}
     <ButtonSet style="justify-content: flex-end;">
       <Button kind="secondary" on:click={(e) => fail(e)}>Fail</Button>
-      <Button on:click={(e) => next(e)}>Next</Button>
+      <Button disabled={!step || !step.next} on:click={(e) => next(e)}>Next</Button>
     </ButtonSet>
   </Form>
 </div>
@@ -41,13 +53,13 @@ $: step = runner.currStep();
   .descr {
     display: flex;
     flex-flow: column nowrap;
-    justify-content: center;
-    align-items: center;
+    justify-content: flex-start;
+    align-items: flex-start;
     width: 100%;
     height: 100%;
   }
   .descr span {
-    max-width: 80%;
+    max-width: 90%;
     white-space: normal;
     font-size: 1.25rem;
     text-align: justify;

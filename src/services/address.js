@@ -226,7 +226,7 @@ class Address {
       this.#timers[nam] = setTimeout((key, src) => {
         this.send059904(126996, src);
         delete this.#timers[key];
-      }, 3000, nam, msg.header.src);
+      }, 2000, nam, msg.header.src);
     }
     switch (this.#asm.currentState.name) {
       case 'WaitForContention':

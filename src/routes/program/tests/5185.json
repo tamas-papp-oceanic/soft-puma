@@ -1,19 +1,36 @@
 {
   "steps": {
-    "1":{
-      "blurb": "Connect the device to the NMEA network and power before continuing...",
+    "1": {
+      "blurb": "1. Connect the device to the NMEA network and power before continuing.",
+      "scripts": {
+        "1": {
+          "action": "start"
+        }
+      }
+    },
+    "2": {
+      "blurb": "2. Waiting for P7 load.",
       "variables": {
-        "deviceDetected": false
+        "detected": false
       },
       "scripts": {
         "1": {
-          "action": "scan-device"
-        },
-        "2": {
-          "action": "wait-device",
-          "product-code": 5185,
-          "timeout": 300,
-          "onSuccess": { "action": "set-var", "var": "deviceDetected", "value": true }
+          "action": "scan-device",
+          "product-code": 9969,
+          "timeout": 3000,
+          "onSuccess": { "action": "set-var", "variable": "detected", "value": true }
+        }
+      }
+    },
+    "3": {
+      "blurb": "3. Scan S/N label.",
+      "variables": {
+        "serial": ""
+      },
+      "scripts": {
+        "1": {
+          "action": "scan-serial",
+          "onSuccess": { "action": "set-var", "variable": "serial", "value": null }
         }
       }
     }
