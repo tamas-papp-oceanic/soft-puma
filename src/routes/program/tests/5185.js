@@ -4,17 +4,22 @@ import { findProduct } from '../../../stores/data.js';
 async function sleep(ms) {
   return new Promise(resolve => setTimeout(resolve, ms));
 }
+// Sets serial number
+async function setSerial(ser) {
 
+  console.log(ser);
+
+};
 // Starts tests
 export async function start(script) {
   enableNext();
-}
+};
 // Scans network(s) for device
 export async function scanDevice(script) {
-  window.pumaAPI.send('n2k-scan');
-  await sleep(script.timeout);
-  let pro = findProduct(script['product-code']);
-  if (pro != null) {
+  // window.pumaAPI.send('n2k-scan');
+  // await sleep(script.timeout);
+  // let pro = findProduct(script['product-code']);
+  // if (pro != null) {
     let suc = script.onSuccess;
     if (typeof suc !== 'undefined') {
       await runScript(suc);
@@ -23,30 +28,29 @@ export async function scanDevice(script) {
         enableNext();
       }
     }
-  }
+  // }
 };
 // Scans S/N label
 export async function scanSerial(script) {
-  // window.pumaAPI.send('n2k-scan');
-  // await sleep(script.timeout);
-  // let pro = findProduct(script['product-code']);
-  // if (pro != null) {
+  // let ser = scan();
+  // if (ser != null) {
     let suc = script.onSuccess;
     if (typeof suc !== 'undefined') {
       suc.value = "SCANNED";
       await runScript(suc);
       let res = await getStoreValue({ variable: 'serial' });
       if (res == "SCANNED") {
+        await setSerial("SCANNED");
         enableNext();
       }
     }
   // }
 };
-
-export async function doEthernetTest(){}
-
-export async function doTouchTest(){}
-
-export async function doBrightnessTest(){}
-
-export async function setSerialNumber(){}
+// Runs screen touch tests
+export async function touchTest(script) {
+  enableNext();
+};
+// Runs screen brightness tests
+export async function brightTest(script) {
+  enableNext();
+};

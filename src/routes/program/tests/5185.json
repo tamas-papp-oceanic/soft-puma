@@ -16,7 +16,7 @@
       "scripts": {
         "1": {
           "action": "scan-device",
-          "product-code": 9969,
+          "product-code": 5185,
           "timeout": 3000,
           "onSuccess": { "action": "set-var", "variable": "detected", "value": true }
         }
@@ -32,6 +32,22 @@
         "1": {
           "action": "scan-serial",
           "onSuccess": { "action": "set-var", "variable": "serial", "value": null }
+        }
+      }
+    },
+    "4": {
+      "blurb": "4. Touch screen test.",
+      "scripts": {
+        "1": {
+          "action": "touch-test"
+        }
+      }
+    },
+    "5": {
+      "blurb": "5. Brightness test.",
+      "scripts": {
+        "1": {
+          "action": "bright-test"
         }
       }
     }
