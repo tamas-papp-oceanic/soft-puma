@@ -46,11 +46,21 @@ export async function scanSerial(script) {
     }
   // }
 };
-// Runs screen touch tests
+// Receives screen touch test result
+window.pumaAPI.recv('touch-done', (e) => {
+  window.pumaAPI.send('n2k-touch', false);
+  enableNext();
+});
+// Runs screen touch test
 export async function touchTest(script) {
-  enableNext();
+  window.pumaAPI.send('n2k-touch', true);
 };
-// Runs screen brightness tests
-export async function brightTest(script) {
+// Receives screen brightness test result
+window.pumaAPI.recv('bright-done', (e) => {
+  window.pumaAPI.send('n2k-bright', false);
   enableNext();
+});
+// Runs screen brightness test
+export async function brightTest(script) {
+  window.pumaAPI.send('n2k-bright', true);
 };

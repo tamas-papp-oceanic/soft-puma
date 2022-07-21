@@ -11,35 +11,34 @@
   the results at the end of the test.
  */
 import { get } from 'svelte/store';
-import { scriptData } from '../../../stores/tests.js';
-
-let steps;
-let actions;
-let current;
+import { scriptData, steps, actions, current } from '../../../stores/tests.js';
 
 export function initRun(stps, acts) {
-  steps = stps;
-  for (const [key, val] of Object.entries(steps)) {
-    steps[key].next = false;
+  for (const [key, val] of Object.entries(stps)) {
+    stps[key].next = false;
   }
-  actions = {
+  steps.set(stps);
+  acts = Object.assign({
     'set-var': setStoreValue,
     'get-var': getStoreValue,
-  };
-  actions = Object.assign(actions, acts);
-  current = 1;
-  return currStep();
+  }, acts);
+  actions.set(acts);
+  current.set(1);
 };
 
 export function currStep() {
-  if ((typeof steps !== 'undefined') && (typeof steps[current] !== 'undefined')) {
-    return steps[current];
+  let sts = get(steps);
+  let cur = get(current);
+  if ((typeof sts !== 'undefined') && (typeof sts[cur] !== 'undefined')) {
+    return sts[cur];
   }
   return null;
 };
 
 export async function nextStep() {
-  current++;
+  let cur = get(current);
+  cur++;
+  current.set(cur);
   let step = currStep();
   if (step != null) {
     if (typeof step.variables !== 'undefined') {
@@ -63,7 +62,8 @@ export async function runStep() {
 };
 
 export async function runScript(script) {
-  let act = actions[script.action];
+  let acs = get(actions);
+  let act = acs[script.action];
   if (typeof act !== "undefined") {
     await act(script);
   }
@@ -87,9 +87,12 @@ export async function setStoreValue(script) {
 };
 
 export function enableNext() {
-  if ((typeof steps !== 'undefined') && (typeof steps[current] !== 'undefined')) {
-    if (Object.keys(steps).length > current) {
-      steps[current].next = true;
+  let sts = get(steps);
+  let cur = get(current);
+  if ((typeof sts !== 'undefined') && (typeof sts[cur] !== 'undefined')) {
+    if (Object.keys(sts).length > cur) {
+      sts[cur].next = true;
+      steps.set(sts);
     }
   }
 };

@@ -182,6 +182,28 @@ ipcMain.on('n2k-scan', (e) => {
     val.engine.send059904(60928, 0xFF);
   }
 });
+ipcMain.on('n2k-touch', (e, arg) => {
+  for (const [key, val] of Object.entries(devices)) {
+    // Send touch test ON/OFF proprietary PGN
+    // val.engine.send059904(60928, 0xFF);
+  }
+  if (arg == true) {
+    if ((typeof mainWindow !== 'undefined') && (typeof mainWindow.webContents !== 'undefined')) {
+      mainWindow.webContents.send('touch-done');
+    }
+  }
+});
+ipcMain.on('n2k-bright', (e, arg) => {
+  for (const [key, val] of Object.entries(devices)) {
+    // Send brightness test ON/OFF proprietary PGN
+    // val.engine.send059904(60928, 0xFF);
+  }
+  if (arg == true) {
+    if ((typeof mainWindow !== 'undefined') && (typeof mainWindow.webContents !== 'undefined')) {
+      mainWindow.webContents.send('bright-done', [ true ]);
+    }
+  }
+});
 // Start device processing
 ipcMain.on('dev-start', (e, ...args) => {
   for (const [key, val] of Object.entries(devices)) {

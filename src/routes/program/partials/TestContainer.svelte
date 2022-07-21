@@ -7,23 +7,26 @@
   export let actions;
   export let style;
   
-  let step = initRun(steps, actions);
+  let step;
   // let result;
 
   onMount(async () => {
+    initRun(steps, actions);
     await runStep();
-    step = currStep();
   });
 
   async function next(e) {
-    step = await nextStep();
+    await nextStep();
     await runStep();
-    step = currStep();
   }
 
   function fail(e) {
     console.log(e)
   }
+
+  $: step = currStep();
+  $: console.log(step)
+
 </script>
 
 <div class="container" style={style}>
