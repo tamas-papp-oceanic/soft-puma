@@ -93,6 +93,9 @@
         "2": {
           "action": "wait-gps",
           "onSuccess": { "action": "set-var", "variable": "gpsOk", "value": true }
+        },
+        "3": {
+          "action": "stop-tests"
         }
       }
     },
@@ -117,9 +120,6 @@
       "buttons": [ "Ok" ],
       "scripts": {
         "1": {
-          "action": "stop-tests"
-        },
-        "2": {
           "action": "log-result"
         }
       }
