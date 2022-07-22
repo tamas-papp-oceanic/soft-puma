@@ -97,8 +97,8 @@ app.on('activate', function () {
 // code. You can also put them in separate files and require them here.
 // Data processing
 // FOR INIT ONLY
-// let tool = require('./src/tools/nmea.js');
-// tool.create();
+let tool = require('./src/tools/nmea.js');
+tool.create();
 // Discovering interfaces
 function discover() {
   Serial.discover().then((sls) => {
@@ -179,29 +179,38 @@ ipcMain.on('n2k-data', (e, ...args) => {
 });
 ipcMain.on('n2k-scan', (e) => {
   for (const [key, val] of Object.entries(devices)) {
+    // Send ISO Request for Address Claim
     val.engine.send059904(60928, 0xFF);
   }
-});
-ipcMain.on('n2k-touch', (e, arg) => {
-  for (const [key, val] of Object.entries(devices)) {
-    // Send touch test ON/OFF proprietary PGN
-    // val.engine.send059904(60928, 0xFF);
-  }
-  if (arg == true) {
-    if ((typeof mainWindow !== 'undefined') && (typeof mainWindow.webContents !== 'undefined')) {
-      mainWindow.webContents.send('touch-done');
-    }
+  // *** TEST ***
+  if ((typeof mainWindow !== 'undefined') && (typeof mainWindow.webContents !== 'undefined')) {
+    mainWindow.webContents.send('scan-done');
   }
 });
-ipcMain.on('n2k-bright', (e, arg) => {
+ipcMain.on('n2k-start', (e) => {
   for (const [key, val] of Object.entries(devices)) {
-    // Send brightness test ON/OFF proprietary PGN
+    // Send start test proprietary PGN
+    val.engine.send065477(0x80);
+  }
+});
+ipcMain.on('n2k-test', (e, test) => {
+  for (const [key, val] of Object.entries(devices)) {
+    // Send touch test proprietary PGN
+    val.engine.send065477(test);
+  }
+  // *** TEST ***
+  if ((typeof mainWindow !== 'undefined') && (typeof mainWindow.webContents !== 'undefined')) {
+    mainWindow.webContents.send('done-' + test);
+  }
+});
+ipcMain.on('n2k-update', (e) => {
+  for (const [key, val] of Object.entries(devices)) {
+    // Send device update proprietary PGN
     // val.engine.send059904(60928, 0xFF);
   }
-  if (arg == true) {
-    if ((typeof mainWindow !== 'undefined') && (typeof mainWindow.webContents !== 'undefined')) {
-      mainWindow.webContents.send('bright-done', [ true ]);
-    }
+  // *** TEST ***
+  if ((typeof mainWindow !== 'undefined') && (typeof mainWindow.webContents !== 'undefined')) {
+    mainWindow.webContents.send('update-done', [ true ]);
   }
 });
 // Start device processing

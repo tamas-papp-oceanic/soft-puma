@@ -2,6 +2,7 @@
   "steps": {
     "1": {
       "blurb": "1. Connect the device to the NMEA network and power before continuing.",
+      "buttons": [ "Cancel", "Next" ],
       "scripts": {
         "1": {
           "action": "start"
@@ -9,13 +10,17 @@
       }
     },
     "2": {
-      "blurb": "2. Waiting for P7 load.",
+      "blurb": "2. Waiting for P7 to load.",
       "variables": {
         "detected": false
       },
+      "buttons": [ "Fail", "Next" ],
       "scripts": {
         "1": {
-          "action": "scan-device",
+          "action": "scan-device"
+        },
+        "2": {
+          "action": "wait-device",
           "product-code": 5185,
           "timeout": 3000,
           "onSuccess": { "action": "set-var", "variable": "detected", "value": true }
@@ -28,26 +33,94 @@
       "variables": {
         "serial": ""
       },
+      "buttons": [ "Cancel", "Next" ],
       "scripts": {
         "1": {
-          "action": "scan-serial",
+          "action": "scan-serial"
+        },
+        "2": {
+          "action": "wait-serial",
           "onSuccess": { "action": "set-var", "variable": "serial", "value": null }
         }
       }
     },
     "4": {
-      "blurb": "4. Touch screen test.",
+      "blurb": "4. Touch screen test. Press all of the crosses on the screen.",
+      "variables": {
+        "touchOk": false
+      },
+      "buttons": [ "Fail", "Next" ],
       "scripts": {
         "1": {
-          "action": "touch-test"
+          "action": "start-tests"
+        },
+        "2": {
+          "action": "start-touch"
+        },
+        "3": {
+          "action": "wait-touch",
+          "onSuccess": { "action": "set-var", "variable": "touchOk", "value": true }
         }
       }
     },
     "5": {
-      "blurb": "5. Brightness test.",
+      "blurb": "5. Brightness test. Check full range of brightness.",
+      "variables": {
+        "brightOk": false
+      },
+      "buttons": [ "Fail", "Next" ],
       "scripts": {
         "1": {
-          "action": "bright-test"
+          "action": "start-bright"
+        },
+        "2": {
+          "action": "wait-bright",
+          "onSuccess": { "action": "set-var", "variable": "brightOk", "value": true }
+        }
+      }
+    },
+    "6": {
+      "blurb": "6. GPS test. Attach GPS antenna.",
+      "timeout": 180000,
+      "variables": {
+        "gpsOk": false
+      },
+      "buttons": [ "Fail", "Next" ],
+      "scripts": {
+        "1": {
+          "action": "start-gps"
+        },
+        "2": {
+          "action": "wait-gps",
+          "onSuccess": { "action": "set-var", "variable": "gpsOk", "value": true }
+        }
+      }
+    },
+    "7": {
+      "blurb": "7. Insert update USB.",
+      "variables": {
+        "updated": false
+      },
+      "buttons": [ "Fail", "Next" ],
+      "scripts": {
+        "1": {
+          "action": "start-update"
+        },
+        "2": {
+          "action": "wait-update",
+          "onSuccess": { "action": "set-var", "variable": "updated", "value": true }
+        }
+      }
+    },
+    "8": {
+      "blurb": "TESTING DONE",
+      "buttons": [ "Ok" ],
+      "scripts": {
+        "1": {
+          "action": "stop-tests"
+        },
+        "2": {
+          "action": "log-result"
         }
       }
     }

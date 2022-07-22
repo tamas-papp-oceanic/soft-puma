@@ -175,6 +175,24 @@ class NMEAEngine {
   send059904(pgn, dst) {
     this.#addrMngr.send059904(pgn, dst);
   };
+  // Sends Test Control message
+  send065477(cod) {
+    if (this.#addrMngr.state == 'Valid') {
+      let msg = {
+      key: 'nmea2000/065477/-/161/4/-/-',
+        header: { pgn: 65477, src: this.#addrMngr.address, dst: 0xFF },
+        fields: [
+          { field: 1,title: 'Manufacturer Code', state: 'V', value: this.#addrMngr.name[2] },
+          { field: 2,title: 'Reserved', state: 'V', value: 0b11 },
+          { field: 3,title: 'Industry Group', state: 'V', value: this.#addrMngr.name[9] },
+          { field: 4,title: 'Security Code', state: 'V', value: 0xBC },
+          { field: 5,title: 'Test Code', state: 'V', value: cod },
+        ],
+      };
+      return this.sendMsg(msg);
+    }
+    return false;
+  };
   // Processes Proprietary Command message
   // Set Serial Number
   #proc065280(msg) {

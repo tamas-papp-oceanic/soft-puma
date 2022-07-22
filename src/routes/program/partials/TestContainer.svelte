@@ -1,7 +1,8 @@
 <script>
   import { onMount } from "svelte";
   import { Form, Tile, ButtonSet, Button, ImageLoader, InlineLoading } from "carbon-components-svelte";
-  import { initRun, currStep, runStep, nextStep } from "../tests/runner.js"
+  import { initRun, runStep, nextStep } from "../tests/runner.js"
+  import { _steps, _current } from '../../../stores/tests.js';
 
   export let steps;
   export let actions;
@@ -15,7 +16,7 @@
     await runStep();
   });
 
-  async function next(e) {
+  async function pass(e) {
     await nextStep();
     await runStep();
   }
@@ -24,7 +25,7 @@
     console.log(e)
   }
 
-  $: step = currStep();
+  $: step = $_steps[$_current];
   $: console.log(step)
 
 </script>
@@ -49,10 +50,14 @@
         <!-- <Scanner bind:result></Scanner> -->
       </div>
     {/if}
-    <ButtonSet style="justify-content: flex-end;">
-      <Button kind="secondary" on:click={(e) => fail(e)}>Fail</Button>
-      <Button disabled={!step || !step.next} on:click={(e) => next(e)}>Next</Button>
-    </ButtonSet>
+    {#if step && step.buttons}
+      <ButtonSet style="justify-content: flex-end;">
+        {#if step.buttons.length > 1}
+          <Button kind="secondary" on:click={(e) => fail(e)}>{step.buttons[0]}</Button>
+        {/if}
+        <Button disabled={!step || !step.next} on:click={(e) => pass(e)}>{step.buttons.length > 1 ? step.buttons[1] : step.buttons[0]}</Button>
+      </ButtonSet>
+    {/if}
   </Form>
 </div>
 

@@ -2,14 +2,28 @@
   import { Row, Grid, Column, InlineNotification } from "carbon-components-svelte";
   import TestContainer from './partials/TestContainer.svelte';
   import test from './tests/5185.json';
-  import { start, scanDevice, scanSerial, touchTest, brightTest } from './tests/5185.js';
+  import { start, scanDevice, waitDevice, scanSerial, waitSerial,
+    startTests, startTouch, waitTouch, startBright,
+    waitBright, startGps, waitGps, startUpdate, waitUpdate,
+    stopTests, logResult } from './tests/5185.js';
 
   let actions = {
     "start": start,
     "scan-device": scanDevice,
+    "wait-device": waitDevice,
     "scan-serial": scanSerial,
-    "touch-test": touchTest,
-    "bright-test": brightTest,
+    "wait-serial": waitSerial,
+    "start-tests": startTests,
+    "start-touch": startTouch,
+    "wait-touch": waitTouch,
+    "start-bright": startBright,
+    "wait-bright": waitBright,
+    "start-gps": startGps,
+    "wait-gps": waitGps,
+    "start-update": startUpdate,
+    "wait-update": waitUpdate,
+    "stop-tests": stopTests,
+    "log-result": logResult,
   }
 </script>
 

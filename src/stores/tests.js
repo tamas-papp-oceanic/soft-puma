@@ -1,9 +1,9 @@
 import { writable, derived } from 'svelte/store';
 
-const scriptData = writable({});
-const steps = writable({});
-const actions = writable({});
-const current = writable(0);
-const runState = writable({});
+const _scriptData = writable({});
+const _steps = writable({});
+const _actions = writable({});
+const _current = writable(0);
+const _runState = writable({});
 
-export { scriptData, steps, actions, current, runState }
+export { _scriptData, _steps, _actions, _current, _runState }

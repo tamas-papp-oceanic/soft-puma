@@ -15148,7 +15148,7 @@
       }
     ]
   },
-  "nmea2000/065280/-/161/7": {
+  "nmea2000/065280/-/161/4": {
     "title": "Proprietary - Set Serial Number",
     "single": true,
     "priority": 6,
@@ -15903,6 +15903,54 @@
         "field": 7,
         "title": "Repeat Count",
         "type": "uint8",
+        "unit": null,
+        "multiplier": null,
+        "reserved": null
+      }
+    ]
+  },
+  "nmea2000/065477/-/161/4": {
+    "title": "Proprietary - Device Test Control",
+    "single": true,
+    "priority": 6,
+    "interval": null,
+    "fields": [
+      {
+        "field": 1,
+        "title": "Manufacturer Code",
+        "type": "bit(11)",
+        "unit": null,
+        "multiplier": null,
+        "reserved": null
+      },
+      {
+        "field": 2,
+        "title": "NMEA Reserved",
+        "type": "bit(2)",
+        "unit": null,
+        "multiplier": null,
+        "reserved": "DD001"
+      },
+      {
+        "field": 3,
+        "title": "Industry Group",
+        "type": "bit(3)",
+        "unit": null,
+        "multiplier": null,
+        "reserved": null
+      },
+      {
+        "field": 4,
+        "title": "Security Code",
+        "type": "bit(8)",
+        "unit": null,
+        "multiplier": null,
+        "reserved": null
+      },
+      {
+        "field": 5,
+        "title": "Test Code",
+        "type": "bit(8)",
         "unit": null,
         "multiplier": null,
         "reserved": null
