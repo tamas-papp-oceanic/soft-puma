@@ -1,5 +1,8 @@
-import { runScript, enableNext, getStoreValue } from './runner.js';
-import { findProduct } from '../../../stores/data.js';
+import { get } from "svelte/store";
+import { _scriptData } from "../../../stores/tests.js";
+
+import { runScript, enableNext, getStoreValue } from "./runner.js";
+import { findProduct } from "../../../stores/data.js";
 
 async function sleep(ms) {
   return new Promise(resolve => setTimeout(resolve, ms));
@@ -98,6 +101,10 @@ export async function waitGps(script) {
     enableNext();
   });
 };
+// Sets device in normal mode
+export async function stopTests(script) {
+  window.pumaAPI.send('n2k-test', 0);
+};
 // Starts device update
 export async function startUpdate(script) {
   window.pumaAPI.send('n2k-update', true);
@@ -109,11 +116,11 @@ export async function waitUpdate(script) {
     enableNext();
   });
 };
-// Sets device in normal mode
-export async function stopTests(script) {
-  window.pumaAPI.send('n2k-test', 0);
-};
 // Logs test results
 export async function logResult(script) {
+
+  let tmp = get(_scriptData);
+  console.log(tmp)
+
   enableNext();
 };
