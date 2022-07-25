@@ -59,45 +59,14 @@ export async function waitSerial(script) {
 export async function startTests(script) {
   window.pumaAPI.send('n2k-test', 0x80);
 };
-// Starts screen touch test
-export async function startTouch(script) {
-  window.pumaAPI.send('n2k-test', 1);
+// Starts device's test
+export async function startTest(script) {
+  window.pumaAPI.send('n2k-test', script.testCode);
 };
-// Waits for touch test to finish
-export async function waitTouch(script) {
+// Waits for device's test to finish
+export async function waitTest(script) {
   // Receives screen touch test result
-  window.pumaAPI.recv('done-1', (e) => {
-
-    console.log('touch-done')
-
-    enableNext();
-  });
-};
-// Starts screen brightness test
-export async function startBright(script) {
-  window.pumaAPI.send('n2k-test', 2);
-};
-// Waits for brightness test to finish
-export async function waitBright(script) {
-  // Receives screen brightness test result
-  window.pumaAPI.recv('done-2', (e) => {
-
-    console.log('bright-done')
-
-    enableNext();
-  });
-};
-// Starts gps test
-export async function startGps(script) {
-  window.pumaAPI.send('n2k-test', 3);
-};
-// Waits for gps test to finish
-export async function waitGps(script) {
-  // Receives screen brightness test result
-  window.pumaAPI.recv('done-3', (e) => {
-
-    console.log('gps-done')
-
+  window.pumaAPI.recv('done-' + script.testCode, (e) => {
     enableNext();
   });
 };

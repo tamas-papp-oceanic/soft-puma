@@ -26,8 +26,6 @@
   }
 
   $: step = $_steps[$_current];
-  $: console.log(step)
-
 </script>
 
 <div class="container" style={style}>

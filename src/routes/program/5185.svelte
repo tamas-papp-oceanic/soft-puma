@@ -3,9 +3,8 @@
   import TestContainer from './partials/TestContainer.svelte';
   import test from './tests/5185.json';
   import { start, scanDevice, waitDevice, scanSerial, waitSerial,
-    startTests, startTouch, waitTouch, startBright,
-    waitBright, startGps, waitGps, startUpdate, waitUpdate,
-    stopTests, logResult } from './tests/5185.js';
+    startTests, startTest, waitTest, stopTests, startUpdate,
+    waitUpdate, logResult } from './tests/5185.js';
 
   let actions = {
     "start": start,
@@ -14,12 +13,8 @@
     "scan-serial": scanSerial,
     "wait-serial": waitSerial,
     "start-tests": startTests,
-    "start-touch": startTouch,
-    "wait-touch": waitTouch,
-    "start-bright": startBright,
-    "wait-bright": waitBright,
-    "start-gps": startGps,
-    "wait-gps": waitGps,
+    "start-test": startTest,
+    "wait-test": waitTest,
     "start-update": startUpdate,
     "wait-update": waitUpdate,
     "stop-tests": stopTests,

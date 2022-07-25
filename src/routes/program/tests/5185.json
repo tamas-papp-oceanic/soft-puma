@@ -55,10 +55,12 @@
           "action": "start-tests"
         },
         "2": {
-          "action": "start-touch"
+          "action": "start-test",
+          "testCode": 1
         },
         "3": {
-          "action": "wait-touch",
+          "action": "wait-test",
+          "testCode": 1,
           "onSuccess": { "action": "set-var", "variable": "touchOk", "value": true }
         }
       }
@@ -71,10 +73,12 @@
       "buttons": [ "Fail", "Next" ],
       "scripts": {
         "1": {
-          "action": "start-bright"
+          "action": "start-test",
+          "testCode": 2
         },
         "2": {
-          "action": "wait-bright",
+          "action": "wait-test",
+          "testCode": 2,
           "onSuccess": { "action": "set-var", "variable": "brightOk", "value": true }
         }
       }
@@ -88,10 +92,12 @@
       "buttons": [ "Fail", "Next" ],
       "scripts": {
         "1": {
-          "action": "start-gps"
+          "action": "start-test",
+          "testCode": 3
         },
         "2": {
-          "action": "wait-gps",
+          "action": "wait-test",
+          "testCode": 3,
           "onSuccess": { "action": "set-var", "variable": "gpsOk", "value": true }
         },
         "3": {
