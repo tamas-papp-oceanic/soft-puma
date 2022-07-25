@@ -29,10 +29,15 @@
     },
     "3": {
       "blurb": "3. Scan S/N label.",
-      "scanner": true,
       "variables": {
         "serial": ""
       },
+      "inputs" : [{
+        "type": "TextInput",
+        "label": "Serial number",
+        "placeholder": "Enter serial number...",
+        "onChange": "ser-change"
+      }],
       "buttons": [ "Cancel", "Next" ],
       "scripts": {
         "1": {

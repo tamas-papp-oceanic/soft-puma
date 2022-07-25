@@ -4,7 +4,7 @@
   import test from './tests/5185.json';
   import { start, scanDevice, waitDevice, scanSerial, waitSerial,
     startTests, startTest, waitTest, stopTests, startUpdate,
-    waitUpdate, logResult } from './tests/5185.js';
+    waitUpdate, logResult, serChange } from './tests/5185.js';
 
   let actions = {
     "start": start,
@@ -15,11 +15,15 @@
     "start-tests": startTests,
     "start-test": startTest,
     "wait-test": waitTest,
+    "stop-tests": stopTests,
     "start-update": startUpdate,
     "wait-update": waitUpdate,
-    "stop-tests": stopTests,
     "log-result": logResult,
-  }
+  };
+
+  let events = {
+    "ser-change": serChange,
+  };
 </script>
 
 <Grid>
@@ -32,7 +36,7 @@
         title="Programming of this device is performed outside of Puma."
         subtitle="Please refer to the SOP."
       />
-      <TestContainer steps={test.steps} actions={actions} style="height: 68vh;" />
+      <TestContainer steps={test.steps} actions={actions} events={events} style="height: 68vh;" />
     </Column>
   </Row>
 </Grid>

@@ -11,9 +11,9 @@
   the results at the end of the test.
  */
 import { get } from 'svelte/store';
-import { _scriptData, _steps, _actions, _current } from '../../../stores/tests.js';
+import { _scriptData, _steps, _actions, _events, _current } from '../../../stores/tests.js';
 
-export function initRun(stps, acts) {
+export function initRun(stps, acts, evts) {
   for (const [key, val] of Object.entries(stps)) {
     stps[key].next = false;
   }
@@ -23,6 +23,7 @@ export function initRun(stps, acts) {
     'get-var': getStoreValue,
   }, acts);
   _actions.set(acts);
+  _events.set(evts);
   _current.set(1);
 };
 
@@ -40,19 +41,32 @@ export async function nextStep() {
   cur++;
   _current.set(cur);
   let step = currStep();
-  if (step != null) {
-    if (typeof step.variables !== 'undefined') {
-      for (const [key, val] of Object.entries(step.variables)) {
-        await setStoreValue({ variable: key, value: val });
-      }
-    }
-  }
+  // if (step != null) {
+  //   if (typeof step.variables !== 'undefined') {
+  //     for (const [key, val] of Object.entries(step.variables)) {
+  //       await setStoreValue({ variable: key, value: val });
+  //     }
+  //   }
+  // }
   return step;
 };
 
 export async function runStep() {
   let step = currStep();
   if (step != null) {
+    if (typeof step.variables !== 'undefined') {
+      for (const [key, val] of Object.entries(step.variables)) {
+        await setStoreValue({ variable: key, value: val });
+      }
+    }
+    let evs = get(_events);
+    if (typeof step.inputs !== 'undefined') {
+      for (let i in step.inputs) {
+        if (typeof step.inputs[i].onChange !== "undefined") {
+          step.inputs[i].onChange = evs[i];
+        }
+      }
+    }
     if (typeof step.scripts !== "undefined") {
       for (const [key, val] of Object.entries(step.scripts)) {
         await runScript(val)

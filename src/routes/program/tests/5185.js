@@ -1,6 +1,5 @@
 import { get } from "svelte/store";
 import { _scriptData } from "../../../stores/tests.js";
-
 import { runScript, enableNext, getStoreValue } from "./runner.js";
 import { findProduct } from "../../../stores/data.js";
 
@@ -92,4 +91,9 @@ export async function logResult(script) {
   console.log(tmp)
 
   enableNext();
+};
+// Serial number change event
+export async function serChange(e) {
+
+  console.log(e);
 };
