@@ -62,7 +62,7 @@
         title="Programming of this device is performed outside of Puma."
         subtitle="Please refer to the SOP."
       />
-      <TestContainer step={step} pass={pass} fail={fail} style="height: 65vh;">
+      <TestContainer step={step} on:pass={pass} on:fail={fail} style="height: 65vh;">
         <Tile style="height: -webkit-fill-available;">
           <div class="descr">
             <span>{step ? step.blurb : ''}</span>

@@ -38,6 +38,7 @@
         "placeholder": "Enter serial number...",
         "onInput": "ser-input"
       }],
+      "image": "/images/ean.gif",
       "buttons": [ "Next", "Cancel" ],
       "scripts": {
         "1": {

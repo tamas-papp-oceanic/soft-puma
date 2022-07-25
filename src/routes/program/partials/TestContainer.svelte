@@ -1,13 +1,22 @@
 <script>
+  import { createEventDispatcher } from "svelte";
   import { ButtonSet, Button } from "carbon-components-svelte";
 
   export let step;
-  export let pass;
-  export let fail;
   export let style;
+
+  const dispatch = createEventDispatcher();
+
+  function pass(e) {
+    dispatch("pass", e);
+  };
+
+  function fail(e) {
+    dispatch("fail", e);
+  };
 </script>
 
-<div class="container" step={step} pass={pass} fail={fail} style={style}>
+<div class="container" step={step} style={style}>
   <slot></slot>
   {#if step && step.buttons}
     <ButtonSet style="justify-content: flex-end;">
