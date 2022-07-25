@@ -2,7 +2,7 @@
   "steps": {
     "1": {
       "blurb": "1. Connect the device to the NMEA network and power before continuing.",
-      "buttons": [ "Cancel", "Next" ],
+      "buttons": [ "Next", "Cancel" ],
       "scripts": {
         "1": {
           "action": "start"
@@ -14,7 +14,7 @@
       "variables": {
         "detected": false
       },
-      "buttons": [ "Fail", "Next" ],
+      "buttons": [ "Next", "Fail" ],
       "scripts": {
         "1": {
           "action": "scan-device"
@@ -28,7 +28,7 @@
       }
     },
     "3": {
-      "blurb": "3. Scan S/N label.",
+      "blurb": "3. Scan S/N label and type in the box below.",
       "variables": {
         "serial": ""
       },
@@ -36,16 +36,12 @@
         "type": "TextInput",
         "label": "Serial number",
         "placeholder": "Enter serial number...",
-        "onChange": "ser-change"
+        "onInput": "ser-input"
       }],
-      "buttons": [ "Cancel", "Next" ],
+      "buttons": [ "Next", "Cancel" ],
       "scripts": {
         "1": {
-          "action": "scan-serial"
-        },
-        "2": {
-          "action": "wait-serial",
-          "onSuccess": { "action": "set-var", "variable": "serial", "value": null }
+          "action": "select-serial"
         }
       }
     },
@@ -54,7 +50,7 @@
       "variables": {
         "touchOk": false
       },
-      "buttons": [ "Fail", "Next" ],
+      "buttons": [ "Next", "Fail" ],
       "scripts": {
         "1": {
           "action": "start-tests"
@@ -75,7 +71,7 @@
       "variables": {
         "brightOk": false
       },
-      "buttons": [ "Fail", "Next" ],
+      "buttons": [ "Next", "Fail" ],
       "scripts": {
         "1": {
           "action": "start-test",
@@ -94,7 +90,7 @@
       "variables": {
         "gpsOk": false
       },
-      "buttons": [ "Fail", "Next" ],
+      "buttons": [ "Next", "Fail" ],
       "scripts": {
         "1": {
           "action": "start-test",
@@ -115,7 +111,7 @@
       "variables": {
         "updated": false
       },
-      "buttons": [ "Fail", "Next" ],
+      "buttons": [ "Next", "Fail" ],
       "scripts": {
         "1": {
           "action": "start-update"

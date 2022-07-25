@@ -40,15 +40,6 @@ export async function nextStep() {
   let cur = get(_current);
   cur++;
   _current.set(cur);
-  let step = currStep();
-  // if (step != null) {
-  //   if (typeof step.variables !== 'undefined') {
-  //     for (const [key, val] of Object.entries(step.variables)) {
-  //       await setStoreValue({ variable: key, value: val });
-  //     }
-  //   }
-  // }
-  return step;
 };
 
 export async function runStep() {
@@ -62,8 +53,8 @@ export async function runStep() {
     let evs = get(_events);
     if (typeof step.inputs !== 'undefined') {
       for (let i in step.inputs) {
-        if (typeof step.inputs[i].onChange !== "undefined") {
-          step.inputs[i].onChange = evs[i];
+        if (typeof step.inputs[i].onInput !== "undefined") {
+          step.inputs[i].onInput = evs[step.inputs[i].onInput];
         }
       }
     }
@@ -100,11 +91,11 @@ export async function setStoreValue(script) {
   }
 };
 
-export function enableNext() {
+export function enableNext(val) {
   let sts = get(_steps);
   let cur = get(_current);
   if ((typeof sts !== 'undefined') && (typeof sts[cur] !== 'undefined')) {
-    sts[cur].next = true;
+    sts[cur].next = val;
     _steps.set(sts);
   }
 };

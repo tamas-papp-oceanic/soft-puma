@@ -14,7 +14,7 @@ async function setSerial(ser) {
 };
 // Starts processing
 export async function start(script) {
-  enableNext();
+  enableNext(true);
 };
 // Starts scan for device
 export async function scanDevice(script) {
@@ -29,30 +29,14 @@ export async function waitDevice(script) {
     if (typeof suc !== 'undefined') {
       await runScript(suc);
       let res = await getStoreValue({ variable: 'detected' });
-      if (res == true) {
-        enableNext();
-      }
+      enableNext(res);
     }
   // }
 };
-// Start scan for S/N label
-export async function scanSerial(script) {
-  // let ser = scan();
-};
-// Waits for S/N label scan to finish
-export async function waitSerial(script) {
-  // if (ser != null) {
-    let suc = script.onSuccess;
-    if (typeof suc !== 'undefined') {
-      suc.value = "SCANNED";
-      await runScript(suc);
-      let res = await getStoreValue({ variable: 'serial' });
-      if (res == "SCANNED") {
-        await setSerial("SCANNED");
-        enableNext();
-      }
-    }
-  // }
+// Starts S/N label type in
+export async function selectSerial(script) {
+  let wrp = document.getElementsByClassName('bx--text-input')[0];
+  wrp.focus();
 };
 // Sets device in test mode
 export async function startTests(script) {
@@ -66,7 +50,7 @@ export async function startTest(script) {
 export async function waitTest(script) {
   // Receives screen touch test result
   window.pumaAPI.recv('done-' + script.testCode, (e) => {
-    enableNext();
+    enableNext(true);
   });
 };
 // Sets device in normal mode
@@ -81,7 +65,7 @@ export async function startUpdate(script) {
 export async function waitUpdate(script) {
   // Receives update result
   window.pumaAPI.recv('update-done', (e) => {
-    enableNext();
+    enableNext(true);
   });
 };
 // Logs test results
@@ -90,10 +74,5 @@ export async function logResult(script) {
   let tmp = get(_scriptData);
   console.log(tmp)
 
-  enableNext();
-};
-// Serial number change event
-export async function serChange(e) {
-
-  console.log(e);
+  enableNext(true);
 };
