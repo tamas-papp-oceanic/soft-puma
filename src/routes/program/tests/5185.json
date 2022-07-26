@@ -36,7 +36,7 @@
         "type": "TextInput",
         "label": "Serial number",
         "placeholder": "Enter serial number...",
-        "onInput": "ser-input"
+        "handler": "ser-input"
       }],
       "image": "/images/ean.gif",
       "buttons": [ "Next", "Cancel" ],

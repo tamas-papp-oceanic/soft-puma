@@ -53,8 +53,8 @@ export async function runStep() {
     let evs = get(_events);
     if (typeof step.inputs !== 'undefined') {
       for (let i in step.inputs) {
-        if (typeof step.inputs[i].onInput !== "undefined") {
-          step.inputs[i].onInput = evs[step.inputs[i].onInput];
+        if (typeof step.inputs[i].handler !== "undefined") {
+          step.inputs[i].handler = evs[step.inputs[i].handler];
         }
       }
     }

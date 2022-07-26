@@ -70,7 +70,7 @@
               <div class="inputs">
                 {#each step.inputs as input}
                   {#if input.type == 'TextInput'}
-                    <TextInput inline labelText={input.label} placeholder={input.placeholder} on:input={input.onInput} />
+                    <TextInput inline labelText={input.label} placeholder={input.placeholder} on:input={input.handler} />
                   {/if}
                 {/each}
               </div>                
@@ -112,7 +112,11 @@
     margin-bottom: 2rem;
   }
   .descr .image {
-    max-height: 100%;
+    display: flex;
+    flex-flow: row nowrap;
+    justify-content: center;
+    justify-items: center;
     align-self: center;
+    max-height: -webkit-fill-available;
   }
 </style>
