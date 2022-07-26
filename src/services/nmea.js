@@ -100,7 +100,7 @@ class NMEAEngine {
     return null;
   };
   // NMEA data creating function
-  _createMsg(msg) {
+  #createMsg(msg) {
     let frm = enc.encode(msg);
     if (frm != null) {
       let tmp = enc.pack(frm);
@@ -112,7 +112,7 @@ class NMEAEngine {
   };
   // NMEA message sending function
   sendMsg(msg) {
-    let frs = this._createMsg(msg);
+    let frs = this.#createMsg(msg);
     for (let i in frs) {
       try {
         this.#device.send(frs[i]);

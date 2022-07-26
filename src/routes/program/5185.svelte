@@ -62,61 +62,10 @@
         title="Programming of this device is performed outside of Puma."
         subtitle="Please refer to the SOP."
       />
-      <TestContainer step={step} on:pass={pass} on:fail={fail} style="height: 65vh;">
-        <Tile style="height: -webkit-fill-available;">
-          <div class="descr">
-            <div class="title">{step ? step.blurb : ''}</div>
-            {#if step && step.inputs}
-              <div class="inputs">
-                {#each step.inputs as input}
-                  {#if input.type == 'TextInput'}
-                    <TextInput inline labelText={input.label} placeholder={input.placeholder} on:input={input.handler} />
-                  {/if}
-                {/each}
-              </div>                
-            {/if}
-            {#if step && step.image}
-              <div class="image">
-                <ImageLoader src={step.image}>
-                  <svelte:fragment slot="loading">
-                    <InlineLoading />
-                  </svelte:fragment>
-                  <svelte:fragment slot="error">An error occurred.</svelte:fragment>
-                </ImageLoader>
-              </div>
-            {/if}
-          </div>
-        </Tile>
-      </TestContainer>
+      <TestContainer step={step} on:pass={pass} on:fail={fail} style="height: 65vh;" />
     </Column>
   </Row>
 </Grid>
 
 <style lang="css">
-  .descr {
-    display: flex;
-    flex-flow: column nowrap;
-    justify-content: flex-start;
-    align-items: flex-start;
-    width: 100%;
-    height: 100%;
-  }
-  .descr .title {
-    max-width: 90%;
-    white-space: normal;
-    font-size: 1.25rem;
-    text-align: justify;
-    margin-bottom: 2rem;
-  }
-  .descr .inputs {
-    margin-bottom: 2rem;
-  }
-  .descr .image {
-    display: flex;
-    flex-flow: row nowrap;
-    justify-content: center;
-    justify-items: center;
-    align-self: center;
-    max-height: -webkit-fill-available;
-  }
 </style>
