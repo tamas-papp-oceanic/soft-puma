@@ -65,16 +65,18 @@
       <TestContainer step={step} on:pass={pass} on:fail={fail} style="height: 65vh;">
         <Tile style="height: -webkit-fill-available;">
           <div class="descr">
-            <span>{step ? step.blurb : ''}</span>
+            <div class="title">{step ? step.blurb : ''}</div>
             {#if step && step.inputs}
-              {#each step.inputs as input}
-                {#if input.type == 'TextInput'}
-                  <TextInput inline labelText={input.label} placeholder={input.placeholder} on:input={input.onInput} />
-                {/if}
-              {/each}
+              <div class="inputs">
+                {#each step.inputs as input}
+                  {#if input.type == 'TextInput'}
+                    <TextInput inline labelText={input.label} placeholder={input.placeholder} on:input={input.onInput} />
+                  {/if}
+                {/each}
+              </div>                
             {/if}
             {#if step && step.image}
-              <div class="imgHolder">
+              <div class="image">
                 <ImageLoader src={step.image}>
                   <svelte:fragment slot="loading">
                     <InlineLoading />
@@ -99,14 +101,18 @@
     width: 100%;
     height: 100%;
   }
-  .descr span {
+  .descr .title {
     max-width: 90%;
     white-space: normal;
     font-size: 1.25rem;
     text-align: justify;
     margin-bottom: 2rem;
   }
-  .imgHolder {
+  .descr .inputs {
+    margin-bottom: 2rem;
+  }
+  .descr .image {
     max-height: 100%;
+    align-self: center;
   }
 </style>
