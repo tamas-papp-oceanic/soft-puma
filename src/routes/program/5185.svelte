@@ -1,20 +1,19 @@
 <script>
   import { onMount } from "svelte";
-  import { Row, Grid, Column, InlineNotification, Form, Tile,
-    TextInput, ImageLoader, InlineLoading } from "carbon-components-svelte";
+  import { Row, Grid, Column, InlineNotification } from "carbon-components-svelte";
   import TestContainer from './partials/TestContainer.svelte';
   import test from './tests/5185.json';
-  import { start, scanDevice, waitDevice, selectSerial,
-    startTests, startTest, waitTest, stopTests, startUpdate,
-    waitUpdate, logResult } from './tests/5185.js';
-  import { initRun, runStep, nextStep, enableNext, setStoreValue } from "./tests/runner.js"
-  import { _steps, _current } from '../../stores/tests.js';
+  import { start, scanDevice, waitDevice, startForm, startTests,
+    startTest, waitTest, stopTests, startUpdate,  waitUpdate,
+    logResult } from './tests/5185.js';
+  import { initRun, runStep, nextStep, setStoreValue } from "./tests/runner.js"
+  import { _steps, _events, _current } from '../../stores/tests.js';
 
   let actions = {
     "start": start,
     "scan-device": scanDevice,
     "wait-device": waitDevice,
-    "select-serial": selectSerial,
+    "start-form": startForm,
     "start-tests": startTests,
     "start-test": startTest,
     "wait-test": waitTest,
@@ -24,9 +23,7 @@
     "log-result": logResult,
   };
 
-  let events = {
-    "ser-input": serInput,
-  };
+  let events = {};
 
   let step;
   // On mount event  
@@ -34,19 +31,38 @@
     initRun(test.steps, actions, events);
     await runStep();
   });
-  // Pass button event
-  async function pass(e) {
-    await nextStep();
-    await runStep();
+  // Submit button event
+  async function submit(e) {
+    let val = false;
+    if (typeof $_steps[$_current] !== 'undefined') {
+      val = true;
+      if (typeof $_steps[$_current].inputs !== 'undefined') {
+        for (let i in $_steps[$_current].inputs) {
+          let wrp = document.getElementById($_steps[$_current].inputs[i].id);
+          if ($_steps[$_current].inputs[i].id == 'serial') {
+            if (wrp.value.length < 6) {
+              $_steps[$_current].inputs[i].error.active = true;
+              // Only for reactivity
+              $_steps[$_current] = $_steps[$_current];
+            } else {
+              await setStoreValue({ variable: 'serial', value: wrp.value });
+            }
+          }
+          if ($_steps[$_current].inputs[i].error.active) {
+            wrp.focus();
+            val = false;
+          }
+        }
+      }
+    }
+    if (val) {
+      await nextStep();
+      await runStep();
+    }
   };
-  // Fail button event
-  function fail(e) {
+  // Cancel button event
+  function cancel(e) {
     console.log(e)
-  };
-  // Serial number input event
-  async function serInput(e) {
-    await setStoreValue({ variable: 'serial', value: e.detail });
-    enableNext(e.detail.length > 5);
   };
   // Data getters
   $: step = $_steps[$_current];
@@ -62,7 +78,7 @@
         title="Programming of this device is performed outside of Puma."
         subtitle="Please refer to the SOP."
       />
-      <TestContainer step={step} on:pass={pass} on:fail={fail} style="height: 65vh;" />
+      <TestContainer step={step} on:submit={submit} on:cancel={cancel} style="height: 65vh;" />
     </Column>
   </Row>
 </Grid>

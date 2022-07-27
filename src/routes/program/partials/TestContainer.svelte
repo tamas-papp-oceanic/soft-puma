@@ -1,30 +1,38 @@
 <script>
   import { createEventDispatcher } from "svelte";
-  import { ButtonSet, Button, Tile, TextInput, ImageLoader, InlineLoading } from "carbon-components-svelte";
+  import { ButtonSet, Button, Tile, Form, TextInput, ImageLoader,
+    InlineLoading, InlineNotification } from "carbon-components-svelte";
 
   export let step;
   export let style;
 
   const dispatch = createEventDispatcher();
 
-  function pass(e) {
-    dispatch("pass", e);
+  function submit(e) {
+    dispatch("submit", e);
   };
 
-  function fail(e) {
-    dispatch("fail", e);
+  function cancel(e) {
+    dispatch("cancel", e);
   };
 </script>
 
 <div class="container" step={step} style={style}>
   <Tile style="height: -webkit-fill-available;">
-    <div class="descr">
+    <div class="tilecont">
       <div class="title">{step ? step.blurb : ''}</div>
       {#if step && step.inputs}
         <div class="inputs">
           {#each step.inputs as input}
             {#if input.type == 'TextInput'}
-              <TextInput inline labelText={input.label} placeholder={input.placeholder} on:input={input.handler} />
+              <TextInput id={input.id} inline labelText={input.label} placeholder={input.placeholder} />
+            {/if}
+            {#if input.error && input.error.active}
+              <InlineNotification
+                hideCloseButton
+                title={input.error.title}
+                subtitle={input.error.subtitle}
+              />
             {/if}
           {/each}
         </div>                
@@ -44,9 +52,9 @@
   {#if step && step.buttons}
     <ButtonSet style="justify-content: flex-end;">
       {#if step.buttons.length > 1}
-      <Button kind="secondary" on:click={(e) => fail(e)}>{step.buttons[1]}</Button>
+        <Button kind="secondary" on:click={(e) => cancel(e)}>{step.buttons[1]}</Button>
       {/if}
-      <Button kind="primary" disabled={!step || !step.next} on:click={(e) => pass(e)}>{step.buttons[0]}</Button>
+      <Button kind="primary" disabled={!step || !step.next} on:click={(e) => submit(e)}>{step.buttons[0]}</Button>
     </ButtonSet>
   {/if}
 </div>
@@ -59,7 +67,7 @@
     border: 1px solid gray;
     width: 100%;
   }
-  .descr {
+  .container .tilecont {
     display: flex;
     flex-flow: column nowrap;
     justify-content: flex-start;
@@ -67,17 +75,17 @@
     width: 100%;
     height: 100%;
   }
-  .descr .title {
+  .container .tilecont .title {
     max-width: 90%;
     white-space: normal;
     font-size: 1.25rem;
     text-align: justify;
     margin-bottom: 2rem;
   }
-  .descr .inputs {
+  .container .tilecont .inputs {
     margin-bottom: 2rem;
   }
-  .descr .image {
+  .container .tilecont .image {
     display: flex;
     flex-flow: row nowrap;
     justify-content: center;

@@ -34,15 +34,20 @@
       },
       "inputs" : [{
         "type": "TextInput",
+        "id": "serial",
         "label": "Serial number",
         "placeholder": "Enter serial number...",
-        "handler": "ser-input"
-      }],
+        "error": {
+          "title": "Error",
+          "subtitle": "Serial number should be at least 6 characters long.",
+          "active": false
+        }
+        }],
       "image": "/images/ean.gif",
       "buttons": [ "Next", "Cancel" ],
       "scripts": {
         "1": {
-          "action": "select-serial"
+          "action": "start-form"
         }
       }
     },

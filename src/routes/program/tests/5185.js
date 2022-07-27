@@ -1,6 +1,6 @@
 import { get } from "svelte/store";
 import { _scriptData } from "../../../stores/tests.js";
-import { runScript, enableNext, getStoreValue } from "./runner.js";
+import { runScript, enableNext, getStoreValue, setStoreValue } from "./runner.js";
 import { findProduct } from "../../../stores/data.js";
 
 async function sleep(ms) {
@@ -33,12 +33,13 @@ export async function waitDevice(script) {
     }
   // }
 };
-// Starts S/N label type in
-export async function selectSerial(script) {
-  let wrp = document.getElementsByClassName('bx--text-input')[0];
+// Starts form processing
+export async function startForm(script) {
+  let wrp = document.getElementById('serial');
   wrp.focus();
+  enableNext(true);
 };
-// Sets device in test mode
+  // Sets device in test mode
 export async function startTests(script) {
   window.pumaAPI.send('n2k-test', 0x80);
 };
