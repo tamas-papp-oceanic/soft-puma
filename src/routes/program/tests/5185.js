@@ -43,16 +43,34 @@ export async function startForm(script) {
 export async function startTests(script) {
   window.pumaAPI.send('n2k-test', 0x80);
 };
+
+let success = null;
+
 // Starts device's test
 export async function startTest(script) {
   window.pumaAPI.send('n2k-test', script.testCode);
 };
+// Test result processing
+async function testResult(e, args) {
+  if (success != null) {
+    await runScript(success);
+    success = null;
+  }
+
+
+  console.log(args)
+  enableNext(true);
+  
+  // Remove listener
+  window.pumaAPI.reml('n2k-test');
+}
 // Waits for device's test to finish
 export async function waitTest(script) {
-  // Receives screen touch test result
-  window.pumaAPI.recv('done-' + script.testCode, (e) => {
-    enableNext(true);
-  });
+  if (typeof script.onSuccess !== 'undefined') {
+    success = script.onSuccess;
+  }
+  // Receives device's test result
+  window.pumaAPI.recv('n2k-test', testResult);
 };
 // Sets device in normal mode
 export async function stopTests(script) {

@@ -15954,6 +15954,14 @@
         "unit": null,
         "multiplier": null,
         "reserved": null
+      },
+      {
+        "field": 6,
+        "title": "Test Data",
+        "type": "bit(32)",
+        "unit": null,
+        "multiplier": null,
+        "reserved": null
       }
     ]
   },

@@ -97,8 +97,8 @@ app.on('activate', function () {
 // code. You can also put them in separate files and require them here.
 // Data processing
 // FOR INIT ONLY
-let tool = require('./src/tools/nmea.js');
-tool.create();
+// let tool = require('./src/tools/nmea.js');
+// tool.create();
 // Discovering interfaces
 function discover() {
   Serial.discover().then((sls) => {
@@ -140,6 +140,9 @@ function proc(dev, frm) {
         break;
       case 126996:
         mainWindow.webContents.send('n2k-prod', [ dev, msg ]);
+        break;
+      case 65477:
+        mainWindow.webContents.send('n2k-test', [ dev, msg ]);
         break;
       default:
         mainWindow.webContents.send('n2k-data', [ dev, msg ]);
@@ -195,13 +198,13 @@ ipcMain.on('n2k-start', (e) => {
 });
 ipcMain.on('n2k-test', (e, test) => {
   for (const [key, val] of Object.entries(devices)) {
-    // Send touch test proprietary PGN
+    // Send Device Test Control proprietary PGN
     val.engine.send065477(test);
   }
   // *** TEST ***
-  if ((typeof mainWindow !== 'undefined') && (typeof mainWindow.webContents !== 'undefined')) {
-    mainWindow.webContents.send('done-' + test);
-  }
+  // if ((typeof mainWindow !== 'undefined') && (typeof mainWindow.webContents !== 'undefined')) {
+  //   mainWindow.webContents.send('done-' + test);
+  // }
 });
 ipcMain.on('n2k-update', (e) => {
   for (const [key, val] of Object.entries(devices)) {

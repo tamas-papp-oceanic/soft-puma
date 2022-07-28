@@ -187,6 +187,7 @@ class NMEAEngine {
           { field: 3,title: 'Industry Group', state: 'V', value: this.#addrMngr.name[9] },
           { field: 4,title: 'Security Code', state: 'V', value: 0xBC },
           { field: 5,title: 'Test Code', state: 'V', value: cod },
+          { field: 6,title: 'Test Data', state: 'V', value: 0xFFFFFFFF },
         ],
       };
       return this.sendMsg(msg);
