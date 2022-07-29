@@ -3,6 +3,8 @@ import { _scriptData } from "../../../stores/tests.js";
 import { runScript, enableNext, getStoreValue, setStoreValue } from "./runner.js";
 import { findProduct } from "../../../stores/data.js";
 
+let succ = null;
+
 async function sleep(ms) {
   return new Promise(resolve => setTimeout(resolve, ms));
 }
@@ -23,15 +25,15 @@ export async function scanDevice(script) {
 // Waits for device scan to finish
 export async function waitDevice(script) {
   await sleep(script.timeout);
-  // let pro = findProduct(script['product-code']);
-  // if (pro != null) {
-    let suc = script.onSuccess;
-    if (typeof suc !== 'undefined') {
-      await runScript(suc);
-      let res = await getStoreValue({ variable: 'detected' });
-      enableNext(res);
+  let pro = findProduct(script['product-code']);
+  if (pro != null) {
+    if (typeof script.onSuccess !== 'undefined') {
+      succ = script.onSuccess;
+      await runScript(succ);
+      enableNext(true);
+      succ = null;
     }
-  // }
+  }
 };
 // Starts form processing
 export async function startForm(script) {
@@ -44,30 +46,28 @@ export async function startTests(script) {
   window.pumaAPI.send('n2k-test', [0x80]);
 };
 
-let success = null;
-
 // Starts device's test
 export async function startTest(script) {
   window.pumaAPI.send('n2k-test', [script.testCode, script.testParam]);
 };
 // Test result processing
 async function testResult(e, args) {
-  if (success != null) {
-    if (!Array.isArray(success)) {
-      success = new Array(success);  
+  if (succ != null) {
+    if (!Array.isArray(succ)) {
+      succ = new Array(succ);  
     }
-    for (let i in success) {
-      switch (success[i].variable) {
+    for (let i in succ) {
+      switch (succ[i].variable) {
         case 'touchResult':
         case 'brightResult':
         case 'gpsResult':
           const [dev, msg] = args;
-          success[i].value = msg.fields[5].value;
+          succ[i].value = msg.fields[5].value;
           break;
       }
-      await runScript(success[i]);
+      await runScript(succ[i]);
     }
-    success = null;
+    succ = null;
   }
   enableNext(true);
   // Remove listener
@@ -76,13 +76,13 @@ async function testResult(e, args) {
 // Waits for device's test to finish
 export async function waitTest(script) {
   if (typeof script.onSuccess !== 'undefined') {
-    success = script.onSuccess;
+    succ = script.onSuccess;
   }
   // Receives device's test result
   window.pumaAPI.recv('n2k-test', testResult);
 };
 // Sets device in normal mode
-export async function stopTests(script) {
+export async function stopTests() {
   window.pumaAPI.send('n2k-test', [0]);
 };
 // Starts device update

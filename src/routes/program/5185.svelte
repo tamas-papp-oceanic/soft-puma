@@ -1,6 +1,7 @@
 <script>
   import { onMount } from "svelte";
   import { Row, Grid, Column, InlineNotification } from "carbon-components-svelte";
+	import { pop } from 'svelte-spa-router'
   import TestContainer from './partials/TestContainer.svelte';
   import test from './tests/5185.json';
   import { start, scanDevice, waitDevice, startForm, startTests,
@@ -62,7 +63,8 @@
   };
   // Cancel button event
   function cancel(e) {
-    console.log(e)
+    stopTests();
+    pop();
   };
   // Data getters
   $: step = $_steps[$_current];

@@ -21,7 +21,7 @@
         },
         "2": {
           "action": "wait-device",
-          "product-code": 5185,
+          "product-code": 9075,
           "timeout": 3000,
           "onSuccess": { "action": "set-var", "variable": "detected", "value": true }
         }
