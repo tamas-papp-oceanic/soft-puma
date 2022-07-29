@@ -101,6 +101,8 @@ export async function logResult(script) {
 
   let tmp = get(_scriptData);
   console.log(tmp)
-
+};
+// Stops processing
+export async function stop(script) {
   enableNext(true);
 };

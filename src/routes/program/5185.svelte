@@ -6,7 +6,7 @@
   import test from './tests/5185.json';
   import { start, scanDevice, waitDevice, startForm, startTests,
     startTest, waitTest, stopTests, startUpdate,  waitUpdate,
-    logResult } from './tests/5185.js';
+    logResult, stop } from './tests/5185.js';
   import { initRun, runStep, nextStep, setStoreValue } from "./tests/runner.js"
   import { _steps, _events, _current } from '../../stores/tests.js';
 
@@ -22,6 +22,7 @@
     "start-update": startUpdate,
     "wait-update": waitUpdate,
     "log-result": logResult,
+    "stop": stop,
   };
 
   let events = {};
@@ -35,9 +36,12 @@
   // Submit button event
   async function submit(e) {
     let val = false;
+    let stp = false;
     if (typeof $_steps[$_current] !== 'undefined') {
       val = true;
-      if (typeof $_steps[$_current].inputs !== 'undefined') {
+      if (typeof $_steps[$_current].last !== 'undefined') {
+        stp = true;
+      } else if (typeof $_steps[$_current].inputs !== 'undefined') {
         for (let i in $_steps[$_current].inputs) {
           let wrp = document.getElementById($_steps[$_current].inputs[i].id);
           if ($_steps[$_current].inputs[i].id == 'serial') {
@@ -57,13 +61,18 @@
       }
     }
     if (val) {
-      await nextStep();
-      await runStep();
+      if (stp) {
+        pop();
+      } else {
+        await nextStep();
+        await runStep();
+      }
     }
   };
   // Cancel button event
   function cancel(e) {
     stopTests();
+    logResult();
     pop();
   };
   // Data getters

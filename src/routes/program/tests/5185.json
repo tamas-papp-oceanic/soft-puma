@@ -139,6 +139,7 @@
     },
     "8": {
       "blurb": "TESTING DONE",
+      "last": true,
       "buttons": [ "Ok" ],
       "scripts": {
         "1": {
