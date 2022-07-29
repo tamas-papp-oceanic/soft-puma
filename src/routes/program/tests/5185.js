@@ -41,26 +41,35 @@ export async function startForm(script) {
 };
   // Sets device in test mode
 export async function startTests(script) {
-  window.pumaAPI.send('n2k-test', 0x80);
+  window.pumaAPI.send('n2k-test', [0x80]);
 };
 
 let success = null;
 
 // Starts device's test
 export async function startTest(script) {
-  window.pumaAPI.send('n2k-test', script.testCode);
+  window.pumaAPI.send('n2k-test', [script.testCode, script.testParam]);
 };
 // Test result processing
 async function testResult(e, args) {
   if (success != null) {
-    await runScript(success);
+    if (!Array.isArray(success)) {
+      success = new Array(success);  
+    }
+    for (let i in success) {
+      switch (success[i].variable) {
+        case 'touchResult':
+        case 'brightResult':
+        case 'gpsResult':
+          const [dev, msg] = args;
+          success[i].value = msg.fields[5].value;
+          break;
+      }
+      await runScript(success[i]);
+    }
     success = null;
   }
-
-
-  console.log(args)
   enableNext(true);
-  
   // Remove listener
   window.pumaAPI.reml('n2k-test');
 }
@@ -74,7 +83,7 @@ export async function waitTest(script) {
 };
 // Sets device in normal mode
 export async function stopTests(script) {
-  window.pumaAPI.send('n2k-test', 0);
+  window.pumaAPI.send('n2k-test', [0]);
 };
 // Starts device update
 export async function startUpdate(script) {

@@ -196,15 +196,12 @@ ipcMain.on('n2k-start', (e) => {
     val.engine.send065477(0x80);
   }
 });
-ipcMain.on('n2k-test', (e, test) => {
+ipcMain.on('n2k-test', (e, args) => {
+  const [code, param] = args;
   for (const [key, val] of Object.entries(devices)) {
     // Send Device Test Control proprietary PGN
-    val.engine.send065477(test);
+    val.engine.send065477(code, param);
   }
-  // *** TEST ***
-  // if ((typeof mainWindow !== 'undefined') && (typeof mainWindow.webContents !== 'undefined')) {
-  //   mainWindow.webContents.send('done-' + test);
-  // }
 });
 ipcMain.on('n2k-update', (e) => {
   for (const [key, val] of Object.entries(devices)) {

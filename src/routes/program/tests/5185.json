@@ -54,7 +54,8 @@
     "4": {
       "blurb": "4. Touch screen test. Press all of the crosses on the screen.",
       "variables": {
-        "touchOk": false
+        "touchOk": false,
+        "touchResult": null
       },
       "buttons": [ "Next", "Fail" ],
       "scripts": {
@@ -67,14 +68,18 @@
         },
         "3": {
           "action": "wait-test",
-          "onSuccess": { "action": "set-var", "variable": "touchOk", "value": true }
+          "onSuccess": [
+            { "action": "set-var", "variable": "touchOk", "value": true },
+            { "action": "set-var", "variable": "touchResult", "value": null }
+          ]
         }
       }
     },
     "5": {
       "blurb": "5. Brightness test. Check full range of brightness.",
       "variables": {
-        "brightOk": false
+        "brightOk": false,
+        "brightResult": null
       },
       "buttons": [ "Next", "Fail" ],
       "scripts": {
@@ -84,7 +89,10 @@
         },
         "2": {
           "action": "wait-test",
-          "onSuccess": { "action": "set-var", "variable": "brightOk", "value": true }
+          "onSuccess": [
+            { "action": "set-var", "variable": "brightOk", "value": true },
+            { "action": "set-var", "variable": "brightResult", "value": null }
+          ]
         }
       }
     },
@@ -92,7 +100,8 @@
       "blurb": "6. GPS test. Attach GPS antenna.",
       "timeout": 180000,
       "variables": {
-        "gpsOk": false
+        "gpsOk": false,
+        "gpsResult": null
       },
       "buttons": [ "Next", "Fail" ],
       "scripts": {
@@ -102,7 +111,10 @@
         },
         "2": {
           "action": "wait-test",
-          "onSuccess": { "action": "set-var", "variable": "gpsOk", "value": true }
+          "onSuccess": [
+            { "action": "set-var", "variable": "gpsOk", "value": true },
+            { "action": "set-var", "variable": "gpsResult", "value": null }
+          ]
         },
         "3": {
           "action": "stop-tests"

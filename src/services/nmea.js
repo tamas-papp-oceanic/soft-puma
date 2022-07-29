@@ -176,7 +176,10 @@ class NMEAEngine {
     this.#addrMngr.send059904(pgn, dst);
   };
   // Sends Test Control message
-  send065477(cod) {
+  send065477(code, param) {
+    if (typeof param === 'undefined') {
+      param = 0xFFFFFFFF;
+    }
     if (this.#addrMngr.state == 'Valid') {
       let msg = {
       key: 'nmea2000/065477/-/161/4/-/-',
@@ -186,8 +189,8 @@ class NMEAEngine {
           { field: 2,title: 'Reserved', state: 'V', value: 0b11 },
           { field: 3,title: 'Industry Group', state: 'V', value: this.#addrMngr.name[9] },
           { field: 4,title: 'Security Code', state: 'V', value: 0xBC },
-          { field: 5,title: 'Test Code', state: 'V', value: cod },
-          { field: 6,title: 'Test Data', state: 'V', value: 0xFFFFFFFF },
+          { field: 5,title: 'Test Code', state: 'V', value: code },
+          { field: 6,title: 'Test Param', state: 'V', value: param },
         ],
       };
       return this.sendMsg(msg);
