@@ -2,6 +2,17 @@
   "steps": {
     "1": {
       "blurb": "1. Connect the device to the NMEA network and power before continuing.",
+      "variables": {
+        "detected": false,
+        "serial": null,
+        "touchOk": false,
+        "touchResult": null,
+        "brightOk": false,
+        "brightResult": null,
+        "gpsOk": false,
+        "gpsResult": null,
+        "updated": false
+      },
       "buttons": [ "Next", "Cancel" ],
       "scripts": {
         "1": {
@@ -11,9 +22,6 @@
     },
     "2": {
       "blurb": "2. Waiting for P7 to load.",
-      "variables": {
-        "detected": false
-      },
       "buttons": [ "Next", "Fail" ],
       "scripts": {
         "1": {
@@ -29,9 +37,6 @@
     },
     "3": {
       "blurb": "3. Scan S/N label and type in the box below.",
-      "variables": {
-        "serial": ""
-      },
       "inputs" : [{
         "type": "TextInput",
         "id": "serial",
@@ -53,10 +58,6 @@
     },
     "4": {
       "blurb": "4. Touch screen test. Press all of the crosses on the screen.",
-      "variables": {
-        "touchOk": false,
-        "touchResult": null
-      },
       "buttons": [ "Next", "Fail" ],
       "scripts": {
         "1": {
@@ -77,10 +78,6 @@
     },
     "5": {
       "blurb": "5. Brightness test. Check full range of brightness.",
-      "variables": {
-        "brightOk": false,
-        "brightResult": null
-      },
       "buttons": [ "Next", "Fail" ],
       "scripts": {
         "1": {
@@ -99,10 +96,6 @@
     "6": {
       "blurb": "6. GPS test. Attach GPS antenna.",
       "timeout": 180000,
-      "variables": {
-        "gpsOk": false,
-        "gpsResult": null
-      },
       "buttons": [ "Next", "Fail" ],
       "scripts": {
         "1": {
@@ -115,23 +108,20 @@
             { "action": "set-var", "variable": "gpsOk", "value": true },
             { "action": "set-var", "variable": "gpsResult", "value": null }
           ]
-        },
-        "3": {
-          "action": "stop-tests"
         }
       }
     },
     "7": {
       "blurb": "7. Insert update USB.",
-      "variables": {
-        "updated": false
-      },
       "buttons": [ "Next", "Fail" ],
       "scripts": {
         "1": {
-          "action": "start-update"
+          "action": "stop-tests"
         },
         "2": {
+          "action": "start-update"
+        },
+        "3": {
           "action": "wait-update",
           "onSuccess": { "action": "set-var", "variable": "updated", "value": true }
         }
