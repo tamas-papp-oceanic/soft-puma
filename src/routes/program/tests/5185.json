@@ -3,14 +3,8 @@
     "1": {
       "blurb": "1. Connect the device to the NMEA network and power before continuing.",
       "variables": {
-        "detected": false,
+        "product": null,
         "serial": null,
-        "touchOk": false,
-        "touchResult": null,
-        "brightOk": false,
-        "brightResult": null,
-        "gpsOk": false,
-        "gpsResult": null,
         "updated": false
       },
       "buttons": [ "Next", "Cancel" ],
@@ -30,8 +24,7 @@
         "2": {
           "action": "wait-device",
           "product-code": 9075,
-          "timeout": 3000,
-          "onSuccess": { "action": "set-var", "variable": "detected", "value": true }
+          "timeout": 3000
         }
       }
     },
@@ -68,11 +61,7 @@
           "testCode": 1
         },
         "3": {
-          "action": "wait-test",
-          "onSuccess": [
-            { "action": "set-var", "variable": "touchOk", "value": true },
-            { "action": "set-var", "variable": "touchResult", "value": null }
-          ]
+          "action": "wait-test"
         }
       }
     },
@@ -85,17 +74,12 @@
           "testCode": 2
         },
         "2": {
-          "action": "wait-test",
-          "onSuccess": [
-            { "action": "set-var", "variable": "brightOk", "value": true },
-            { "action": "set-var", "variable": "brightResult", "value": null }
-          ]
+          "action": "wait-test"
         }
       }
     },
     "6": {
       "blurb": "6. GPS test. Attach GPS antenna.",
-      "timeout": 180000,
       "buttons": [ "Next", "Fail" ],
       "scripts": {
         "1": {
@@ -104,10 +88,7 @@
         },
         "2": {
           "action": "wait-test",
-          "onSuccess": [
-            { "action": "set-var", "variable": "gpsOk", "value": true },
-            { "action": "set-var", "variable": "gpsResult", "value": null }
-          ]
+          "timeout": 180000
         }
       }
     },

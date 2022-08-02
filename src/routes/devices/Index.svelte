@@ -79,7 +79,7 @@
         let nam = {
           id: key,
           uniqueNumber: val.uniqueNumber != null ? val.uniqueNumber : '',
-          manufacturer: val.manufacturer != null ? val.manufacturer : '',
+          manufacturer: val.decoded.manufacturer != null ? val.decoded.manufacturer : '',
           productCode: val.productCode != null ? val.productCode : '',
           modelID: val.modelID != null ? val.modelID : '',
           instance: val.deviceInstance != null ? val.deviceInstance : '',

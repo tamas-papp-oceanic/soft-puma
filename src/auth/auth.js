@@ -52,7 +52,8 @@ async function logout() {
   refreshToken.set("")
   loggedIn.set(false)
 }
-async function afetch(url, options){
+
+async function afetch(url, options) {
   // add logic to add auth header here.
   if(get(loggedIn) === true){
     let authCode = get(accessToken)

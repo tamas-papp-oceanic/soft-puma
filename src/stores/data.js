@@ -56,6 +56,12 @@ window.pumaAPI.recv('n2k-name', (e, args) => {
     serialCode: null,
     certification: null,
     loadEquivalency: null,
+    decoded: {
+      manufacturer: null,
+      function: null,
+      class: null,
+      industry: null,
+    },
   };
   let acl = get(clas);
   let afu = get(func);
@@ -77,10 +83,9 @@ window.pumaAPI.recv('n2k-name', (e, args) => {
         nam.uniqueNumber = fld.value;
         break;
       case 2:
+        nam.manufacturer = fld.value;
         if (typeof ama[fld.value] !== 'undefined') {
-          nam.manufacturer = ama[fld.value];
-        } else {
-          nam.manufacturer = fld.value;
+          nam.decoded.manufacturer = ama[fld.value];
         }
         break;
       case 3:
@@ -90,28 +95,25 @@ window.pumaAPI.recv('n2k-name', (e, args) => {
         nam.deviceInstance += (fld.value << 3);
         break;
       case 5:
+        nam.function = fld.value;
         if ((cla != null) && (typeof afu[cla] !== 'undefined') &&
           (typeof afu[cla][fld.value] !== 'undefined')) {
-          nam.function = afu[cla][fld.value];
-        } else {
-          nam.function = fld.value;
-      }
+          nam.decoded.function = afu[cla][fld.value];
+        }
         break;
       case 7:
+        nam.class = fld.value;
         if (typeof acl[fld.value] !== 'undefined') {
-          nam.class = acl[fld.value];
-        } else {
-          nam.class = fld.value;
+          nam.decoded.class = acl[fld.value];
         }
         break;
       case 8:
         nam.systemInstance = fld.value;
         break;
       case 9:
+        nam.industry = fld.value;
         if (typeof ain[fld.value] !== 'undefined') {
-          nam.industry = ain[fld.value];
-        } else {
-          nam.industry = fld.value;
+          nam.decoded.industry = ain[fld.value];
         }
         break;
     }
@@ -160,6 +162,12 @@ window.pumaAPI.recv('n2k-prod', (e, args) => {
       serialCode: null,
       certification: null,
       loadEquivalency: null,
+      decoded: {
+        manufacturer: null,
+        function: null,
+        class: null,
+        industry: null,
+      },
     };
   }
   for (let i in msg.fields) {
