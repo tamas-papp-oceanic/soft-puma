@@ -1,9 +1,11 @@
 import { get } from "svelte/store";
+import { userData, accessToken, refreshToken, loggedIn,
+  permissions } from '../../../stores/user.js';
 import { _scriptData } from "../../../stores/tests.js";
 import { runScript, enableNext, getStoreValue, setStoreValue } from "./runner.js";
 import { findProduct } from "../../../stores/data.js";
 
-let succ = null;
+// let succ = null;
 
 async function sleep(ms) {
   return new Promise(resolve => setTimeout(resolve, ms));
@@ -28,11 +30,9 @@ export async function waitDevice(script) {
   let pro = findProduct(script['product-code']);
   if (pro != null) {
     if (typeof script.onSuccess !== 'undefined') {
-      succ = script.onSuccess;
-      await runScript(succ);
-      enableNext(true);
-      succ = null;
+      await runScript(script.onSuccess);
     }
+    enableNext(true);
   }
 };
 // Starts form processing
@@ -52,32 +52,52 @@ export async function startTest(script) {
 };
 // Test result processing
 async function testResult(e, args) {
-  if (succ != null) {
-    if (!Array.isArray(succ)) {
-      succ = new Array(succ);  
-    }
-    for (let i in succ) {
-      switch (succ[i].variable) {
-        case 'touchResult':
-        case 'brightResult':
-        case 'gpsResult':
-          const [dev, msg] = args;
-          succ[i].value = msg.fields[5].value;
-          break;
-      }
-      await runScript(succ[i]);
-    }
-    succ = null;
-  }
+  // if (succ != null) {
+  //   if (!Array.isArray(succ)) {
+  //     succ = new Array(succ);  
+  //   }
+  //   for (let i in succ) {
+  //     switch (succ[i].variable) {
+  //       case 'touchResult':
+  //       case 'brightResult':
+  //       case 'gpsResult':
+  //         const [dev, msg] = args;
+  //         succ[i].value = msg.fields[5].value;
+  //         break;
+  //     }
+  //     await runScript(succ[i]);
+  //   }
+  //   succ = null;
+  // }
+
+  let tmp = get(_scriptData);
+  let usr = get(userData);
+  console.log(usr)
+  // const [dev, msg] = args;
+  // const res = await fetch('http://localhost:8080/test', {
+  //   method: 'POST',
+  //   body: JSON.stringify({
+  //     user: user,
+  //     product: product,
+  //     serial: tmp.serial,
+  //     test: msg.fields[4].value,
+  //     result: msg.fields[5].value
+  //   }),
+  // });
+  // const status = res.status;
+  // const json = await res.json();
+  // if (res.status != 200) {
+  //   console.log("Logging test failed");
+  // }
   enableNext(true);
   // Remove listener
   window.pumaAPI.reml('n2k-test');
 }
 // Waits for device's test to finish
 export async function waitTest(script) {
-  if (typeof script.onSuccess !== 'undefined') {
-    succ = script.onSuccess;
-  }
+  // if (typeof script.onSuccess !== 'undefined') {
+  //   succ = script.onSuccess;
+  // }
   // Receives device's test result
   window.pumaAPI.recv('n2k-test', testResult);
 };
@@ -98,7 +118,6 @@ export async function waitUpdate(script) {
 };
 // Logs test results
 export async function logResult(script) {
-
   let tmp = get(_scriptData);
   console.log(tmp)
 };

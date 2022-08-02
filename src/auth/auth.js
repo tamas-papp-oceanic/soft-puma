@@ -1,12 +1,7 @@
-import {
-  userData,
-  accessToken,
-  refreshToken,
-  loggedIn,
-  permissions
-} from '../stores/user.js';
 import { get } from "svelte/store";
 import jwt_decode from "jwt-decode";
+import { userData, accessToken, refreshToken, loggedIn,
+  permissions } from '../stores/user.js';
 
 function refreshLogin() {
   return false; // because I need to do this later. TODO
@@ -16,8 +11,10 @@ async function getPerms(){
   let res = await afetch("http://localhost:8080/roles", {method: 'GET'})
   let perms = await res.json()
   let permsObject= {};
-  for(let i=0;i<perms.length;i++){
-    if(permsObject[perms[i][1]]===undefined) permsObject[perms[i][1]] = {}
+  for(let i = 0; i < perms.length; i++){
+    if(typeof permsObject[perms[i][1]] === 'undefined') {
+      permsObject[perms[i][1]] = {}
+    }
     permsObject[perms[i][1]][perms[i][2]] = true
   }
   permissions.set(permsObject)
@@ -80,10 +77,11 @@ async function afetch(url, options){
 // route refers to a API route
 // type = read write or delete
 function checkAccess(route, type) {
-  if($permissions[route].type == true){
-    return true
+  let prm = get(permissions);
+  if (typeof prm[route] !== 'undefined') {
+    return (prm[route].type == type);
   }
-  return false
+  return false;
 }
 
 export {
