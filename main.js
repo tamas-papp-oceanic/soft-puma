@@ -185,9 +185,12 @@ ipcMain.on('n2k-scan', (e) => {
     // Send ISO Request for Address Claim
     val.engine.send059904(60928, 0xFF);
   }
-  // *** TEST ***
-  if ((typeof mainWindow !== 'undefined') && (typeof mainWindow.webContents !== 'undefined')) {
-    mainWindow.webContents.send('scan-done');
+});
+ipcMain.on('n2k-serial', (e, args) => {
+  const [serial] = args;
+  for (const [key, val] of Object.entries(devices)) {
+    // Send Proprietary Set serial PGN
+    val.engine.send065280(serial);
   }
 });
 ipcMain.on('n2k-start', (e) => {

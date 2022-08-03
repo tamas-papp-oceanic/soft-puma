@@ -13,7 +13,7 @@
 import { get } from 'svelte/store';
 import { _scriptData, _steps, _actions, _events, _current } from '../../../stores/tests.js';
 
-export function initRun(stps, acts, evts) {
+export function initRun(stps, acts, evts, vari) {
   for (const [key, val] of Object.entries(stps)) {
     stps[key].next = false;
   }
@@ -24,6 +24,11 @@ export function initRun(stps, acts, evts) {
   }, acts);
   _actions.set(acts);
   _events.set(evts);
+  if (typeof vari !== 'undefined') {
+    let scr = get(_scriptData);
+    scr.variant = vari;
+    _scriptData.set(scr);
+  }
   _current.set(1);
 };
 

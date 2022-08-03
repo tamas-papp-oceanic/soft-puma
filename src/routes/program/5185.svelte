@@ -10,6 +10,8 @@
   import { initRun, runStep, nextStep, setStoreValue } from "./tests/runner.js"
   import { _steps, _events, _current } from '../../stores/tests.js';
 
+  export let params;
+
   let actions = {
     "start": start,
     "scan-device": scanDevice,
@@ -30,7 +32,7 @@
   let step;
   // On mount event  
   onMount(async () => {
-    initRun(test.steps, actions, events);
+    initRun(test.steps, actions, events, params.variant);
     await runStep();
   });
   // Submit button event
@@ -45,12 +47,18 @@
         for (let i in $_steps[$_current].inputs) {
           let wrp = document.getElementById($_steps[$_current].inputs[i].id);
           if ($_steps[$_current].inputs[i].id == 'serial') {
+            let num = parseInt(wrp.value);
             if (wrp.value.length < 6) {
               $_steps[$_current].inputs[i].error.active = true;
               // Only for reactivity
               $_steps[$_current] = $_steps[$_current];
+            } else if (isNaN(num)) {
+              $_steps[$_current].inputs[i].error.active = true;
+              // Only for reactivity
+              $_steps[$_current] = $_steps[$_current];
             } else {
-              await setStoreValue({ variable: 'serial', value: wrp.value });
+              await setStoreValue({ variable: 'serial', value: num.toString() });
+              window.pumaAPI.send('n2k-serial', [num]);
             }
           }
           if ($_steps[$_current].inputs[i].error.active) {
@@ -82,7 +90,7 @@
 <Grid>
   <Row>
     <Column>
-      <h2>5185 Poseidon 7 - Test Suite</h2>
+      <h2>{'5185 Poseidon 7' + (params.variant != null ? '(' + params.variant + ')' : '') + ' - Test Suite'}</h2>
       <InlineNotification
         hideCloseButton
         kind="info"

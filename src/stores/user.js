@@ -1,5 +1,6 @@
 import { writable, derived } from 'svelte/store';
 
+const authURL = 'http://localhost:8080';
 const user = JSON.parse(localStorage.getItem('userData'));
 const userData = writable(user);
 userData.subscribe((val) =>{
@@ -25,5 +26,5 @@ const loggedIn = writable(logg);
 loggedIn.subscribe((val) =>{
   localStorage.setItem('loggedIn', JSON.stringify(val));
 });
-export { userData, accessToken, refreshToken, loggedIn, permissions }
+export { authURL, userData, accessToken, refreshToken, loggedIn, permissions }
 //TODO save this data to filesystem so that you can work somewhat offline

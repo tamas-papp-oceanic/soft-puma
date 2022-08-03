@@ -225,6 +225,27 @@ class NMEAEngine {
       }
     // }
   };
+  // Send Proprietary Command message
+  // Set Serial Number
+  send065280(serial) {
+    // This PGN should be 061184 (addressable)
+    if (this.#addrMngr.state == 'Valid') {
+      let msg = {
+      key: 'nmea2000/065280/-/161/4/-/-',
+        header: { pgn: 65280, src: this.#addrMngr.address, dst: 0xFF },
+        fields: [
+          { field: 1,title: 'Manufacturer Code', state: 'V', value: this.#addrMngr.name[2] },
+          { field: 2,title: 'NMEA Reserved', state: 'V', value: 0b11 },
+          { field: 3,title: 'Industry Group', state: 'V', value: this.#addrMngr.name[9] },
+          { field: 4,title: 'Security Code', state: 'V', value: 0xBC },
+          { field: 5,title: 'Serial Number', state: 'V', value: serial },
+          { field: 6,title: 'NMEA Reserved', state: 'V', value: 0b111 },
+        ],
+      };
+      return this.sendMsg(msg);
+    }
+    return false;
+  };
   /*
     Processes Proprietary Request / Command message
 

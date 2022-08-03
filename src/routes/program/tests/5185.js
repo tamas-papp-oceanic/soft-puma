@@ -1,6 +1,6 @@
 import { get } from "svelte/store";
 import { userData } from '../../../stores/user.js';
-import { _scriptData } from "../../../stores/tests.js";
+import { testURL, _scriptData } from "../../../stores/tests.js";
 import { enableNext } from "./runner.js";
 import { findProduct } from "../../../stores/data.js";
 import { afetch } from "../../../auth/auth.js";
@@ -36,7 +36,7 @@ export async function startForm(script) {
   wrp.focus();
   enableNext(true);
 };
-  // Sets device in test mode
+// Sets device in test mode
 export async function startTests(script) {
   window.pumaAPI.send('n2k-test', [0x80]);
 };
@@ -53,13 +53,12 @@ async function testResult(e, args) {
   }
   let tmp = get(_scriptData);
   let usr = get(userData);
-  console.log(tmp, usr)
   const [dev, msg] = args;
-  const res = await afetch('http://localhost:8080/test', {
+  const res = await afetch(testURL + '/test', {
     method: 'POST',
     body: JSON.stringify({
       user: parseInt(usr.user_id),
-      product: tmp.product.manufacturer == 257 ? tmp.product.modelVersion + '-H' : tmp.product.modelVersion,
+      product: tmp.variant && tmp.variant == 'Honda' ? tmp.product.modelVersion + '-H' : tmp.product.modelVersion,
       serial: tmp.serial,
       test: msg.fields[4].value,
       result: msg.fields[5].value,
@@ -104,8 +103,8 @@ export async function waitUpdate(script) {
 };
 // Logs test results
 export async function logResult(script) {
-  let tmp = get(_scriptData);
-  console.log(tmp)
+  // let tmp = get(_scriptData);
+  // console.log(tmp)
 };
 // Stops processing
 export async function stop(script) {
