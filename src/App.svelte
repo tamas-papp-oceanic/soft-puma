@@ -44,7 +44,7 @@
 		}),
 		"/simulate": Simulate,
 		"/program": Program,
-		"/program/5185": Program5185,
+		"/program/5185/:variant?": Program5185,
 		"/Welcome": wrap({
 			component: Welcome,
 			conditions: [(detail) =>{

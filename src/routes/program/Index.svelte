@@ -25,12 +25,19 @@
         <TabContent>Not available yet</TabContent>
         <TabContent>Not available yet</TabContent>
         <TabContent>
-          <Grid>
-            <Row>
+          <Grid padding fullWidth noGutter>
+              <Row>
               <Column sm={4} md={3} lg={4} aspectRatio="1x1">
                 <div class="product-card" class:selected={dev == '5185'} on:pointerdown={(e) => { $selected.device = '5185'; push('/program/5185'); }}>
                   <div class="product-number">5185</div>
                   <div class="product-title">Poseidon 7</div>
+                  <div class="product-image"><img src="images/P7.webp" alt="P7" /></div>
+                </div>
+              </Column>
+              <Column sm={4} md={3} lg={4} aspectRatio="1x1">
+                <div class="product-card" class:selected={dev == '5185-H'} on:pointerdown={(e) => { $selected.device = '5185-H'; push('/program/5185/Honda'); }}>
+                  <div class="product-number">5185</div>
+                  <div class="product-title">Poseidon 7 (Honda)</div>
                   <div class="product-image"><img src="images/P7.webp" alt="P7" /></div>
                 </div>
               </Column>

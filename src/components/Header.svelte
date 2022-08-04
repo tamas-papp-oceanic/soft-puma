@@ -3,7 +3,9 @@
   import { Header, HeaderNav, HeaderNavItem, HeaderUtilities, HeaderGlobalAction,
     ComposedModal, ModalHeader, ModalFooter } from "carbon-components-svelte";
   import Login20 from "carbon-icons-svelte/lib/Login20";
+  import Logout20 from "carbon-icons-svelte/lib/Logout20";
   import Close20 from "carbon-icons-svelte/lib/Close20";
+  import { loggedIn } from '../stores/user.js';
   
   export let company;
   export let product;
@@ -16,6 +18,11 @@
   let re = /(\/[A-z]+)/;
   
   function login(e) {
+    push("/login");
+  };
+
+  function logout(e) {
+    $loggedIn = false;
     push("/login");
   };
 
@@ -45,7 +52,11 @@
       <HeaderNavItem class="{routeParsed === '/program' ? 'active' : ''}"disabled on:click={() => push('/program')} text="Program" />
     </HeaderNav>
     <HeaderUtilities>
-      <HeaderGlobalAction on:click={(e) => login(e)} aria-label="Login" icon={Login20} text="Login" />
+      {#if !$loggedIn}
+        <HeaderGlobalAction on:click={(e) => login(e)} aria-label="Login" icon={Login20} text="Login" />
+      {:else}
+        <HeaderGlobalAction on:click={(e) => logout(e)} aria-label="Logout" icon={Logout20} text="Logout" />
+      {/if}
       <HeaderGlobalAction on:click={(e) => show(e)} id="close-btn" aria-label="Exit" icon={Close20} />
     </HeaderUtilities>
   </Header>

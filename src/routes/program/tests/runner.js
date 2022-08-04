@@ -11,19 +11,32 @@
   the results at the end of the test.
  */
 import { get } from 'svelte/store';
-import { _scriptData, _steps, _actions, _events, _current } from '../../../stores/tests.js';
+import { testURL, _scriptData, _steps, _actions, _events, _current } from '../../../stores/tests.js';
+import { userData } from '../../../stores/user.js';
+import { afetch } from '../../../auth/auth.js';
 
-export function initRun(stps, acts, evts) {
+export function initRun(stps, acts, evts, vari) {
   for (const [key, val] of Object.entries(stps)) {
     stps[key].next = false;
+    if (typeof val.testCode !== 'undefined') {
+      for (let i in stps[key].scripts) {
+        stps[key].scripts[i].testCode = val.testCode;
+      }
+    }
   }
   _steps.set(stps);
   acts = Object.assign({
     'set-var': setStoreValue,
     'get-var': getStoreValue,
+    'add-log': addToLog,
   }, acts);
   _actions.set(acts);
   _events.set(evts);
+  if (typeof vari !== 'undefined') {
+    let scr = get(_scriptData);
+    scr.variant = vari;
+    _scriptData.set(scr);
+  }
   _current.set(1);
 };
 
@@ -102,6 +115,23 @@ export function enableNext(val) {
 
 // createWarning(title, text, failure=false) {};
 
-// addToLog(entry) {};
+export async function addToLog(script) {
+  let tmp = get(_scriptData);
+  let usr = get(userData);
+  const res = await afetch(testURL + '/test', {
+    method: 'POST',
+    body: JSON.stringify({
+      user: parseInt(usr.user_id),
+      product: tmp.variant && tmp.variant == 'Honda' ? tmp.product.modelVersion + '-H' : tmp.product.modelVersion,
+      serial: tmp.serial,
+      test: script.testCode,
+      result: script.testValue,
+    }),
+  });
+  const json = await res.json();
+  if (res.status != 200) {
+    console.log("Logging test failed");
+  }
+};
 
 // submitResult() {};
