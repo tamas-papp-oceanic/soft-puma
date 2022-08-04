@@ -50,6 +50,7 @@
       } else if (typeof cur.inputs !== 'undefined') {
         for (let i in cur.inputs) {
           let wrp = document.getElementById(cur.inputs[i].id);
+          cur.inputs[i].error.active = false;
           if (cur.inputs[i].id == 'serial') {
             let num = parseInt(wrp.value);
             if (wrp.value.length < 6) {
