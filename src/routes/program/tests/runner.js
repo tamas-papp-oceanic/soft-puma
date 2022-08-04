@@ -113,7 +113,6 @@ export function enableNext(val) {
   }
 };
 
-// createWarning(title, text, failure=false) {};
 
 export async function addToLog(script) {
   let tmp = get(_scriptData);
@@ -122,7 +121,7 @@ export async function addToLog(script) {
     method: 'POST',
     body: JSON.stringify({
       user: parseInt(usr.user_id),
-      product: tmp.variant && tmp.variant == 'Honda' ? tmp.product.modelVersion + '-H' : tmp.product.modelVersion,
+      product: tmp.product.modelVersion + (tmp.variant ? '-' + tmp.variant : ''),
       serial: tmp.serial,
       test: script.testCode,
       result: script.testValue,
@@ -134,4 +133,5 @@ export async function addToLog(script) {
   }
 };
 
+// createWarning(title, text, failure=false) {};
 // submitResult() {};

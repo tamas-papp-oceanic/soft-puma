@@ -90,9 +90,6 @@
         "2": {
           "action": "wait-test",
           "timeout": 180000
-        },
-        "3": {
-          "action": "stop-tests"
         }
       },
       "onSuccess": { "action": "add-log", "testCode": 3, "testValue": 1 }
@@ -104,9 +101,12 @@
       "buttons": [ "Pass", "Fail" ],
       "scripts": {
         "1": {
-          "action": "start-update"
+          "action": "stop-tests"
         },
         "2": {
+          "action": "start-update"
+        },
+        "3": {
           "action": "wait-update"
         }
       },

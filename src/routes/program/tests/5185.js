@@ -1,10 +1,6 @@
-// import { get } from "svelte/store";
-// import { testURL, _scriptData } from "../../../stores/tests.js";
 import { runScript, enableNext } from "./runner.js";
 import { findProduct } from "../../../stores/data.js";
-// import { afetch } from "../../../auth/auth.js";
 
-// let succ = null;
 let timer = null;
 
 async function sleep(ms) {
@@ -43,33 +39,6 @@ export async function startTests(script) {
 export async function startTest(script) {
   window.pumaAPI.send('n2k-test', [script.testCode, script.testParam]);
 };
-// Test result processing
-// async function testResult(e, args) {
-//   if (timer != null) {
-//     clearTimeout(timer);
-//     timer = null
-//   }
-//   // let tmp = get(_scriptData);
-//   // let usr = get(userData);
-//   // const [dev, msg] = args;
-//   // const res = await afetch(testURL + '/test', {
-//   //   method: 'POST',
-//   //   body: JSON.stringify({
-//   //     user: parseInt(usr.user_id),
-//   //     product: tmp.variant && tmp.variant == 'Honda' ? tmp.product.modelVersion + '-H' : tmp.product.modelVersion,
-//   //     serial: tmp.serial,
-//   //     test: msg.fields[4].value,
-//   //     result: msg.fields[5].value,
-//   //   }),
-//   // });
-//   // const json = await res.json();
-//   // if (res.status != 200) {
-//   //   console.log("Logging test failed");
-//   // }
-//   enableNext(true);
-//   // Remove listener
-//   window.pumaAPI.reml('n2k-test');
-// }
 // Waits for device's test to finish
 export async function waitTest(script) {
   if (typeof script.timeout !== 'undefined') {
@@ -78,7 +47,6 @@ export async function waitTest(script) {
       timer = null;
       // Remove listener
       window.pumaAPI.reml('n2k-test');
-      enableNext(true);
     }, script.timeout);
   }
   // Receives device's test result
@@ -107,12 +75,3 @@ export async function waitUpdate(script) {
     enableNext(true);
   });
 };
-// Logs test results
-// export async function logResult(script) {
-//   // let tmp = get(_scriptData);
-//   // console.log(tmp)
-// };
-// Stops processing
-// export async function stop(script) {
-//   enableNext(true);
-// };

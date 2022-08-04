@@ -80,15 +80,18 @@
       "onSuccess": { "action": "add-log", "testCode": 2, "testValue": 1 }
     },
     "6": {
-      "blurb": "7. Insert update USB.",
+      "blurb": "6. Insert update USB.",
       "testCode": 4,
       "last": true,
       "buttons": [ "Pass", "Fail" ],
       "scripts": {
         "1": {
-          "action": "start-update"
+          "action": "stop-tests"
         },
         "2": {
+          "action": "start-update"
+        },
+        "3": {
           "action": "wait-update"
         }
       },
