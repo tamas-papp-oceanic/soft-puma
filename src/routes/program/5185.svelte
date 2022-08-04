@@ -3,11 +3,11 @@
   import { Row, Grid, Column, InlineNotification } from "carbon-components-svelte";
 	import { pop } from 'svelte-spa-router'
   import TestContainer from './partials/TestContainer.svelte';
-  import test from './tests/5185.json';
+  import testG from './tests/5185G.json';
+  import testH from './tests/5185H.json';
   import { start, scanDevice, waitDevice, startForm, startTests,
-    startTest, waitTest, stopTests, startUpdate,  waitUpdate,
-    logResult, stop } from './tests/5185.js';
-  import { initRun, runStep, nextStep, setStoreValue } from "./tests/runner.js"
+    startTest, waitTest, stopTests, startUpdate,  waitUpdate } from './tests/5185.js';
+  import { initRun, runStep, nextStep, runScript, setStoreValue } from "./tests/runner.js"
   import { _steps, _events, _current } from '../../stores/tests.js';
 
   export let params;
@@ -23,15 +23,18 @@
     "stop-tests": stopTests,
     "start-update": startUpdate,
     "wait-update": waitUpdate,
-    "log-result": logResult,
-    "stop": stop,
   };
-
   let events = {};
-
   let step;
+  let test;
+
   // On mount event  
   onMount(async () => {
+    if ((typeof params.variant !== 'undefined') && (params.variant == 'Honda')) {
+      test = testH;
+    } else {
+      test = testG;
+    }
     initRun(test.steps, actions, events, params.variant);
     await runStep();
   });
@@ -39,29 +42,28 @@
   async function submit(e) {
     let val = false;
     let stp = false;
-    if (typeof $_steps[$_current] !== 'undefined') {
+    let cur = $_steps[$_current];
+    if (typeof cur !== 'undefined') {
       val = true;
-      if (typeof $_steps[$_current].last !== 'undefined') {
+      if (typeof cur.last !== 'undefined') {
         stp = true;
-      } else if (typeof $_steps[$_current].inputs !== 'undefined') {
-        for (let i in $_steps[$_current].inputs) {
-          let wrp = document.getElementById($_steps[$_current].inputs[i].id);
-          if ($_steps[$_current].inputs[i].id == 'serial') {
+      } else if (typeof cur.inputs !== 'undefined') {
+        for (let i in cur.inputs) {
+          let wrp = document.getElementById(cur.inputs[i].id);
+          if (cur.inputs[i].id == 'serial') {
             let num = parseInt(wrp.value);
             if (wrp.value.length < 6) {
-              $_steps[$_current].inputs[i].error.active = true;
-              // Only for reactivity
-              $_steps[$_current] = $_steps[$_current];
+              cur.inputs[i].error.active = true;
+              $_steps[$_current] = cur;
             } else if (isNaN(num)) {
-              $_steps[$_current].inputs[i].error.active = true;
-              // Only for reactivity
-              $_steps[$_current] = $_steps[$_current];
+              cur.inputs[i].error.active = true;
+              $_steps[$_current] = cur;
             } else {
               await setStoreValue({ variable: 'serial', value: num.toString() });
               window.pumaAPI.send('n2k-serial', [num]);
             }
           }
-          if ($_steps[$_current].inputs[i].error.active) {
+          if (cur.inputs[i].error.active) {
             wrp.focus();
             val = false;
           }
@@ -69,6 +71,10 @@
       }
     }
     if (val) {
+      let suc = $_steps[$_current].onSuccess;
+      if (typeof suc !== 'undefined') {
+        runScript(suc);
+      }
       if (stp) {
         pop();
       } else {
@@ -79,8 +85,14 @@
   };
   // Cancel button event
   function cancel(e) {
+    let cur = $_steps[$_current];
+    if (typeof cur !== 'undefined') {
+      if (typeof cur.testCode !== 'undefined') {
+        let scr = { "action": "add-log", "testCode": cur.testCode, "testValue": 0 }
+        runScript(scr);
+      }
+    }
     stopTests();
-    logResult();
     pop();
   };
   // Data getters

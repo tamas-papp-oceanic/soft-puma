@@ -1,6 +1,6 @@
 <script>
   import { createEventDispatcher } from "svelte";
-  import { ButtonSet, Button, Tile, Form, TextInput, ImageLoader,
+  import { ButtonSet, Button, Tile, TextInput, ImageLoader,
     InlineLoading, InlineNotification } from "carbon-components-svelte";
 
   export let step;

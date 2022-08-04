@@ -1,0 +1,116 @@
+{
+  "steps": {
+    "1": {
+      "blurb": "1. Connect the device to the NMEA network and power before continuing.",
+      "variables": {
+        "product": null,
+        "serial": null
+      },
+      "buttons": [ "Next", "Cancel" ],
+      "scripts": {
+        "1": {
+          "action": "start"
+        }
+      }
+    },
+    "2": {
+      "blurb": "2. Waiting for P7 to load.",
+      "buttons": [ "Next", "Fail" ],
+      "scripts": {
+        "1": {
+          "action": "scan-device"
+        },
+        "2": {
+          "action": "wait-device",
+          "product-code": 9075,
+          "timeout": 3000
+        }
+      }
+    },
+    "3": {
+      "blurb": "3. Scan S/N label and type in the box below.",
+      "inputs" : [{
+        "type": "TextInput",
+        "id": "serial",
+        "label": "Serial number",
+        "placeholder": "Enter serial number...",
+        "error": {
+          "title": "Error",
+          "subtitle": "Serial number should be at least 6 characters long integer.",
+          "active": false
+        }
+        }],
+      "image": "/images/ean.gif",
+      "buttons": [ "Next", "Cancel" ],
+      "scripts": {
+        "1": {
+          "action": "start-form"
+        }
+      }
+    },
+    "4": {
+      "blurb": "4. Touch screen test. Press all of the crosses on the screen.",
+      "testCode": 1,
+      "buttons": [ "Next", "Fail" ],
+      "scripts": {
+        "1": {
+          "action": "start-tests"
+        },
+        "2": {
+          "action": "start-test"
+        },
+        "3": {
+          "action": "wait-test"
+        }
+      },
+      "onSuccess": { "action": "add-log", "testCode": 1, "testValue": 1 }
+    },
+    "5": {
+      "blurb": "5. Brightness test. Check full range of brightness.",
+      "testCode": 2,
+      "buttons": [ "Next", "Fail" ],
+      "scripts": {
+        "1": {
+          "action": "start-test"
+        },
+        "2": {
+          "action": "wait-test"
+        }
+      },
+      "onSuccess": { "action": "add-log", "testCode": 2, "testValue": 1 }
+    },
+    "6": {
+      "blurb": "6. GPS test. Attach GPS antenna.",
+      "testCode": 3,
+      "buttons": [ "Next", "Fail" ],
+      "scripts": {
+        "1": {
+          "action": "start-test"
+        },
+        "2": {
+          "action": "wait-test",
+          "timeout": 180000
+        },
+        "3": {
+          "action": "stop-tests"
+        }
+      },
+      "onSuccess": { "action": "add-log", "testCode": 3, "testValue": 1 }
+    },
+    "7": {
+      "blurb": "7. Insert update USB.",
+      "testCode": 4,
+      "last": true,
+      "buttons": [ "Pass", "Fail" ],
+      "scripts": {
+        "1": {
+          "action": "start-update"
+        },
+        "2": {
+          "action": "wait-update"
+        }
+      },
+      "onSuccess": { "action": "add-log", "testCode": 4, "testValue": 1 }
+    }
+  }
+}

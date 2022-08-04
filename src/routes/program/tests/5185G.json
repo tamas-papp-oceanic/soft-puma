@@ -4,8 +4,7 @@
       "blurb": "1. Connect the device to the NMEA network and power before continuing.",
       "variables": {
         "product": null,
-        "serial": null,
-        "updated": false
+        "serial": null
       },
       "buttons": [ "Next", "Cancel" ],
       "scripts": {
@@ -51,72 +50,49 @@
     },
     "4": {
       "blurb": "4. Touch screen test. Press all of the crosses on the screen.",
+      "testCode": 1,
       "buttons": [ "Next", "Fail" ],
       "scripts": {
         "1": {
           "action": "start-tests"
         },
         "2": {
-          "action": "start-test",
-          "testCode": 1
+          "action": "start-test"
         },
         "3": {
           "action": "wait-test"
         }
-      }
+      },
+      "onSuccess": { "action": "add-log", "testCode": 1, "testValue": 1 }
     },
     "5": {
       "blurb": "5. Brightness test. Check full range of brightness.",
+      "testCode": 2,
       "buttons": [ "Next", "Fail" ],
       "scripts": {
         "1": {
-          "action": "start-test",
-          "testCode": 2
+          "action": "start-test"
         },
         "2": {
           "action": "wait-test"
         }
-      }
+      },
+      "onSuccess": { "action": "add-log", "testCode": 2, "testValue": 1 }
     },
     "6": {
-      "blurb": "6. GPS test. Attach GPS antenna.",
-      "buttons": [ "Next", "Fail" ],
-      "scripts": {
-        "1": {
-          "action": "start-test",
-          "testCode": 3
-        },
-        "2": {
-          "action": "wait-test",
-          "timeout": 180000
-        }
-      }
-    },
-    "7": {
       "blurb": "7. Insert update USB.",
-      "buttons": [ "Next", "Fail" ],
+      "testCode": 4,
+      "last": true,
+      "buttons": [ "Pass", "Fail" ],
       "scripts": {
         "1": {
-          "action": "stop-tests"
-        },
-        "2": {
           "action": "start-update"
         },
-        "3": {
-          "action": "wait-update",
-          "onSuccess": { "action": "set-var", "variable": "updated", "value": true }
+        "2": {
+          "action": "wait-update"
         }
-      }
-    },
-    "8": {
-      "blurb": "TESTING DONE",
-      "last": true,
-      "buttons": [ "Ok" ],
-      "scripts": {
-        "1": {
-          "action": "log-result"
-        }
-      }
+      },
+      "onSuccess": { "action": "add-log", "testCode": 4, "testValue": 1 }
     }
   }
 }
