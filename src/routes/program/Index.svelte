@@ -38,7 +38,7 @@
                 <div class="product-card" class:selected={dev == '5185-H'} on:pointerdown={(e) => { $selected.device = '5185-H'; push('/program/5185/Honda'); }}>
                   <div class="product-number">5185</div>
                   <div class="product-title">Poseidon 7 (Honda)</div>
-                  <div class="product-image"><img src="images/P7.webp" alt="P7" /></div>
+                  <div class="product-image"><img src="images/P7-Honda.webp" alt="P7-H" /></div>
                 </div>
               </Column>
               <Column sm={4} md={3} lg={4}>
