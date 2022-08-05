@@ -300,7 +300,7 @@ function decodeFastPacket(frm) {
     let seq = frm.data.readUInt8(0) >> 5;
     let cnt = frm.data.readUInt8(0) & 0x1F;
     let min = 0;
-    let key = frm.id.toString(16).padStart(8, '0');
+    let key = frm.id.toString(16).padStart(8, '0') + '/' + seq.toString(16).padStart(2, '0');
     if (typeof fastbuff[key] === 'undefined') {
       let len = frm.data.readUInt8(1);
       fap = {
@@ -329,7 +329,7 @@ function decodeFastPacket(frm) {
     } else {
       fap = fastbuff[key];
       min = Math.min(7, (fap.length - fap.index));
-      if (!fap.corrupted &&  (seq != fap.sequence)) {
+      if (!fap.corrupted && (seq != fap.sequence)) {
         fap.corrupted = true;
       }
       if (!fap.corrupted) {
