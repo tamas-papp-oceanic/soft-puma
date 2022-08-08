@@ -12,7 +12,6 @@
   export let product;
   export let version;
   
-  // let isSideNavOpen = false;
   let open = false;
   let platform = product + " v" + version;
   let routeParsed;
@@ -74,6 +73,7 @@
 <style global>
   .bx--header {
     -webkit-user-select: none;
+    user-select: none;
     -webkit-app-region: drag;
   }
 

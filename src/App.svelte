@@ -74,7 +74,7 @@
 	<Router {routes} restoreScrollState={true} />
 </main>
 
-<style lang="scss" global>
+<style global>
 	@import "~carbon-components-svelte/css/g100.css";
 	.content {
 		margin-top: 10vh;

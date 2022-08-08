@@ -1,4 +1,5 @@
 <script>
- export let params;
+  export let params;
 </script>
+
 Address is {params.address}

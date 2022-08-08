@@ -1,7 +1,6 @@
 <script>
   import { Grid, Row, Column } from "carbon-components-svelte";
   import { userData } from '../stores/user.js';
-  import {location, push, pop, replace, link} from 'svelte-spa-router'
 </script>
 
 <Grid>

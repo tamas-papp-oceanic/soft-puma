@@ -1,31 +1,16 @@
 <script>
-  import {
-    Grid,
-    Row,
-    Column
-  } from "carbon-components-svelte";
-  import {
-    Form,
-    TextInput,
-    PasswordInput,
-    Button,
-  } from "carbon-components-svelte";
-  import {
-    userData,
-    accessToken,
-    refreshToken,
-    loggedIn
-  } from '../stores/user.js';
-  import {
-    login
-  } from '../auth/auth.js'
-  import {location, push, pop, replace, link} from 'svelte-spa-router'
-  let isSideNavOpen = false;
+  import { Grid, Row, Column, Form, TextInput,
+    PasswordInput, Button } from "carbon-components-svelte";
+  import { login } from '../auth/auth.js'
+  import {push } from 'svelte-spa-router'
+
+  export let redirect = "/welcome"
+
   let username = '';
   let password = '';
   let error = false;
-  export let redirect = "/welcome"
-  async function doLogin() {
+
+  async function _login() {
     const res = await login(username,password)
     if (res != true) {
       console.log("Login failed")
@@ -36,11 +21,6 @@
   }
 </script>
 
-<style>
-  .error {
-    color: red;
-  }
-</style>
 <Grid>
   <Row>
     <Column sm={0} md={2} lg={4} />
@@ -51,7 +31,7 @@
       <Form>
         <TextInput bind:value={username} labelText="User name" placeholder="Enter user name..." required />
         <PasswordInput bind:value={password} required type="password" labelText="Password" placeholder="Enter password..." />
-        <Button on:click={doLogin} type="submit">Submit</Button>
+        <Button on:click={(e) => _login(e)} type="submit">Submit</Button>
       </Form>
     </Column>
     <Column sm={0} md={2} lg={4} />
@@ -59,7 +39,13 @@
   <hr>
   <Row>
   {#if error}
-  <Column sm={4} md={4} lg={8}><span class="error">Login failed, please try again.</span></Column>
+    <Column sm={4} md={4} lg={8}><span class="error">Login failed, please try again.</span></Column>
   {/if}
-</Row>
+  </Row>
 </Grid>
+
+<style>
+  .error {
+    color: red;
+  }
+</style>

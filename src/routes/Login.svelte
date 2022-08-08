@@ -10,7 +10,7 @@
   let error = false;
   let errtext = '';
 
-  async function submit() {
+  async function _submit() {
     if ((username == null) | (username.length == 0)) {
       errtext = 'User name can\'t be empty.'
       error = true;
@@ -31,11 +31,6 @@
   }
 </script>
 
-<style>
-  .error {
-    color: red;
-  }
-</style>
 <Grid>
   <Row>
     <Column sm={0} md={2} lg={4} />
@@ -46,7 +41,7 @@
       <Form>
         <TextInput bind:value={username} labelText="User name" placeholder="Enter user name..." required />
         <PasswordInput bind:value={password} type="password" labelText="Password" placeholder="Enter password..." required />
-        <Button on:click={submit} type="submit">Submit</Button>
+        <Button on:click={(e) => _submit(e)} type="submit">Submit</Button>
       </Form>
     </Column>
     <Column sm={0} md={2} lg={4} />
@@ -58,3 +53,9 @@
   {/if}
 </Row>
 </Grid>
+
+<style>
+  .error {
+    color: red;
+  }
+</style>
