@@ -48,8 +48,8 @@ async function login(username, password) {
       password
     })
   });
-  const json = await res.json();
   if (res.status == 200) {
+    const json = await res.json();
     console.log("Login Success");
     accessToken.set(json.access_token);
     refreshToken.set(json.refresh_token);
@@ -86,18 +86,22 @@ async function afetch(url, options) {
     options["credentials"] = "include"
     options["headers"] = {'Authorization': bearer, "Content-Type":"application/json" }
   }
-  const res = await fetch(url, options);
-  if (get(loggedIn) && (res.status == 401)) {
-    // refreshLogin will set LoggedIn to false if it fails, so we only do one loop
-    console.log("Suspect access expired. Try to refresh")
-    let rfl = await refreshLogin();
-    if(rfl == true){
-      // success refresh
-      const res2 = await afetch(url, options);
-      return res2
+  try {
+    const res = await fetch(url, options);
+    if (get(loggedIn) && (res.status == 401)) {
+      // refreshLogin will set LoggedIn to false if it fails, so we only do one loop
+      console.log("Suspect access expired. Try to refresh")
+      let rfl = await refreshLogin();
+      if(rfl == true){
+        // success refresh
+        const res2 = await afetch(url, options);
+        return res2
+      }
     }
+    return res
+  } catch (err) {
+    return {status: 500};
   }
-  return res
 }
 // route refers to a API route
 // type = read write or delete

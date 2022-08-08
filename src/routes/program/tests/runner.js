@@ -127,8 +127,9 @@ export async function addToLog(script) {
       result: script.testValue,
     }),
   });
-  const json = await res.json();
-  if (res.status != 200) {
+  if (res.status == 200) {
+    const json = await res.json();
+  } else {
     console.log("Logging test failed");
   }
 };
