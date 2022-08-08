@@ -11,33 +11,35 @@ async function refreshLogin() {
       'refresh_token': token,
     }),
   });
-  const json = await res.json();
-  if (res.status != 201) {
-    loggedIn.set(false);
-    console.log("Refresh failed");
-    return false;
-  } else {
-    console.log("Refresh Success");
+  if (res.status == 201) {
+    const json = await res.json();
     accessToken.set(json.access_token);
     refreshToken.set(json.refresh_token);
     loggedIn.set(true);
     let dec = jwt_decode(json.access_token);
     userData.set(dec);
+    console.log("Refresh Success");
     return true;
+  } else {
+    loggedIn.set(false);
+    console.log("Refresh failed");
+    return false;
   }
 }
 
 async function getPerms() {
-  let res = await afetch(authURL + '/roles', {method: 'GET'})
-  let perms = await res.json()
-  let permsObject= {};
-  for(let i = 0; i < perms.length; i++){
-    if(typeof permsObject[perms[i][1]] === 'undefined') {
-      permsObject[perms[i][1]] = {}
+  let res = await afetch(authURL + '/roles', {method: 'GET'});
+  if (res.status == 200) {
+    let perms = await res.json();
+    let permsObject= {};
+    for (let i = 0; i < perms.length; i++) {
+      if(typeof permsObject[perms[i][1]] === 'undefined') {
+        permsObject[perms[i][1]] = {};
+      }
+      permsObject[perms[i][1]][perms[i][2]] = true;
     }
-    permsObject[perms[i][1]][perms[i][2]] = true
+    permissions.set(permsObject);
   }
-  permissions.set(permsObject)
 }
 
 async function login(username, password) {
@@ -50,13 +52,13 @@ async function login(username, password) {
   });
   if (res.status == 200) {
     const json = await res.json();
-    console.log("Login Success");
     accessToken.set(json.access_token);
     refreshToken.set(json.refresh_token);
     loggedIn.set(true);
     let dec = jwt_decode(json.access_token);
     userData.set(dec);
     await getPerms();
+    console.log("Login Success");
     return true;
   }
   console.log("Login failed");
@@ -66,11 +68,11 @@ async function login(username, password) {
 async function logout() {
   let res = await afetch(authURL + '/logout', {method: 'POST'})
   if (res.status == 200) {
-    console.log("Logout Success");
     userData.set({});
     accessToken.set("");
     refreshToken.set("");
     loggedIn.set(false);
+    console.log("Logout Success");
     return true;
   }
   console.log("Logout failed");
