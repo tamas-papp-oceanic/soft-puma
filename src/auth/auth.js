@@ -48,32 +48,33 @@ async function login(username, password) {
       password
     })
   });
-  const json = await res.json()
-  if (res.status != 200) {
-    console.log("Login failed")
-    return false
-  } else {
-    console.log("Login Success")
-    accessToken.set(json.access_token)
-    refreshToken.set(json.refresh_token)
-    loggedIn.set(true)
-    let dec = jwt_decode(json.access_token)
-
-console.log(dec)
-
-
-    userData.set(dec)
-    await getPerms()
-    return true
+  const json = await res.json();
+  if (res.status == 200) {
+    console.log("Login Success");
+    accessToken.set(json.access_token);
+    refreshToken.set(json.refresh_token);
+    loggedIn.set(true);
+    let dec = jwt_decode(json.access_token);
+    userData.set(dec);
+    await getPerms();
+    return true;
   }
+  console.log("Login failed");
+  return false;
 }
 
 async function logout() {
   let res = await afetch(authURL + '/logout', {method: 'POST'})
-  userData.set({})
-  accessToken.set("")
-  refreshToken.set("")
-  loggedIn.set(false)
+  if (res.status == 200) {
+    console.log("Logout Success");
+    userData.set({});
+    accessToken.set("");
+    refreshToken.set("");
+    loggedIn.set(false);
+    return true;
+  }
+  console.log("Logout failed");
+  return false;
 }
 
 async function afetch(url, options) {

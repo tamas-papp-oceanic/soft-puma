@@ -24,8 +24,8 @@
 		"/": Devices,
 		"/login": wrap({
 			component: Login,
-			conditions: [(detail) =>{
-				if($loggedIn == true) {
+			conditions: [() =>{
+				if ($loggedIn == true) {
 					push("/welcome")
 				} else {
 					return true
@@ -34,8 +34,8 @@
 		}),
 		"/logout": wrap({
 			component: Logout,
-			conditions: [(detail) =>{
-				if($loggedIn == false) {
+			conditions: [() =>{
+				if ($loggedIn == false) {
 					push("/login")
 				} else {
 					return true
@@ -47,8 +47,8 @@
 		"/program/5185/:variant?": Program5185,
 		"/Welcome": wrap({
 			component: Welcome,
-			conditions: [(detail) =>{
-				if($loggedIn == true) {
+			conditions: [() =>{
+				if ($loggedIn == true) {
 					return true
 				} else {
 					push("/login")

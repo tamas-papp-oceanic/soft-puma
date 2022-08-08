@@ -2,41 +2,43 @@
   import { location, push } from 'svelte-spa-router'
   import { Header, HeaderNav, HeaderNavItem, HeaderUtilities, HeaderGlobalAction,
     ComposedModal, ModalHeader, ModalFooter } from "carbon-components-svelte";
+  import { logout } from '../auth/auth.js'
+  import { loggedIn } from '../stores/user.js';
   import Login20 from "carbon-icons-svelte/lib/Login20";
   import Logout20 from "carbon-icons-svelte/lib/Logout20";
   import Close20 from "carbon-icons-svelte/lib/Close20";
-  import { loggedIn } from '../stores/user.js';
   
   export let company;
   export let product;
   export let version;
   
-  let isSideNavOpen = false;
+  // let isSideNavOpen = false;
   let open = false;
   let platform = product + " v" + version;
   let routeParsed;
   let re = /(\/[A-z]+)/;
   
-  function login(e) {
+  function _login(e) {
     push("/login");
   };
 
-  function logout(e) {
-    $loggedIn = false;
-    push("/login");
+  async function _logout(e) {
+    let res = await logout();
+    if (res == true) {
+      push("/logout");
+    }
   };
 
-  function close(e) {
+  function _close(e) {
     open = false;
-    // window.close();
     window.pumaAPI.send('app-quit');
   };  
 
-  function show(e) {
+  function _show(e) {
     open = true;
   };  
 
-  function cancel(e) {
+  function _cancel(e) {
     open = false;
   };  
   
@@ -53,19 +55,19 @@
     </HeaderNav>
     <HeaderUtilities>
       {#if !$loggedIn}
-        <HeaderGlobalAction on:click={(e) => login(e)} aria-label="Login" icon={Login20} text="Login" />
+        <HeaderGlobalAction on:click={(e) => _login(e)} aria-label="Login" icon={Login20} text="Login" />
       {:else}
-        <HeaderGlobalAction on:click={(e) => logout(e)} aria-label="Logout" icon={Logout20} text="Logout" />
+        <HeaderGlobalAction on:click={(e) => _logout(e)} aria-label="Logout" icon={Logout20} text="Logout" />
       {/if}
-      <HeaderGlobalAction on:click={(e) => show(e)} id="close-btn" aria-label="Exit" icon={Close20} />
+      <HeaderGlobalAction on:click={(e) => _show(e)} id="close-btn" aria-label="Exit" icon={Close20} />
     </HeaderUtilities>
   </Header>
-  <ComposedModal bind:open on:submit={(e) => close(e)} size="xs">
+  <ComposedModal bind:open on:submit={(e) => _close(e)} size="xs">
     <ModalHeader title="Confirm exit" />
     <ModalFooter
       primaryButtonText="Proceed"
       secondaryButtons={[{ text: "Cancel" }]}
-      on:click:button--secondary={(e) => cancel(e)}
+      on:click:button--secondary={(e) => _cancel(e)}
     />
   </ComposedModal></div>
 
