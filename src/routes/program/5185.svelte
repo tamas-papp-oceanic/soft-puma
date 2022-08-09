@@ -5,15 +5,15 @@
   import TestContainer from './partials/TestContainer.svelte';
   import testG from './tests/5185G.json';
   import testH from './tests/5185H.json';
-  import { start, scanDevice, waitDevice, startForm, startTests,
-    startTest, waitTest, stopTests, startUpdate,  waitUpdate } from './tests/5185.js';
+  import { next, scanDevice, waitDevice, startForm, startTests,
+    startTest, waitTest, stopTests, startUpdate } from './tests/5185.js';
   import { initRun, runStep, nextStep, runScript, setStoreValue } from "./tests/runner.js"
   import { _steps, _events, _current } from '../../stores/tests.js';
 
   export let params;
 
   let actions = {
-    "start": start,
+    "next": next,
     "scan-device": scanDevice,
     "wait-device": waitDevice,
     "start-form": startForm,
@@ -22,7 +22,6 @@
     "wait-test": waitTest,
     "stop-tests": stopTests,
     "start-update": startUpdate,
-    "wait-update": waitUpdate,
   };
   let events = {};
   let step;

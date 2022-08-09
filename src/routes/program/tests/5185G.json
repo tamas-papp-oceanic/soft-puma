@@ -9,7 +9,7 @@
       "buttons": [ "Next", "Cancel" ],
       "scripts": {
         "1": {
-          "action": "start"
+          "action": "next"
         }
       }
     },
@@ -82,7 +82,6 @@
     "6": {
       "blurb": "6. Insert update USB.",
       "testCode": 4,
-      "last": true,
       "buttons": [ "Pass", "Fail" ],
       "scripts": {
         "1": {
@@ -90,12 +89,21 @@
         },
         "2": {
           "action": "start-update"
-        },
-        "3": {
-          "action": "wait-update"
         }
       },
       "onSuccess": { "action": "add-log", "testCode": 4, "testValue": 1 }
+    },
+    "7": {
+      "blurb": "7. Printing product label.",
+      "testCode": 5,
+      "last": true,
+      "buttons": [ "Print" ],
+      "scripts": {
+        "1": {
+          "action": "next"
+        }
+      },
+      "onSuccess": { "action": "print-label" }
     }
   }
 }

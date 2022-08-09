@@ -206,16 +206,6 @@ ipcMain.on('n2k-test', (e, args) => {
     val.engine.send065477(code, param);
   }
 });
-ipcMain.on('n2k-update', (e) => {
-  for (const [key, val] of Object.entries(devices)) {
-    // Send device update proprietary PGN
-    // val.engine.send059904(60928, 0xFF);
-  }
-  // *** TEST ***
-  if ((typeof mainWindow !== 'undefined') && (typeof mainWindow.webContents !== 'undefined')) {
-    mainWindow.webContents.send('update-done', [ true ]);
-  }
-});
 // Start device processing
 ipcMain.on('dev-start', (e, ...args) => {
   for (const [key, val] of Object.entries(devices)) {

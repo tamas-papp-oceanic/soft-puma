@@ -6,8 +6,8 @@ let timer = null;
 async function sleep(ms) {
   return new Promise(resolve => setTimeout(resolve, ms));
 }
-// Starts processing
-export async function start(script) {
+// Enable next processing
+export async function next(script) {
   enableNext(true);
 };
 // Starts scan for device
@@ -66,12 +66,5 @@ export async function stopTests() {
 };
 // Starts device update
 export async function startUpdate(script) {
-  window.pumaAPI.send('n2k-update', true);
-};
-// Waits for device update to finish
-export async function waitUpdate(script) {
-  // Receives update result
-  window.pumaAPI.recv('update-done', (e) => {
-    enableNext(true);
-  });
+  enableNext(true);
 };

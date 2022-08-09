@@ -29,6 +29,7 @@ export function initRun(stps, acts, evts, vari) {
     'set-var': setStoreValue,
     'get-var': getStoreValue,
     'add-log': addToLog,
+    'print-label': printLabel,
   }, acts);
   _actions.set(acts);
   _events.set(evts);
@@ -134,5 +135,24 @@ export async function addToLog(script) {
   }
 };
 
+export async function printLabel(script) {
+  // let tmp = get(_scriptData);
+  // let usr = get(userData);
+  // const res = await afetch(testURL + '/test', {
+  //   method: 'POST',
+  //   body: JSON.stringify({
+  //     user: parseInt(usr.user_id),
+  //     product: tmp.product.modelVersion + (tmp.variant ? '-' + tmp.variant : ''),
+  //     serial: tmp.serial,
+  //     test: script.testCode,
+  //     result: script.testValue,
+  //   }),
+  // });
+  // if (res.status == 200) {
+  //   const json = await res.json();
+  // } else {
+  //   console.log("Logging test failed");
+  // }
+};
 // createWarning(title, text, failure=false) {};
 // submitResult() {};
