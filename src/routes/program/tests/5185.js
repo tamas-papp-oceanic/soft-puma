@@ -6,10 +6,6 @@ let timer = null;
 async function sleep(ms) {
   return new Promise(resolve => setTimeout(resolve, ms));
 }
-// Enable next processing
-export async function next(script) {
-  enableNext(true);
-};
 // Starts scan for device
 export async function scanDevice(script) {
   window.pumaAPI.send('n2k-scan');

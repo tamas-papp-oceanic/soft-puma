@@ -26,6 +26,7 @@ export function initRun(stps, acts, evts, vari) {
   }
   _steps.set(stps);
   acts = Object.assign({
+    'next': enableNext,
     'set-var': setStoreValue,
     'get-var': getStoreValue,
     'add-log': addToLog,
@@ -88,6 +89,15 @@ export async function runScript(script) {
   }
 };
 
+export function enableNext(val) {
+  let sts = get(_steps);
+  let cur = get(_current);
+  if ((typeof sts !== 'undefined') && (typeof sts[cur] !== 'undefined')) {
+    sts[cur].next = val;
+    _steps.set(sts);
+  }
+};
+
 export async function getStoreValue(script) {
   if (typeof script.variable === 'string') {
     let dat = get(_scriptData);
@@ -104,16 +114,6 @@ export async function setStoreValue(script) {
     _scriptData.set(dat);
   }
 };
-
-export function enableNext(val) {
-  let sts = get(_steps);
-  let cur = get(_current);
-  if ((typeof sts !== 'undefined') && (typeof sts[cur] !== 'undefined')) {
-    sts[cur].next = val;
-    _steps.set(sts);
-  }
-};
-
 
 export async function addToLog(script) {
   let tmp = get(_scriptData);
