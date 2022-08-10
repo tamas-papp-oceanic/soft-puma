@@ -53,7 +53,7 @@
 
   function scan(e) {
     rows = new Array();
-    window.pumaAPI.send('n2k-scan');
+    window.pumaAPI.send('bus-scan');
   };
 
   function select(e) {

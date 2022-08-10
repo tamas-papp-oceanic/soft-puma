@@ -1,5 +1,6 @@
 // Modules to control application life and create native browser window
 const { app, BrowserWindow, ipcMain } = require('electron');
+const os = require('os');
 const path = require('path');
 const serve = require('electron-serve');
 const loadURL = serve({ directory: 'public' });
@@ -7,6 +8,7 @@ const Can = require('./src/services/can.js');
 const Serial = require('./src/services/serial.js');
 const com = require('./src/services/common.js');
 const NMEAEngine = require('./src/services/nmea.js');
+const barcode = require('barcode');
 
 // Keep a global reference of the window object, if you don't, the window will
 // be closed automatically when the JavaScript object is garbage collected.
@@ -142,7 +144,7 @@ function proc(dev, frm) {
         mainWindow.webContents.send('n2k-prod', [ dev, msg ]);
         break;
       case 65477:
-        mainWindow.webContents.send('n2k-test', [ dev, msg ]);
+        mainWindow.webContents.send('test-data', [ dev, msg ]);
         break;
       default:
         mainWindow.webContents.send('n2k-data', [ dev, msg ]);
@@ -180,31 +182,39 @@ ipcMain.on('n2k-data', (e, ...args) => {
     dev.engine.sendMsg(args[1]);
   }
 });
-ipcMain.on('n2k-scan', (e) => {
+ipcMain.on('bus-scan', (e) => {
   for (const [key, val] of Object.entries(devices)) {
     // Send ISO Request for Address Claim
     val.engine.send059904(60928, 0xFF);
   }
 });
-ipcMain.on('n2k-serial', (e, args) => {
+ipcMain.on('ser-num', (e, args) => {
   const [serial] = args;
   for (const [key, val] of Object.entries(devices)) {
     // Send Proprietary Set serial PGN
     val.engine.send065280(serial);
   }
 });
-ipcMain.on('n2k-start', (e) => {
-  for (const [key, val] of Object.entries(devices)) {
-    // Send start test proprietary PGN
-    val.engine.send065477(0x80);
-  }
-});
-ipcMain.on('n2k-test', (e, args) => {
+ipcMain.on('test-data', (e, args) => {
   const [code, param] = args;
   for (const [key, val] of Object.entries(devices)) {
     // Send Device Test Control proprietary PGN
     val.engine.send065477(code, param);
   }
+});
+ipcMain.on('bar-code', (e, args) => {
+  const [code] = args;
+  let code39 = barcode('code39', {
+    data: code,
+    width: 2175,
+    height: 475,
+  });
+  let out = path.join(os.tmpdir(), 'code39.png');
+  code39.saveImage(out, (err) => {
+  	console.log(err);
+	  if (err) throw err;
+  	console.log('File has been written!');
+  });
 });
 // Start device processing
 ipcMain.on('dev-start', (e, ...args) => {

@@ -5,9 +5,8 @@
   import TestContainer from './partials/TestContainer.svelte';
   import testG from './tests/5185G.json';
   import testH from './tests/5185H.json';
-  import { scanDevice, waitDevice, startForm, startTests,
-    startTest, waitTest, stopTests, startUpdate } from './tests/5185.js';
-  import { initRun, runStep, nextStep, runScript, setStoreValue } from "./tests/runner.js"
+  import { scanDevice, waitDevice, startForm } from './tests/5185.js';
+  import { initRun, runStep, nextStep, runScript, setStoreValue, stopTests } from "./tests/runner.js"
   import { _steps, _events, _current } from '../../stores/tests.js';
 
   export let params;
@@ -16,11 +15,6 @@
     "scan-device": scanDevice,
     "wait-device": waitDevice,
     "start-form": startForm,
-    "start-tests": startTests,
-    "start-test": startTest,
-    "wait-test": waitTest,
-    "stop-tests": stopTests,
-    "start-update": startUpdate,
   };
   let events = {};
   let step;
@@ -51,15 +45,15 @@
           cur.inputs[i].error.active = false;
           if (cur.inputs[i].id == 'serial') {
             let num = parseInt(wrp.value);
-            if (wrp.value.length < 6) {
+            if (wrp.value.length < 7) {
               cur.inputs[i].error.active = true;
               $_steps[$_current] = cur;
             } else if (isNaN(num)) {
               cur.inputs[i].error.active = true;
               $_steps[$_current] = cur;
             } else {
-              await setStoreValue({ variable: 'serial', value: num.toString() });
-              window.pumaAPI.send('n2k-serial', [num]);
+              await setStoreValue({ variable: 'serial', value: 'UZSY-' + num.toString().padStart(7, '0') });
+              window.pumaAPI.send('ser-num', [num]);
             }
           }
           if (cur.inputs[i].error.active) {
