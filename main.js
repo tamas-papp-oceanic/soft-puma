@@ -1,6 +1,7 @@
 // Modules to control application life and create native browser window
 const { app, BrowserWindow, ipcMain } = require('electron');
 const os = require('os');
+const fs = require('fs');
 const path = require('path');
 const serve = require('electron-serve');
 const loadURL = serve({ directory: 'public' });
@@ -8,7 +9,9 @@ const Can = require('./src/services/can.js');
 const Serial = require('./src/services/serial.js');
 const com = require('./src/services/common.js');
 const NMEAEngine = require('./src/services/nmea.js');
-const barcode = require('barcode');
+const bwipjs = require('bwip-js');
+const PDFDocument = require('pdfkit');
+const ptp = require('@rasgo/pdf-to-printer');
 
 // Keep a global reference of the window object, if you don't, the window will
 // be closed automatically when the JavaScript object is garbage collected.
@@ -204,16 +207,46 @@ ipcMain.on('test-data', (e, args) => {
 });
 ipcMain.on('bar-code', (e, args) => {
   const [code] = args;
-  let code39 = barcode('code39', {
-    data: code,
-    width: 2175,
-    height: 475,
+  const doc = new PDFDocument({
+    size: [180, 110],
+    margin: 10,
   });
-  let out = path.join(os.tmpdir(), 'code39.png');
-  code39.saveImage(out, (err) => {
-  	console.log(err);
-	  if (err) throw err;
-  	console.log('File has been written!');
+  doc.pipe(fs.createWriteStream('barcode.pdf'));
+  // doc.font('Courier');
+  doc.fontSize(11);
+  doc.text('Marine Multifunction Display 7"', {
+    width: 160,
+    align: 'left',
+  });
+  doc.text('MTOC: MFDS', {
+    width: 160,
+    align: 'left',
+  });
+  doc.fontSize(10);
+  doc.moveDown();
+  doc.text('Serial No: ' + code, {
+    width: 160,
+    align: 'left',
+  });
+  bwipjs.toBuffer({
+    bcid:        'code39',  // Barcode type
+    text:        code,      // Text to encode
+    scale:       3,         // 3x scaling factor
+    height:      20,        // Bar height, in millimeters
+    includetext: false,     // Show human-readable text
+    textxalign:  'center',  // Always good to set this
+  }).then((png) => {
+    doc.image(png, 10, 60, {
+      width: 160,
+    });
+    doc.end();
+    ptp.print('barcode.pdf').then((res) => {
+      fs.rmSync('barcode.pdf');
+    }).catch((err) => {
+      console.log(err);
+    });
+  }).catch((err) => {
+    console.log(err)
   });
 });
 // Start device processing
