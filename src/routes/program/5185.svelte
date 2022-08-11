@@ -6,7 +6,7 @@
   import testG from './tests/5185G.json';
   import testH from './tests/5185H.json';
   import { scanDevice, waitDevice, startForm } from './tests/5185.js';
-  import { initRun, runStep, nextStep, runScript, setStoreValue, stopTests } from "./tests/runner.js"
+  import { initRun, runStep, nextStep, runScript, setStoreValue, lastStep } from "./tests/runner.js"
   import { _steps, _events, _current } from '../../stores/tests.js';
 
   export let params;
@@ -77,7 +77,7 @@
     }
   };
   // Cancel button event
-  function cancel(e) {
+  async function cancel(e) {
     let cur = $_steps[$_current];
     if (typeof cur !== 'undefined') {
       if (typeof cur.testCode !== 'undefined') {
@@ -85,11 +85,15 @@
         runScript(scr);
       }
     }
-    stopTests();
-    pop();
+    await setStoreValue({variable: 'result', value: false });
+    await lastStep();
+    await runStep();
   };
   // Data getters
   $: step = $_steps[$_current];
+
+$: console.log(step)
+
 </script>
 
 <Grid>

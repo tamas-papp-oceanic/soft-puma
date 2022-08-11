@@ -168,11 +168,6 @@
   "resolved" "https://registry.npmjs.org/@polka/url/-/url-1.0.0-next.21.tgz"
   "version" "1.0.0-next.21"
 
-"@rasgo/pdf-to-printer@^1.5.6":
-  "integrity" "sha512-Ozre0awTCv132GRvou8W4Pi1CWEz7+YmiT3twitl6P/saq/OCQE2sLnLGz2+t0PJlqSZfCLJ0pIqEcQzSH1M3Q=="
-  "resolved" "https://registry.npmjs.org/@rasgo/pdf-to-printer/-/pdf-to-printer-1.5.6.tgz"
-  "version" "1.5.6"
-
 "@rollup/plugin-commonjs@^17.0.0":
   "integrity" "sha512-PoMdXCw0ZyvjpCMT5aV4nkL0QywxP29sODQsSGeDpr/oI49Qq9tRtAsb/LbYbDzFlOydVEqHmmZWFtXJEAX9ew=="
   "resolved" "https://registry.npmjs.org/@rollup/plugin-commonjs/-/plugin-commonjs-17.1.0.tgz"

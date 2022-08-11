@@ -11,7 +11,7 @@ const com = require('./src/services/common.js');
 const NMEAEngine = require('./src/services/nmea.js');
 const bwipjs = require('bwip-js');
 const PDFDocument = require('pdfkit');
-const ptp = require('@rasgo/pdf-to-printer');
+const prt = 'HP-LaserJet-Pro-M404-M405';
 
 // Keep a global reference of the window object, if you don't, the window will
 // be closed automatically when the JavaScript object is garbage collected.
@@ -207,11 +207,12 @@ ipcMain.on('test-data', (e, args) => {
 });
 ipcMain.on('bar-code', (e, args) => {
   const [code] = args;
+  let fil = path.join(__dirname, 'barcode.pdf');
   const doc = new PDFDocument({
     size: [180, 110],
     margin: 10,
   });
-  doc.pipe(fs.createWriteStream('barcode.pdf'));
+  doc.pipe(fs.createWriteStream(fil));
   // doc.font('Courier');
   doc.fontSize(11);
   doc.text('Marine Multifunction Display 7"', {
@@ -240,11 +241,8 @@ ipcMain.on('bar-code', (e, args) => {
       width: 160,
     });
     doc.end();
-    ptp.print('barcode.pdf').then((res) => {
-      fs.rmSync('barcode.pdf');
-    }).catch((err) => {
-      console.log(err);
-    });
+    // require('child_process').execSync('lp -d ' + prt + ' -o media=a4 ' + fil);
+    fs.rmSync(fil);
   }).catch((err) => {
     console.log(err)
   });

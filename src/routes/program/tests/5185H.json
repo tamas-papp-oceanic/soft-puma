@@ -4,7 +4,8 @@
       "blurb": "1. Connect the device to the NMEA network and power before continuing.",
       "variables": {
         "product": null,
-        "serial": null
+        "serial": null,
+        "result": true
       },
       "buttons": [ "Next", "Cancel" ],
       "scripts": {
@@ -109,16 +110,17 @@
       "onSuccess": { "action": "add-log", "testCode": 4, "testValue": 1 }
     },
     "8": {
-      "blurb": "8. Printing product label.",
-      "testCode": 5,
+      "blurb": "8. Test result.",
       "last": true,
-      "buttons": [ "Print" ],
+      "buttons": [ "Ok" ],
       "scripts": {
         "1": {
+          "action": "result"
+        },
+        "2": {
           "action": "next"
         }
-      },
-      "onSuccess": { "action": "print-label" }
+      }
     }
   }
 }

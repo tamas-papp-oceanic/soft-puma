@@ -21,23 +21,28 @@
   <Tile style="height: -webkit-fill-available;">
     <div class="tilecont">
       <div class="title">{step ? step.blurb : ''}</div>
-      {#if step && step.inputs}
-        <div class="inputs">
-          {#each step.inputs as input}
-            {#if input.type == 'TextInput'}
-              <TextInput id={input.id} inline labelText={input.label} placeholder={input.placeholder} />
-            {/if}
-            {#if input.error && input.error.active}
-              <InlineNotification
-                hideCloseButton
-                title={input.error.title}
-                subtitle={input.error.subtitle}
-              />
-            {/if}
-          {/each}
-        </div>                
-      {/if}
-      {#if step && step.image}
+      {#if step && (typeof step.result !== "undefined")}
+        <div class="result">
+          <Tile style={'color: ' + (step.result ? 'lightgreen' : 'red') + ';'}>{step.result ? 'SUCCESS' : 'FAIL'}</Tile>
+        </div>
+      {:else}
+        {#if step && step.inputs}
+          <div class="inputs">
+            {#each step.inputs as input}
+              {#if input.type == 'TextInput'}
+                <TextInput id={input.id} inline labelText={input.label} placeholder={input.placeholder} />
+              {/if}
+              {#if input.error && input.error.active}
+                <InlineNotification
+                  hideCloseButton
+                  title={input.error.title}
+                  subtitle={input.error.subtitle}
+                />
+              {/if}
+            {/each}
+          </div>                
+        {/if}
+        {#if step && step.image}
         <div class="image">
           <ImageLoader src={step.image}>
             <svelte:fragment slot="loading">
@@ -46,6 +51,7 @@
             <svelte:fragment slot="error">An error occurred.</svelte:fragment>
           </ImageLoader>
         </div>
+        {/if}
       {/if}
     </div>
   </Tile>
@@ -74,6 +80,11 @@
     align-items: flex-start;
     width: 100%;
     height: 100%;
+  }
+  .container .tilecont .result {
+    width: 100%;
+    font-size: 300%;
+    text-align: center;
   }
   .container .tilecont .title {
     max-width: 90%;

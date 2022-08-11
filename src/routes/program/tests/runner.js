@@ -37,6 +37,7 @@ export function initRun(stps, acts, evts, vari) {
     "wait-test": waitTest,
     "stop-tests": stopTests,
     "start-update": startUpdate,
+    'result': result,
     'add-log': addToLog,
     'print-label': printLabel,
   }, acts);
@@ -63,6 +64,12 @@ export async function nextStep() {
   let cur = get(_current);
   cur++;
   _current.set(cur);
+};
+// Performs last step
+export async function lastStep() {
+  let sts = get(_steps);
+  const res = Object.keys(sts)[Object.keys(sts).length-1];
+  _current.set(res);
 };
 // Runs current step
 export async function runStep() {
@@ -161,6 +168,19 @@ export async function stopTests() {
 export async function startUpdate(script) {
   enableNext(true);
 };
+// Processes test reult
+export async function result() {
+  let sts = get(_steps);
+  let cur = get(_current);
+  if ((typeof sts !== 'undefined') && (typeof sts[cur] !== 'undefined')) {
+    const res = await getStoreValue({ variable: 'result' });
+    sts[cur].result = res;
+    _steps.set(sts);
+
+console.log(sts)
+
+  }
+};
 // Add record to log
 export async function addToLog(script) {
   let tmp = get(_scriptData);
@@ -185,23 +205,6 @@ export async function addToLog(script) {
 export async function printLabel(script) {
   const code = await getStoreValue({ variable: 'serial' });
   window.pumaAPI.send('bar-code', [code]);
-  // let tmp = get(_scriptData);
-  // let usr = get(userData);
-  // const res = await afetch(testURL + '/test', {
-  //   method: 'POST',
-  //   body: JSON.stringify({
-  //     user: parseInt(usr.user_id),
-  //     product: tmp.product.modelVersion + (tmp.variant ? '-' + tmp.variant : ''),
-  //     serial: tmp.serial,
-  //     test: script.testCode,
-  //     result: script.testValue,
-  //   }),
-  // });
-  // if (res.status == 200) {
-  //   const json = await res.json();
-  // } else {
-  //   console.log("Logging test failed");
-  // }
 };
 // createWarning(title, text, failure=false) {};
 // submitResult() {};
