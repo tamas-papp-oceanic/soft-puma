@@ -19,6 +19,8 @@ let mainWindow;
 let devices = {};
 let timer = null;
 
+console.log(os.platform())
+
 function isDev() {
   return !app.isPackaged;
 }
@@ -107,8 +109,10 @@ app.on('activate', function () {
 // Discovering interfaces
 function discover() {
   Serial.discover().then((sls) => {
+    let plf = os.platform();
+    let dev = (plf == 'linux' ? '/dev/ttyACM' : 'COM');
     for (let i in sls) {
-      if (sls[i].path.startsWith('/dev/ttyACM')) {
+      if (sls[i].path.startsWith(dev)) {
         if (typeof devices[sls[i].path] === "undefined") {
           console.log('New serial interface (' + sls[i].path + ')')
           let dev = new Serial(sls[i].path, 115200);
