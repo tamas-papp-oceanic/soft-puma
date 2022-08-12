@@ -8,7 +8,7 @@ HOME=~/.electron-gyp node-gyp rebuild --target=19.0.0 --arch=x64 --dist-url=http
 const os = require('os');
 const fs = require('fs');
 const path = require('path');
-const can = require('socketcan');
+const Pcan = require('@csllc/cs-pcan-usb');
 // Class definition
 class Can {
   // Local variables
@@ -19,7 +19,7 @@ class Can {
   // Constructor
   constructor(dev) {
     this.#device = dev;
-    this.#channel = null;
+    this.#channel = new Pcan(dev);
     this.#running = false;
     this.#timer = null;
   };
@@ -37,13 +37,13 @@ class Can {
       this.#timer = null;
     }
     if ((this.#channel != null) && this.#running) {
-      this.#channel.stop();
+      this.#channel.close();
     }
   };
   // Sends data to CAN port
   send(frm) {
     if ((this.#channel != null) && this.#running) {
-      this.#channel.send(frm);
+      this.#channel.write(frm);
     }
   };
   // Gets device string
@@ -52,34 +52,41 @@ class Can {
   }
   // Discovers can devices
   static discover() {
-    return fs.readdirSync('/sys/class/net');
+    let res = new Array();
+
+console.log(this.#channel)
+
+    if (this.#channel != null) {
+      this.#channel.list().then((prs) => {
+        for (let i in prs) {
+          res.push(prs[i].path);
+        }
+        return res;
+      }).catch((err) => {
+        console.log(err);
+        return res;
+      });
+    }
+    return res;
   }
   // Timer tick event
   #tick(fun) {
-    try {
-      if (!this.#running) {
-        console.log('Starting CAN port (' + this.#device + ')...');
-        this.#channel = can.createRawChannel(this.#device, true);
-        if (this.#channel != null) {
-          this.#channel.addListener('onMessage', (frm) => {
+    if (!this.#running) {
+      console.log('Starting CAN port (' + this.#device + ')...');
+      if (this.#channel != null) {
+        this.#channel.open(this.#device).then(() => {
+          this.#channel.on('data', (frm) => {
             // console.log('(' + (msg.ts_sec + msg.ts_usec / 1000000).toFixed(6) + ') ' + msg.id.toString(16).toUpperCase().padStart(8, '0') + '#' + msg.data.toString('hex').toUpperCase());
             fun(this.#device, frm);
           });
-          this.#channel.addListener('onStopped', () => {
-            console.log('CAN port (' + this.#device + ') stopped.');
-            this.#running = false;
-            this.#channel = null;
-          });
-          this.#channel.start();
           this.#running = true;
           console.log('CAN port (' + this.#device + ') started.');
           return;
-        }
+        }).catch((err) => {
+          this.#running = false;
+          console.log(err);
+        });
       }
-    } catch (err) {
-      this.#running = false;
-      this.#channel = null;
-      console.log(err);
     }
   };
 };

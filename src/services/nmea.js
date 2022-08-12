@@ -1,8 +1,16 @@
+const os = require('os');
 const dec = require('./decode.js');
 const enc = require('./encode.js');
 const com = require('./common.js');
-const can = require('./can.js');
+let can = null;
 const ser = require('./serial.js');
+
+if (os.platform() == 'linux') {
+  can = require('./can.js');
+} else if (os.platform() == 'windows') {
+  can = require('./pcan.js');
+}
+
 const Address = require('./address.js');
 // Class definition
 class NMEAEngine {

@@ -4,8 +4,9 @@ const os = require('os');
 const fs = require('fs');
 const path = require('path');
 const serve = require('electron-serve');
+const { SerialPort } = require('serialport')
 const loadURL = serve({ directory: 'public' });
-const Can = require('./src/services/can.js');
+let Can = null;
 const Serial = require('./src/services/serial.js');
 const com = require('./src/services/common.js');
 const NMEAEngine = require('./src/services/nmea.js');
@@ -13,13 +14,17 @@ const bwipjs = require('bwip-js');
 const PDFDocument = require('pdfkit');
 const prt = 'HP-LaserJet-Pro-M404-M405';
 
+if (os.platform() == 'linux') {
+  Can = require('./src/services/can.js');
+} else if (os.platform() == 'win32') {
+  Can = require('./src/services/pcan.js');
+}
+
 // Keep a global reference of the window object, if you don't, the window will
 // be closed automatically when the JavaScript object is garbage collected.
 let mainWindow;
 let devices = {};
 let timer = null;
-
-console.log(os.platform())
 
 function isDev() {
   return !app.isPackaged;
