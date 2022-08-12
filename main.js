@@ -2,6 +2,7 @@
 const { app, BrowserWindow, ipcMain } = require('electron');
 const os = require('os');
 const fs = require('fs');
+const util = require('util');
 const path = require('path');
 const serve = require('electron-serve');
 const { SerialPort } = require('serialport')
@@ -112,7 +113,7 @@ app.on('activate', function () {
 // let tool = require('./src/tools/nmea.js');
 // tool.create();
 // Discovering interfaces
-function discover() {
+async function discover() {
   Serial.discover().then((sls) => {
     let plf = os.platform();
     let dev = (plf == 'linux' ? '/dev/ttyACM' : 'COM');
@@ -127,18 +128,17 @@ function discover() {
         }
       }
     }
-    let cls = Can.discover();
-    for (let i in cls) {
-      if (cls[i].startsWith('can')) {
-        if (typeof devices[cls[i]] === "undefined") {
-          console.log('New CAN interface (' + cls[i] + ')')
-          let dev = new Can(cls[i]);
-          let eng = new NMEAEngine(dev);
-          eng.init();
-          devices[cls[i]] = { device: dev, engine: eng, process: proc };
-        }
+    let can = new Can();
+    can.discover().then((cls) => {
+      if (cls.length > 0) {
+        console.log('New CAN interface (' + cls[0] + ')')
+        let eng = new NMEAEngine(dev);
+        eng.init();
+        devices[cls[0].path] = { device: can, engine: eng, process: proc };
       }
-    }
+    }).catch((err) => {
+      console.log(err);
+    });
   }).catch((err) => {
     console.log(err);
   });

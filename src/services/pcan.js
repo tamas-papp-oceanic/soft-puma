@@ -8,18 +8,20 @@ HOME=~/.electron-gyp node-gyp rebuild --target=19.0.0 --arch=x64 --dist-url=http
 const os = require('os');
 const fs = require('fs');
 const path = require('path');
-const Pcan = require('@csllc/cs-pcan-usb');
+const PcanUsb = require('@csllc/cs-pcan-usb');
+const { rejects } = require('assert');
+
 // Class definition
 class Can {
   // Local variables
-  #device;
+  #devices;
   #channel;
   #running;
   #timer;
   // Constructor
-  constructor(dev) {
-    this.#device = dev;
-    this.#channel = new Pcan(dev);
+  constructor() {
+    this.#devices = new Array();
+    this.#channel = new PcanUsb({ canRate: 250000 });
     this.#running = false;
     this.#timer = null;
   };
@@ -48,39 +50,37 @@ class Can {
   };
   // Gets device string
   device() {
-    return this.#device;
+    return this.#devices[0];
   }
   // Discovers can devices
-  static discover() {
-    let res = new Array();
-
-console.log(this.#channel)
-
-    if (this.#channel != null) {
-      this.#channel.list().then((prs) => {
-        for (let i in prs) {
-          res.push(prs[i].path);
-        }
-        return res;
-      }).catch((err) => {
-        console.log(err);
-        return res;
-      });
-    }
-    return res;
+  discover() {
+    return new Promise((resolve, reject) => {
+      this.#devices = new Array();
+      if (this.#channel != null) {
+        this.#channel.list().then((prs) => {
+          this.#devices.push(...prs);
+          resolve(prs);
+        }).catch((err) => {
+          console.log(err);
+          reject(err);
+        });
+      } else {
+        reject('Not ready');
+      }
+    });
   }
   // Timer tick event
   #tick(fun) {
     if (!this.#running) {
-      console.log('Starting CAN port (' + this.#device + ')...');
+      console.log('Starting CAN port (' + this.#devices[0].path + ')...');
       if (this.#channel != null) {
-        this.#channel.open(this.#device).then(() => {
+        this.#channel.open(this.#devices[0].path).then(() => {
           this.#channel.on('data', (frm) => {
             // console.log('(' + (msg.ts_sec + msg.ts_usec / 1000000).toFixed(6) + ') ' + msg.id.toString(16).toUpperCase().padStart(8, '0') + '#' + msg.data.toString('hex').toUpperCase());
-            fun(this.#device, frm);
+            fun(this.#devices[0].path, frm);
           });
           this.#running = true;
-          console.log('CAN port (' + this.#device + ') started.');
+          console.log('CAN port (' + this.#devices[0].path + ') started.');
           return;
         }).catch((err) => {
           this.#running = false;
