@@ -2,12 +2,11 @@
 const { app, BrowserWindow, ipcMain } = require('electron');
 const os = require('os');
 const fs = require('fs');
-const util = require('util');
+// const util = require('util');
 const path = require('path');
 const serve = require('electron-serve');
-const { SerialPort } = require('serialport')
+// const { SerialPort } = require('serialport')
 const loadURL = serve({ directory: 'public' });
-let Can = null;
 const Serial = require('./src/services/serial.js');
 const com = require('./src/services/common.js');
 const NMEAEngine = require('./src/services/nmea.js');
@@ -15,11 +14,11 @@ const bwipjs = require('bwip-js');
 const PDFDocument = require('pdfkit');
 const prt = 'HP-LaserJet-Pro-M404-M405';
 
-if (os.platform() == 'linux') {
-  Can = require('./src/services/can.js');
-} else if (os.platform() == 'win32') {
-  Can = require('./src/services/pcan.js');
-}
+// if (os.platform() == 'linux') {
+//   const Can = require('./src/services/can.js');
+// } else if (os.platform() == 'win32') {
+  const Can = require('./src/services/pcan.js');
+// }
 
 // Keep a global reference of the window object, if you don't, the window will
 // be closed automatically when the JavaScript object is garbage collected.
@@ -130,9 +129,9 @@ async function discover() {
     }
     let can = new Can();
     can.discover().then((cls) => {
-      if (cls.length > 0) {
-        console.log('New CAN interface (' + cls[0] + ')')
-        let eng = new NMEAEngine(dev);
+      if ((cls.length > 0) && (typeof devices[cls[0].path] === "undefined")) {
+        console.log('New CAN interface (' + cls[0].path + ')')
+        let eng = new NMEAEngine(can);
         eng.init();
         devices[cls[0].path] = { device: can, engine: eng, process: proc };
       }
