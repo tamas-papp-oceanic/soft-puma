@@ -18,6 +18,7 @@
 const { app } = require('electron');
 const path = require('path');
 const fs = require('fs');
+const log = require('electron-log');
 
 let nmeadefs = {};
 let nmeaconv = {};
@@ -33,7 +34,7 @@ function init() {
       nmeaconv = JSON.parse(fs.readFileSync(nco, 'utf8'));
     }
   } catch(err) {
-    console.log(err);
+    log.error(err);
   }
 };
 

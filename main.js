@@ -7,6 +7,7 @@ const path = require('path');
 const serve = require('electron-serve');
 // const { SerialPort } = require('serialport')
 const loadURL = serve({ directory: 'public' });
+const log = require('electron-log');
 const Serial = require('./src/services/serial.js');
 const com = require('./src/services/common.js');
 const NMEAEngine = require('./src/services/nmea.js');
@@ -119,7 +120,7 @@ async function discover() {
     for (let i in sls) {
       if (sls[i].path.startsWith(dev)) {
         if (typeof devices[sls[i].path] === "undefined") {
-          console.log('New serial interface (' + sls[i].path + ')')
+          log.info('New serial interface (' + sls[i].path + ')')
           let dev = new Serial(sls[i].path, 115200);
           let eng = new NMEAEngine(dev);
           eng.init();
@@ -129,17 +130,17 @@ async function discover() {
     }
     let can = new Can();
     can.discover().then((cls) => {
-      if ((cls.length > 0) && (typeof devices[cls[0].path] === "undefined")) {
-        console.log('New CAN interface (' + cls[0].path + ')')
+      if (typeof devices[cls[0].path] === "undefined") {
+        log.info('New CAN interface (' + cls[0].path + ')')
         let eng = new NMEAEngine(can);
         eng.init();
         devices[cls[0].path] = { device: can, engine: eng, process: proc };
       }
     }).catch((err) => {
-      console.log(err);
+      log.error(err);
     });
   }).catch((err) => {
-    console.log(err);
+    log.error(err);
   });
 }
 // NMEA processing
@@ -167,7 +168,7 @@ function proc(dev, frm) {
 // Initialize NMEA translator
 com.init();
 // Start discovery loop
-console.log('Discovering interfaces...')
+log.info('Discovering interfaces...')
 discover();
 timer = setInterval(() => {
   discover();
@@ -252,7 +253,7 @@ ipcMain.on('bar-code', (e, args) => {
     // require('child_process').execSync('lp -d ' + prt + ' -o media=a4 ' + fil);
     fs.rmSync(fil);
   }).catch((err) => {
-    console.log(err)
+    log.error(err)
   });
 });
 // Start device processing
@@ -275,16 +276,16 @@ ipcMain.on('app-quit', (e, ...args) => {
   }
   for (const [key, val] of Object.entries(devices)) {
     if (key.startsWith('can')) {
-      console.log('Stopping CAN (' + key + ')...');
+      log.info('Stopping CAN (' + key + ')...');
     } else if (key.startsWith('/dev/ttyACM')) {
-      console.log('Closing Serial (' + key + ')...');
+      log.info('Closing Serial (' + key + ')...');
     }
     val.device.stop();
   }
-  console.log('Stopping NMEA engines...');
+  log.info('Stopping NMEA engines...');
   for (const [key, val] of Object.entries(devices)) {
     val.engine.destroy();
   }
-  console.log('Quit...')
+  log.info('Quit...')
   app.quit();
 });

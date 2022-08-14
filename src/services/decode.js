@@ -1,4 +1,5 @@
 const cry = require('crypto');
+const log = require('electron-log');
 const com = require('./common.js');
 
 let fastbuff = {};
@@ -206,7 +207,7 @@ function decode(frm) {
     }
     return msg;
   } catch (err) {
-    console.log("ERROR", err);
+    log.error("ERROR", err);
     return null;
   }
 };
@@ -243,7 +244,7 @@ function controlDataTransfer(frm) {
     }
     return null;
   } catch (err) {
-    console.log("ERROR", err);
+    log.error("ERROR", err);
     return null;
   }
 }
@@ -289,7 +290,7 @@ function decodeDataTransfer(frm) {
     }
     return null;
   } catch (err) {
-    console.log("ERROR", err);
+    log.error("ERROR", err);
     return null;
   }
 }
@@ -370,7 +371,7 @@ function decodeFastPacket(frm) {
     }
     return null;
   } catch (err) {
-    console.log("ERROR", err);
+    log.error("ERROR", err);
     return null;
   }
 }
@@ -442,7 +443,7 @@ function extend(pgn, def, frm) {
     }
     return JSON.parse(JSON.stringify(def));
   } catch (err) {
-    console.log("ERROR", err);
+    log.error("ERROR", err);
     return null;
   }
 }
@@ -541,7 +542,7 @@ function proc126208(def, frm) {
     }
     return JSON.parse(JSON.stringify(def));
   } catch (err) {
-    console.log("ERROR", err);
+    log.error("ERROR", err);
     return null;
   }
 }

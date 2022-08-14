@@ -91,9 +91,6 @@
   };
   // Data getters
   $: step = $_steps[$_current];
-
-$: console.log(step)
-
 </script>
 
 <Grid>

@@ -8,6 +8,7 @@ HOME=~/.electron-gyp node-gyp rebuild --target=19.0.0 --arch=x64 --dist-url=http
 const os = require('os');
 const fs = require('fs');
 const path = require('path');
+const log = require('electron-log');
 const can = require('socketcan');
 // Class definition
 class Can {
@@ -58,7 +59,7 @@ class Can {
   #tick(fun) {
     try {
       if (!this.#running) {
-        console.log('Starting CAN port (' + this.#device + ')...');
+        log.info('Starting CAN port (' + this.#device + ')...');
         this.#channel = can.createRawChannel(this.#device, true);
         if (this.#channel != null) {
           this.#channel.addListener('onMessage', (frm) => {
@@ -66,20 +67,20 @@ class Can {
             fun(this.#device, frm);
           });
           this.#channel.addListener('onStopped', () => {
-            console.log('CAN port (' + this.#device + ') stopped.');
+            log.info('CAN port (' + this.#device + ') stopped.');
             this.#running = false;
             this.#channel = null;
           });
           this.#channel.start();
           this.#running = true;
-          console.log('CAN port (' + this.#device + ') started.');
+          log.info('CAN port (' + this.#device + ') started.');
           return;
         }
       }
     } catch (err) {
       this.#running = false;
       this.#channel = null;
-      console.log(err);
+      log.error(err);
     }
   };
 };

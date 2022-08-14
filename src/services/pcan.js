@@ -1,3 +1,4 @@
+const log = require('electron-log');
 const PcanUsb = require('@csllc/cs-pcan-usb');
 
 // Class definition
@@ -23,7 +24,7 @@ class Can {
           this.#devices.push(...prs);
           resolve(prs);
         }).catch((err) => {
-          console.log(err);
+          log.error(err);
           reject(err);
         });
       } else {
@@ -54,7 +55,7 @@ class Can {
     delete frm.data;
     if ((this.#device != null) && this.#running) {
       this.#device.write(frm).catch((err) => {
-        console.log(err);
+        log.error(err);
       });
     }
   };
@@ -65,7 +66,7 @@ class Can {
   // Timer tick event
   #tick(fun) {
     if (!this.#running) {
-      console.log('Starting CAN port (' + this.#devices[0].path + ')...');
+      log.info('Starting CAN port (' + this.#devices[0].path + ')...');
       this.#device.open(this.#devices[0].path).then(() => {
         this.#device.on('data', (frm) => {
           frm.data = frm.buf;
@@ -74,11 +75,11 @@ class Can {
           fun(this.#devices[0].path, frm);
         });
         this.#running = true;
-        console.log('CAN port (' + this.#devices[0].path + ') started.');
+        log.info('CAN port (' + this.#devices[0].path + ') started.');
         return;
       }).catch((err) => {
         this.#running = false;
-        console.log(err);
+        log.info(err);
       });
     }
   };

@@ -176,9 +176,6 @@ export async function result() {
     const res = await getStoreValue({ variable: 'result' });
     sts[cur].result = res;
     _steps.set(sts);
-
-console.log(sts)
-
   }
 };
 // Add record to log

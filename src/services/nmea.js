@@ -1,4 +1,5 @@
 const os = require('os');
+const log = require('electron-log');
 const dec = require('./decode.js');
 const enc = require('./encode.js');
 const com = require('./common.js');
@@ -125,7 +126,7 @@ class NMEAEngine {
       try {
         this.#device.send(frs[i]);
       } catch (err) {
-        console.log(err);
+        log.error(err);
         return false;
       }
     }
@@ -137,7 +138,7 @@ class NMEAEngine {
       this.#device.send(frm);
       return true;
     } catch (err) {
-      console.log(err);
+      log.error(err);
       return false;
     }
   };
@@ -332,10 +333,10 @@ class NMEAEngine {
             let rdi = (dat >> 8) & 0xFF;
             // Additional information
             let add = (dat >> 16) & 0xFF;
-            console.log("SF CONF REQ", tid, ins, did, frm, rdi, add);
+            log.debug("SF CONF REQ", tid, ins, did, frm, rdi, add);
           } else {
             // COMMAND
-            console.log("SF CONF CMD", tid, ins, did, dat);
+            log.debug("SF CONF CMD", tid, ins, did, dat);
           }
           break;
       }

@@ -1,3 +1,4 @@
+const log = require('electron-log');
 const com = require('./common.js');
 
 let fastbuff = {};
@@ -155,7 +156,7 @@ function encode(msg) {
   raw.copy(frm.data, 0, 0, dlc);
   return frm;
 } catch (err) {
-  console.log("ERROR", err);
+  log.error("ERROR", err);
   return null;
 }
 };
@@ -213,7 +214,7 @@ function encodeFastPacket(fap) {
     }
     return ret;
   } catch (err) {
-    console.log("ERROR", err);
+    log.error("ERROR", err);
     return null;
   }
 }
@@ -277,7 +278,7 @@ function extend(def, msg) {
     }
     return JSON.parse(JSON.stringify(def));
   } catch (err) {
-    console.log("ERROR", err);
+    log.error("ERROR", err);
     return null;
   }
 
@@ -367,7 +368,7 @@ function proc126208(def, msg) {
     }
     return JSON.parse(JSON.stringify(def));
   } catch (err) {
-    console.log("ERROR", err);
+    log.error("ERROR", err);
     return null;
   }
 }

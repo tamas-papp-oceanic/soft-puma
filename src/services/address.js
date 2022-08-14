@@ -1,3 +1,4 @@
+const log = require('electron-log');
 const com = require('./common.js');
 const enc = require('./encode.js');
 const { StateMachine } = require('@edium/fsm');

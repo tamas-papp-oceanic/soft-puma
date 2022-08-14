@@ -1,3 +1,4 @@
+const log = require('electron-log');
 const { SerialPort } = require('serialport')
 const { ReadlineParser } = require("@serialport/parser-readline");
 // Class definition
@@ -17,16 +18,16 @@ class Serial {
       this.#logged.open = false;
       this.#logged.error = false;
       this.#running = true;
-      console.log('Serial port (' + this.#device + ') opened.');
+      log.info('Serial port (' + this.#device + ') opened.');
     });
     // On error event
     this.#port.on('error', (err) => {
       this.#running = false;
-      console.log('Error on serial port (' + this.#device + '):', err.message);
+      log.error('Error on serial port (' + this.#device + '):', err.message);
     });
     // On close event
     this.#port.on('close', () => {
-      console.log('Serial port (' + this.#device + ') closed.');
+      log.info('Serial port (' + this.#device + ') closed.');
     });
     this.#running = false;
     this.#timer = null;
@@ -73,13 +74,13 @@ class Serial {
   #tick(fun) {
     if (!this.#port.isOpen) {
       if (!this.#logged.open) {
-        console.log('Opening serial port (' + this.#device + ')...');
+        log.info('Opening serial port (' + this.#device + ')...');
         this.#logged.open = true;
       }
       this.#port.open((err) => {
         if (err) {
           if (!this.#logged.error) {
-            console.log('Couldn\'t open serial port (' + this.#device + '):', err.message);
+            log.error('Couldn\'t open serial port (' + this.#device + '):', err.message);
             this.#logged.error = true;
           }
           return;
