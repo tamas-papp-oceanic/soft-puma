@@ -1,6 +1,6 @@
 import { writable, derived } from 'svelte/store';
 
-const testURL = 'http://localhost:8080';
+const testURL = 'http://192.168.16.52:8080';
 const _scriptData = writable({});
 const _steps = writable({});
 const _actions = writable({});
