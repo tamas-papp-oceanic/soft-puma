@@ -145,11 +145,13 @@ async function discover() {
     } else {
       let can = new Can();
       can.discover().then((cls) => {
-        if (typeof devices[cls[0].path] === "undefined") {
-          log.info('New CAN interface (' + cls[0].path + ')')
-          let eng = new NMEAEngine(can);
-          eng.init();
-          devices[cls[0].path] = { device: can, engine: eng, process: proc };
+        if (cls.length > 0) {
+          if (typeof devices[cls[0].path] === "undefined") {
+            log.info('New CAN interface (' + cls[0].path + ')')
+            let eng = new NMEAEngine(can);
+            eng.init();
+            devices[cls[0].path] = { device: can, engine: eng, process: proc };
+          }
         }
       }).catch((err) => {
         log.error(err);
