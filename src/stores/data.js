@@ -37,6 +37,10 @@ window.pumaAPI.recv('n2k-indu', (e, val) => {
 window.pumaAPI.recv('n2k-manu', (e, val) => {
   manu.set(val);
 });
+// Remove name records
+window.pumaAPI.recv('n2k-clear', (e, val) => {
+  name.set({});
+});
 // NMEA address claim message
 window.pumaAPI.recv('n2k-name', (e, args) => {
   const [ dev, msg ] = args;

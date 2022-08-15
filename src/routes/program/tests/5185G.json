@@ -49,7 +49,7 @@
       }
     },
     "4": {
-      "blurb": "4. Touch screen test. Press all of the crosses on the screen.",
+      "blurb": "4. Touch screen test.\n\nPress all of the crosses on the screen.",
       "testCode": 1,
       "buttons": [ "Next", "Fail" ],
       "scripts": {
@@ -66,7 +66,7 @@
       "onSuccess": { "action": "add-log", "testCode": 1, "testValue": 1 }
     },
     "5": {
-      "blurb": "5. Brightness test. Check full range of brightness.",
+      "blurb": "5. Brightness test.\n\nCheck full range of brightness.",
       "testCode": 2,
       "buttons": [ "Next", "Fail" ],
       "scripts": {
@@ -80,7 +80,7 @@
       "onSuccess": { "action": "add-log", "testCode": 2, "testValue": 1 }
     },
     "6": {
-      "blurb": "6. Insert update USB.",
+      "blurb": "6. Insert update USB.\n\nWait for update to be done and only when language selection screen is showing up after update click Pass.\nIf device update isn't successful click Fail.",
       "testCode": 4,
       "buttons": [ "Pass", "Fail" ],
       "scripts": {

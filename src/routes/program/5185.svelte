@@ -6,7 +6,7 @@
   import testG from './tests/5185G.json';
   import testH from './tests/5185H.json';
   import { scanDevice, waitDevice, startForm } from './tests/5185.js';
-  import { initRun, runStep, nextStep, runScript, setStoreValue, lastStep } from "./tests/runner.js"
+  import { initRun, runStep, nextStep, runScript, setStoreValue, lastStep, stopTests } from "./tests/runner.js"
   import { _steps, _events, _current } from '../../stores/tests.js';
 
   export let params;
@@ -86,6 +86,7 @@
       }
     }
     await setStoreValue({variable: 'result', value: false });
+    await stopTests();
     await lastStep();
     await runStep();
   };
@@ -96,7 +97,7 @@
 <Grid>
   <Row>
     <Column>
-      <h2>{'5185 Poseidon 7' + (params.variant != null ? '(' + params.variant + ')' : '') + ' - Test Suite'}</h2>
+      <h2>{'5185 Poseidon 7' + (params.variant != null ? ' (' + params.variant + ')' : '') + ' - Test Suite'}</h2>
       <InlineNotification
         hideCloseButton
         kind="info"

@@ -52,10 +52,8 @@ class Can {
     return this.#device;
   }
   // Discovers can devices
-  discover() {
-    return new Promise((resolve) => {
-      resolve(fs.readdirSync('/sys/class/net'));
-    });
+  static discover() {
+    return fs.readdirSync('/sys/class/net');
   }
   // Timer tick event
   #tick(fun) {
@@ -65,7 +63,7 @@ class Can {
         this.#channel = can.createRawChannel(this.#device, true);
         if (this.#channel != null) {
           this.#channel.addListener('onMessage', (frm) => {
-            // console.log('(' + (msg.ts_sec + msg.ts_usec / 1000000).toFixed(6) + ') ' + msg.id.toString(16).toUpperCase().padStart(8, '0') + '#' + msg.data.toString('hex').toUpperCase());
+            // log.debug('(' + (msg.ts_sec + msg.ts_usec / 1000000).toFixed(6) + ') ' + msg.id.toString(16).toUpperCase().padStart(8, '0') + '#' + msg.data.toString('hex').toUpperCase());
             fun(this.#device, frm);
           });
           this.#channel.addListener('onStopped', () => {

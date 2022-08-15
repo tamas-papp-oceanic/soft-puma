@@ -43,14 +43,14 @@
           </div>                
         {/if}
         {#if step && step.image}
-        <div class="image">
-          <ImageLoader src={step.image}>
-            <svelte:fragment slot="loading">
-              <InlineLoading />
-            </svelte:fragment>
-            <svelte:fragment slot="error">An error occurred.</svelte:fragment>
-          </ImageLoader>
-        </div>
+          <div class="image">
+            <ImageLoader src={step.image}>
+              <svelte:fragment slot="loading">
+                <InlineLoading />
+              </svelte:fragment>
+              <svelte:fragment slot="error">An error occurred.</svelte:fragment>
+            </ImageLoader>
+          </div>
         {/if}
       {/if}
     </div>
@@ -88,7 +88,7 @@
   }
   .container .tilecont .title {
     max-width: 90%;
-    white-space: normal;
+    white-space: pre-line;
     font-size: 1.25rem;
     text-align: justify;
     margin-bottom: 2rem;

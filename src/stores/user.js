@@ -1,6 +1,7 @@
 import { writable, derived } from 'svelte/store';
 
-const authURL = 'http://192.168.16.52:8080';
+const plf = navigator?.userAgentData?.platform || navigator?.platform || 'unknown';
+const authURL = (plf == 'Win32') ? 'http://192.168.16.52:8080' : 'http://localhost:8080';
 const user = JSON.parse(localStorage.getItem('userData'));
 const userData = writable(user);
 userData.subscribe((val) =>{

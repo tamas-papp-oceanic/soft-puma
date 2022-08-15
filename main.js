@@ -19,7 +19,6 @@ if (os.platform() == 'linux') {
 } else if (os.platform() == 'win32') {
   Can = require('./src/services/pcan.js');
 }
-
 // Keep a global reference of the window object, if you don't, the window will
 // be closed automatically when the JavaScript object is garbage collected.
 let mainWindow;
@@ -60,7 +59,9 @@ function createWindow() {
   }
 
   // Open the DevTools.
-  mainWindow.webContents.openDevTools();
+  if (os.platform() == 'linux') {
+    mainWindow.webContents.openDevTools();
+  }
 
   // Uncomment the following line of code when app is ready to be packaged.
   // loadURL(mainWindow);
@@ -114,30 +115,46 @@ app.on('activate', function () {
 // Discovering interfaces
 async function discover() {
   Serial.discover().then((sls) => {
-    let plf = os.platform();
-    let dev = (plf == 'linux' ? '/dev/ttyACM' : 'COM');
+    let dev = (os.platform() == 'linux' ? '/dev/ttyACM' : 'COM');
     for (let i in sls) {
       if (sls[i].path.startsWith(dev)) {
         if (typeof devices[sls[i].path] === "undefined") {
-          log.info('New serial interface (' + sls[i].path + ')')
-          let dev = new Serial(sls[i].path, 115200);
-          let eng = new NMEAEngine(dev);
-          eng.init();
-          devices[sls[i].path] = { device: dev, engine: eng, process: proc };
+          if (os.platform() == 'linux') {
+            log.info('New serial interface (' + sls[i].path + ')')
+            let dev = new Serial(sls[i].path, 115200);
+            let eng = new NMEAEngine(dev);
+            eng.init();
+            devices[sls[i].path] = { device: dev, engine: eng, process: proc };
+          }
         }
       }
     }
-    let can = new Can();
-    can.discover().then((cls) => {
-      if (typeof devices[cls[0].path] === "undefined") {
-        log.info('New CAN interface (' + cls[0].path + ')')
-        let eng = new NMEAEngine(can);
-        eng.init();
-        devices[cls[0].path] = { device: can, engine: eng, process: proc };
+    if (os.platform() == 'linux') {
+      let cls = Can.discover();
+      for (let i in cls) {
+        if (cls[i].startsWith('can')) {
+          if (typeof devices[cls[i]] === "undefined") {
+            log.info('New CAN interface (' + cls[i] + ')')
+            let dev = new Can(cls[i]);
+            let eng = new NMEAEngine(dev);
+            eng.init();
+            devices[cls[i]] = { device: dev, engine: eng, process: proc };
+          }
+        }
       }
-    }).catch((err) => {
-      log.error(err);
-    });
+    } else {
+      let can = new Can();
+      can.discover().then((cls) => {
+        if (typeof devices[cls[0].path] === "undefined") {
+          log.info('New CAN interface (' + cls[0].path + ')')
+          let eng = new NMEAEngine(can);
+          eng.init();
+          devices[cls[0].path] = { device: can, engine: eng, process: proc };
+        }
+      }).catch((err) => {
+        log.error(err);
+      });
+    }
   }).catch((err) => {
     log.error(err);
   });
@@ -194,6 +211,9 @@ ipcMain.on('n2k-data', (e, ...args) => {
   }
 });
 ipcMain.on('bus-scan', (e) => {
+  if ((typeof mainWindow !== 'undefined') && (typeof mainWindow.webContents !== 'undefined')) {
+    mainWindow.webContents.send('n2k-clear');
+  }
   for (const [key, val] of Object.entries(devices)) {
     // Send ISO Request for Address Claim
     val.engine.send059904(60928, 0xFF);
