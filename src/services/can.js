@@ -52,8 +52,10 @@ class Can {
     return this.#device;
   }
   // Discovers can devices
-  static discover() {
-    return fs.readdirSync('/sys/class/net');
+  discover() {
+    return new Promise((resolve) => {
+      resolve(fs.readdirSync('/sys/class/net'));
+    });
   }
   // Timer tick event
   #tick(fun) {
