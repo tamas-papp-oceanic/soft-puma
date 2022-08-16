@@ -8,8 +8,10 @@
     "productName": "Svelte and Electron App",
     "files": [
       "public/**/*",
+      "src/config/*",
       "src/services/*",
-      "main.js"
+      "main.js",
+      "preload.js"
     ],
     "win": {},
     "linux": {},
@@ -61,9 +63,9 @@
     "yarn": "^1.22.19"
   },
   "optionalDependencies": {
+    "@csllc/cs-pcan-usb": "^0.2.1",
     "serialport": "^10.4.0",
-    "socketcan":"^3.0.0",
-    "@csllc/cs-pcan-usb": "^0.2.1"
+    "socketcan": "^3.0.0"
   },
   "postinstall": "electron-builder install-app-deps"
 }

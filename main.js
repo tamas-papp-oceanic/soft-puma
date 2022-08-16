@@ -119,13 +119,10 @@ async function discover() {
     for (let i in sls) {
       if (sls[i].path.startsWith(dev)) {
         if (typeof devices[sls[i].path] === "undefined") {
-          if (os.platform() == 'linux') {
-            log.info('New serial interface (' + sls[i].path + ')')
-            let dev = new Serial(sls[i].path, 115200);
-            let eng = new NMEAEngine(dev);
-            eng.init();
-            devices[sls[i].path] = { device: dev, engine: eng, process: proc };
-          }
+          log.info('New serial interface (' + sls[i].path + ')')
+          let dev = new Serial(sls[i].path, 115200);
+          let eng = new NMEAEngine(dev);
+          devices[sls[i].path] = { device: dev, engine: eng, process: proc };
         }
       }
     }
@@ -137,7 +134,6 @@ async function discover() {
             log.info('New CAN interface (' + cls[i] + ')')
             let dev = new Can(cls[i]);
             let eng = new NMEAEngine(dev);
-            eng.init();
             devices[cls[i]] = { device: dev, engine: eng, process: proc };
           }
         }
@@ -149,7 +145,6 @@ async function discover() {
           if (typeof devices[cls[0].path] === "undefined") {
             log.info('New CAN interface (' + cls[0].path + ')')
             let eng = new NMEAEngine(can);
-            eng.init();
             devices[cls[0].path] = { device: can, engine: eng, process: proc };
           }
         }
@@ -281,6 +276,7 @@ ipcMain.on('bar-code', (e, args) => {
 ipcMain.on('dev-start', (e, ...args) => {
   for (const [key, val] of Object.entries(devices)) {
     val.device.start(val.process);  
+    val.engine.init();
   }
 });
 // Stop device processing

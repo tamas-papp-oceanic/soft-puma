@@ -20,7 +20,7 @@
 	export let version;
 	export let appName;
 
-  const routes = {
+	const routes = {
 		"/": Devices,
 		"/login": wrap({
 			component: Login,
@@ -62,7 +62,7 @@
 		"*": NotFound,
 	};
 
-  window.pumaAPI.send('dev-start');
+	window.pumaAPI.send('dev-start');
 </script>
 
 <svelte:head>
