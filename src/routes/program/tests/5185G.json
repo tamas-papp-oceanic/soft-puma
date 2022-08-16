@@ -4,7 +4,8 @@
       "blurb": "1. Connect the device to the NMEA network and power before continuing.",
       "variables": {
         "product": null,
-        "serial": null
+        "serial": null,
+        "result": true
       },
       "buttons": [ "Next", "Cancel" ],
       "scripts": {
@@ -36,7 +37,7 @@
         "placeholder": "Enter serial number...",
         "error": {
           "title": "Error",
-          "subtitle": "Serial number should be at least 6 characters long integer.",
+          "subtitle": "Serial number should be 7 characters long integer.",
           "active": false
         }
         }],
@@ -80,30 +81,40 @@
       "onSuccess": { "action": "add-log", "testCode": 2, "testValue": 1 }
     },
     "6": {
-      "blurb": "6. Insert update USB.\n\nWait for update to be done and only when language selection screen is showing up after update click Pass.\nIf device update isn't successful click Fail.",
-      "testCode": 4,
-      "buttons": [ "Pass", "Fail" ],
+      "blurb": "6. Insert update USB and click Next.",
+      "buttons": [ "Next", "Cancel" ],
       "scripts": {
         "1": {
           "action": "stop-tests"
         },
         "2": {
+          "action": "next"
+        }
+      }
+    },
+    "7": {
+      "blurb": "7. Wait for update result.\n\nIf language selection screen is showing up click Pass.\nIf device update isn't successful click Fail.",
+      "testCode": 4,
+      "buttons": [ "Pass", "Fail" ],
+      "scripts": {
+        "1": {
           "action": "start-update"
         }
       },
       "onSuccess": { "action": "add-log", "testCode": 4, "testValue": 1 }
     },
-    "7": {
-      "blurb": "7. Printing product label.",
-      "testCode": 5,
+    "8": {
+      "blurb": "8. Test result.",
       "last": true,
-      "buttons": [ "Print" ],
+      "buttons": [ "Ok" ],
       "scripts": {
         "1": {
+          "action": "result"
+        },
+        "2": {
           "action": "next"
         }
-      },
-      "onSuccess": { "action": "print-label" }
+      }
     }
   }
 }
