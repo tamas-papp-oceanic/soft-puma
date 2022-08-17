@@ -59,7 +59,7 @@ function createWindow() {
   }
 
   // Open the DevTools.
-  if (os.platform() == 'linux') {
+  if (isDev()) {
     mainWindow.webContents.openDevTools();
   }
 
