@@ -115,14 +115,14 @@ app.on('activate', function () {
 // Discovering interfaces
 async function discover() {
   Serial.discover().then((sls) => {
-    let dev = (os.platform() == 'linux' ? '/dev/ttyACM' : 'COM');
     for (let i in sls) {
-      if (sls[i].path.startsWith(dev)) {
+      if ((sls[i].vendorId == '0483') && (sls[i].productId == '5740')) {
+        // STMicroelectronics Virtual COM port
         if (typeof devices[sls[i].path] === "undefined") {
           log.info('New serial interface (' + sls[i].path + ')')
           let dev = new Serial(sls[i].path, 115200);
           let eng = new NMEAEngine(dev);
-          devices[sls[i].path] = { device: dev, engine: eng, process: proc };
+          devices[sls[i].path] = { type: 'serial', device: dev, engine: eng, process: proc };
         }
       }
     }
@@ -134,7 +134,7 @@ async function discover() {
             log.info('New CAN interface (' + cls[i] + ')')
             let dev = new Can(cls[i]);
             let eng = new NMEAEngine(dev);
-            devices[cls[i]] = { device: dev, engine: eng, process: proc };
+            devices[cls[i]] = { type: 'can', device: dev, engine: eng, process: proc };
           }
         }
       }
@@ -145,7 +145,7 @@ async function discover() {
           if (typeof devices[cls[0].path] === "undefined") {
             log.info('New CAN interface (' + cls[0].path + ')')
             let eng = new NMEAEngine(can);
-            devices[cls[0].path] = { device: can, engine: eng, process: proc };
+            devices[cls[0].path] = { type: 'can', device: can, engine: eng, process: proc };
           }
         }
       }).catch((err) => {
@@ -292,16 +292,16 @@ ipcMain.on('app-quit', (e, ...args) => {
     timer = null;
   }
   for (const [key, val] of Object.entries(devices)) {
-    if (key.startsWith('can')) {
-      log.info('Stopping CAN (' + key + ')...');
-    } else if (key.startsWith('/dev/ttyACM')) {
+    log.info('Stopping NMEA engines...');
+    for (const [key, val] of Object.entries(devices)) {
+      val.engine.destroy();
+    }
+    if (val.type == 'serial') {
       log.info('Closing Serial (' + key + ')...');
+    } else if (val.type == 'can') {
+      log.info('Stopping CAN (' + key + ')...');
     }
     val.device.stop();
-  }
-  log.info('Stopping NMEA engines...');
-  for (const [key, val] of Object.entries(devices)) {
-    val.engine.destroy();
   }
   log.info('Quit...')
   app.quit();
