@@ -29,7 +29,7 @@
       }
     },
     "3": {
-      "blurb": "3. Scan S/N label and type in the box below.",
+      "blurb": "3. Scan S/N label or type in the box below.",
       "inputs" : [{
         "type": "TextInput",
         "id": "serial",
@@ -37,7 +37,7 @@
         "placeholder": "Enter serial number...",
         "error": {
           "title": "Error",
-          "subtitle": "Serial number should be 7 characters long integer.",
+          "subtitle": "Serial number should be at least 7 characters long integer.",
           "active": false
         }
         }],

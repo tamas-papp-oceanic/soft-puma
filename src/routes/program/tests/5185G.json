@@ -29,7 +29,7 @@
       }
     },
     "3": {
-      "blurb": "3. Scan S/N label and type in the box below.",
+      "blurb": "3. Scan S/N label or type in the box below.",
       "inputs" : [{
         "type": "TextInput",
         "id": "serial",
