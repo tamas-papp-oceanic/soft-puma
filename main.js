@@ -1,5 +1,6 @@
 // Modules to control application life and create native browser window
 const { app, BrowserWindow, ipcMain } = require('electron');
+const { autoUpdater } = require('electron-updater');
 const os = require('os');
 const fs = require('fs');
 const path = require('path');
@@ -83,11 +84,36 @@ function createWindow() {
   });
 }
 
+autoUpdater.logger = log;
+autoUpdater.logger.transports.file.level = 'info';
+// AutoUpdater callbacks
+autoUpdater.on('checking-for-update', () => {
+  sendStatus('Checking for update...');
+})
+autoUpdater.on('update-available', (ev, info) => {
+  sendStatus('Update available.');
+})
+autoUpdater.on('update-not-available', (ev, info) => {
+  sendStatus('Update not available.');
+})
+autoUpdater.on('error', (ev, err) => {
+  sendStatus('Error in auto-updater.');
+})
+autoUpdater.on('download-progress', (ev, progressObj) => {
+  sendStatus('Download progress...');
+})
+autoUpdater.on('update-downloaded', (ev, info) => {
+  sendStatus('Update downloaded; will install in 5 seconds');
+  setTimeout(function() {
+    autoUpdater.quitAndInstall();  
+  }, 5000)
+});
 // This method will be called when Electron has finished
 // initialization and is ready to create browser windows.
 // Some APIs can only be used after this event occurs.
 app.whenReady().then(async () => {
   createWindow();
+  autoUpdater.checkForUpdates();
 });
 
 // Quit when all windows are closed.
@@ -112,6 +138,14 @@ app.on('activate', function () {
 // FOR INIT ONLY
 // let tool = require('./src/tools/nmea.js');
 // tool.create();
+
+
+function sendStatus(txt) {
+  log.info(txt);
+  if ((typeof mainWindow !== 'undefined') && (typeof mainWindow.webContents !== 'undefined')) {
+    mainWindow.webContents.send('updater', txt);
+  }
+}
 // Discovering interfaces
 async function discover() {
   Serial.discover().then((sls) => {

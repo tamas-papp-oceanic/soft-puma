@@ -20,7 +20,7 @@
 	export let version;
 	export let appName;
 
-	const routes = {
+  const routes = {
 		"/": Devices,
 		"/login": wrap({
 			component: Login,
@@ -62,7 +62,19 @@
 		"*": NotFound,
 	};
 
-	window.pumaAPI.send('dev-start');
+  let update = false;
+  let message = '';
+
+  window.pumaAPI.recv('updater', (e, val) => {
+    update = true;
+    message = val;
+
+console.log(message)
+
+
+  });
+
+  window.pumaAPI.send('dev-start');
 </script>
 
 <svelte:head>
@@ -71,6 +83,14 @@
 
 <Header company="Oceanic" product={appName} version={version} />
 <main class="content">
+  <ToastNotification
+    bind:update
+    hideCloseButton
+    kind="info"
+    title="Updater"
+    subtitle={message}
+    caption={new Date().toLocaleString()}
+  />
 	<Router {routes} restoreScrollState={true} />
 </main>
 

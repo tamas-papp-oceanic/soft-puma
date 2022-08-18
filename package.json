@@ -15,7 +15,14 @@
     ],
     "win": {},
     "linux": {},
-    "mac": {}
+    "mac": {},
+    "appImage": {
+      "synopsis": "Diagnostic App"
+    },
+    "publish": {
+      "provider": "generic",
+      "url": "http://localhost:8080/release"
+    }
   },
   "scripts": {
     "build": "rollup -c",
@@ -58,6 +65,7 @@
     "crypto": "^1.0.1",
     "electron-log": "^4.4.8",
     "electron-serve": "^1.1.0",
+    "electron-updater": "^5.2.1",
     "jwt-decode": "^3.1.2",
     "pdfkit": "^0.13.0",
     "yarn": "^1.22.19"

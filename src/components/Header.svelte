@@ -1,7 +1,7 @@
 <script>
   import { location, push } from 'svelte-spa-router'
   import { Header, HeaderNav, HeaderNavItem, HeaderUtilities, HeaderGlobalAction,
-    ComposedModal, ModalHeader, ModalFooter } from "carbon-components-svelte";
+    ComposedModal, ModalHeader, ModalFooter, ToastNotification } from "carbon-components-svelte";
   import { logout } from '../auth/auth.js'
   import { loggedIn } from '../stores/user.js';
   import Login20 from "carbon-icons-svelte/lib/Login20";
@@ -39,7 +39,7 @@
 
   function _cancel(e) {
     open = false;
-  };  
+  };
   
   $: platform = product + " v" + version
   $: routeParsed = $location.replace(re, '$1')
@@ -68,7 +68,8 @@
       secondaryButtons={[{ text: "Cancel" }]}
       on:click:button--secondary={(e) => _cancel(e)}
     />
-  </ComposedModal></div>
+  </ComposedModal>
+</div>
 
 <style global>
   .bx--header {
