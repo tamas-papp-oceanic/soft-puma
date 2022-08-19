@@ -5,7 +5,7 @@
   "main": "main.js",
   "build": {
     "icon": "public/favicon.png",
-    "productName": "Puma Diagnostic Tool",
+    "productName": "Puma",
     "files": [
       "public/**/*",
       "src/config/*",
@@ -13,17 +13,25 @@
       "main.js",
       "preload.js"
     ],
-    "win": {},
-    "linux": {},
+    "win": { "target": "nsis" },
+    "linux": { "target": "appImage" },
     "mac": {},
     "appImage": {
       "synopsis": "Puma Diagnostic Tool",
       "description": "Oceanic System's Device Settings & Diagnostic Application",
-      "artifactName": "puma"
+      "artifactName": "puma",
+      "publish": {
+        "provider": "generic",
+        "url": "http://localhost:8080/release"
+      }
     },
-    "publish": {
-      "provider": "generic",
-      "url": "http://localhost:8080/release"
+    "nsis": {
+      "oneClick": false,
+      "allowToChangeInstallationDirectory": true,
+      "publish": {
+        "provider": "generic",
+        "url": "http://192.168.16.52:8080/release"
+      }
     }
   },
   "scripts": {
