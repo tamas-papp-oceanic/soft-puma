@@ -88,27 +88,23 @@ function createWindow() {
 
 autoUpdater.logger = log;
 // AutoUpdater callbacks
-autoUpdater.on('checking-for-update', () => {
-  // log.info('Checking for update...');
+// autoUpdater.on('checking-for-update', () => {
+// })
+autoUpdater.on('update-available', (info) => {
+  setTimeout(() => {
+    if ((mainWindow != null) && (typeof mainWindow.webContents !== 'undefined')) {
+      mainWindow.webContents.send('app-update', info.version);
+    }
+  }, 3000);
 })
-autoUpdater.on('update-available', (ev, info) => {
-  // sendStatus('Update available.');
-})
-autoUpdater.on('update-not-available', (ev, info) => {
-  // log.info('Update not available.');
-})
-autoUpdater.on('error', (ev, err) => {
-  // log.error('Error in auto-updater.');
-})
-autoUpdater.on('download-progress', (ev, progressObj) => {
-  // log.info('Download progress...');
-})
-autoUpdater.on('update-downloaded', (ev, info) => {
-  // sendStatus('Update downloaded; will install in 5 seconds');
-  // setTimeout(function() {
-  //   autoUpdater.quitAndInstall();  
-  // }, 5000)
-});
+// autoUpdater.on('update-not-available', (info) => {
+// })
+// autoUpdater.on('error', (err) => {
+// })
+// autoUpdater.on('download-progress', (progressObj) => {
+// })
+// autoUpdater.on('update-downloaded', (info) => {
+// });
 
 // This method will be called when Electron has finished
 // initialization and is ready to create browser windows.
@@ -116,15 +112,7 @@ autoUpdater.on('update-downloaded', (ev, info) => {
 app.whenReady().then(async () => {
   createWindow();
   autoUpdater.autoDownload = false;
-  autoUpdater.checkForUpdates().then((res) => {
-    setTimeout(() => {
-      if ((mainWindow != null) && (typeof mainWindow.webContents !== 'undefined')) {
-        mainWindow.webContents.send('app-update', res.updateInfo.version);
-      }
-    }, 5000);
-  }).catch((err) => {
-    log.error(err);
-  });
+  autoUpdater.checkForUpdates();
 });
 
 // Quit when all windows are closed.
@@ -310,6 +298,7 @@ ipcMain.on('bar-code', (e, args) => {
     log.error(err)
   });
 });
+
 // Start device processing
 ipcMain.on('dev-start', (e, ...args) => {
   for (const [key, val] of Object.entries(devices)) {
@@ -317,12 +306,14 @@ ipcMain.on('dev-start', (e, ...args) => {
     val.engine.init();
   }
 });
+
 // Stop device processing
 ipcMain.on('dev-stop', (e, ...args) => {
   for (const [key, val] of Object.entries(devices)) {
     val.device.stop();  
   }
 });
+
 // Update the application
 ipcMain.on('app-update', (e, ...args) => {
   autoUpdater.downloadUpdate().then((res) => {

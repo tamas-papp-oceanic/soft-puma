@@ -19,7 +19,6 @@
     "appImage": {
       "synopsis": "Puma Diagnostic Tool",
       "description": "Oceanic System's Device Settings & Diagnostic Application",
-      "category": "Utility",
       "artifactName": "puma"
     },
     "publish": {
