@@ -1,9 +1,11 @@
 <script>
   import { location, push } from 'svelte-spa-router'
   import { Header, HeaderNav, HeaderNavItem, HeaderUtilities, HeaderGlobalAction,
-    ComposedModal, ModalHeader, ModalFooter, ToastNotification } from "carbon-components-svelte";
+    ComposedModal, ModalHeader, ModalFooter, TooltipDefinition } from "carbon-components-svelte";
   import { logout } from '../auth/auth.js'
   import { loggedIn } from '../stores/user.js';
+	import { update, updmsg } from '../stores/update.js';
+  import Update20 from "carbon-icons-svelte/lib/UpdateNow20";
   import Login20 from "carbon-icons-svelte/lib/Login20";
   import Logout20 from "carbon-icons-svelte/lib/Logout20";
   import Close20 from "carbon-icons-svelte/lib/Close20";
@@ -41,6 +43,10 @@
     open = false;
   };
   
+  function _update(e) {
+    window.pumaAPI.send('app-update');
+  };
+
   $: platform = product + " v" + version
   $: routeParsed = $location.replace(re, '$1')
 </script>
@@ -53,15 +59,26 @@
       <HeaderNavItem class="{routeParsed === '/program' ? 'active' : ''}"disabled on:click={() => push('/program')} text="Program" />
     </HeaderNav>
     <HeaderUtilities>
-      {#if !$loggedIn}
-        <HeaderGlobalAction on:click={(e) => _login(e)} aria-label="Login" icon={Login20} text="Login" />
-      {:else}
-        <HeaderGlobalAction on:click={(e) => _logout(e)} aria-label="Logout" icon={Logout20} text="Logout" />
+      {#if $update}
+        <TooltipDefinition direction="bottom" align="center" tooltipText={"Update available: v" + $updmsg + "\nClick to install."}>
+          <HeaderGlobalAction on:click={(e) => _update(e)} aria-label="Update available" icon={Update20} />
+        </TooltipDefinition>
       {/if}
-      <HeaderGlobalAction on:click={(e) => _show(e)} id="close-btn" aria-label="Exit" icon={Close20} />
+      {#if !$loggedIn}
+        <TooltipDefinition direction="bottom" align="center" tooltipText="Login">
+          <HeaderGlobalAction on:click={(e) => _login(e)} aria-label="Login" icon={Login20} />
+        </TooltipDefinition>
+      {:else}
+        <TooltipDefinition direction="bottom" align="center" tooltipText="Logout">
+          <HeaderGlobalAction on:click={(e) => _logout(e)} aria-label="Logout" icon={Logout20} />
+        </TooltipDefinition>
+      {/if}
+      <TooltipDefinition direction="bottom" align="center" tooltipText="Exit">
+        <HeaderGlobalAction on:click={(e) => _show(e)} aria-label="Exit" icon={Close20} />
+      </TooltipDefinition>
     </HeaderUtilities>
   </Header>
-  <ComposedModal bind:open on:submit={(e) => _close(e)} size="xs">
+  <ComposedModal open={open} on:submit={(e) => _close(e)} size="xs">
     <ModalHeader title="Confirm exit" />
     <ModalFooter
       primaryButtonText="Proceed"
@@ -77,7 +94,6 @@
     user-select: none;
     -webkit-app-region: drag;
   }
-
   button,
   a {
     -webkit-app-region: no-drag;
@@ -88,4 +104,11 @@
   .bx--table-sort.bx--table-sort--active, .bx--table-sort:hover {
     background: #4e4e4e;
   }
+  .bx--tooltip__trigger.bx--tooltip__trigger--definition {
+    border-bottom: none;
+  }
+  .bx--tooltip__trigger.bx--tooltip__trigger--definition.bx--tooltip--bottom.bx--tooltip--align-center.bx--tooltip--a11y+.bx--assistive-text {
+    white-space: pre-line;
+  }
 </style>
+

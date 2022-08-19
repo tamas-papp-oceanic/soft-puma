@@ -5,7 +5,7 @@
   "main": "main.js",
   "build": {
     "icon": "public/favicon.png",
-    "productName": "Svelte and Electron App",
+    "productName": "Puma Diagnostic Tool",
     "files": [
       "public/**/*",
       "src/config/*",
@@ -17,7 +17,10 @@
     "linux": {},
     "mac": {},
     "appImage": {
-      "synopsis": "Diagnostic App"
+      "synopsis": "Puma Diagnostic Tool",
+      "description": "Oceanic System's Device Settings & Diagnostic Application",
+      "category": "Utility",
+      "artifactName": "puma"
     },
     "publish": {
       "provider": "generic",

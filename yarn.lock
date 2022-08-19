@@ -1064,10 +1064,10 @@
   "resolved" "https://registry.npmjs.org/caniuse-lite/-/caniuse-lite-1.0.30001359.tgz"
   "version" "1.0.30001359"
 
-"carbon-components-svelte@^0.67.0":
-  "integrity" "sha512-2PzAivpDmiQXDd+FVLMGNiE/p1DyueN7EWRl3wDYFCv6w7DVMWJ2rv4JT9pUaEjypSwGSuT2gNuxpA3njJ+7Yg=="
-  "resolved" "https://registry.npmjs.org/carbon-components-svelte/-/carbon-components-svelte-0.67.0.tgz"
-  "version" "0.67.0"
+"carbon-components-svelte@^0.67.9":
+  "integrity" "sha512-QZd7oxWlBjWx3TbXZhke8voFAQtuoZeQoGx/RkCRbUqBbWsMAaGLn/umTP9+kpiHeMX8/7Hl/CTML+CkKOfE1g=="
+  "resolved" "https://registry.npmjs.org/carbon-components-svelte/-/carbon-components-svelte-0.67.9.tgz"
+  "version" "0.67.9"
   dependencies:
     "flatpickr" "4.6.9"
 

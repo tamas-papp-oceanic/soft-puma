@@ -1,6 +1,6 @@
 <script>
   import Router from 'svelte-spa-router';
-	import { location, push, pop, replace, link } from 'svelte-spa-router'
+	import { push } from 'svelte-spa-router'
 	import { wrap } from 'svelte-spa-router/wrap';
 	import Login from './routes/Login.svelte';
 	import Logout from './routes/Logout.svelte';
@@ -16,6 +16,7 @@
 	import Program from './routes/program/Index.svelte';
 	import Program5185 from './routes/program/5185.svelte';
 	import { loggedIn } from './stores/user.js';
+  import { update, updmsg } from './stores/update.js';
 
 	export let version;
 	export let appName;
@@ -62,16 +63,10 @@
 		"*": NotFound,
 	};
 
-  let update = false;
-  let message = '';
-
-  window.pumaAPI.recv('updater', (e, val) => {
-    update = true;
-    message = val;
-
-console.log(message)
-
-
+  // Updater hook
+  window.pumaAPI.recv('app-update', (e, val) => {
+    $update = true;
+    $updmsg = val;
   });
 
   window.pumaAPI.send('dev-start');
@@ -83,14 +78,6 @@ console.log(message)
 
 <Header company="Oceanic" product={appName} version={version} />
 <main class="content">
-  <ToastNotification
-    bind:update
-    hideCloseButton
-    kind="info"
-    title="Updater"
-    subtitle={message}
-    caption={new Date().toLocaleString()}
-  />
 	<Router {routes} restoreScrollState={true} />
 </main>
 

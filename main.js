@@ -13,6 +13,12 @@ const NMEAEngine = require('./src/services/nmea.js');
 const bwipjs = require('bwip-js');
 const PDFDocument = require('pdfkit');
 const prt = 'HP-LaserJet-Pro-M404-M405';
+
+// Keep a global reference of the window object, if you don't, the window will
+// be closed automatically when the JavaScript object is garbage collected.
+let mainWindow;
+let devices = {};
+let timer = null;
 let Can = null;
 
 if (os.platform() == 'linux') {
@@ -20,11 +26,9 @@ if (os.platform() == 'linux') {
 } else if (os.platform() == 'win32') {
   Can = require('./src/services/pcan.js');
 }
-// Keep a global reference of the window object, if you don't, the window will
-// be closed automatically when the JavaScript object is garbage collected.
-let mainWindow;
-let devices = {};
-let timer = null;
+
+log.transports.console.level = 'info';
+log.transports.file.level = 'info';
 
 function isDev() {
   return !app.isPackaged;
@@ -50,26 +54,24 @@ function createWindow() {
     // icon: path.join(__dirname, 'public/favicon.png'),
     show: false
   });
+
   mainWindow.setMenuBarVisibility(false)
-  // This block of code is intended for development purpose only.
-  // Delete this entire block of code when you are ready to package the application.
+
   if (isDev()) {
+    // This block of code is intended for development purpose only.
+    // Delete this entire block of code when you are ready to package the application.
     mainWindow.loadURL('http://localhost:5000/');
   } else {
+    // Uncomment the following line of code when app is ready to be packaged.
     loadURL(mainWindow);
   }
 
-  // Open the DevTools.
+  // Open the DevTools and also disable Electron Security Warning.
+  // process.env['ELECTRON_DISABLE_SECURITY_WARNINGS'] = true;
   if (isDev()) {
     mainWindow.webContents.openDevTools();
   }
 
-  // Uncomment the following line of code when app is ready to be packaged.
-  // loadURL(mainWindow);
-
-  // Open the DevTools and also disable Electron Security Warning.
-  // process.env['ELECTRON_DISABLE_SECURITY_WARNINGS'] = true;
-  //mainWindow.webContents.openDevTools();ipc
   mainWindow.on('closed', function () {
     // Dereference the window object, usually you would store windows
     // in an array if your app supports multi windows, this is the time
@@ -85,35 +87,44 @@ function createWindow() {
 }
 
 autoUpdater.logger = log;
-autoUpdater.logger.transports.file.level = 'info';
 // AutoUpdater callbacks
 autoUpdater.on('checking-for-update', () => {
-  sendStatus('Checking for update...');
+  // log.info('Checking for update...');
 })
 autoUpdater.on('update-available', (ev, info) => {
-  sendStatus('Update available.');
+  // sendStatus('Update available.');
 })
 autoUpdater.on('update-not-available', (ev, info) => {
-  sendStatus('Update not available.');
+  // log.info('Update not available.');
 })
 autoUpdater.on('error', (ev, err) => {
-  sendStatus('Error in auto-updater.');
+  // log.error('Error in auto-updater.');
 })
 autoUpdater.on('download-progress', (ev, progressObj) => {
-  sendStatus('Download progress...');
+  // log.info('Download progress...');
 })
 autoUpdater.on('update-downloaded', (ev, info) => {
-  sendStatus('Update downloaded; will install in 5 seconds');
-  setTimeout(function() {
-    autoUpdater.quitAndInstall();  
-  }, 5000)
+  // sendStatus('Update downloaded; will install in 5 seconds');
+  // setTimeout(function() {
+  //   autoUpdater.quitAndInstall();  
+  // }, 5000)
 });
+
 // This method will be called when Electron has finished
 // initialization and is ready to create browser windows.
 // Some APIs can only be used after this event occurs.
 app.whenReady().then(async () => {
   createWindow();
-  autoUpdater.checkForUpdates();
+  autoUpdater.autoDownload = false;
+  autoUpdater.checkForUpdates().then((res) => {
+    setTimeout(() => {
+      if ((mainWindow != null) && (typeof mainWindow.webContents !== 'undefined')) {
+        mainWindow.webContents.send('app-update', res.updateInfo.version);
+      }
+    }, 5000);
+  }).catch((err) => {
+    log.error(err);
+  });
 });
 
 // Quit when all windows are closed.
@@ -139,13 +150,6 @@ app.on('activate', function () {
 // let tool = require('./src/tools/nmea.js');
 // tool.create();
 
-
-function sendStatus(txt) {
-  log.info(txt);
-  if ((typeof mainWindow !== 'undefined') && (typeof mainWindow.webContents !== 'undefined')) {
-    mainWindow.webContents.send('updater', txt);
-  }
-}
 // Discovering interfaces
 async function discover() {
   Serial.discover().then((sls) => {
@@ -192,7 +196,7 @@ async function discover() {
 }
 // NMEA processing
 function proc(dev, frm) {
-  if ((typeof mainWindow !== 'undefined') && (typeof mainWindow.webContents !== 'undefined')) {
+  if ((mainWindow != null) && (typeof mainWindow.webContents !== 'undefined')) {
     let msg = devices[dev].engine.process(frm);
     if (msg != null) {
       switch (msg.header.pgn) {
@@ -222,7 +226,7 @@ timer = setInterval(() => {
 }, 10000);
 // Load configurations
 ipcMain.on('n2k-ready', (e, ...args) => {
-  if ((typeof mainWindow !== 'undefined') && (typeof mainWindow.webContents !== 'undefined')) {
+  if ((mainWindow != null) && (typeof mainWindow.webContents !== 'undefined')) {
     mainWindow.webContents.send('n2k-devs', Object.keys(devices));
     const configs = ['classes', 'functions', 'industries', 'manufacturers'];
     for (let i in configs) {
@@ -242,7 +246,7 @@ ipcMain.on('n2k-data', (e, ...args) => {
   }
 });
 ipcMain.on('bus-scan', (e) => {
-  if ((typeof mainWindow !== 'undefined') && (typeof mainWindow.webContents !== 'undefined')) {
+  if ((mainWindow != null) && (typeof mainWindow.webContents !== 'undefined')) {
     mainWindow.webContents.send('n2k-clear');
   }
   for (const [key, val] of Object.entries(devices)) {
@@ -319,6 +323,15 @@ ipcMain.on('dev-stop', (e, ...args) => {
     val.device.stop();  
   }
 });
+// Update the application
+ipcMain.on('app-update', (e, ...args) => {
+  autoUpdater.downloadUpdate().then((res) => {
+    autoUpdater.quitAndInstall();
+  }).catch((err) => {
+    log.error(err);
+  });
+});
+
 // Close the application
 ipcMain.on('app-quit', (e, ...args) => {
   if (timer != null) {
