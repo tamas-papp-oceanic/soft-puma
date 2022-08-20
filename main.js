@@ -20,6 +20,7 @@ let mainWindow;
 let devices = {};
 let timer = null;
 let Can = null;
+let updToken;
 
 if (os.platform() == 'linux') {
   Can = require('./src/services/can.js');
@@ -87,6 +88,7 @@ function createWindow() {
 }
 
 autoUpdater.logger = log;
+autoUpdater.disableWebInstaller = true;
 // AutoUpdater callbacks
 // autoUpdater.on('checking-for-update', () => {
 // })
@@ -101,10 +103,14 @@ autoUpdater.on('update-available', (info) => {
 // })
 // autoUpdater.on('error', (err) => {
 // })
-// autoUpdater.on('download-progress', (progressObj) => {
-// })
-// autoUpdater.on('update-downloaded', (info) => {
-// });
+autoUpdater.on('download-progress', (progObj) => {
+  if ((mainWindow != null) && (typeof mainWindow.webContents !== 'undefined')) {
+    mainWindow.webContents.send('upd-progress', progObj);
+  }
+})
+autoUpdater.on('update-downloaded', (info) => {
+  mainWindow.webContents.send('upd-download', false);
+});
 
 // This method will be called when Electron has finished
 // initialization and is ready to create browser windows.
@@ -112,7 +118,9 @@ autoUpdater.on('update-available', (info) => {
 app.whenReady().then(async () => {
   createWindow();
   autoUpdater.autoDownload = false;
-  autoUpdater.checkForUpdates();
+  autoUpdater.checkForUpdates().then((res) => {
+    updToken = res.cancellationToken;
+  });
 });
 
 // Quit when all windows are closed.
@@ -314,13 +322,18 @@ ipcMain.on('dev-stop', (e, ...args) => {
   }
 });
 
-// Update the application
-ipcMain.on('app-update', (e, ...args) => {
-  autoUpdater.downloadUpdate().then((res) => {
+// Start update process
+ipcMain.on('upd-start', (e, ...args) => {
+  autoUpdater.downloadUpdate(updToken).then(() => {
     autoUpdater.quitAndInstall();
-  }).catch((err) => {
-    log.error(err);
   });
+});
+
+// Cancel update process
+ipcMain.on('upd-cancel', (e, ...args) => {
+  if ((typeof updToken.cancel !== 'undefined') && (!updToken.cancelled)) {
+    updToken.cancel();
+  }
 });
 
 // Close the application

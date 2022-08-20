@@ -2,6 +2,7 @@
   import Router from 'svelte-spa-router';
 	import { push } from 'svelte-spa-router'
 	import { wrap } from 'svelte-spa-router/wrap';
+	import { ComposedModal, ModalHeader, ModalBody, ModalFooter, ProgressBar } from 'carbon-components-svelte';
 	import Login from './routes/Login.svelte';
 	import Logout from './routes/Logout.svelte';
 	import Welcome from './routes/Welcome.svelte';
@@ -16,7 +17,7 @@
 	import Program from './routes/program/Index.svelte';
 	import Program5185 from './routes/program/5185.svelte';
 	import { loggedIn } from './stores/user.js';
-  import { update, updmsg } from './stores/update.js';
+  import { update, updmsg, download, progress } from './stores/update.js';
 
 	export let version;
 	export let appName;
@@ -63,13 +64,53 @@
 		"*": NotFound,
 	};
 
-  // Updater hook
+	let prc;
+  let val;
+	let max;
+	let txt;
+	let started = false;
+
+	// Updater available hook
   window.pumaAPI.recv('app-update', (e, val) => {
     $update = true;
     $updmsg = val;
   });
 
-  window.pumaAPI.send('dev-start');
+	// Updater download hook
+  window.pumaAPI.recv('upd-download', (e, val) => {
+		$download = val;
+  });
+
+	// Updater progress hook
+  window.pumaAPI.recv('upd-progress', (e, val) => {
+    // {
+		//   total: 103826908,
+		//   delta: 2132100,
+		//   transferred: 6227698,
+		//   percent: 5.99815415865028,
+		//   bytesPerSecond: 2075899
+		// }
+		$progress = val;
+  });
+
+	function _start(e) {
+		started = true;
+		window.pumaAPI.send('upd-start', null);
+	}
+
+	function _cancel(e) {
+		window.pumaAPI.send('upd-cancel', null);
+		$download = false;
+		started = false;
+	}
+
+	window.pumaAPI.send('dev-start');
+
+	$: prc = $progress && $progress.percent ? $progress.percent : 0;
+	$: max = $progress && $progress.total ? $progress.total / (1024 * 1024) : 100;
+	$: val = $progress && $progress.transferred ? $progress.transferred / (1024 * 1024) : 0;
+	$: txt = val > 0 ? val.toFixed(0) + "MB of " + max.toFixed(0) + "MB" : "Press start";
+  $: if (val === max) { txt = "Done" };
 </script>
 
 <svelte:head>
@@ -79,6 +120,18 @@
 <Header company="Oceanic" product={appName} version={version} />
 <main class="content">
 	<Router {routes} restoreScrollState={true} />
+	<ComposedModal bind:open={$download} on:submit={(e) => _start(e)}>
+		<ModalHeader label="Download update" title="Confirm download" />
+		<ModalBody>
+			<ProgressBar value={prc} labelText="Download status" helperText={txt} />
+		</ModalBody>
+		<ModalFooter
+			primaryButtonDisabled={started == true}
+			primaryButtonText="Start"
+			secondaryButtons={[{ text: "Cancel" }]}
+			on:click:button--secondary={(e) => _cancel(e)}
+		/>
+	</ComposedModal>
 </main>
 
 <style lang="scss" global>

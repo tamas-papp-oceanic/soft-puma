@@ -4,7 +4,7 @@
     ComposedModal, ModalHeader, ModalFooter, TooltipDefinition } from "carbon-components-svelte";
   import { logout } from '../auth/auth.js'
   import { loggedIn } from '../stores/user.js';
-	import { update, updmsg } from '../stores/update.js';
+	import { update, updmsg, download } from '../stores/update.js';
   import Update20 from "carbon-icons-svelte/lib/UpdateNow20";
   import Login20 from "carbon-icons-svelte/lib/Login20";
   import Logout20 from "carbon-icons-svelte/lib/Logout20";
@@ -44,7 +44,7 @@
   };
   
   function _update(e) {
-    window.pumaAPI.send('app-update');
+    $download = true;
   };
 
   $: platform = product + " v" + version
