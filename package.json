@@ -17,8 +17,7 @@
       "target": "appImage",
       "publish": {
         "provider": "generic",
-        "url": "http://localhost:8080/release/x86_64",
-        "useMultipleRangeRequest": false
+        "url": "http://localhost:8080/release/x86_64"
       }
     },
     "mac": {},
@@ -26,8 +25,7 @@
       "target": "nsis",
       "publish": {
         "provider": "generic",
-        "url": "http://192.168.16.52:8080/release/win64",
-        "useMultipleRangeRequest": false
+        "url": "http://192.168.16.52:8080/release/win64"
       }
     },
     "appImage": {

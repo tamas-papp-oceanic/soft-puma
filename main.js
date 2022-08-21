@@ -1,6 +1,6 @@
 // Modules to control application life and create native browser window
 const { app, BrowserWindow, ipcMain } = require('electron');
-const { autoUpdater } = require('electron-updater');
+const { autoUpdater, CancellationToken } = require('electron-updater');
 const os = require('os');
 const fs = require('fs');
 const path = require('path');
@@ -20,7 +20,7 @@ let mainWindow;
 let devices = {};
 let timer = null;
 let Can = null;
-let updToken;
+let cancelToken;
 
 if (os.platform() == 'linux') {
   Can = require('./src/services/can.js');
@@ -95,7 +95,7 @@ autoUpdater.disableWebInstaller = true;
 autoUpdater.on('update-available', (info) => {
   setTimeout(() => {
     if ((mainWindow != null) && (typeof mainWindow.webContents !== 'undefined')) {
-      mainWindow.webContents.send('app-update', info.version);
+      mainWindow.webContents.send('upd-available', info.version);
     }
   }, 3000);
 })
@@ -118,9 +118,7 @@ autoUpdater.on('update-downloaded', (info) => {
 app.whenReady().then(async () => {
   createWindow();
   autoUpdater.autoDownload = false;
-  autoUpdater.checkForUpdates().then((res) => {
-    updToken = res.cancellationToken;
-  });
+  autoUpdater.checkForUpdates();
 });
 
 // Quit when all windows are closed.
@@ -324,15 +322,17 @@ ipcMain.on('dev-stop', (e, ...args) => {
 
 // Start update process
 ipcMain.on('upd-start', (e, ...args) => {
-  autoUpdater.downloadUpdate(updToken).then(() => {
+  cancelToken = new CancellationToken();
+  autoUpdater.downloadUpdate(cancelToken).then(() => {
     autoUpdater.quitAndInstall();
   });
 });
 
 // Cancel update process
 ipcMain.on('upd-cancel', (e, ...args) => {
-  if ((typeof updToken.cancel !== 'undefined') && (!updToken.cancelled)) {
-    updToken.cancel();
+  if ((typeof cancelToken.cancel !== 'undefined') && (!cancelToken.cancelled)) {
+    cancelToken.cancel();
+    cancelToken.dispose();
   }
 });
 

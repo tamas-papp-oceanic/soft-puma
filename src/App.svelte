@@ -2,7 +2,8 @@
   import Router from 'svelte-spa-router';
 	import { push } from 'svelte-spa-router'
 	import { wrap } from 'svelte-spa-router/wrap';
-	import { ComposedModal, ModalHeader, ModalBody, ModalFooter, ProgressBar } from 'carbon-components-svelte';
+	import { ComposedModal, ModalHeader, ModalBody, ModalFooter,
+		ProgressBar } from 'carbon-components-svelte';
 	import Login from './routes/Login.svelte';
 	import Logout from './routes/Logout.svelte';
 	import Welcome from './routes/Welcome.svelte';
@@ -71,7 +72,7 @@
 	let started = false;
 
 	// Updater available hook
-  window.pumaAPI.recv('app-update', (e, val) => {
+  window.pumaAPI.recv('upd-available', (e, val) => {
     $update = true;
     $updmsg = val;
   });
@@ -95,12 +96,13 @@
 
 	function _start(e) {
 		started = true;
-		window.pumaAPI.send('upd-start', null);
+		window.pumaAPI.send('upd-start');
 	}
 
 	function _cancel(e) {
-		window.pumaAPI.send('upd-cancel', null);
+		window.pumaAPI.send('upd-cancel');
 		$download = false;
+		$progress = {};
 		started = false;
 	}
 
@@ -121,7 +123,7 @@
 <main class="content">
 	<Router {routes} restoreScrollState={true} />
 	<ComposedModal bind:open={$download} on:submit={(e) => _start(e)}>
-		<ModalHeader label="Download update" title="Confirm download" />
+		<ModalHeader label="Download update" title={"Confirm download of Puma v" + $updmsg} />
 		<ModalBody>
 			<ProgressBar value={prc} labelText="Download status" helperText={txt} />
 		</ModalBody>
