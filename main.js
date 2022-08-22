@@ -1,6 +1,7 @@
 // Modules to control application life and create native browser window
 const { app, BrowserWindow, ipcMain } = require('electron');
 const { autoUpdater, CancellationToken } = require('electron-updater');
+const isDev = require('electron-is-dev');
 const os = require('os');
 const fs = require('fs');
 const path = require('path');
@@ -31,10 +32,6 @@ if (os.platform() == 'linux') {
 log.transports.console.level = 'info';
 log.transports.file.level = 'info';
 
-function isDev() {
-  return !app.isPackaged;
-}
-
 function createWindow() {
   // Create the browser window.
   mainWindow = new BrowserWindow({
@@ -47,10 +44,10 @@ function createWindow() {
       nodeIntegration: true,
       enableRemoteModule: true,
       contextIsolation: true,
-      preload: path.join(isDev() ? process.cwd() : __dirname, 'preload.js'),
+      preload: path.join(isDev ? process.cwd() : __dirname, 'preload.js'),
     },
     // Use this in development mode.
-    icon: path.join(isDev() ? process.cwd() : __dirname, 'public/favicon.png'),
+    icon: path.join(isDev ? process.cwd() : __dirname, 'public/favicon.png'),
     // Use this in production mode.
     // icon: path.join(__dirname, 'public/favicon.png'),
     show: false
@@ -58,7 +55,7 @@ function createWindow() {
 
   mainWindow.setMenuBarVisibility(false)
 
-  if (isDev()) {
+  if (isDev) {
     // This block of code is intended for development purpose only.
     // Delete this entire block of code when you are ready to package the application.
     mainWindow.loadURL('http://localhost:5000/');
@@ -69,7 +66,7 @@ function createWindow() {
 
   // Open the DevTools and also disable Electron Security Warning.
   // process.env['ELECTRON_DISABLE_SECURITY_WARNINGS'] = true;
-  if (isDev()) {
+  if (isDev) {
     mainWindow.webContents.openDevTools();
   }
 

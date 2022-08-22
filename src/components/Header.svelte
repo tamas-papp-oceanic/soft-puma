@@ -78,7 +78,7 @@
       </TooltipDefinition>
     </HeaderUtilities>
   </Header>
-  <ComposedModal open={open} on:submit={(e) => _close(e)} size="xs">
+  <ComposedModal open={open} on:submit={(e) => _close(e)} on:close={(e) => _cancel(e)} size="xs">
     <ModalHeader title="Confirm exit" />
     <ModalFooter
       primaryButtonText="Proceed"
