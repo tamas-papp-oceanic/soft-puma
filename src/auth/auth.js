@@ -112,7 +112,8 @@ async function afetch(url, options) {
 // type = read write or delete
 function checkAccess(route, type) {
   let prm = get(permissions);
-  if ((typeof prm[route] !== 'undefined') && (typeof prm[route][type] !== 'undefined')) {
+  if ((prm != null) && (typeof prm[route] !== 'undefined') &&
+    (typeof prm[route][type] !== 'undefined')) {
     return prm[route][type];
   }
   return false;
