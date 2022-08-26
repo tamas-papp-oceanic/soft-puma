@@ -15,9 +15,9 @@ async function refreshLogin() {
     const json = await res.json();
     accessToken.set(json.access_token);
     refreshToken.set(json.refresh_token);
-    loggedIn.set(true);
     let dec = jwt_decode(json.access_token);
     userData.set(dec);
+    loggedIn.set(true);
     console.log("Refresh Success");
     return true;
   } else {
@@ -54,9 +54,9 @@ async function login(username, password) {
     const json = await res.json();
     accessToken.set(json.access_token);
     refreshToken.set(json.refresh_token);
-    loggedIn.set(true);
     let dec = jwt_decode(json.access_token);
     userData.set(dec);
+    loggedIn.set(true);
     await getPerms();
     console.log("Login Success");
     return true;
@@ -66,8 +66,9 @@ async function login(username, password) {
 }
 
 async function logout() {
-  let res = await afetch(authURL + '/logout', {method: 'POST'})
+  const res = await afetch(authURL + '/logout', {method: 'POST'})
   if (res.status == 200) {
+    permissions.set({});
     userData.set({});
     accessToken.set("");
     refreshToken.set("");
@@ -81,7 +82,8 @@ async function logout() {
 
 async function afetch(url, options) {
   // add logic to add auth header here.
-  if (get(loggedIn) === true) {
+  let lin = get(loggedIn);
+  if (lin) {
     let token = get(accessToken)
     let bearer = "bearer " + token
     options["withCredentials"] = true
@@ -89,12 +91,13 @@ async function afetch(url, options) {
     options["headers"] = {'Authorization': bearer, "Content-Type":"application/json" }
   }
   try {
+    let lin = get(loggedIn);
     const res = await fetch(url, options);
-    if (get(loggedIn) && (res.status == 401)) {
+    if (lin && (res.status == 401)) {
       // refreshLogin will set LoggedIn to false if it fails, so we only do one loop
       console.log("Suspect access expired. Try to refresh")
       let rfl = await refreshLogin();
-      if(rfl == true){
+      if (rfl == true){
         // success refresh
         const res2 = await afetch(url, options);
         return res2
@@ -109,8 +112,8 @@ async function afetch(url, options) {
 // type = read write or delete
 function checkAccess(route, type) {
   let prm = get(permissions);
-  if (typeof prm[route] !== 'undefined') {
-    return (prm[route].type == type);
+  if ((typeof prm[route] !== 'undefined') && (typeof prm[route][type] !== 'undefined')) {
+    return prm[route][type];
   }
   return false;
 }
@@ -118,6 +121,6 @@ function checkAccess(route, type) {
 export {
   login,
   logout,
+  afetch,
   checkAccess,
-  afetch
 }

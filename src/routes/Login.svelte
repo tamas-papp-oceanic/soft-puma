@@ -3,7 +3,7 @@
   import { Grid, Row, Column, Form, TextInput, PasswordInput, Button } from "carbon-components-svelte";
   import { login } from '../auth/auth.js'
   
-  export let redirect = "/welcome"
+  let redirect = "/welcome"
 
   let username = '';
   let password = '';
@@ -38,11 +38,9 @@
       <h3>Restricted Access</h3>
       <p>Please enter your login credentials to continue</p><small>(Internet connection required)</small>
       <hr>
-      <Form>
-        <TextInput bind:value={username} labelText="User name" placeholder="Enter user name..." required />
-        <PasswordInput bind:value={password} type="password" labelText="Password" placeholder="Enter password..." required />
-        <Button on:click={(e) => _submit(e)} type="submit">Submit</Button>
-      </Form>
+      <TextInput bind:value={username} labelText="User name" placeholder="Enter user name..." required />
+      <PasswordInput bind:value={password} type="password" labelText="Password" placeholder="Enter password..." required />
+      <Button on:click={(e) => _submit(e)} type="submit">Submit</Button>
     </Column>
     <Column sm={0} md={2} lg={4} />
   </Row>

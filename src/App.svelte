@@ -5,7 +5,6 @@
 	import { ComposedModal, ModalHeader, ModalBody, ModalFooter,
 		ProgressBar } from 'carbon-components-svelte';
 	import Login from './routes/Login.svelte';
-	import Logout from './routes/Logout.svelte';
 	import Welcome from './routes/Welcome.svelte';
 	import NotFound from './routes/NotFound.svelte';
 	import Header from './components/Header.svelte';
@@ -17,7 +16,7 @@
 	import Configure from './routes/Configure.svelte';
 	import Program from './routes/program/Index.svelte';
 	import Program5185 from './routes/program/5185.svelte';
-	import { loggedIn } from './stores/user.js';
+	import { loggedIn, userData } from './stores/user.js';
   import { update, updmsg, download, progress } from './stores/update.js';
 
 	export let version;
@@ -30,16 +29,6 @@
 			conditions: [() =>{
 				if ($loggedIn == true) {
 					push("/welcome")
-				} else {
-					return true
-				}
-			}],
-		}),
-		"/logout": wrap({
-			component: Logout,
-			conditions: [() =>{
-				if ($loggedIn == false) {
-					push("/login")
 				} else {
 					return true
 				}

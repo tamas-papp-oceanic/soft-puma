@@ -2,9 +2,11 @@
   import { Row, Grid, Column, Tabs, Tab, TabContent } from "carbon-components-svelte";
   import { push } from 'svelte-spa-router'
   import { selected } from '../../stores/data.js'
+  import { checkAccess } from '../../auth/auth'
 
   let tab;
   let dev;
+  let ptw;
 
   function change(e){
     $selected.program = e.detail;
@@ -12,6 +14,7 @@
 
   $: tab = $selected.program;
   $: dev = $selected.device;
+  $: ptw = checkAccess('test', 'write');
 </script>
 
 <Grid>
@@ -20,41 +23,45 @@
     <Tabs type="container" bind:selected={tab} on:change={(e) => change(e)}>
       <Tab label="Sensors" />
       <Tab label="Adaptors" />
-      <Tab label="Displays" />
+      {#if ptw}
+        <Tab label="Displays" />
+      {/if}
       <div slot="content">
         <TabContent>Not available yet</TabContent>
         <TabContent>Not available yet</TabContent>
-        <TabContent>
-          <Grid padding fullWidth noGutter>
-              <Row>
-              <Column sm={4} md={3} lg={4} aspectRatio="1x1">
-                <div class="product-card" class:selected={dev == '5185'} on:pointerdown={(e) => { $selected.device = '5185'; push('/program/5185'); }}>
-                  <div class="product-number">5185</div>
-                  <div class="product-title">Poseidon 7</div>
-                  <div class="product-image"><img src="images/P7.webp" alt="P7" /></div>
-                </div>
-              </Column>
-              <Column sm={4} md={3} lg={4} aspectRatio="1x1">
-                <div class="product-card" class:selected={dev == '5185-H'} on:pointerdown={(e) => { $selected.device = '5185-H'; push('/program/5185/Honda'); }}>
-                  <div class="product-number">5185</div>
-                  <div class="product-title">Poseidon 7 (Honda)</div>
-                  <div class="product-image"><img src="images/P7-Honda.webp" alt="P7-H" /></div>
-                </div>
-              </Column>
-              <Column sm={4} md={3} lg={4}>
-                <div class="product-card">
-                  <div class="product-number">5189</div>
-                  <div class="product-title">Poseidon 10</div>
-                  <div class="product-image"><img src="images/P7.webp" alt="P10" /></div>
-                </div>
-              </Column>
-              <Column sm={3} md={3} lg={4}>
-              </Column>
-              <Column sm={4} md={3} lg={4}>
-              </Column>
-            </Row>
-          </Grid>
-        </TabContent>
+        {#if ptw}
+          <TabContent>
+            <Grid padding fullWidth noGutter>
+                <Row>
+                <Column sm={4} md={3} lg={4} aspectRatio="1x1">
+                  <div class="product-card" class:selected={dev == '5185'} on:pointerdown={(e) => { $selected.device = '5185'; push('/program/5185'); }}>
+                    <div class="product-number">5185</div>
+                    <div class="product-title">Poseidon 7</div>
+                    <div class="product-image"><img src="images/P7.webp" alt="P7" /></div>
+                  </div>
+                </Column>
+                <Column sm={4} md={3} lg={4} aspectRatio="1x1">
+                  <div class="product-card" class:selected={dev == '5185-H'} on:pointerdown={(e) => { $selected.device = '5185-H'; push('/program/5185/Honda'); }}>
+                    <div class="product-number">5185</div>
+                    <div class="product-title">Poseidon 7 (Honda)</div>
+                    <div class="product-image"><img src="images/P7-Honda.webp" alt="P7-H" /></div>
+                  </div>
+                </Column>
+                <Column sm={4} md={3} lg={4}>
+                  <div class="product-card">
+                    <div class="product-number">5189</div>
+                    <div class="product-title">Poseidon 10</div>
+                    <div class="product-image"><img src="images/P7.webp" alt="P10" /></div>
+                  </div>
+                </Column>
+                <Column sm={3} md={3} lg={4}>
+                </Column>
+                <Column sm={4} md={3} lg={4}>
+                </Column>
+              </Row>
+            </Grid>
+          </TabContent>
+        {/if}
       </div>
     </Tabs>
   </Column>

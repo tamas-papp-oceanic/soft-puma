@@ -24,9 +24,9 @@
   };
 
   async function _logout(e) {
-    let res = await logout();
+    const res = await logout();
     if (res == true) {
-      push("/logout");
+      push("/login");
     }
   };
 
