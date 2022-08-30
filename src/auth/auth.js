@@ -5,7 +5,7 @@ import { authURL, userData, accessToken, refreshToken, loggedIn,
 
 async function refreshLogin() {
   let token = get(refreshToken);
-  let res = await afetch(authURL + '/refresh', {
+  let res = await fetch(authURL + '/refresh', {
     method: 'POST',
     body: JSON.stringify({
       'refresh_token': token,
@@ -97,7 +97,7 @@ async function afetch(url, options) {
       // refreshLogin will set LoggedIn to false if it fails, so we only do one loop
       console.log("Suspect access expired. Try to refresh")
       let rfl = await refreshLogin();
-      if (rfl == true){
+      if (rfl == true) {
         // success refresh
         const res2 = await afetch(url, options);
         return res2
