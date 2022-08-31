@@ -13,7 +13,7 @@
   <Row>
     <Column>
       <h2>{'3420 AC Monitor - Programming'}</h2>
-      <ProgramContainer on:cancel={cancel} style="height: 80vh;" />
+      <ProgramContainer device="3420" on:cancel={cancel} style="height: 80vh;" />
     </Column>
   </Row>
 </Grid>

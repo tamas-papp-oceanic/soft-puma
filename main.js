@@ -14,6 +14,7 @@ const NMEAEngine = require('./src/services/nmea.js');
 const bwipjs = require('bwip-js');
 const PDFDocument = require('pdfkit');
 const prt = 'HP-LaserJet-Pro-M404-M405';
+const { writeBoot, writeProg } = require('./src/services/program.js')
 
 // Keep a global reference of the window object, if you don't, the window will
 // be closed automatically when the JavaScript object is garbage collected.
@@ -332,6 +333,38 @@ ipcMain.on('upd-cancel', (e, ...args) => {
     cancelToken.dispose();
   }
 });
+
+// Start bootloader programing
+ipcMain.on('boot-start', (e, ...args) => {
+  writeBoot(args[0], bootMessage).then((res) => {
+    if ((mainWindow != null) && (typeof mainWindow.webContents !== 'undefined')) {
+      mainWindow.webContents.send('boot-done', res);
+    }
+  });
+});
+
+// Sends bootloader console message
+function bootMessage(msg) {
+  if ((mainWindow != null) && (typeof mainWindow.webContents !== 'undefined')) {
+    mainWindow.webContents.send('boot-data', msg);
+  }
+}
+
+// Start device programing
+ipcMain.on('prog-start', (e, ...args) => {
+  writeProg(args[0], progMessage).then((res) => {
+    if ((mainWindow != null) && (typeof mainWindow.webContents !== 'undefined')) {
+      mainWindow.webContents.send('prog-done', res);
+    }
+  });
+});
+
+// Sends programmer console message
+function progMessage(msg) {
+  if ((mainWindow != null) && (typeof mainWindow.webContents !== 'undefined')) {
+    mainWindow.webContents.send('prog-data', msg);
+  }
+}
 
 // Close the application
 ipcMain.on('app-quit', (e, ...args) => {
