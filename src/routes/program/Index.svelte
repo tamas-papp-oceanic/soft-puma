@@ -27,12 +27,28 @@
         <Tab label="Displays" />
       {/if}
       <div slot="content">
-        <TabContent>Not available yet</TabContent>
+        <TabContent>
+          <Grid padding fullWidth noGutter>
+            <Row>
+              <Column sm={4} md={3} lg={4} aspectRatio="1x1">
+                <div class="product-card" class:selected={dev == '3420'} on:pointerdown={(e) => { $selected.device = '3420'; push('/program/3420'); }}>
+                  <div class="product-number">3420</div>
+                  <div class="product-title">AC Monitor</div>
+                  <div class="product-image"><img src="images/3420.webp" alt="3420" /></div>
+                </div>
+              </Column>
+              <Column sm={3} md={3} lg={4}>
+              </Column>
+              <Column sm={4} md={3} lg={4}>
+              </Column>
+            </Row>
+          </Grid>
+        </TabContent>
         <TabContent>Not available yet</TabContent>
         {#if ptw}
           <TabContent>
             <Grid padding fullWidth noGutter>
-                <Row>
+              <Row>
                 <Column sm={4} md={3} lg={4} aspectRatio="1x1">
                   <div class="product-card" class:selected={dev == '5185'} on:pointerdown={(e) => { $selected.device = '5185'; push('/program/5185'); }}>
                     <div class="product-number">5185</div>

@@ -105,4 +105,3 @@
     max-height: -webkit-fill-available;
   }
 </style>
-  

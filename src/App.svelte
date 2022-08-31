@@ -15,6 +15,7 @@
 	import Simulate from './routes/Simulate.svelte';
 	import Configure from './routes/Configure.svelte';
 	import Program from './routes/program/Index.svelte';
+	import Program3420 from './routes/program/3420.svelte';
 	import Program5185 from './routes/program/5185.svelte';
 	import { loggedIn, userData } from './stores/user.js';
   import { update, updmsg, download, progress } from './stores/update.js';
@@ -36,6 +37,7 @@
 		}),
 		"/simulate": Simulate,
 		"/program": Program,
+		"/program/3420": Program3420,
 		"/program/5185/:variant?": Program5185,
 		"/Welcome": wrap({
 			component: Welcome,
