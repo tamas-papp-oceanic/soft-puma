@@ -46,9 +46,6 @@
     });
     // Receives bootloader result
     window.pumaAPI.recv('boot-done', (e, res) => {
-
-console.log(res);
-
       stop('boot');
       running = false;
     });

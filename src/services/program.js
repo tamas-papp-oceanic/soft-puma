@@ -1,4 +1,3 @@
-import fetch from 'node-fetch';
 /*
   Bootloader:
     STM32_Programmer_CLI -c port=jtag -log 3420-Bootloader.log -w ./3420-Bootloader.bin 0x08000000 -v
@@ -230,25 +229,26 @@ tidyUpExitRepro:
 
 const progURL = 'http://localhost:4000';
 
-function download(url) {
-  fetch(url, { method: 'GET' }).then((res) => {
-    if ((res.status >= 200) && (res.status <= 299)) {
-      // const json = await res.json();
-      // accessToken.set(json.access_token);
-      // refreshToken.set(json.refresh_token);
-      // let dec = jwt_decode(json.access_token);
-      // userData.set(dec);
-      // loggedIn.set(true);
-      // console.log("Refresh Success");
-      return true;
-    } else {
-      // loggedIn.set(false);
-      // console.log("Refresh failed");
-      return false;
-    }
-  }).catch((err) => {
+const log = require('electron-log');
+const fetch = require('node-fetch');
+
+
+async function download(url) {
+  const res = await fetch(url, { method: 'GET' }).catch((err) => {
+    log.error(err);
     return false;
-  });
+  })
+  if ((res.status >= 200) && (res.status <= 299)) {
+    // const json = await res.json();
+    // accessToken.set(json.access_token);
+    // refreshToken.set(json.refresh_token);
+    // let dec = jwt_decode(json.access_token);
+    // userData.set(dec);
+    // loggedIn.set(true);
+    // console.log("Refresh Success");
+    return true;
+  }
+  return false;
 }
 
 async function writeBoot(dev, func) {
