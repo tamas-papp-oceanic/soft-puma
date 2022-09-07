@@ -37,7 +37,7 @@
         "placeholder": "Enter serial number...",
         "error": {
           "title": "Error",
-          "subtitle": "Serial number should be 7 characters long integer.",
+          "subtitle": "Serial number should be maximum 7 characters long integer.",
           "active": false
         }
         }],

@@ -45,14 +45,18 @@
           cur.inputs[i].error.active = false;
           if (cur.inputs[i].id == 'serial') {
             let num = parseInt(wrp.value);
-            if (wrp.value.length < 7) {
+            if ((wrp.value.length == 0) || (wrp.value.length > 7)) {
               cur.inputs[i].error.active = true;
               $_steps[$_current] = cur;
             } else if (isNaN(num)) {
               cur.inputs[i].error.active = true;
               $_steps[$_current] = cur;
             } else {
-              await setStoreValue({ variable: 'serial', value: 'UZSY-' + num.toString().padStart(7, '0') });
+              let stv = num.toString().padStart(7, '0');
+              if (params.variant == 'Honda') {
+                stv = 'UZSY-' + stv;
+              }
+              await setStoreValue({ variable: 'serial', value: stv });
               window.pumaAPI.send('ser-num', [num]);
             }
           }
