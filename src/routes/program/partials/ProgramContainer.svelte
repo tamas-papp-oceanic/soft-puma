@@ -1,83 +1,24 @@
 <script>
-  import { createEventDispatcher, onMount } from "svelte";
+  import { createEventDispatcher } from "svelte";
   import { ButtonSet, Button, Tile } from "carbon-components-svelte";
   import { checkAccess } from "../../../auth/auth.js";
 
-  export let device;
+  export let message;
   export let style;
+  export let running;
 
-  const plf = navigator?.userAgentData?.platform || navigator?.platform || 'unknown';
   const dispatch = createEventDispatcher();
-  const timeout = 5000;
-  let running = false;
   let access = false;
-  let message = '';
-  let timer = null;
-
-  onMount(() => {
-    switch (plf) {
-      case 'Win32':
-        break;
-      default:
-        break;
-    }
-  });
-
-  function stop(lis) {
-    if (timer != null) {
-      clearTimeout(timer);
-      timer = null
-    }
-    // Remove listeners
-    window.pumaAPI.reml(lis + '-data');
-    window.pumaAPI.reml(lis + '-done');
-  }
 
   function loader(e) {
-    running = true;
-    timer = setTimeout(() => {
-      stop('boot');
-      running = false;
-    }, timeout);
-    message = '';
-    // Receives bootloader data
-    window.pumaAPI.recv('boot-data', (e, msg) => {
-      message += msg;
-    });
-    // Receives bootloader result
-    window.pumaAPI.recv('boot-done', (e, res) => {
-      stop('boot');
-      running = false;
-    });
-    window.pumaAPI.send('boot-start', device);
+    dispatch("loader", e);
   };
 
   function program(e) {
-    running = true;
-    timer = setTimeout(() => {
-      stop('prog');
-      running = false;
-    }, timeout);
-    message = '';
-    // Receives programming data
-    window.pumaAPI.recv('prog-data', (e, msg) => {
-      message += msg;
-    });
-    // Receives programming result
-    window.pumaAPI.recv('prog-done', (e, res) => {
-
-console.log(res);
-
-      stop('prog');
-      running = false;
-    });
-    window.pumaAPI.send('prog-start', device);
+    dispatch("program", e);
   };
 
   function cancel(e) {
-    stop('boot-done');
-    stop('prog-done');
-    running = false;
     dispatch("cancel", e);
   };
 

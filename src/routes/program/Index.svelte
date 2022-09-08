@@ -64,11 +64,6 @@
                   </div>
                 </Column>
                 <Column sm={4} md={3} lg={4}>
-                  <div class="product-card">
-                    <div class="product-number">5189</div>
-                    <div class="product-title">Poseidon 10</div>
-                    <div class="product-image"><img src="images/P7.webp" alt="P10" /></div>
-                  </div>
                 </Column>
                 <Column sm={3} md={3} lg={4}>
                 </Column>

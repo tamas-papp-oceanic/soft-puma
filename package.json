@@ -78,6 +78,7 @@
     "carbon-components-svelte": "^0.67.0",
     "carbon-icons-svelte": "^10.45.1",
     "crypto": "^1.0.1",
+    "download": "^8.0.0",
     "electron-is-dev": "^2.0.0",
     "electron-log": "^4.4.8",
     "electron-serve": "^1.1.0",

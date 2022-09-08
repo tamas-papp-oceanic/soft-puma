@@ -229,27 +229,11 @@ tidyUpExitRepro:
 
 const progURL = 'http://localhost:4000';
 
+const { app } = require('electron');
 const log = require('electron-log');
-const fetch = require('node-fetch');
-
-
-async function download(url) {
-  const res = await fetch(url, { method: 'GET' }).catch((err) => {
-    log.error(err);
-    return false;
-  })
-  if ((res.status >= 200) && (res.status <= 299)) {
-    // const json = await res.json();
-    // accessToken.set(json.access_token);
-    // refreshToken.set(json.refresh_token);
-    // let dec = jwt_decode(json.access_token);
-    // userData.set(dec);
-    // loggedIn.set(true);
-    // console.log("Refresh Success");
-    return true;
-  }
-  return false;
-}
+const dwl = require('download');
+const path = require('path');
+const cp = require('child_process');
 
 async function writeBoot(dev, func) {
   let prog = null;
@@ -264,8 +248,29 @@ async function writeBoot(dev, func) {
       break;
   }
   if (file != null) {
-    const res = download(progURL + '/boot?file=' + file);
-    return res;
+    dwl(progURL + '/boot?file=' + file, path.join(app.getAppPath(), 'downloads')).then((res) => {
+      log.info('Download successful:', file);
+      let prc = cp.exec(
+        'STM32_Programmer_CLI -c port=jtag -w ' + path.join(app.getAppPath(), 'downloads', file) + ' 0x08000000 -v',
+        (err, stdout, stderr) => {
+        if (err) {
+          console.log(err);
+        }
+        stdout.on('data', function (data) {
+          var str = data.toString()
+          var lines = str.split(/(\r?\n)/g);
+          console.log(lines.join(""));
+        });
+        stderr.on('data', function (data) {
+          var str = data.toString()
+          var lines = str.split(/(\r?\n)/g);
+          console.log(lines.join(""));
+        });
+      });
+    }).catch((err) => {
+      log.error(err);
+      return false;
+    });
   }
   return false;
 }
@@ -280,8 +285,13 @@ async function writeProg(dev, func) {
       break;
   }
   if (file != null) {
-    const res = download(progURL + '/prog?file=' + file);
-    return res;
+    dwl(progURL + '/prog?file=' + file, path.join(app.getAppPath(), 'downloads')).then((res) => {
+      log.info('Download successful:', file);
+      return true;
+    }).catch((err) => {
+      log.error(err);
+      return false;
+    });
   }
   return false;
 }
