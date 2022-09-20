@@ -340,6 +340,8 @@ ipcMain.on('boot-start', (e, ...args) => {
     if ((mainWindow != null) && (typeof mainWindow.webContents !== 'undefined')) {
       mainWindow.webContents.send('boot-done', res);
     }
+  }).catch((err) => {
+    log.error(err);
   });
 });
 
@@ -356,6 +358,8 @@ ipcMain.on('prog-start', (e, ...args) => {
     if ((mainWindow != null) && (typeof mainWindow.webContents !== 'undefined')) {
       mainWindow.webContents.send('prog-done', res);
     }
+  }).catch((err) => {
+    log.error(err);
   });
 });
 

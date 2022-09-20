@@ -236,64 +236,69 @@ const path = require('path');
 const cp = require('child_process');
 
 async function writeBoot(dev, func) {
-  let prog = null;
-  let file = null;
-  switch (dev) {
-    case '3420':
-      prog = 'STM32';
-      file = '3420-Bootloader.bin'
-      break;
-    default:
-      prog = 'Atmel';
-      break;
-  }
-  if (file != null) {
-    dwl(progURL + '/boot?file=' + file, path.join(app.getAppPath(), 'downloads')).then((res) => {
+  return new Promise((resolve, reject) => {
+    let prog = null;
+    let file = null;
+    switch (dev) {
+      case '3420':
+        prog = 'STM32';
+        file = '3420-Bootloader.bin'
+        break;
+      default:
+        prog = 'Atmel';
+        break;
+    }
+    if (file == null) {
+      reject(new Error('Invalid request'));
+      return;
+    }
+    let dwn = path.join(app.getAppPath(), 'downloads');
+    dwl(progURL + '/boot?file=' + file, dwn).then((res) => {
       log.info('Download successful:', file);
-      let prc = cp.exec(
-        'STM32_Programmer_CLI -c port=jtag -w ' + path.join(app.getAppPath(), 'downloads', file) + ' 0x08000000 -v',
-        (err, stdout, stderr) => {
-        if (err) {
-          console.log(err);
-        }
-        stdout.on('data', function (data) {
-          var str = data.toString()
-          var lines = str.split(/(\r?\n)/g);
-          console.log(lines.join(""));
-        });
-        stderr.on('data', function (data) {
-          var str = data.toString()
-          var lines = str.split(/(\r?\n)/g);
-          console.log(lines.join(""));
-        });
+      dwn = path.join(dwn, file);
+      const chd = cp.spawn('STM32_Programmer_CLI', ['-c port=jtag', '-w', dwn,  '0x08000000', '-v']);
+      chd.stdout.on('data', (data) => {
+        let msg = data.toString().replace(/\x1B\[[0-9;]*[JKmsu]/g, '');
+        func(msg);
+        log.info(msg);
+        return;
+      });
+      chd.stderr.on('data', (data) => {
+        let msg = data.toString().replace(/\x1B\[[0-9;]*[JKmsu]/g, '');
+        func(msg);
+        log.error(msg);
+        return;
+      });
+      chd.on('close', (code) => {
+        resolve(code == 0);
       });
     }).catch((err) => {
-      log.error(err);
-      return false;
+      reject(err);
     });
-  }
-  return false;
+  });
 }
 
 async function writeProg(dev, func) {
-  let file = null;
-  switch (dev) {
-    case '3420':
-      file = '3420.bin'
-      break;
-    default:
-      break;
-  }
-  if (file != null) {
+  return new Promise((resolve, reject) => {
+    let file = null;
+    switch (dev) {
+      case '3420':
+        file = '3420.bin'
+        break;
+      default:
+        break;
+    }
+    if (file == null) {
+      reject(new Error('Invalid request'));
+      return;
+    }
     dwl(progURL + '/prog?file=' + file, path.join(app.getAppPath(), 'downloads')).then((res) => {
       log.info('Download successful:', file);
-      return true;
+      resolve(true);
     }).catch((err) => {
-      log.error(err);
-      return false;
+      reject(err);
     });
-  }
-  return false;
+  });
 }
 
 module.exports = {

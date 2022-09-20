@@ -38,7 +38,7 @@
       </div>
       <h5>Console</h5>
       <div class="console">
-        <Tile style="height: -webkit-fill-available;">{message}</Tile>
+        <Tile style="height: -webkit-fill-available; white-space: pre !important;">{message}</Tile>
       </div>
     </div>
   </Tile>
