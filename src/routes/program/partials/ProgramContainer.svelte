@@ -24,6 +24,15 @@
 
   // Data getters
   $: access = checkAccess('boot', 'write');
+  $: {
+    let msg = message;
+    let con = document.getElementsByClassName('console');
+    if ((con != null) && (con.length > 0)) {
+      setTimeout(() => {
+        con[0].scrollTop = con[0].scrollHeight;
+      }, 100);
+    }
+  }
 </script>
 
 <div class="container" style={style}>
@@ -43,7 +52,7 @@
     </div>
   </Tile>
   <ButtonSet style="justify-content: flex-end;">
-    <Button kind="secondary" on:click={(e) => cancel(e)}>Cancel</Button>
+    <Button kind="secondary" on:click={(e) => cancel(e)}>Close</Button>
   </ButtonSet>
 </div>
 
