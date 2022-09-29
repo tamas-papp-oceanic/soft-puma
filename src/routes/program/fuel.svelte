@@ -8,7 +8,7 @@
   const plf = navigator?.userAgentData?.platform || navigator?.platform || 'unknown';
   const timeout = 5000;
   let timer = null;
-  let mode = null;
+  let mode = '0';
   let table = new Array();
   let running = false;
 
@@ -58,20 +58,22 @@
       running = false;
     }, timeout);
     table = new Array();
+
+
+// TEST
+for (let i = 0; i < 100; i++) {
+  table.push({ 'id': i, 'perlvl': i, 'pervol': i, 'volume': i * 1000 });
+}
+console.log(table)
+// TEST
+
+
     // Receives volume table data
     window.pumaAPI.recv('voltable-data', (e, data) => {
       table = data;
       stop('voltable');
       running = false;
     });
-
-// TEST
-    for (let i = 0; i < 100; i++) {
-      table.push({});
-    }
-
-// TEST
-
   };
 
   function upload(e) {
@@ -100,7 +102,7 @@
   <Row>
     <Column>
       <h2>{params.adaptor + ' - Programming'}</h2>
-      <VolumeContainer table={table} running={running} style="height: 80vh;"
+      <VolumeContainer mode={mode} table={table} running={running} style="height: 80vh;"
         on:getmode={getmode} on:setmode={setmode} on:download={download} on:upload={upload} on:cancel={cancel} />
     </Column>
   </Row>
