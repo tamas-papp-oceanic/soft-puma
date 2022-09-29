@@ -17,7 +17,8 @@
 	import Program from './routes/program/Index.svelte';
 	import Program3420 from './routes/program/3420.svelte';
 	import Program5185 from './routes/program/5185.svelte';
-	import { loggedIn, userData } from './stores/user.js';
+	import ProgramFuel from './routes/program/fuel.svelte';
+	import { loggedIn } from './stores/user.js';
   import { update, updmsg, download, progress } from './stores/update.js';
 
 	export let version;
@@ -38,6 +39,7 @@
 		"/simulate": Simulate,
 		"/program": Program,
 		"/program/3420": Program3420,
+		"/program/fuel/:adaptor?": ProgramFuel,
 		"/program/5185/:variant?": Program5185,
 		"/Welcome": wrap({
 			component: Welcome,

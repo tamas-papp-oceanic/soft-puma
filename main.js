@@ -370,6 +370,15 @@ function progMessage(msg) {
   }
 }
 
+// Sends SF Config Command
+ipcMain.on('prog-boot', (e, args) => {
+  const [code, param] = args;
+  for (const [key, val] of Object.entries(devices)) {
+    // Send Device Test Control proprietary PGN
+    val.engine.send065477(code, param);
+  }
+});
+
 // Close the application
 ipcMain.on('app-quit', (e, ...args) => {
   if (timer != null) {

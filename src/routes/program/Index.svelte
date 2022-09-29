@@ -44,7 +44,19 @@
             </Row>
           </Grid>
         </TabContent>
-        <TabContent>Not available yet</TabContent>
+        <TabContent>
+          <Grid padding fullWidth noGutter>
+            <Row>
+              <Column sm={4} md={3} lg={4} aspectRatio="1x1">
+                <div class="product-card" class:selected={dev == '4291'} on:pointerdown={(e) => { $selected.device = '4291'; push('/program/fuel/4291 Tank Level Adaptor'); }}>
+                  <div class="product-number">4291</div>
+                  <div class="product-title">Tank Level Adaptor</div>
+                  <div class="product-image"><img src="images/4291.webp" alt="4291" /></div>
+                </div>
+              </Column>
+          </Row>
+          </Grid>
+        </TabContent>
         {#if ptw}
           <TabContent>
             <Grid padding fullWidth noGutter>
@@ -62,8 +74,6 @@
                     <div class="product-title">Poseidon 7 (Honda)</div>
                     <div class="product-image"><img src="images/P7-Honda.webp" alt="P7-H" /></div>
                   </div>
-                </Column>
-                <Column sm={4} md={3} lg={4}>
                 </Column>
                 <Column sm={3} md={3} lg={4}>
                 </Column>

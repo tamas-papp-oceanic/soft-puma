@@ -58,8 +58,8 @@
   };
 
   function cancel(e) {
-    stop('boot-done');
-    stop('prog-done');
+    stop('boot');
+    stop('prog');
     running = false;
     pop();
   };

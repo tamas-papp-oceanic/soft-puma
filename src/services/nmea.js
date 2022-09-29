@@ -814,6 +814,24 @@ class NMEAEngine {
     return false;
   };
 
+  // Sends Proprietary SF Config Command message
+  send065445(ctr, grp, pgn, dst) {
+    if (this.#addrMngr.state == 'Valid') {
+      let msg = {
+        key: 'nmea2000/065445/-/-/-/-/-',
+        header: { pgn: 59392, src: this.#addrMngr.address, dst: dst },
+        fields: [
+          { field: 1,title: 'Control Byte', state: 'V', value: ctr },
+          { field: 2,title: 'Group Function Value', state: 'V', value: grp },
+          { field: 3,title: 'NMEA Reserved', state: 'V', value: 0xFFFFFF },
+          { field: 4,title: 'PGN of Requested Information', state: 'V', value: pgn },
+        ],
+      };
+      return this.sendMsg(msg);
+    }
+    return false;
+  };
+
   // Sends Heartbeat message
   #send126993() {
     if (this.#addrMngr.state == 'Valid') {
