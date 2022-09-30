@@ -52,11 +52,11 @@
   };
 
   function download(e) {
-    running = true;
-    timer = setTimeout(() => {
-      stop('voltable');
-      running = false;
-    }, timeout);
+    // running = true;
+    // timer = setTimeout(() => {
+    //   stop('voltable');
+    //   running = false;
+    // }, timeout);
     table = new Array();
 
 
@@ -69,11 +69,11 @@ console.log(table)
 
 
     // Receives volume table data
-    window.pumaAPI.recv('voltable-data', (e, data) => {
-      table = data;
-      stop('voltable');
-      running = false;
-    });
+    // window.pumaAPI.recv('voltable-data', (e, data) => {
+    //   table = data;
+    //   stop('voltable');
+    //   running = false;
+    // });
   };
 
   function upload(e) {
@@ -102,7 +102,7 @@ console.log(table)
   <Row>
     <Column>
       <h2>{params.adaptor + ' - Programming'}</h2>
-      <VolumeContainer mode={mode} table={table} running={running} style="height: 80vh;"
+      <VolumeContainer bind:mode={mode} bind:table={table} running={running} style="height: 80vh;"
         on:getmode={getmode} on:setmode={setmode} on:download={download} on:upload={upload} on:cancel={cancel} />
     </Column>
   </Row>
