@@ -2,6 +2,8 @@
   import { createEventDispatcher } from "svelte";
   import { ButtonSet, Button, Tile, Grid, Row, Column, DataTable, 
     Dropdown, TextInput, Pagination } from "carbon-components-svelte";
+  import Open from "carbon-icons-svelte/lib/Document16";
+  import Save from "carbon-icons-svelte/lib/Save16";
   import Add from "carbon-icons-svelte/lib/Add16";
   import Del from "carbon-icons-svelte/lib/Delete16";
 
@@ -12,6 +14,10 @@
 
   String.prototype.isNumber = function() {
     return /^\d+$|^\d+\.\d+$/.test(this);
+  }
+
+  String.prototype.isInteger = function() {
+    return /^\d+$/.test(this);
   }
 
   const dispatch = createEventDispatcher();
@@ -96,30 +102,39 @@
         ret = id;
       }
     }
-    return ret;
+    return ret.toString();
   };
 
-  /* Calculation for interpolation
-      start - height% start
-      end - height% end
+  /* interpolation calculation
+      hes - height % start
+      hee - height % end
+      vos - volume % start
+      voe - volume % end
   */
-	function range(start, end, dif, val) {
-		let step = dif / (end - start);
+	function range(hes, hee, vos, voe) {
+    let stp = (voe - vos) / (hee - hes);
     var ret = new Array();
-    for (let i = start; (i < end) || (i == 100); i++) {
+    for (let i = hes; (i < hee) || (i == 100); i++) {
       let cap = document.getElementById('capacity');
       if (cap != null) {
-        let per = Math.round(val + ((i - start) * step));
-        let vol = Math.round(val + ((i - start) * step));
-        ret.push({ 'id': next(), 'perlvl': i.toString(), 'pervol': per.toString(), 'volume': '0' });
+        let per = Math.round((vos + ((i - hes) * stp)) * 100) / 100;
+        let vol = Math.round(per * cap.value) / 100;
+        ret.push({ 'id': null, 'perlvl': i, 'pervol': per, 'volume': vol });
       }
     }
     return ret;
 	}
 
-
   function getmode(e) {
     dispatch("getmode", e);
+  };
+
+  function open(e) {
+    dispatch("open", e);
+  };
+
+  function save(e) {
+    dispatch("save", e);
   };
 
   function setmode(e) {
@@ -137,18 +152,37 @@
   };
 
   function interpolate(e) {
-    if (find('0') == null) {
-      table.push({ 'id': next(), 'perlvl': '0', 'pervol': '0', 'volume': '0' });
+    selected = new Array();
+    if (find(0) == null) {
+      table.push({ 'id': next(), 'perlvl': 0, 'pervol': 0, 'volume': 0 });
     };
-    if (find('100') == null) {
+    if (find(100) == null) {
       let cap = document.getElementById('capacity');
       if (cap != null) {
-        table.push({ 'id': next(), 'perlvl': '100', 'pervol': '100', 'volume': cap.value });
+        table.push({ 'id': next(), 'perlvl': 100, 'pervol': 100, 'volume': parseFloat(cap.value) });
       }
     };
-    selected = new Array();
     table.sort((a, b) => a.perlvl - b.perlvl);
-    rows = JSON.parse(JSON.stringify(table));
+    let res = new Array();
+    for (let i in table) {
+      let curr = table[i];
+      if (i > 0) {
+        let prev = table[i - 1];
+        let diff = curr.perlvl - prev.perlvl;
+        if (diff > 1) {
+          let tmp = range(prev.perlvl, curr.perlvl, prev.pervol, curr.pervol);
+          res = [...res, ...tmp];
+        } else {
+          res = [...res, prev];
+        }
+      }
+    }
+    res.sort((a, b) => a.perlvl - b.perlvl);
+    for (let i in res) {
+      res[i].id = i.toString();
+    }
+    table = JSON.parse(JSON.stringify(res));
+    rows = JSON.parse(JSON.stringify(res));
   };
 
   function upload(e) {
@@ -167,21 +201,21 @@
       let val = null;
       if (units[unit].text == '%') {
         val = cap.value * vol.value * (units[unit].text == '%' ? 0.01 : 1);
-        let elm = find(parseFloat(lvl.value));
+        let elm = find(parseInt(lvl.value));
         if (elm != null) {
           table[elm].pervol = parseFloat(vol.value);
           table[elm].volume = val;
         } else {
-          table.push({ 'id': next(), 'perlvl': parseFloat(lvl.value), 'pervol': parseFloat(vol.value), 'volume': val });
+          table.push({ 'id': next(), 'perlvl': parseInt(lvl.value), 'pervol': parseFloat(vol.value), 'volume': val });
         }
       } else {
         val = vol.value / cap.value * 100;
-        let elm = find(parseFloat(lvl.value));
+        let elm = find(parseInt(lvl.value));
         if (elm != null) {
           table[elm].pervol = val
           table[elm].volume = parseFloat(vol.value);;
         } else {
-          table.push({ 'id': next(), 'perlvl': parseFloat(lvl.value), 'pervol': val, 'volume': parseFloat(vol.value) });
+          table.push({ 'id': next(), 'perlvl': parseInt(lvl.value), 'pervol': val, 'volume': parseFloat(vol.value) });
         }
       }
       table.sort((a, b) => a.perlvl - b.perlvl);
@@ -219,7 +253,7 @@
   };
 
   function lvlinput(e) {
-    valid.lvl = e.detail.isNumber();
+    valid.lvl = e.detail.isInteger();
   };
 
   function volinput(e) {
@@ -262,34 +296,34 @@
       <Grid fullWidth noGutter>
         <Row>
           <Column sm={1} md={1} lg={3} padding>
-            <Row>
-              <Column>
-                <Dropdown titleText="Fluid type" size="sm" selectedId={fluid} items={fluids} />
+            <Row style="text-align: right;">
+              <Column style="flex-grow: 0; padding: 0 0.2rem 0 1rem;">
+                <Button tooltipPosition="top" tooltipAlignment="center" iconDescription="Open table" icon={Open}
+                  disabled={running} on:click={(e) => open(e)}></Button>
+              </Column>
+              <Column style="flex-grow: 0; padding: 0 0 0 0.2rem;">
+                <Button tooltipPosition="top" tooltipAlignment="center" iconDescription="Save table" icon={Save}
+                  disabled={running} on:click={(e) => save(e)}></Button>
               </Column>
             </Row>
             <Row padding>
               <Column>
+                <Dropdown titleText="Fluid type" size="sm" selectedId={fluid} items={fluids} />
+              </Column>
+            </Row>
+            <Row>
+              <Column>
                 <Dropdown titleText="Instance" size="sm" selectedId={inst} items={insts} />
               </Column>
             </Row>
-            <Row style="text-align: right;">
-              <Column>
-                <Button kind="primary" disabled={running} on:click={(e) => clear(e)}>Clear Table</Button>
-              </Column>
-            </Row>
             <Row padding style="text-align: right;">
               <Column>
-                <Button kind="primary" disabled={running} on:click={(e) => download(e)}>Read Table</Button>
-              </Column>
-            </Row>
-            <Row style="text-align: right;">
-              <Column>
-                <Button kind="primary" disabled={running || !valid.int} on:click={(e) => interpolate(e)}>Interpolate</Button>
-              </Column>
-            </Row>
-            <Row padding style="text-align: right;">
-              <Column>
-                <Button kind="primary" disabled={running} on:click={(e) => upload(e)}>Write Table</Button>
+                <ButtonSet stacked style="padding: 0.2rem;">
+                  <Button disabled={running} on:click={(e) => clear(e)}>Clear Table</Button>
+                  <Button disabled={running} on:click={(e) => download(e)}>Read from Sender</Button>
+                  <Button disabled={running || !valid.int} on:click={(e) => interpolate(e)}>Interpolate</Button>
+                  <Button disabled={running} on:click={(e) => upload(e)}>Write to Sender</Button>
+                </ButtonSet>
               </Column>
             </Row>
           </Column>

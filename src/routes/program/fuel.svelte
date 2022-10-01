@@ -22,6 +22,12 @@
     window.pumaAPI.reml(lis + '-done');
   }
 
+  function open(e) {
+  };
+
+  function save(e) {
+  };
+
   function getmode(e) {
     running = true;
     timer = setTimeout(() => {
@@ -103,7 +109,8 @@ console.log(table)
     <Column>
       <h2>{params.adaptor + ' - Programming'}</h2>
       <VolumeContainer bind:mode={mode} bind:table={table} running={running} style="height: 80vh;"
-        on:getmode={getmode} on:setmode={setmode} on:download={download} on:upload={upload} on:cancel={cancel} />
+        on:open={open} on:save={save} on:getmode={getmode} on:setmode={setmode} on:download={download}
+        on:upload={upload} on:cancel={cancel} />
     </Column>
   </Row>
 </Grid>
