@@ -7,8 +7,7 @@
   import Add from "carbon-icons-svelte/lib/Add16";
   import Del from "carbon-icons-svelte/lib/Delete16";
 
-  export let mode;
-  export let table;
+  export let data;
   export let style;
   export let running;
 
@@ -62,6 +61,7 @@
     { key: 'pervol', value: 'Volume (%)', sort: false },
     { key: 'volume', value: 'Volume (L)', sort: false },
   );
+  const rounding = false;
   let height;
   let pagination = {
     pageSize: 10,
@@ -69,25 +69,21 @@
     totalItems: 0,
   };
   let unit = '0';
-  let fluid = '0';
-  let inst = '0';
   let rows = new Array();
   let selected = new Array();
   let valid = { int: false, cap: false, lvl: false, vol: false };
   
-  // Re-calculates table values
+  // Re-calculates data.table values
   function calculate() {
-    let cap = document.getElementById('capacity');
-    if (cap != null) {
-      for (let i in table) {
-        table[i].volume = cap.value * table[i].pervol * (units[unit].text == '%' ? 0.01 : 1);
-      }
+    for (let i in data.table) {
+      let val = Math.round(data.capacity * data.table[i].pervol * (units[unit].text == '%' ? 0.01 : 1) * 100) / 100;
+      data.table[i].volume = rounding ? Math.round(val) : val;
     }
   }
 
   function find(lvl) {
-    for (let i in table) {
-      if (table[i].perlvl == lvl) {
+    for (let i in data.table) {
+      if (data.table[i].perlvl == lvl) {
         return i;
       }
     }
@@ -96,8 +92,8 @@
 
   function next() {
     let ret = 0;
-    for (let i in table) {
-      let id = parseInt(table[i].id) + 1;
+    for (let i in data.table) {
+      let id = parseInt(data.table[i].id) + 1;
       if (id > ret) {
         ret = id;
       }
@@ -125,49 +121,50 @@
     return ret;
 	}
 
-  function getmode(e) {
-    dispatch("getmode", e);
+  function load(e) {
+    dispatch("load");
   };
-
-  function open(e) {
-    dispatch("open", e);
-  };
-
+  
   function save(e) {
-    dispatch("save", e);
+    dispatch("save");
+  };
+  
+  function getmode(e) {
+    dispatch("getmode");
   };
 
   function setmode(e) {
-    dispatch("setmode", e);
+    dispatch("setmode");
   };
   
   function clear(e) {
-    table = new Array();
     selected = new Array();
-    rows = JSON.parse(JSON.stringify(table));
+    data.capacity = null;
+    data.table = new Array();
+    rows = JSON.parse(JSON.stringify(data.table));
   };
   
   function download(e) {
-    dispatch("download", e);
+    dispatch("download");
   };
 
   function interpolate(e) {
     selected = new Array();
     if (find(0) == null) {
-      table.push({ 'id': next(), 'perlvl': 0, 'pervol': 0, 'volume': 0 });
+      data.table.push({ 'id': next(), 'perlvl': 0, 'pervol': 0, 'volume': 0 });
     };
     if (find(100) == null) {
       let cap = document.getElementById('capacity');
       if (cap != null) {
-        table.push({ 'id': next(), 'perlvl': 100, 'pervol': 100, 'volume': parseFloat(cap.value) });
+        data.table.push({ 'id': next(), 'perlvl': 100, 'pervol': 100, 'volume': parseFloat(cap.value) });
       }
     };
-    table.sort((a, b) => a.perlvl - b.perlvl);
+    data.table.sort((a, b) => a.perlvl - b.perlvl);
     let res = new Array();
-    for (let i in table) {
-      let curr = table[i];
+    for (let i in data.table) {
+      let curr = data.table[i];
       if (i > 0) {
-        let prev = table[i - 1];
+        let prev = data.table[i - 1];
         let diff = curr.perlvl - prev.perlvl;
         if (diff > 1) {
           let tmp = range(prev.perlvl, curr.perlvl, prev.pervol, curr.pervol);
@@ -181,16 +178,16 @@
     for (let i in res) {
       res[i].id = i.toString();
     }
-    table = JSON.parse(JSON.stringify(res));
+    data.table = JSON.parse(JSON.stringify(res));
     rows = JSON.parse(JSON.stringify(res));
   };
 
   function upload(e) {
-    dispatch("upload", e);
+    dispatch("upload");
   };
 
   function cancel(e) {
-    dispatch("cancel", e);
+    dispatch("cancel");
   };
 
   function addrow(e) {
@@ -203,23 +200,23 @@
         val = cap.value * vol.value * (units[unit].text == '%' ? 0.01 : 1);
         let elm = find(parseInt(lvl.value));
         if (elm != null) {
-          table[elm].pervol = parseFloat(vol.value);
-          table[elm].volume = val;
+          data.table[elm].pervol = parseFloat(vol.value);
+          data.table[elm].volume = val;
         } else {
-          table.push({ 'id': next(), 'perlvl': parseInt(lvl.value), 'pervol': parseFloat(vol.value), 'volume': val });
+          data.table.push({ 'id': next(), 'perlvl': parseInt(lvl.value), 'pervol': parseFloat(vol.value), 'volume': val });
         }
       } else {
         val = vol.value / cap.value * 100;
         let elm = find(parseInt(lvl.value));
         if (elm != null) {
-          table[elm].pervol = val
-          table[elm].volume = parseFloat(vol.value);;
+          data.table[elm].pervol = val
+          data.table[elm].volume = parseFloat(vol.value);;
         } else {
-          table.push({ 'id': next(), 'perlvl': parseInt(lvl.value), 'pervol': val, 'volume': parseFloat(vol.value) });
+          data.table.push({ 'id': next(), 'perlvl': parseInt(lvl.value), 'pervol': val, 'volume': parseFloat(vol.value) });
         }
       }
-      table.sort((a, b) => a.perlvl - b.perlvl);
-      rows = JSON.parse(JSON.stringify(table));
+      data.table.sort((a, b) => a.perlvl - b.perlvl);
+      rows = JSON.parse(JSON.stringify(data.table));
       lvl.value = null;
       vol.value = null;
       valid.lvl = false;
@@ -231,25 +228,29 @@
   function delrows(e) {
     if (selected.length > 0) {
       for (let i in selected) {
-        for (let j in table) {
-          if (table[j].id == selected[i]) {
-            table.splice(j, 1);
+        for (let j in data.table) {
+          if (data.table[j].id == selected[i]) {
+            data.table.splice(j, 1);
             break;
           }
         }
       }
       selected = new Array();
-      rows = JSON.parse(JSON.stringify(table));
+      rows = JSON.parse(JSON.stringify(data.table));
     }
   };
 
   function capinput(e) {
     valid.cap = e.detail.isNumber();
+    valid.int = e.detail.isNumber();
   };
 
   function capchange(e) {
-    calculate();
     valid.int = e.detail.isNumber();
+    if (valid.int) {
+      data.capacity = parseFloat(e.detail);
+      calculate();
+    }
   };
 
   function lvlinput(e) {
@@ -273,8 +274,9 @@
     }
   };
 
-  // Data getters
-  $: rows = JSON.parse(JSON.stringify(table));
+  // Data getters / setters
+  $: valid.int = (typeof data.capacity !== 'undefined') && (data.capacity != null) && data.capacity.toString().isNumber();
+  $: rows = JSON.parse(JSON.stringify(data.table));
   $: pagination.totalItems = rows.length;
   $: pagination.pageSize = Math.round((height / getComputedStyle(document.documentElement).fontSize.replace('px', '')) / 2) - 8;
   $: if (selected.length > 0) {
@@ -298,8 +300,8 @@
           <Column sm={1} md={1} lg={3} padding>
             <Row style="text-align: right;">
               <Column style="flex-grow: 0; padding: 0 0.2rem 0 1rem;">
-                <Button tooltipPosition="top" tooltipAlignment="center" iconDescription="Open table" icon={Open}
-                  disabled={running} on:click={(e) => open(e)}></Button>
+                <Button tooltipPosition="top" tooltipAlignment="center" iconDescription="Load table" icon={Open}
+                  disabled={running} on:click={(e) => load(e)}></Button>
               </Column>
               <Column style="flex-grow: 0; padding: 0 0 0 0.2rem;">
                 <Button tooltipPosition="top" tooltipAlignment="center" iconDescription="Save table" icon={Save}
@@ -308,21 +310,21 @@
             </Row>
             <Row padding>
               <Column>
-                <Dropdown titleText="Fluid type" size="sm" selectedId={fluid} items={fluids} />
+                <Dropdown titleText="Fluid type" size="sm" selectedId={data.fluid} items={fluids} />
               </Column>
             </Row>
             <Row>
               <Column>
-                <Dropdown titleText="Instance" size="sm" selectedId={inst} items={insts} />
+                <Dropdown titleText="Instance" size="sm" selectedId={data.instance} items={insts} />
               </Column>
             </Row>
             <Row padding style="text-align: right;">
               <Column>
                 <ButtonSet stacked style="padding: 0.2rem;">
-                  <Button disabled={running} on:click={(e) => clear(e)}>Clear Table</Button>
-                  <Button disabled={running} on:click={(e) => download(e)}>Read from Sender</Button>
-                  <Button disabled={running || !valid.int} on:click={(e) => interpolate(e)}>Interpolate</Button>
-                  <Button disabled={running} on:click={(e) => upload(e)}>Write to Sender</Button>
+                  <Button style="margin: 0.2rem 0" disabled={running} on:click={(e) => clear(e)}>Clear table</Button>
+                  <Button style="margin: 0.2rem 0" disabled={running} on:click={(e) => download(e)}>Read from Sender</Button>
+                  <Button style="margin: 0.2rem 0" disabled={running || !valid.int} on:click={(e) => interpolate(e)}>Interpolate</Button>
+                  <Button style="margin: 0.2rem 0" disabled={running} on:click={(e) => upload(e)}>Write to Sender</Button>
                 </ButtonSet>
               </Column>
             </Row>
@@ -330,7 +332,7 @@
           <Column sm={1} md={6} lg={10} padding>
             <Row>
               <Column>
-                <TextInput id="capacity" size="sm" labelText="Capacity (L)" disabled={running}
+                <TextInput id="capacity" size="sm" labelText="Capacity (L)" value={data.capacity} disabled={running}
                   on:input={(e) => capinput(e)} on:change={(e) => capchange(e)} />
               </Column>
               <Column>
@@ -385,7 +387,7 @@
             </Row>
             <Row padding>
               <Column>
-                <Dropdown hideLabel titleText="Select mode" size="xl" selectedId={mode} items={modes} />
+                <Dropdown hideLabel titleText="Select mode" size="xl" selectedId={data.mode} items={modes} />
               </Column>
             </Row>
             <Row>
