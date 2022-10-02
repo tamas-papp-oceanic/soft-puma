@@ -1,59 +1,52 @@
 
 // const progURL = 'http://localhost:4000';
 
-const { app } = require('electron');
+const { app, dialog } = require('electron');
 const log = require('electron-log');
-const dwl = require('download');
+const fs = require('fs');
 const path = require('path');
+const dwl = require('download');
 const cp = require('child_process');
 
-async function readFile(dev, func) {
+async function readFile() {
   return new Promise((resolve, reject) => {
-    resolve(true);
+    let fp = dialog.showOpenDialogSync({ title: 'Open volume table', defaultPath: path.join(process.env.HOME, 'puma', 'save', 'voltab.json'),
+      filters: [{ name: 'JSON file', extensions: ['json'] }]});
+    if (typeof fp !== 'undefined') {
+      let cnt = fs.readFileSync(fp[0], { encoding: 'UTF8'} );
+      try {
+        let dat = JSON.parse(cnt);
+        if ((typeof dat.fluid !== 'undefined') && (typeof dat.instance !== 'undefined') &&
+          (typeof dat.table !== 'undefined') && (typeof dat.mode !== 'undefined')) {
+          console.log(dat)
+          resolve(dat);
+        } else {
+          reject(new Error('Invalid data structure'));
+        }
+      } catch (err) {
+        reject(err);
+      }
+    } else { 
+      reject(new Error('Nothing selected'));
+    }
   });
 };
 
-async function writeFile(dev, func) {
+async function writeFile(data) {
   return new Promise((resolve, reject) => {
-    resolve(true);
-    // let prog = null;
-    // let file = null;
-    // switch (dev) {
-    //   case '3420':
-    //     prog = 'STM32';
-    //     file = '3420-Bootloader.bin'
-    //     break;
-    //   default:
-    //     prog = 'Atmel';
-    //     break;
-    // }
-    // if (file == null) {
-    //   reject(new Error('Invalid request'));
-    //   return;
-    // }
-    // let dwn = path.join(app.getAppPath(), 'downloads');
-    // dwl(progURL + '/boot?file=' + file, dwn).then((res) => {
-    //   log.info('Download successful:', file);
-    //   dwn = path.join(dwn, file);
-    //   const chd = cp.spawn('STM32_Programmer_CLI', ['-c port=jtag', '-w', dwn,  '0x08000000', '-v']);
-    //   chd.stdout.on('data', (data) => {
-    //     let msg = data.toString().replace(/\x1B\[[0-9;]*[JKmsu]/g, '');
-    //     func(msg);
-    //     log.info(msg);
-    //     return;
-    //   });
-    //   chd.stderr.on('data', (data) => {
-    //     let msg = data.toString().replace(/\x1B\[[0-9;]*[JKmsu]/g, '');
-    //     func(msg);
-    //     log.error(msg);
-    //     return;
-    //   });
-    //   chd.on('close', (code) => {
-    //     resolve(code == 0);
-    //   });
-    // }).catch((err) => {
-    //   reject(err);
-    // });
+    let fp = dialog.showSaveDialogSync({ title: 'Save volume table', defaultPath: path.join(process.env.HOME, 'puma', 'save', 'voltab.json'),
+      filters: [{ name: 'JSON file', extensions: ['json'] }]});
+    if (typeof fp !== 'undefined') {
+      try {
+        let dat = JSON.stringify(data);
+        fs.writeFileSync(fp, dat, { encoding: 'UTF8'} );
+        resolve(true);
+      } catch (err) {
+        reject(err);
+      }
+    } else { 
+      reject(new Error('Nothing selected'));
+    }
   });
 };
 
