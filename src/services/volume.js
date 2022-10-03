@@ -13,7 +13,6 @@ async function readFile() {
         let dat = JSON.parse(cnt);
         if ((typeof dat.fluid !== 'undefined') && (typeof dat.instance !== 'undefined') &&
           (typeof dat.table !== 'undefined') && (typeof dat.mode !== 'undefined')) {
-          console.log(dat)
           resolve(dat);
         } else {
           reject(new Error('Invalid data structure'));

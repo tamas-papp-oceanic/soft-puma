@@ -38,8 +38,6 @@
                   running = false;
                 }
                 break;
-              default:
-                break;
             }
             break;
           case '130825':
@@ -63,11 +61,7 @@
                   running = false;
                 }
                 break;
-              default:
-                break;
             }
-            break;
-          default:
             break;
         }
       }
@@ -95,17 +89,13 @@
 
   function load(e) {
     running = true;
-    timer = setTimeout(() => {
-      stop('volfile');
-      running = false;
-    }, timeout);
     data.table = new Array();
     // Receives volume file data
     window.pumaAPI.recv('volfile-data', (e, dat) => {
       data = JSON.parse(JSON.stringify(dat));
     });
     // Receives volume file result
-    window.pumaAPI.recv('volfile-done', (e, res) => {
+    window.pumaAPI.recv('volfile-done', (e) => {
       stop('volfile');
       running = false;
     });

@@ -109,14 +109,14 @@ function decode(frm) {
         } else if (fld.type.startsWith('chr(')) {
           let buf = Buffer.alloc(Math.ceil(len / 8));
           frm.data.copy(buf, 0, byt);
-          val = buf.toString('utf8').replace(/[^\x01-\x7F]/g, "");
+          val = buf.toString('utf8');
           ptr += len;
         } else if (fld.type == 'str') {
           let asc = frm.data.readUInt8(byt + 1);
           if (len > 16) {
             let buf = Buffer.alloc(Math.ceil((len - 2) / 8) - 2);
             frm.data.copy(buf, 0, byt + 2);
-            val = buf.toString(asc == 0 ? 'utf8' : 'ucs2').replace(/[^\x01-\x7F]/g, "");
+            val = buf.toString(asc == 0 ? 'utf8' : 'ucs2');
           }
           ptr += len;
         } else {
