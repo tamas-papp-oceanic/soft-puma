@@ -383,28 +383,12 @@ ipcMain.on('prog-boot', (e, args) => {
 ipcMain.on('volfile-read', (e, ...args) => {
   readFile(args[0]).then((res) => {
     if ((mainWindow != null) && (typeof mainWindow.webContents !== 'undefined')) {
-
-
-// TEST
-let fluid = '2';
-let inst = '0';
-let cap = 1000;
-let tab = new Array();
-for (let i = 0; i < 100; i++) {
-  tab.push({ 'id': i, 'perlvl': i, 'pervol': i, 'volume': i * 1000 });
-}
-// TEST
-
-      mainWindow.webContents.send('volfile-data', {
-        fluid: fluid,
-        instance: inst,
-        capacity: cap,
-        table: JSON.parse(JSON.stringify(tab)),
-      });
-      mainWindow.webContents.send('volfile-done', res);
+      mainWindow.webContents.send('volfile-data', res);
+      mainWindow.webContents.send('volfile-done');
     }
   }).catch((err) => {
     log.error(err);
+    mainWindow.webContents.send('volfile-done');
   });
 });
 
