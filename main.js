@@ -15,7 +15,7 @@ const bwipjs = require('bwip-js');
 const PDFDocument = require('pdfkit');
 const prt = 'HP-LaserJet-Pro-M404-M405';
 const { writeBoot, writeProg } = require('./src/services/program.js')
-const { readFile, writeFile, readMode, writeMode, readTable, writeTable } = require('./src/services/volume.js')
+const { readFile, writeFile } = require('./src/services/volume.js')
 
 // Keep a global reference of the window object, if you don't, the window will
 // be closed automatically when the JavaScript object is garbage collected.
@@ -379,15 +379,6 @@ ipcMain.on('prog-boot', (e, args) => {
   }
 });
 
-// Sends Volume Table to Sender
-ipcMain.on('volfile-data', (e, args) => {
-  const [code, param] = args;
-  for (const [key, val] of Object.entries(devices)) {
-    // Send Device Test Control proprietary PGN
-    // val.engine.send065477(code, param);
-  }
-});
-
 // Starts volume file reading
 ipcMain.on('volfile-read', (e, ...args) => {
   readFile(args[0]).then((res) => {
@@ -430,75 +421,44 @@ ipcMain.on('volfile-write', (e, ...args) => {
 
 // Starts volume mode reading
 ipcMain.on('volmode-read', (e, ...args) => {
-  readMode(args[0]).then((res) => {
-    if ((mainWindow != null) && (typeof mainWindow.webContents !== 'undefined')) {
-
-// TEST
-let fluid = '0';
-let inst = '0';
-let mod = '0';
-// TEST
-
-      mainWindow.webContents.send('volmode-data', {
-        fluid: fluid,
-        instance: inst,
-        mode: mod,
-      });
-      mainWindow.webContents.send('volmode-done', res);
-    }
-  }).catch((err) => {
-    log.error(err);
-  });
+  const { fluid, instance } = args;
+  for (const [key, val] of Object.entries(devices)) {
+    // Send Fluid Sender Control proprietary PGN
+    // Request for Mode Data
+    val.engine.send065289(fluid, instance, 0x05);
+  }
 });
 
 // Starts volume mode writing
 ipcMain.on('volmode-write', (e, ...args) => {
-  writeMode(args[0]).then((res) => {
-    if ((mainWindow != null) && (typeof mainWindow.webContents !== 'undefined')) {
-      mainWindow.webContents.send('volmode-done', res);
-    }
-  }).catch((err) => {
-    log.error(err);
-  });
+  // writeMode(args[0]).then((res) => {
+  //   if ((mainWindow != null) && (typeof mainWindow.webContents !== 'undefined')) {
+  //     mainWindow.webContents.send('volmode-done', res);
+  //   }
+  // }).catch((err) => {
+  //   log.error(err);
+  // });
 });
 
 // Starts volume table reading
 ipcMain.on('voltable-read', (e, ...args) => {
-  readTable(args[0]).then((res) => {
-    if ((mainWindow != null) && (typeof mainWindow.webContents !== 'undefined')) {
-
-// TEST
-let fluid = '0';
-let inst = '0';
-let cap = 1000;
-let tab = new Array();
-for (let i = 0; i < 100; i++) {
-  tab.push({ 'id': i, 'perlvl': i, 'pervol': i, 'volume': i * 1000 });
-}
-// TEST
-
-      mainWindow.webContents.send('voltable-data', {
-        fluid: fluid,
-        instance: inst,
-        capacity: cap,
-        table: JSON.parse(JSON.stringify(tab)),
-      });
-      mainWindow.webContents.send('voltable-done', res);
-    }
-  }).catch((err) => {
-    log.error(err);
-  });
+  const { fluid, instance } = args;
+  for (const [key, val] of Object.entries(devices)) {
+    // Send Fluid Sender Control proprietary PGN
+    // Request for Volumetric Data
+    val.engine.send065289(fluid, instance, 0x02);
+  }
 });
 
 // Starts volume table writing
 ipcMain.on('voltable-write', (e, ...args) => {
-  writeTable(args[0]).then((res) => {
-    if ((mainWindow != null) && (typeof mainWindow.webContents !== 'undefined')) {
-      mainWindow.webContents.send('voltable-done', res);
-    }
-  }).catch((err) => {
-    log.error(err);
-  });
+  // writeTable(args[0]).then((res) => {
+  //   if ((mainWindow != null) && (typeof mainWindow.webContents !== 'undefined')) {
+  //     mainWindow.webContents.send('voltable-done', res);
+  //   }
+  // }).catch((err) => {
+  //   log.error(err);
+  // });
 });
 
 // Closes the application

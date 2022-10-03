@@ -1,4 +1,5 @@
 <script>
+  import { onMount, onDestroy } from "svelte";
   import { Row, Grid, Column } from "carbon-components-svelte";
   import { pop } from "svelte-spa-router";
   import VolumeContainer from './partials/VolumeContainer.svelte';
@@ -16,6 +17,77 @@
     mode: '0',
   };
   let running = false;
+
+  onMount(() => {
+    window.pumaAPI.recv('n2k-data', (e, args) => {
+      const [ dev, msg ] = args;
+      // <protocol>/<pgn>/<function>/<manufacturer>/<industry>/<instance>/<type>
+      let spl = msg.key.split('/');
+      if ((spl[0] == 'nmea2000') && (spl[3] == '161')  && (spl[4] == '4')) {
+        switch (spl[1]) {
+          case '065289':
+            switch (spl[2]) {
+              case '6':
+                // Stored Mode Data (0 = Level Mode, 1 = Volumetric Mode)
+                if (timer != null) {
+                  clearTimeout(timer);
+                  timer = null
+                }
+                if ((msg.fields[3].value == data.instance) && (msg.fields[4].value == data.fluid)) {
+                  data.mode = msg.fields[6].value.toString();
+                  running = false;
+                }
+                break;
+              default:
+                break;
+            }
+            break;
+          case '130825':
+            switch (spl[2]) {
+              case '3':
+                // Stored Volumetric Data
+                if (timer != null) {
+                  clearTimeout(timer);
+                  timer = null
+                }
+                if ((msg.fields[3].value == data.instance) && (msg.fields[4].value == data.fluid)) {
+                  data.table = new Array();
+                  data.capacity = msg.fields[7].value * 1000;
+                  let arr = Array.from(msg.fields[6].value, (x) => x.charCodeAt(0));
+                  for (let i in arr) {
+                    data.table.push({
+                      'id': i.toString(), 'perlvl': i, 'pervol': arr[i],
+                      'volume': Math.round(arr[i] * data.capacity) / 100,
+                    });
+                  }
+                  if (arr.length == 100) {
+                    data.table.push({
+                      'id': '100', 'perlvl': 100, 'pervol': 100,
+                      'volume': Math.round(data.capacity * 100) / 100,
+                    });
+                  }
+                  running = false;
+                }
+                break;
+              default:
+                break;
+            }
+            break;
+          default:
+            break;
+        }
+      }
+    });
+  });
+  
+  onDestroy(() => {
+    if (timer != null) {
+      clearTimeout(timer);
+      timer = null
+    }
+    running = false;
+    window.pumaAPI.reml('n2k-data');
+  });
 
   function stop(lis) {
     if (timer != null) {
@@ -63,20 +135,10 @@
   function getmode(e) {
     running = true;
     timer = setTimeout(() => {
-      stop('volmode');
       running = false;
     }, timeout);
     data.mode = null;
-    // Receives volume mode data
-    window.pumaAPI.recv('volmode-data', (e, mode) => {
-      data.mode = mode.toString();
-    });
-    // Receives volume mode result
-    window.pumaAPI.recv('volmode-done', (e, res) => {
-      stop('volmode');
-      running = false;
-    });
-    window.pumaAPI.send('volmode-read');
+    window.pumaAPI.send('volmode-read', [ data.fluid, data.instance ]);
   };
 
   function setmode(e) {
@@ -101,20 +163,10 @@
   function download(e) {
     running = true;
     timer = setTimeout(() => {
-      stop('voltable');
       running = false;
     }, timeout);
     data.table = new Array();
-    // Receives volume table data
-    window.pumaAPI.recv('voltable-data', (e, dat) => {
-      data = JSON.parse(JSON.stringify(dat));
-    });
-    // Receives volume table result
-    window.pumaAPI.recv('voltable-done', (e, res) => {
-      stop('voltable');
-      running = false;
-    });
-    window.pumaAPI.send('voltable-read');
+    window.pumaAPI.send('voltable-read', [ data.fluid, data.instance ]);
   };
 
   function upload(e) {

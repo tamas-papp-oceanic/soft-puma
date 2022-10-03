@@ -22,8 +22,8 @@
   const dispatch = createEventDispatcher();
   
   const modes = new Array(
-    { id: '0', text: 'Percentage' },
-    { id: '1', text: 'Volume' },
+    { id: '0', text: 'Level' },
+    { id: '1', text: 'Volumetric' },
   );
   const units = new Array(
     { id: '0', text: '%' },
