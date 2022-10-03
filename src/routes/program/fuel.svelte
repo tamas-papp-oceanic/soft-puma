@@ -60,12 +60,6 @@
                       'volume': Math.round(arr[i] * data.capacity) / 100,
                     });
                   }
-                  if (arr.length == 100) {
-                    data.table.push({
-                      'id': '100', 'perlvl': 100, 'pervol': 100,
-                      'volume': Math.round(data.capacity * 100) / 100,
-                    });
-                  }
                   running = false;
                 }
                 break;
