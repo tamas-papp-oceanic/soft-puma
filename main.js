@@ -196,11 +196,17 @@ function proc(dev, frm) {
       case 60928:
         mainWindow.webContents.send('n2k-name', [ dev, msg ]);
         break;
-      case 126996:
-        mainWindow.webContents.send('n2k-prod', [ dev, msg ]);
+      case 65289:
+        mainWindow.webContents.send('n2k-volume', [ dev, msg ]);
         break;
       case 65477:
         mainWindow.webContents.send('test-data', [ dev, msg ]);
+        break;
+      case 126996:
+        mainWindow.webContents.send('n2k-prod', [ dev, msg ]);
+        break;
+      case 130825:
+        mainWindow.webContents.send('n2k-volume', [ dev, msg ]);
         break;
       default:
         mainWindow.webContents.send('n2k-data', [ dev, msg ]);
@@ -404,12 +410,12 @@ ipcMain.on('volfile-write', (e, ...args) => {
 });
 
 // Starts volume mode reading
-ipcMain.on('volmode-read', (e, ...args) => {
-  const { fluid, instance } = args;
+ipcMain.on('volmode-read', (e, args) => {
+  const [fluid, instance] = args;
   for (const [key, val] of Object.entries(devices)) {
     // Send Fluid Sender Control proprietary PGN
     // Request for Mode Data
-    val.engine.send065289(fluid, instance, 0x05);
+    val.engine.send130825(fluid, instance, 0x05);
   }
 });
 
@@ -425,12 +431,12 @@ ipcMain.on('volmode-write', (e, ...args) => {
 });
 
 // Starts volume table reading
-ipcMain.on('voltable-read', (e, ...args) => {
-  const { fluid, instance } = args;
+ipcMain.on('voltable-read', (e, args) => {
+  const [fluid, instance] = args;
   for (const [key, val] of Object.entries(devices)) {
     // Send Fluid Sender Control proprietary PGN
     // Request for Volumetric Data
-    val.engine.send065289(fluid, instance, 0x02);
+    val.engine.send130825(fluid, instance, 0x02);
   }
 });
 

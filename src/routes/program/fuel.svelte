@@ -19,7 +19,7 @@
   let running = false;
 
   onMount(() => {
-    window.pumaAPI.recv('n2k-data', (e, args) => {
+    window.pumaAPI.recv('n2k-volume', (e, args) => {
       const [ dev, msg ] = args;
       // <protocol>/<pgn>/<function>/<manufacturer>/<industry>/<instance>/<type>
       let spl = msg.key.split('/');
@@ -61,6 +61,17 @@
                   running = false;
                 }
                 break;
+              case '6':
+                // Stored Mode Data (0 = Level Mode, 1 = Volumetric Mode)
+                if (timer != null) {
+                  clearTimeout(timer);
+                  timer = null
+                }
+                if ((msg.fields[3].value == data.instance) && (msg.fields[4].value == data.fluid)) {
+                  data.mode = msg.fields[6].value.toString();
+                  running = false;
+                }
+                break;
             }
             break;
         }
@@ -74,7 +85,7 @@
       timer = null
     }
     running = false;
-    window.pumaAPI.reml('n2k-data');
+    window.pumaAPI.reml('n2k-volume');
   });
 
   function stop(lis) {
@@ -122,7 +133,7 @@
       running = false;
     }, timeout);
     data.mode = null;
-    window.pumaAPI.send('volmode-read', [ data.fluid, data.instance ]);
+    window.pumaAPI.send('volmode-read', [data.fluid, data.instance]);
   };
 
   function setmode(e) {
@@ -150,7 +161,7 @@
       running = false;
     }, timeout);
     data.table = new Array();
-    window.pumaAPI.send('voltable-read', [ data.fluid, data.instance ]);
+    window.pumaAPI.send('voltable-read', [data.fluid, data.instance]);
   };
 
   function upload(e) {
