@@ -9,10 +9,10 @@
   let ptw;
 
   function change(e){
-    $selected.program = e.detail;
+    $selected.config = e.detail;
   }
 
-  $: tab = $selected.program;
+  $: tab = $selected.config;
   $: dev = $selected.device;
   $: ptw = checkAccess('test', 'write');
 </script>
@@ -31,11 +31,6 @@
           <Grid padding fullWidth noGutter>
             <Row>
               <Column sm={4} md={3} lg={4}>
-                <div class="product-card" class:selected={dev == '3420'} on:pointerdown={(e) => { $selected.device = '3420'; push('/program/3420'); }}>
-                  <div class="product-number">3420</div>
-                  <div class="product-title">AC Monitor</div>
-                  <div class="product-image"><img src="images/3420.webp" alt="3420" /></div>
-                </div>
               </Column>
               <Column sm={3} md={3} lg={4}>
               </Column>
@@ -48,6 +43,11 @@
           <Grid padding fullWidth noGutter>
             <Row>
               <Column sm={4} md={3} lg={4}>
+                <div class="product-card" class:selected={dev == '4291'} on:pointerdown={(e) => { $selected.device = '4291'; push('/configure/fuel/4291 Tank Level Adaptor'); }}>
+                  <div class="product-number">4291</div>
+                  <div class="product-title">Tank Level Adaptor</div>
+                  <div class="product-image"><img src="images/4291.webp" alt="4291" /></div>
+                </div>
               </Column>
           </Row>
           </Grid>
@@ -56,19 +56,9 @@
           <TabContent>
             <Grid padding fullWidth noGutter>
               <Row>
-                <Column sm={4} md={3} lg={4} aspectRatio="1x1">
-                  <div class="product-card" class:selected={dev == '5185'} on:pointerdown={(e) => { $selected.device = '5185'; push('/program/5185'); }}>
-                    <div class="product-number">5185</div>
-                    <div class="product-title">Poseidon 7</div>
-                    <div class="product-image"><img src="images/P7.webp" alt="P7" /></div>
-                  </div>
+                <Column sm={4} md={3} lg={4}>
                 </Column>
-                <Column sm={4} md={3} lg={4} aspectRatio="1x1">
-                  <div class="product-card" class:selected={dev == '5185-H'} on:pointerdown={(e) => { $selected.device = '5185-H'; push('/program/5185/Honda'); }}>
-                    <div class="product-number">5185</div>
-                    <div class="product-title">Poseidon 7 (Honda)</div>
-                    <div class="product-image"><img src="images/P7-Honda.webp" alt="P7-H" /></div>
-                  </div>
+                <Column sm={4} md={3} lg={4}>
                 </Column>
                 <Column sm={3} md={3} lg={4}>
                 </Column>

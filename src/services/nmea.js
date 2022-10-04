@@ -859,7 +859,7 @@ class NMEAEngine {
   send130825(fluid, inst, code, data1, data2) {
     if (this.#addrMngr.state == 'Valid') {
       let msg = {
-      key: 'nmea2000/130825/' + code + '/161/4/-/-',
+        key: 'nmea2000/130825/' + code + '/161/4/-/-',
         header: { pgn: 130825, src: this.#addrMngr.address, dst: 0xFF },
         fields: [
           { field: 1,title: 'Manufacturer Code', state: 'V', value: this.#addrMngr.name[2] },

@@ -13,11 +13,11 @@
 	import Content from './routes/devices/Content.svelte';
 	// import Details from './routes/Details.svelte';
 	import Simulate from './routes/Simulate.svelte';
-	import Configure from './routes/Configure.svelte';
+	import Configure from './routes/configure/Index.svelte';
 	import Program from './routes/program/Index.svelte';
 	import Program3420 from './routes/program/3420.svelte';
 	import Program5185 from './routes/program/5185.svelte';
-	import ProgramFuel from './routes/program/fuel.svelte';
+	import ConfigureFuel from './routes/configure/fuel.svelte';
 	import { loggedIn } from './stores/user.js';
   import { update, updmsg, download, progress } from './stores/update.js';
 
@@ -39,8 +39,9 @@
 		"/simulate": Simulate,
 		"/program": Program,
 		"/program/3420": Program3420,
-		"/program/fuel/:adaptor?": ProgramFuel,
 		"/program/5185/:variant?": Program5185,
+		"/configure": Configure,
+		"/configure/fuel/:adaptor?": ConfigureFuel,
 		"/Welcome": wrap({
 			component: Welcome,
 			conditions: [() =>{

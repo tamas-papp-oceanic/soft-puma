@@ -29,13 +29,8 @@
             switch (spl[2]) {
               case '6':
                 // Stored Mode Data (0 = Level Mode, 1 = Volumetric Mode)
-                if (timer != null) {
-                  clearTimeout(timer);
-                  timer = null
-                }
                 if ((msg.fields[3].value == data.instance) && (msg.fields[4].value == data.fluid)) {
                   data.mode = msg.fields[6].value.toString();
-                  running = false;
                 }
                 break;
             }
@@ -44,10 +39,6 @@
             switch (spl[2]) {
               case '3':
                 // Stored Volumetric Data
-                if (timer != null) {
-                  clearTimeout(timer);
-                  timer = null
-                }
                 if ((msg.fields[3].value == data.instance) && (msg.fields[4].value == data.fluid)) {
                   data.table = new Array();
                   data.capacity = msg.fields[7].value * 1000;
@@ -58,18 +49,12 @@
                       'volume': Math.round(arr[i] * data.capacity) / 100,
                     });
                   }
-                  running = false;
                 }
                 break;
               case '6':
                 // Stored Mode Data (0 = Level Mode, 1 = Volumetric Mode)
-                if (timer != null) {
-                  clearTimeout(timer);
-                  timer = null
-                }
                 if ((msg.fields[3].value == data.instance) && (msg.fields[4].value == data.fluid)) {
                   data.mode = msg.fields[6].value.toString();
-                  running = false;
                 }
                 break;
             }
@@ -94,7 +79,6 @@
       timer = null
     }
     // Remove listeners
-    window.pumaAPI.reml(lis + '-data');
     window.pumaAPI.reml(lis + '-done');
   }
 
@@ -102,13 +86,18 @@
     running = true;
     data.table = new Array();
     // Receives volume file data
-    window.pumaAPI.recv('volfile-data', (e, dat) => {
-      data = JSON.parse(JSON.stringify(dat));
+    window.pumaAPI.recv('volfile-data', (e, res) => {
+      if (res instanceof Error) {
+        // Error popup
+      } else {
+        data = JSON.parse(JSON.stringify(res));
+      }
     });
     // Receives volume file result
     window.pumaAPI.recv('volfile-done', (e) => {
-      stop('volfile');
       running = false;
+      stop('volfile');
+      window.pumaAPI.reml('volfile-data');
     });
     window.pumaAPI.send('volfile-read');
   };
@@ -121,6 +110,9 @@
     }, timeout);
     // Receives volume file result
     window.pumaAPI.recv('volfile-done', (e, res) => {
+      if (res instanceof Error) {
+        // Error popup
+      }
       stop('volfile');
       running = false;
     });
@@ -133,6 +125,14 @@
       running = false;
     }, timeout);
     data.mode = null;
+    // Receives volume mode result
+    window.pumaAPI.recv('volmode-done', (e, res) => {
+      if (!res) {
+        // Error popup
+      }
+      stop('volmode');
+      running = false;
+    });
     window.pumaAPI.send('volmode-read', [data.fluid, data.instance]);
   };
 
@@ -144,15 +144,13 @@
     }, timeout);
     // Receives volume mode result
     window.pumaAPI.recv('volmode-done', (e, res) => {
+      if (!res) {
+        // Error popup
+      }
       stop('volmode');
       running = false;
     });
-    let dat = {
-      fluid: data.fluid,
-      instance: data.instance,
-      mode: data.mode,
-    };
-    window.pumaAPI.send('volmode-write', dat);
+    window.pumaAPI.send('volmode-write', [data.fluid, data.instance, data.mode]);
   };
 
   function download(e) {
@@ -161,6 +159,14 @@
       running = false;
     }, timeout);
     data.table = new Array();
+    // Receives volume table result
+    window.pumaAPI.recv('voltable-done', (e, res) => {
+      if (!res) {
+        // Error popup
+      }
+      stop('voltable');
+      running = false;
+    });
     window.pumaAPI.send('voltable-read', [data.fluid, data.instance]);
   };
 
@@ -172,10 +178,17 @@
     }, timeout);
     // Receives volume table result
     window.pumaAPI.recv('voltable-done', (e, res) => {
+      if (!res) {
+        // Error popup
+      }
       stop('voltable');
       running = false;
     });
-    window.pumaAPI.send('voltable-write', JSON.parse(JSON.stringify(data)));
+    let dat = '';
+    data.table.forEach((elm) => {
+      dat += String.fromCharCode(elm.pervol);
+    });
+    window.pumaAPI.send('voltable-write', [data.fluid, data.instance, dat, data.capacity]);
   };
 
   function cancel(e) {
@@ -190,7 +203,7 @@
 <Grid>
   <Row>
     <Column>
-      <h2>{params.adaptor + ' - Programming'}</h2>
+      <h2>{params.adaptor + ' - Configuration'}</h2>
       <VolumeContainer style="height: 80vh;" bind:data={data} running={running}
         on:load={load} on:save={save} on:getmode={getmode} on:setmode={setmode} on:download={download}
         on:upload={upload} on:cancel={cancel} />

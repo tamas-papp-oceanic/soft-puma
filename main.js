@@ -197,6 +197,7 @@ function proc(dev, frm) {
         mainWindow.webContents.send('n2k-name', [ dev, msg ]);
         break;
       case 65289:
+      case 130825:
         mainWindow.webContents.send('n2k-volume', [ dev, msg ]);
         break;
       case 65477:
@@ -204,9 +205,6 @@ function proc(dev, frm) {
         break;
       case 126996:
         mainWindow.webContents.send('n2k-prod', [ dev, msg ]);
-        break;
-      case 130825:
-        mainWindow.webContents.send('n2k-volume', [ dev, msg ]);
         break;
       default:
         mainWindow.webContents.send('n2k-data', [ dev, msg ]);
@@ -393,8 +391,10 @@ ipcMain.on('volfile-read', (e, ...args) => {
       mainWindow.webContents.send('volfile-done');
     }
   }).catch((err) => {
-    log.error(err);
-    mainWindow.webContents.send('volfile-done');
+    if ((mainWindow != null) && (typeof mainWindow.webContents !== 'undefined')) {
+      mainWindow.webContents.send('volfile-data', err);
+      mainWindow.webContents.send('volfile-done');
+    }
   });
 });
 
@@ -405,50 +405,70 @@ ipcMain.on('volfile-write', (e, ...args) => {
       mainWindow.webContents.send('volfile-done', res);
     }
   }).catch((err) => {
-    log.error(err);
+    if ((mainWindow != null) && (typeof mainWindow.webContents !== 'undefined')) {
+      mainWindow.webContents.send('volfile-done', err);
+    }
   });
 });
 
 // Starts volume mode reading
 ipcMain.on('volmode-read', (e, args) => {
   const [fluid, instance] = args;
+  let res = true;
   for (const [key, val] of Object.entries(devices)) {
     // Send Fluid Sender Control proprietary PGN
     // Request for Mode Data
-    val.engine.send130825(fluid, instance, 0x05);
+    let ret = val.engine.send130825(fluid, instance, 0x05);
+    res ||= ret;
+  }
+  if ((mainWindow != null) && (typeof mainWindow.webContents !== 'undefined')) {
+    mainWindow.webContents.send('volmode-done', res);
   }
 });
 
 // Starts volume mode writing
-ipcMain.on('volmode-write', (e, ...args) => {
-  // writeMode(args[0]).then((res) => {
-  //   if ((mainWindow != null) && (typeof mainWindow.webContents !== 'undefined')) {
-  //     mainWindow.webContents.send('volmode-done', res);
-  //   }
-  // }).catch((err) => {
-  //   log.error(err);
-  // });
+ipcMain.on('volmode-write', (e, args) => {
+  const [fluid, instance, mode] = args;
+  let res = true;
+  for (const [key, val] of Object.entries(devices)) {
+    // Send Fluid Sender Control proprietary PGN
+    // Send Mode Data
+    let ret = val.engine.send130825(fluid, instance, 0x04, mode);
+    res ||= ret;
+  }
+  if ((mainWindow != null) && (typeof mainWindow.webContents !== 'undefined')) {
+    mainWindow.webContents.send('volmode-done', res);
+  }
 });
 
 // Starts volume table reading
 ipcMain.on('voltable-read', (e, args) => {
   const [fluid, instance] = args;
+  let res = true;
   for (const [key, val] of Object.entries(devices)) {
     // Send Fluid Sender Control proprietary PGN
     // Request for Volumetric Data
-    val.engine.send130825(fluid, instance, 0x02);
+    let ret = val.engine.send130825(fluid, instance, 0x02);
+    res ||= ret;
+  }
+  if ((mainWindow != null) && (typeof mainWindow.webContents !== 'undefined')) {
+    mainWindow.webContents.send('voltable-done', res);
   }
 });
 
 // Starts volume table writing
-ipcMain.on('voltable-write', (e, ...args) => {
-  // writeTable(args[0]).then((res) => {
-  //   if ((mainWindow != null) && (typeof mainWindow.webContents !== 'undefined')) {
-  //     mainWindow.webContents.send('voltable-done', res);
-  //   }
-  // }).catch((err) => {
-  //   log.error(err);
-  // });
+ipcMain.on('voltable-write', (e, args) => {
+  const [fluid, instance, table, capacity] = args;
+  let res = true;
+  for (const [key, val] of Object.entries(devices)) {
+    // Send Fluid Sender Control proprietary PGN
+    // Send Table and Capacity Data
+    let ret = val.engine.send130825(fluid, instance, 0x01, table, capacity);
+    res ||= ret;
+  }
+  if ((mainWindow != null) && (typeof mainWindow.webContents !== 'undefined')) {
+    mainWindow.webContents.send('voltable-done', res);
+  }
 });
 
 // Closes the application

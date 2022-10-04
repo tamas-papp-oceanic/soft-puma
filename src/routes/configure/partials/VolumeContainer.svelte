@@ -298,14 +298,12 @@
       <Grid fullWidth noGutter>
         <Row>
           <Column sm={1} md={1} lg={3} padding>
-            <Row style="text-align: right;">
-              <Column style="flex-grow: 0; padding: 0 0.2rem 0 1rem;">
+            <Row>
+              <Column style="display: flex; flex-flow: row nowrap; justify-content: flex-end;">
                 <Button tooltipPosition="top" tooltipAlignment="center" iconDescription="Load table" icon={Open}
-                  disabled={running} on:click={(e) => load(e)}></Button>
-              </Column>
-              <Column style="flex-grow: 0; padding: 0 0 0 0.2rem;">
+                  style="margin-right: 0.2rem;" disabled={running} on:click={(e) => load(e)}></Button>
                 <Button tooltipPosition="top" tooltipAlignment="center" iconDescription="Save table" icon={Save}
-                  disabled={running} on:click={(e) => save(e)}></Button>
+                  style="margin-left: 0.2rem;" disabled={running} on:click={(e) => save(e)}></Button>
               </Column>
             </Row>
             <Row padding>
