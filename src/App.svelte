@@ -39,9 +39,9 @@
 		"/simulate": Simulate,
 		"/program": Program,
 		"/program/3420": Program3420,
-		"/program/5185/:variant": Program5185,
+		"/program/5185/:variant?": Program5185,
 		"/configure": Configure,
-		"/configure/fluid/:fluid/:instance/:device": ConfigureFluid,
+		"/configure/fluid/:instance/:device": ConfigureFluid,
 		"/Welcome": wrap({
 			component: Welcome,
 			conditions: [() =>{
@@ -52,7 +52,6 @@
 				}
 			}],
 		}),
-		"/devices/:address": Configure,
 		"/monitor/:address": Monitor,
 		"/messages/:protocol/:pgn/:function/:manufacturer/:industry/:instance/:type": Content,
 		// "/details/:protocol/:pgn/:function/:manufacturer/:industry/:instance/:type": Details,

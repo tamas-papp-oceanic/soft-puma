@@ -50,9 +50,11 @@ class NMEAEngine {
   init() {
     this.#addrMngr = new Address();
     this.#addrMngr.start(this.#sendRaw.bind(this));
-    this.#timer = setInterval((fun) => {
-      fun();
-    }, 60000, this.#send126993.bind(this));
+    if (this.#timer == null) {
+      this.#timer = setInterval((fun) => {
+        fun();
+      }, 60000, this.#send126993.bind(this));
+    }
   };
   // Destroys NMEA engine
   destroy() {

@@ -12,6 +12,7 @@
 
   export let params;
 
+  const device = '5185';
   let actions = {
     "scan-device": scanDevice,
     "wait-device": waitDevice,
@@ -102,7 +103,7 @@
 <Grid>
   <Row>
     <Column>
-      <h2>{'5185' + devnames['5185'] + (params.variant != null ? ' (' + params.variant + ')' : '') + ' - Test Suite'}</h2>
+      <h2>{device + ' ' + devnames[device] + (params.variant != null ? ' (' + params.variant + ')' : '') + ' - Test Suite'}</h2>
       <InlineNotification
         hideCloseButton
         kind="info"

@@ -4,7 +4,7 @@
     OverflowMenuItem, Pagination, Dropdown, Tag } from "carbon-components-svelte";
   import Scan from "carbon-icons-svelte/lib/SearchLocate16";
   import { push } from 'svelte-spa-router'
-  import { name, devices, device } from "../../stores/data.js";
+  import { name, devices, device, data } from "../../stores/data.js";
 
   const headers = [{
     key: "id",
@@ -28,6 +28,10 @@
     key: "overflow",
     empty: true
   }];
+  const paths = {
+    '3271': '/fluid',
+    '4291': '/fluid',
+  };
 
   let items = new Array();
   let selected;
@@ -51,6 +55,38 @@
     }
   };
 
+  function conf(e, add) {
+    if ((typeof $devices[selected] !== 'undefined') &&
+      (typeof $name[$devices[selected]] !== 'undefined') &&
+      (typeof $name[$devices[selected]][add] !== 'undefined')) {
+      let nam = $name[$devices[selected]][add];
+      let pat = '/configure';
+      if (typeof paths[nam.modelVersion] !== 'undefined') {
+        pat += paths[nam.modelVersion];
+      }
+      let ins = 0;
+      let flt = 0;
+      if (typeof $data[$devices[selected]] !== 'undefined') {
+        let dat = $data[$devices[selected]];
+        for (let i in dat) {
+          if ((dat[i].header.src == parseInt(add)) && (dat[i].header.pgn == 127505)) {
+            ins = dat[i].fields[0].value;
+            flt = dat[i].fields[1].value;
+            break;
+          }
+        }
+      }
+      switch (pat) {
+        case '/configure/fluid':
+          push(pat + '/' + ((flt << 4) + ins) + '/' + nam.modelVersion);
+          break;
+        default:
+          push(pat);
+          break;
+      }
+    }
+  }
+
   function scan(e) {
     rows = new Array();
     window.pumaAPI.send('bus-scan');
@@ -59,7 +95,7 @@
   function select(e) {
     $device = e.detail.selectedItem.text;
   }
-
+  
   getSelected();
 
   // Data getters, setters
@@ -128,8 +164,8 @@
         <span slot="cell" let:cell let:row>
           {#if cell.key === 'overflow'}
             <OverflowMenu flipped>
-              <OverflowMenuItem text="Configure" on:click={() => push('/devices/'+row.id)} />
-              <OverflowMenuItem text="Monitor" on:click={() => push('/monitor/'+row.id)} />
+              <OverflowMenuItem text="Configure" on:click={(e) => conf(e, row.id)} />
+              <OverflowMenuItem text="Monitor" on:click={(e) => push('/monitor/'+row.id)} />
               <OverflowMenuItem disabled text="Test" />
               <OverflowMenuItem text="Check for Updates" />
             </OverflowMenu>

@@ -7,14 +7,12 @@
 
   export let params;
 
-console.log(params)
-
   const plf = navigator?.userAgentData?.platform || navigator?.platform || 'unknown';
   const timeout = 2000;
   let timer = null;
   let data = {
-    fluid: '0',
-    instance: '0',
+    fluid: ((parseInt(params.instance) & 0xF0) >> 4).toString(),
+    instance: (parseInt(params.instance) & 0x0F).toString(),
     capacity: null,
     table: new Array(),
     mode: '0',

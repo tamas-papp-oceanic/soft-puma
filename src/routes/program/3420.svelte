@@ -2,7 +2,9 @@
   import { Row, Grid, Column } from "carbon-components-svelte";
   import { pop } from "svelte-spa-router";
   import ProgramContainer from './partials/ProgramContainer.svelte';
+  import { devnames } from '../../stores/common.js';
 
+  const device = '3420';
   const plf = navigator?.userAgentData?.platform || navigator?.platform || 'unknown';
   const timeout = 5000;
   let timer = null;
@@ -35,7 +37,7 @@
       stop('boot');
       running = false;
     });
-    window.pumaAPI.send('boot-start', '3420');
+    window.pumaAPI.send('boot-start', device);
   };
 
   function program(e) {
@@ -54,7 +56,7 @@
       stop('prog');
       running = false;
     });
-    window.pumaAPI.send('prog-start', '3420');
+    window.pumaAPI.send('prog-start', device);
   };
 
   function cancel(e) {
@@ -68,7 +70,7 @@
 <Grid>
   <Row>
     <Column>
-      <h2>{'3420 AC Monitor - Programming'}</h2>
+      <h2>{device + ' ' + devnames[device] + ' - Programming'}</h2>
       <ProgramContainer message={message} running={running} style="height: 80vh;"
         on:loader={loader} on:program={program} on:cancel={cancel} />
     </Column>
