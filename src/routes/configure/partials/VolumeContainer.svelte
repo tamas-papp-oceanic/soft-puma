@@ -308,12 +308,12 @@
             </Row>
             <Row padding>
               <Column>
-                <Dropdown titleText="Fluid type" size="sm" selectedId={data.fluid} items={fluids} />
+                <Dropdown titleText="Fluid type" size="sm" bind:selectedId={data.fluid} items={fluids} />
               </Column>
             </Row>
             <Row>
               <Column>
-                <Dropdown titleText="Instance" size="sm" selectedId={data.instance} items={insts} />
+                <Dropdown titleText="Instance" size="sm" bind:selectedId={data.instance} items={insts} />
               </Column>
             </Row>
             <Row padding style="text-align: right;">
@@ -342,7 +342,7 @@
                   on:input={(e) => volinput(e)} />
               </Column>
               <Column>
-                <Dropdown titleText="Unit" size="sm" selectedId={unit} items={units} on:select={(e) => unitselect(e)} />
+                <Dropdown titleText="Unit" size="sm" bind:selectedId={unit} items={units} on:select={(e) => unitselect(e)} />
               </Column>
               <Column style="flex-grow: 0; padding: 0 0.2rem;">
                 <Button tooltipPosition="top" tooltipAlignment="center" iconDescription="Add element" icon={Add}
@@ -385,7 +385,7 @@
             </Row>
             <Row padding>
               <Column>
-                <Dropdown hideLabel titleText="Select mode" size="xl" selectedId={data.mode} items={modes} />
+                <Dropdown hideLabel titleText="Select mode" size="xl" bind:selectedId={data.mode} items={modes} />
               </Column>
             </Row>
             <Row>

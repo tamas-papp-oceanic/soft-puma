@@ -3,6 +3,7 @@
   import { push } from 'svelte-spa-router'
   import { selected } from '../../stores/data.js'
   import { checkAccess } from '../../auth/auth'
+  import { devnames } from '../../stores/common.js'
 
   let tab;
   let dev;
@@ -31,10 +32,11 @@
           <Grid padding fullWidth noGutter>
             <Row>
               <Column sm={4} md={3} lg={4}>
-              </Column>
-              <Column sm={3} md={3} lg={4}>
-              </Column>
-              <Column sm={4} md={3} lg={4}>
+                <div class="product-card" class:selected={dev == '3271'} on:pointerdown={(e) => { $selected.device = '3271'; push('/configure/fluid/0/0/3271'); }}>
+                  <div class="product-number">3271</div>
+                  <div class="product-title">{devnames['3271']}</div>
+                  <div class="product-image"><img src="images/3271.webp" alt="3271" /></div>
+                </div>
               </Column>
             </Row>
           </Grid>
@@ -43,9 +45,9 @@
           <Grid padding fullWidth noGutter>
             <Row>
               <Column sm={4} md={3} lg={4}>
-                <div class="product-card" class:selected={dev == '4291'} on:pointerdown={(e) => { $selected.device = '4291'; push('/configure/fuel/4291 Tank Level Adaptor'); }}>
+                <div class="product-card" class:selected={dev == '4291'} on:pointerdown={(e) => { $selected.device = '4291'; push('/configure/fluid/0/0/4291'); }}>
                   <div class="product-number">4291</div>
-                  <div class="product-title">Tank Level Adaptor</div>
+                  <div class="product-title">{devnames['4291']}</div>
                   <div class="product-image"><img src="images/4291.webp" alt="4291" /></div>
                 </div>
               </Column>
@@ -56,12 +58,6 @@
           <TabContent>
             <Grid padding fullWidth noGutter>
               <Row>
-                <Column sm={4} md={3} lg={4}>
-                </Column>
-                <Column sm={4} md={3} lg={4}>
-                </Column>
-                <Column sm={3} md={3} lg={4}>
-                </Column>
                 <Column sm={4} md={3} lg={4}>
                 </Column>
               </Row>

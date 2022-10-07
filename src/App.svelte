@@ -17,7 +17,7 @@
 	import Program from './routes/program/Index.svelte';
 	import Program3420 from './routes/program/3420.svelte';
 	import Program5185 from './routes/program/5185.svelte';
-	import ConfigureFuel from './routes/configure/fuel.svelte';
+	import ConfigureFluid from './routes/configure/fluid.svelte';
 	import { loggedIn } from './stores/user.js';
   import { update, updmsg, download, progress } from './stores/update.js';
 
@@ -39,9 +39,9 @@
 		"/simulate": Simulate,
 		"/program": Program,
 		"/program/3420": Program3420,
-		"/program/5185/:variant?": Program5185,
+		"/program/5185/:variant": Program5185,
 		"/configure": Configure,
-		"/configure/fuel/:adaptor?": ConfigureFuel,
+		"/configure/fluid/:fluid/:instance/:device": ConfigureFluid,
 		"/Welcome": wrap({
 			component: Welcome,
 			conditions: [() =>{

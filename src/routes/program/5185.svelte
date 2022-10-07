@@ -8,6 +8,7 @@
   import { scanDevice, waitDevice, startForm } from './tests/5185.js';
   import { initRun, runStep, nextStep, runScript, setStoreValue, lastStep, stopTests } from "./tests/runner.js"
   import { _steps, _events, _current } from '../../stores/tests.js';
+  import { devnames } from '../../stores/common.js';
 
   export let params;
 
@@ -101,7 +102,7 @@
 <Grid>
   <Row>
     <Column>
-      <h2>{'5185 Poseidon 7' + (params.variant != null ? ' (' + params.variant + ')' : '') + ' - Test Suite'}</h2>
+      <h2>{'5185' + devnames['5185'] + (params.variant != null ? ' (' + params.variant + ')' : '') + ' - Test Suite'}</h2>
       <InlineNotification
         hideCloseButton
         kind="info"
