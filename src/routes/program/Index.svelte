@@ -3,37 +3,32 @@
   import { push } from 'svelte-spa-router'
   import { selected } from '../../stores/data.js'
   import { checkAccess } from '../../auth/auth'
-  import { devnames } from '../../stores/common.js'
+  import { getname } from '../../stores/common.js'
 
   let tab;
   let dev;
-  let ptw;
-  let devs = {};
+  let devs = {
+    'senders': ['3420'],
+    'adaptors': new Array(),
+    'displays': new Array(),
+  };
 
   function change(e) {
     $selected.program = e.detail;
   };
 
   function select(e, grp, dev) {
-    $selected.device = dev.code;
-    push('/program/' + dev.code + (grp != 'displays' ? '/0' : ''));
+    $selected.device = dev;
+    push('/program/' + dev + (grp != 'displays' ? '/0' : ''));
   };
 
   $: tab = $selected.program;
   $: dev = $selected.device;
-  $: ptw = checkAccess('test', 'write');
-  $: {
-    for (const grp of Object.keys(devnames)) {
-      if (typeof devs[grp] === 'undefined') {
-        devs[grp] = new Array();
-      }
-      for (const [key, val] of Object.entries(devnames[grp])) {
-        if ((grp == 'monitors') || ((grp == 'displays') && ptw)) {
-          devs[grp].push({ code: key, name: val });
-        }
-      }
-    }
-  };
+  $: if (checkAccess('test', 'write')) {
+    devs['displays'] = ['5185',  '5185-H'];
+  } else {
+    devs['displays'] = new Array();
+  }
 </script>
 
 <Grid>
@@ -42,66 +37,24 @@
     <Tabs type="container" bind:selected={tab} on:change={(e) => change(e)}>
       <Tab label="Sensors" />
       <Tab label="Adaptors" />
-      {#if ptw}
-        <Tab label="Displays" />
-      {/if}
+      <Tab label="Displays" />
       <div slot="content">
-        {#each ['monitors', 'adaptors', 'displays'] as group}
-        <TabContent>
-          <Grid padding fullWidth noGutter>
-            <Row>
-              {#each devs[group] as device}
-                <Column sm={4} md={3} lg={4}>
-                  <div class="product-card" class:selected={dev == device.code}
-                    on:pointerdown={(e) => select(e, group, device)}>
-                    <div class="product-number">{device.code}</div>
-                    <div class="product-title">{device.name}</div>
-                    <div class="product-image"><img src={'images/' + device.code + '.webp'} alt={device.code} /></div>
-                  </div>
-                </Column>
-              {/each}
-            </Row>
-<!--        <Row>
-              <Column sm={4} md={3} lg={4}>
-                <div class="product-card" class:selected={dev == '3420'} on:pointerdown={(e) => { $selected.device = '3420'; push('/program/3420'); }}>
-                  <div class="product-number">3420</div>
-                  <div class="product-title">{devnames['3420']}</div>
-                  <div class="product-image"><img src="images/3420.webp" alt="3420" /></div>
-                </div>
-              </Column>
-            </Row> -->
-          </Grid>
-        </TabContent>
-        <!-- <TabContent>
-          <Grid padding fullWidth noGutter>
-            <Row>
-              <Column sm={4} md={3} lg={4}>
-              </Column>
-          </Row>
-          </Grid>
-        </TabContent>
-        {#if ptw}
+        {#each ['senders', 'adaptors', 'displays'] as group}
           <TabContent>
             <Grid padding fullWidth noGutter>
               <Row>
-                <Column sm={4} md={3} lg={4}>
-                  <div class="product-card" class:selected={dev == '5185'} on:pointerdown={(e) => { $selected.device = '5185'; push('/program/5185'); }}>
-                    <div class="product-number">5185</div>
-                    <div class="product-title">{devnames['5185']}</div>
-                    <div class="product-image"><img src="images/P7.webp" alt="P7" /></div>
-                  </div>
-                </Column>
-                <Column sm={4} md={3} lg={4}>
-                  <div class="product-card" class:selected={dev == '5185-H'} on:pointerdown={(e) => { $selected.device = '5185-H'; push('/program/5185/Honda'); }}>
-                    <div class="product-number">5185</div>
-                    <div class="product-title">{devnames['5185'] + ' (Honda)'}</div>
-                    <div class="product-image"><img src="images/P7-Honda.webp" alt="P7-H" /></div>
-                  </div>
-                </Column>
+                {#each devs[group] as device}
+                  <Column sm={4} md={3} lg={4}>
+                    <div class="product-card" class:selected={dev == device} on:pointerdown={(e) => select(e, group, device)}>
+                      <div class="product-number">{device}</div>
+                      <div class="product-title">{getname(device)}</div>
+                      <div class="product-image"><img src={'images/' + device + '.webp'} alt={device} /></div>
+                    </div>
+                  </Column>
+                {/each}
               </Row>
             </Grid>
           </TabContent>
-        {/if} -->
         {/each}
       </div>
     </Tabs>

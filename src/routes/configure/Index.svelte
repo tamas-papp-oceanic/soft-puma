@@ -2,30 +2,27 @@
   import { push } from 'svelte-spa-router'
   import { Row, Grid, Column, Tabs, Tab, TabContent } from "carbon-components-svelte";
   import { selected } from '../../stores/data.js'
-  import { devnames } from '../../stores/common.js'
+  import { getname } from '../../stores/common.js'
 
   let tab;
   let dev;
-  let devs = {};
+  let devs = {
+    'senders': ['3271', '3281', '3420'],
+    'adaptors': ['4291'],
+    'displays': new Array(),
+  };
 
-  function change(e){
+  function change(e) {
     $selected.config = e.detail;
-  }
+  };
+
+  function select(e, dev) {
+    $selected.device = dev;
+    push('/configure/' + dev + '/0' + (dev.includes('3271') || dev.includes('3281') || dev.includes('4291') ? '/0' : ''));
+  };
 
   $: tab = $selected.config;
   $: dev = $selected.device;
-  $: {
-    for (const grp of Object.keys(devnames)) {
-      if (typeof devs[grp] === 'undefined') {
-        devs[grp] = new Array();
-      }
-      for (const [key, val] of Object.entries(devnames[grp])) {
-        if ((grp == 'senders') || (grp == 'adaptors')) {
-          devs[grp].push({ code: key, name: val });
-        }
-      }
-    }
-  };
 </script>
 
 <Grid>
@@ -42,10 +39,10 @@
               <Row>
                 {#each devs[group] as device}
                   <Column sm={4} md={3} lg={4}>
-                    <div class="product-card" class:selected={dev == device.code} on:pointerdown={(e) => { $selected.device = device.code; push('/configure/' + device.code + '/0/0'); }}>
-                      <div class="product-number">{device.code}</div>
-                      <div class="product-title">{device.name}</div>
-                      <div class="product-image"><img src={'images/' + device.code + '.webp'} alt={device.code} /></div>
+                    <div class="product-card" class:selected={dev == device} on:pointerdown={(e) => select(e, device)}>
+                      <div class="product-number">{device}</div>
+                      <div class="product-title">{getname(device)}</div>
+                      <div class="product-image"><img src={'images/' + device + '.webp'} alt={device} /></div>
                     </div>
                   </Column>
                 {/each}

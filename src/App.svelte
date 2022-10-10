@@ -14,10 +14,11 @@
 	// import Details from './routes/Details.svelte';
 	import Simulate from './routes/Simulate.svelte';
 	import Configure from './routes/configure/Index.svelte';
+	import Configure3420 from './routes/configure/3420.svelte';
+	import ConfigureFluid from './routes/configure/fluid.svelte';
 	import Program from './routes/program/Index.svelte';
 	import Program3420 from './routes/program/3420.svelte';
 	import Program5185 from './routes/program/5185.svelte';
-	import ConfigureFluid from './routes/configure/fluid.svelte';
 	import { loggedIn } from './stores/user.js';
   import { update, updmsg, download, progress } from './stores/update.js';
 
@@ -44,6 +45,7 @@
 		"/configure": Configure,
 		"/configure/3271/:instance/:fluid": ConfigureFluid,
 		"/configure/3281/:instance/:fluid": ConfigureFluid,
+		"/configure/3420/:instance": Configure3420,
 		"/configure/4291/:instance/:fluid": ConfigureFluid,
 		"/Welcome": wrap({
 			component: Welcome,

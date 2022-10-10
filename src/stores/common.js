@@ -2,12 +2,10 @@ const devnames = {
   'senders': {
     '3271': 'Volumetric Fuel Sender',
     '3281': 'Water Level Sender',
+    '3420': 'AC Monitor',
   },
   'adaptors': {
     '4291': 'Tank Level Adaptor',
-  },
-  'monitors': {
-    '3420': 'AC Monitor',
   },
   'displays': {
     '5185': 'Poseidon 7',
