@@ -1,13 +1,15 @@
 <script>
   import { onMount, onDestroy } from "svelte";
   import { Row, Grid, Column, ToastNotification } from "carbon-components-svelte";
-  import { pop } from "svelte-spa-router";
+  import { location, pop } from "svelte-spa-router";
   import VolumeContainer from './partials/VolumeContainer.svelte';
   import { getname } from '../../stores/common.js';
 
   export let params;
 
   const plf = navigator?.userAgentData?.platform || navigator?.platform || 'unknown';
+
+  const device = $location.split('/')[2];
   const timeout = 2000;
   let timer = null;
   let data = {
@@ -259,7 +261,7 @@
 <Grid>
   <Row>
     <Column>
-      <h2>{params.device + ' ' + getname(params.device) + ' - Configuration'}</h2>
+      <h2>{device + ' ' + getname(device) + ' - Configuration'}</h2>
       <VolumeContainer style="height: 80vh;" bind:data={data} running={running}
         on:load={load} on:save={save} on:getmode={getmode} on:setmode={setmode} on:download={download}
         on:upload={upload} on:cancel={cancel} />

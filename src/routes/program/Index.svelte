@@ -10,9 +10,14 @@
   let ptw;
   let devs = {};
 
-  function change(e){
+  function change(e) {
     $selected.program = e.detail;
-  }
+  };
+
+  function select(e, grp, dev) {
+    $selected.device = dev.code;
+    push('/program/' + dev.code + (grp != 'displays' ? '/0' : ''));
+  };
 
   $: tab = $selected.program;
   $: dev = $selected.device;
@@ -48,7 +53,7 @@
               {#each devs[group] as device}
                 <Column sm={4} md={3} lg={4}>
                   <div class="product-card" class:selected={dev == device.code}
-                    on:pointerdown={(e) => { $selected.device = device.code; push('/program/' + device.code + '/0'); }}>
+                    on:pointerdown={(e) => select(e, group, device)}>
                     <div class="product-number">{device.code}</div>
                     <div class="product-title">{device.name}</div>
                     <div class="product-image"><img src={'images/' + device.code + '.webp'} alt={device.code} /></div>

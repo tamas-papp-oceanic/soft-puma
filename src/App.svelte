@@ -42,7 +42,9 @@
 		"/program/5185": Program5185,
 		"/program/5185-H": Program5185,
 		"/configure": Configure,
-		"/configure/:device/:instance/:fluid": ConfigureFluid,
+		"/configure/3271/:instance/:fluid": ConfigureFluid,
+		"/configure/3281/:instance/:fluid": ConfigureFluid,
+		"/configure/4291/:instance/:fluid": ConfigureFluid,
 		"/Welcome": wrap({
 			component: Welcome,
 			conditions: [() =>{
