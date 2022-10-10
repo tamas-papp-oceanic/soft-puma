@@ -12,9 +12,7 @@ export const name = writable({});
 export const data = writable({});
 export const queue = writable({});
 export const filter = writable(null);
-export const selected = writable({
-  program: 0,
-});
+export const selected = writable({program: null, config: null, device: null});
 
 window.pumaAPI.send('n2k-ready');
 

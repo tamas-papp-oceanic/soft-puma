@@ -82,14 +82,14 @@
     // window.pumaAPI.reml('n2k-volume');
   });
 
-  function stop(lis) {
-    if (timer != null) {
-      clearTimeout(timer);
-      timer = null
-    }
-    // Remove listeners
-    // window.pumaAPI.reml(lis + '-done');
-  };
+  // function stop(lis) {
+  //   if (timer != null) {
+  //     clearTimeout(timer);
+  //     timer = null
+  //   }
+  //   // Remove listeners
+  //   window.pumaAPI.reml(lis + '-done');
+  // };
 
   // function load(e) {
   //   running = true;
@@ -251,6 +251,7 @@
     // stop('voltable');
     running = false;
     pop();
+
   };
 </script>
 
