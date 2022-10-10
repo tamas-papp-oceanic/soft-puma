@@ -1,13 +1,12 @@
 <script>
-  import { Row, Grid, Column, Tabs, Tab, TabContent } from "carbon-components-svelte";
   import { push } from 'svelte-spa-router'
+  import { Row, Grid, Column, Tabs, Tab, TabContent } from "carbon-components-svelte";
   import { selected } from '../../stores/data.js'
-  import { checkAccess } from '../../auth/auth'
   import { devnames } from '../../stores/common.js'
 
   let tab;
   let dev;
-  let ptw;
+  let devs = {};
 
   function change(e){
     $selected.config = e.detail;
@@ -15,7 +14,18 @@
 
   $: tab = $selected.config;
   $: dev = $selected.device;
-  $: ptw = checkAccess('test', 'write');
+  $: {
+    for (const grp of Object.keys(devnames)) {
+      if (typeof devs[grp] === 'undefined') {
+        devs[grp] = new Array();
+      }
+      for (const [key, val] of Object.entries(devnames[grp])) {
+        if ((grp == 'senders') || (grp == 'adaptors')) {
+          devs[grp].push({ code: key, name: val });
+        }
+      }
+    }
+  };
 </script>
 
 <Grid>
@@ -24,46 +34,25 @@
     <Tabs type="container" bind:selected={tab} on:change={(e) => change(e)}>
       <Tab label="Sensors" />
       <Tab label="Adaptors" />
-      {#if ptw}
-        <Tab label="Displays" />
-      {/if}
+      <Tab label="Displays" />
       <div slot="content">
-        <TabContent>
-          <Grid padding fullWidth noGutter>
-            <Row>
-              <Column sm={4} md={3} lg={4}>
-                <div class="product-card" class:selected={dev == '3271'} on:pointerdown={(e) => { $selected.device = '3271'; push('/configure/fluid/0/3271'); }}>
-                  <div class="product-number">3271</div>
-                  <div class="product-title">{devnames['3271']}</div>
-                  <div class="product-image"><img src="images/3271.webp" alt="3271" /></div>
-                </div>
-              </Column>
-            </Row>
-          </Grid>
-        </TabContent>
-        <TabContent>
-          <Grid padding fullWidth noGutter>
-            <Row>
-              <Column sm={4} md={3} lg={4}>
-                <div class="product-card" class:selected={dev == '4291'} on:pointerdown={(e) => { $selected.device = '4291'; push('/configure/fluid/0/4291'); }}>
-                  <div class="product-number">4291</div>
-                  <div class="product-title">{devnames['4291']}</div>
-                  <div class="product-image"><img src="images/4291.webp" alt="4291" /></div>
-                </div>
-              </Column>
-          </Row>
-          </Grid>
-        </TabContent>
-        {#if ptw}
+        {#each ['senders', 'adaptors', 'displays'] as group}
           <TabContent>
             <Grid padding fullWidth noGutter>
               <Row>
-                <Column sm={4} md={3} lg={4}>
-                </Column>
+                {#each devs[group] as device}
+                  <Column sm={4} md={3} lg={4}>
+                    <div class="product-card" class:selected={dev == device.code} on:pointerdown={(e) => { $selected.device = device.code; push('/configure/' + device.code + '/0/0'); }}>
+                      <div class="product-number">{device.code}</div>
+                      <div class="product-title">{device.name}</div>
+                      <div class="product-image"><img src={'images/' + device.code + '.webp'} alt={device.code} /></div>
+                    </div>
+                  </Column>
+                {/each}
               </Row>
             </Grid>
           </TabContent>
-        {/if}
+        {/each}
       </div>
     </Tabs>
   </Column>

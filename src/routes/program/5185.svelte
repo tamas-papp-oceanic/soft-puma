@@ -1,19 +1,18 @@
 <script>
   import { onMount } from "svelte";
   import { Row, Grid, Column, InlineNotification } from "carbon-components-svelte";
-	import { pop } from 'svelte-spa-router'
+	import { location, pop } from 'svelte-spa-router'
   import TestContainer from './partials/TestContainer.svelte';
   import testG from './tests/5185G.json';
   import testH from './tests/5185H.json';
   import { scanDevice, waitDevice, startForm } from './tests/5185.js';
   import { initRun, runStep, nextStep, runScript, setStoreValue, lastStep, stopTests } from "./tests/runner.js"
   import { _steps, _events, _current } from '../../stores/tests.js';
-  import { devnames } from '../../stores/common.js';
+  import { getname } from '../../stores/common.js';
 
-  export let params;
-
-  const device = '5185';
-  let actions = {
+  const device = $location.split('/')[2];
+  const variant = (device == '5185-H' ? 'Honda' : null);
+  const actions = {
     "scan-device": scanDevice,
     "wait-device": waitDevice,
     "start-form": startForm,
@@ -24,12 +23,12 @@
 
   // On mount event  
   onMount(async () => {
-    if ((typeof params.variant !== 'undefined') && (params.variant == 'Honda')) {
+    if (device == '5185-H') {
       test = testH;
     } else {
       test = testG;
     }
-    initRun(test.steps, actions, events, params.variant);
+    initRun(test.steps, actions, events, variant);
     await runStep();
   });
   // Submit button event
@@ -55,7 +54,7 @@
               $_steps[$_current] = cur;
             } else {
               let stv = num.toString().padStart(7, '0');
-              if (params.variant == 'Honda') {
+              if (variant == 'Honda') {
                 stv = 'UZSY-' + stv;
               }
               await setStoreValue({ variable: 'serial', value: stv });
@@ -103,7 +102,7 @@
 <Grid>
   <Row>
     <Column>
-      <h2>{device + ' ' + devnames[device] + (params.variant != null ? ' (' + params.variant + ')' : '') + ' - Test Suite'}</h2>
+      <h2>{device + ' ' + getname(device) + ' - Test Suite'}</h2>
       <InlineNotification
         hideCloseButton
         kind="info"

@@ -1,8 +1,27 @@
 const devnames = {
-  '3271': 'Volumetric Fuel Sender',
-  '3420': 'AC Monitor',
-  '4291': 'Tank Level Adaptor',
-  '5185': 'Poseidon 7',
+  'senders': {
+    '3271': 'Volumetric Fuel Sender',
+    '3281': 'Water Level Sender',
+  },
+  'adaptors': {
+    '4291': 'Tank Level Adaptor',
+  },
+  'monitors': {
+    '3420': 'AC Monitor',
+  },
+  'displays': {
+    '5185': 'Poseidon 7',
+    '5185-H': 'Poseidon 7 (Honda)',
+  }
 };
 
-export { devnames };
+function getname(cod) {
+  for (const grp of Object.values(devnames)) {
+    if (typeof grp[cod] !== 'undefined') {
+      return grp[cod];
+    }
+  }
+  return null;
+};
+
+export { devnames, getname };

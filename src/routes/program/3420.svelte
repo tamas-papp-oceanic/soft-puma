@@ -1,11 +1,15 @@
 <script>
   import { Row, Grid, Column } from "carbon-components-svelte";
-  import { pop } from "svelte-spa-router";
+  import { location, pop } from "svelte-spa-router";
   import ProgramContainer from './partials/ProgramContainer.svelte';
-  import { devnames } from '../../stores/common.js';
+  import { getname } from '../../stores/common.js';
 
-  const device = '3420';
+  export let params;
+
   const plf = navigator?.userAgentData?.platform || navigator?.platform || 'unknown';
+  
+  const device = $location.split('/')[2];
+  const instance = params.instance;
   const timeout = 5000;
   let timer = null;
   let message = '';
@@ -70,7 +74,7 @@
 <Grid>
   <Row>
     <Column>
-      <h2>{device + ' ' + devnames[device] + ' - Programming'}</h2>
+      <h2>{device + ' ' + getname(device) + ' - Programming'}</h2>
       <ProgramContainer message={message} running={running} style="height: 80vh;"
         on:loader={loader} on:program={program} on:cancel={cancel} />
     </Column>

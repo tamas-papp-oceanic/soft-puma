@@ -3,7 +3,7 @@
   import { Row, Grid, Column, ToastNotification } from "carbon-components-svelte";
   import { pop } from "svelte-spa-router";
   import VolumeContainer from './partials/VolumeContainer.svelte';
-  import { devnames } from '../../stores/common.js';
+  import { getname } from '../../stores/common.js';
 
   export let params;
 
@@ -11,8 +11,8 @@
   const timeout = 2000;
   let timer = null;
   let data = {
-    fluid: ((parseInt(params.instance) & 0xF0) >> 4).toString(),
-    instance: (parseInt(params.instance) & 0x0F).toString(),
+    fluid: params.fluid,
+    instance: params.instance,
     capacity: null,
     table: new Array(),
     mode: '0',
@@ -91,7 +91,7 @@
     }
     // Remove listeners
     window.pumaAPI.reml(lis + '-done');
-  }
+  };
 
   function load(e) {
     running = true;
@@ -259,7 +259,7 @@
 <Grid>
   <Row>
     <Column>
-      <h2>{params.device + ' ' + devnames[params.device] + ' - Configuration'}</h2>
+      <h2>{params.device + ' ' + getname(params.device) + ' - Configuration'}</h2>
       <VolumeContainer style="height: 80vh;" bind:data={data} running={running}
         on:load={load} on:save={save} on:getmode={getmode} on:setmode={setmode} on:download={download}
         on:upload={upload} on:cancel={cancel} />

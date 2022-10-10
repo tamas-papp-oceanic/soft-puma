@@ -8,6 +8,7 @@
   let tab;
   let dev;
   let ptw;
+  let devs = {};
 
   function change(e){
     $selected.program = e.detail;
@@ -16,6 +17,18 @@
   $: tab = $selected.program;
   $: dev = $selected.device;
   $: ptw = checkAccess('test', 'write');
+  $: {
+    for (const grp of Object.keys(devnames)) {
+      if (typeof devs[grp] === 'undefined') {
+        devs[grp] = new Array();
+      }
+      for (const [key, val] of Object.entries(devnames[grp])) {
+        if ((grp == 'monitors') || ((grp == 'displays') && ptw)) {
+          devs[grp].push({ code: key, name: val });
+        }
+      }
+    }
+  };
 </script>
 
 <Grid>
@@ -28,9 +41,22 @@
         <Tab label="Displays" />
       {/if}
       <div slot="content">
+        {#each ['monitors', 'adaptors', 'displays'] as group}
         <TabContent>
           <Grid padding fullWidth noGutter>
             <Row>
+              {#each devs[group] as device}
+                <Column sm={4} md={3} lg={4}>
+                  <div class="product-card" class:selected={dev == device.code}
+                    on:pointerdown={(e) => { $selected.device = device.code; push('/program/' + device.code + '/0'); }}>
+                    <div class="product-number">{device.code}</div>
+                    <div class="product-title">{device.name}</div>
+                    <div class="product-image"><img src={'images/' + device.code + '.webp'} alt={device.code} /></div>
+                  </div>
+                </Column>
+              {/each}
+            </Row>
+<!--        <Row>
               <Column sm={4} md={3} lg={4}>
                 <div class="product-card" class:selected={dev == '3420'} on:pointerdown={(e) => { $selected.device = '3420'; push('/program/3420'); }}>
                   <div class="product-number">3420</div>
@@ -38,10 +64,10 @@
                   <div class="product-image"><img src="images/3420.webp" alt="3420" /></div>
                 </div>
               </Column>
-            </Row>
+            </Row> -->
           </Grid>
         </TabContent>
-        <TabContent>
+        <!-- <TabContent>
           <Grid padding fullWidth noGutter>
             <Row>
               <Column sm={4} md={3} lg={4}>
@@ -70,7 +96,8 @@
               </Row>
             </Grid>
           </TabContent>
-        {/if}
+        {/if} -->
+        {/each}
       </div>
     </Tabs>
   </Column>

@@ -43,7 +43,7 @@ export function initRun(stps, acts, evts, vari) {
   }, acts);
   _actions.set(acts);
   _events.set(evts);
-  if (typeof vari !== 'undefined') {
+  if (vari != null) {
     let scr = get(_scriptData);
     scr.variant = vari;
     _scriptData.set(scr);

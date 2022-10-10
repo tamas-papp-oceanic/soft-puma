@@ -193,14 +193,13 @@ function decode(frm) {
       }
     }
     if (ins != null) {
+      msg.header.ins = ins;
       msg.key += "/" + ins;
     } else {
       msg.key += "/-";
     }
-    if (ins != null) {
-      msg.header.ins = ins;
-    }
     if (typ != null) {
+      msg.header.typ = typ;
       msg.key += "/" + typ;
     } else {
       msg.key += "/-";

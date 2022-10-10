@@ -38,10 +38,11 @@
 		}),
 		"/simulate": Simulate,
 		"/program": Program,
-		"/program/3420": Program3420,
-		"/program/5185/:variant?": Program5185,
+		"/program/3420/:instance": Program3420,
+		"/program/5185": Program5185,
+		"/program/5185-H": Program5185,
 		"/configure": Configure,
-		"/configure/fluid/:instance/:device": ConfigureFluid,
+		"/configure/:device/:instance/:fluid": ConfigureFluid,
 		"/Welcome": wrap({
 			component: Welcome,
 			conditions: [() =>{

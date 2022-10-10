@@ -29,8 +29,8 @@
     empty: true
   }];
   const paths = {
-    '3271': '/fluid',
-    '4291': '/fluid',
+    '3271': '/:instance/:fluid',
+    '4291': '/:instance/:fluid',
   };
 
   let items = new Array();
@@ -60,30 +60,29 @@
       (typeof $name[$devices[selected]] !== 'undefined') &&
       (typeof $name[$devices[selected]][add] !== 'undefined')) {
       let nam = $name[$devices[selected]][add];
-      let pat = '/configure';
+      let pat = '/configure/' + nam.modelVersion;
       if (typeof paths[nam.modelVersion] !== 'undefined') {
         pat += paths[nam.modelVersion];
       }
-      let ins = 0;
-      let flt = 0;
       if (typeof $data[$devices[selected]] !== 'undefined') {
         let dat = $data[$devices[selected]];
         for (let i in dat) {
-          if ((dat[i].header.src == parseInt(add)) && (dat[i].header.pgn == 127505)) {
-            ins = dat[i].fields[0].value;
-            flt = dat[i].fields[1].value;
+          if (dat[i].header.src == parseInt(add)) {
+            if (typeof dat[i].header.ins !== 'undefined') {
+              pat = pat.replace(':instance', dat[i].header.ins.toString());
+            }
+            if (typeof dat[i].header.typ !== 'undefined') {
+              if (dat[i].header.pgn == 127505) {
+                pat = pat.replace(':fluid', dat[i].header.typ.toString());
+              }
+            }
             break;
           }
         }
       }
-      switch (pat) {
-        case '/configure/fluid':
-          push(pat + '/' + ((flt << 4) + ins) + '/' + nam.modelVersion);
-          break;
-        default:
-          push(pat);
-          break;
-      }
+      pat.replace(':instance', '0');
+      pat.replace(':fluid', '0');
+      push(pat);
     }
   }
 
