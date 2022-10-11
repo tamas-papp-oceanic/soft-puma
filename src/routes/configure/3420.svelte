@@ -14,6 +14,7 @@
   let timer = null;
   let data = {
     instance: params.instance,
+    circuit: params.circuit,
   };
   let running = false;
   let notify = false;

@@ -2,41 +2,17 @@
   import { createEventDispatcher } from "svelte";
   import { ButtonSet, Button, Tile, Grid, Row, Column, DataTable, 
     Dropdown, TextInput, Pagination } from "carbon-components-svelte";
-  import Open from "carbon-icons-svelte/lib/Document16";
-  import Save from "carbon-icons-svelte/lib/Save16";
-  import Add from "carbon-icons-svelte/lib/Add16";
-  import Del from "carbon-icons-svelte/lib/Delete16";
+  import Program from "carbon-icons-svelte/lib/Download16";
 
   export let data;
   export let style;
   export let running;
 
-  String.prototype.isNumber = function() {
-    return /^\d+$|^\d+\.\d+$/.test(this);
-  }
-
-  String.prototype.isInteger = function() {
-    return /^\d+$/.test(this);
-  }
-
   const dispatch = createEventDispatcher();
   
-  const modes = new Array(
-    { id: '0', text: 'Level' },
-    { id: '1', text: 'Volumetric' },
-  );
-  const units = new Array(
-    { id: '0', text: '%' },
-    { id: '1', text: 'L' },
-  );
-  const fluids = new Array(
-    { id: '0', text: 'Fuel' },
-    { id: '1', text: 'Fresh Water' },
-    { id: '2', text: 'Waste Water' },
-    { id: '3', text: 'Live Well' },
-    { id: '4', text: 'Oil' },
-    { id: '5', text: 'Black Water' },
-    { id: '6', text: 'Gasoline' },
+  const paras = new Array(
+    { id: '0', text: 'Device Instance' },
+    { id: '1', text: 'Circuit Type' },
   );
   const insts = new Array(
     { id: '0', text: '0' },
@@ -56,23 +32,15 @@
     { id: '14', text: '14' },
     { id: '15', text: '15' },
   );
-  const headers = new Array(
-    { key: 'perlvl', value: 'Height (%)', sort: false },
-    { key: 'pervol', value: 'Volume (%)', sort: false },
-    { key: 'volume', value: 'Volume (L)', sort: false },
+  const circs = new Array(
+    { id: '0', text: 'Single Phase' },
+    { id: '1', text: 'Double Phase' },
+    { id: '2', text: 'Three Phase' },
+    { id: '3', text: 'Split Phase' },
   );
-  const rounding = false;
-  let height;
-  let pagination = {
-    pageSize: 10,
-    page: 1,
-    totalItems: 0,
-  };
-  let unit = '0';
-  let rows = new Array();
-  let selected = new Array();
-  let valid = { int: false, cap: false, lvl: false, vol: false };
-  
+
+let param = 0;
+    
   // // Re-calculates data.table values
   // function calculate() {
   //   for (let i in data.table) {
@@ -186,6 +154,10 @@
   //   dispatch("upload");
   // };
 
+  function program(e) {
+    dispatch("program");
+  };
+
   function cancel(e) {
     dispatch("cancel");
   };
@@ -291,10 +263,43 @@
   // }
 </script>
 
-<svelte:window bind:innerHeight={height} />
 <div class="container" style={style}>
   <Tile style="height: -webkit-fill-available;">
     <div class="tilecont">
+      <Grid fullWidth noGutter>
+        <Row>
+          <Column sm={1} md={2} lg={4} padding>
+          </Column>
+          <Column sm={1} md={4} lg={8} padding>
+            <Row padding>
+              <Column>
+                <Dropdown titleText="AC instance" size="sm" bind:selectedId={data.instance} items={insts} />
+              </Column>
+            </Row>
+            <Row padding>
+              <Column>
+                <Dropdown titleText="Circuit type" size="sm" bind:selectedId={data.circuit} items={circs} />
+              </Column>
+            </Row>
+            <Row padding>
+              <Column>
+                <Dropdown titleText="Parameter to change" size="sm" bind:selectedId={param} items={paras} />
+              </Column>
+            </Row>
+            <Row padding>
+              <Column style="display: flex; flex-flow: row nowrap; justify-content: center;">
+                <Button tooltipPosition="top" tooltipAlignment="center" iconDescription="Write to sender" icon={Program}
+                  disabled={running} on:click={(e) => program(e)}>Write to Sensor</Button>
+              </Column>
+            </Row>
+          </Column>
+          <Column sm={1} md={2} lg={4} padding>
+          </Column>
+        </Row>
+      </Grid>
+
+
+
       <!-- <Grid fullWidth noGutter>
         <Row>
           <Column sm={1} md={1} lg={3} padding>
