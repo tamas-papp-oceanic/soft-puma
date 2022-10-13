@@ -268,9 +268,9 @@ let param = 0;
     <div class="tilecont">
       <Grid fullWidth noGutter>
         <Row>
-          <Column sm={1} md={2} lg={4} padding>
+          <Column sm={1} md={3} lg={5} padding>
           </Column>
-          <Column sm={1} md={4} lg={8} padding>
+          <Column sm={1} md={3} lg={5} padding>
             <Row padding>
               <Column>
                 <Dropdown titleText="AC instance" size="sm" bind:selectedId={data.instance} items={insts} />
@@ -293,7 +293,7 @@ let param = 0;
               </Column>
             </Row>
           </Column>
-          <Column sm={1} md={2} lg={4} padding>
+          <Column sm={1} md={3} lg={5} padding>
           </Column>
         </Row>
       </Grid>

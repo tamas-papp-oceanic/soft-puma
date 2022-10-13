@@ -200,6 +200,15 @@ function proc(dev, frm) {
       case 130825:
         mainWindow.webContents.send('n2k-volume', [ dev, msg ]);
         break;
+      case 65446:
+        if ((msg.fields[0].value == 161) && (msg.fields[2].value == 4)) {
+          switch (msg.fields[3]) {
+            case 8:
+              mainWindow.webContents.send('n2k-3420', [ dev, msg ]);
+              break;
+          }
+        }
+        break;
       case 65477:
         mainWindow.webContents.send('test-data', [ dev, msg ]);
         break;

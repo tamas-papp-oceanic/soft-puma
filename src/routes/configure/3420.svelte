@@ -14,7 +14,7 @@
   let timer = null;
   let data = {
     instance: params.instance,
-    circuit: params.circuit,
+    circuit: '0',
   };
   let running = false;
   let notify = false;
@@ -23,55 +23,25 @@
   let subttl = null;
 
   onMount(() => {
-    // window.pumaAPI.recv('n2k-volume', (e, args) => {
-    //   const [ dev, msg ] = args;
-    //   // <protocol>/<pgn>/<function>/<manufacturer>/<industry>/<instance>/<type>
-    //   let spl = msg.key.split('/');
-    //   if ((spl[0] == 'nmea2000') && (spl[3] == '161')  && (spl[4] == '4')) {
-    //     switch (spl[1]) {
-    //       case '065289':
-    //         switch (spl[2]) {
-    //           case '6':
-    //             // Stored Mode Data (0 = Level Mode, 1 = Volumetric Mode)
-    //             if ((msg.fields[3].value == data.instance) && (msg.fields[4].value == data.fluid)) {
-    //               data.mode = msg.fields[6].value.toString();
-    //               stop('volmode');
-    //               running = false;
-    //             }
-    //             break;
-    //         }
-    //         break;
-    //       case '130825':
-    //         switch (spl[2]) {
-    //           case '3':
-    //             // Stored Volumetric Data
-    //             if ((msg.fields[3].value == data.instance) && (msg.fields[4].value == data.fluid)) {
-    //               data.table = new Array();
-    //               data.capacity = msg.fields[7].value;
-    //               let arr = Array.from(msg.fields[6].value, (x) => x.charCodeAt(0));
-    //               for (let i in arr) {
-    //                 data.table.push({
-    //                   'id': i.toString(), 'perlvl': i, 'pervol': arr[i],
-    //                   'volume': Math.round(arr[i] * data.capacity) / 100,
-    //                 });
-    //               }
-    //               stop('voltable');
-    //               running = false;
-    //             }
-    //             break;
-    //           case '6':
-    //             // Stored Mode Data (0 = Level Mode, 1 = Volumetric Mode)
-    //             if ((msg.fields[3].value == data.instance) && (msg.fields[4].value == data.fluid)) {
-    //               data.mode = msg.fields[6].value.toString();
-    //               stop('volmode');
-    //               running = false;
-    //             }
-    //             break;
-    //         }
-    //         break;
-    //     }
-    //   }
-    // });
+    window.pumaAPI.recv('n2k-3420', (e, args) => {
+      const [ dev, msg ] = args;
+      if (msg.fields[4].value == data.instance) {
+        switch (msg.fields[5].value) {
+          case 0:
+            // Circuit Type (1 = Single Phase, 2 = Duble Phase, 3 = Three Phase, 4 = Split Phase)
+            data.circuit = (msg.fields[6].value - 1).toString();
+            stop('circuit');
+            running = false;
+            break;
+          case 1:
+            // Device Instance
+            data.instance = msg.fields[6].value.toString();
+            stop('instance');
+            running = false;
+            break;
+        }
+      }
+    });
   });
   
   onDestroy(() => {
@@ -80,17 +50,17 @@
       timer = null
     }
     running = false;
-    // window.pumaAPI.reml('n2k-volume');
+    window.pumaAPI.reml('n2k-3420');
   });
 
-  // function stop(lis) {
-  //   if (timer != null) {
-  //     clearTimeout(timer);
-  //     timer = null
-  //   }
-  //   // Remove listeners
-  //   window.pumaAPI.reml(lis + '-done');
-  // };
+  function stop(lis) {
+    if (timer != null) {
+      clearTimeout(timer);
+      timer = null
+    }
+    // Remove listeners
+    window.pumaAPI.reml(lis + '-done');
+  };
 
   // function load(e) {
   //   running = true;
