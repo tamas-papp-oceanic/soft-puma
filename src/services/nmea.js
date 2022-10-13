@@ -258,6 +258,28 @@ class NMEAEngine {
     }
     return false;
   };
+
+  // Sends Proprietary SF Config Request / Command message
+  send065445(typ, ins, dat, val) {
+    if (this.#addrMngr.state == 'Valid') {
+      let msg = {
+        key: 'nmea2000/065445/-/161/4/-/-',
+        header: { pgn: 65445, src: this.#addrMngr.address, dst: 0xFF },
+        fields: [
+          { field: 1,title: 'Manufacturer Code', state: 'V', value: this.#addrMngr.name[2] },
+          { field: 2,title: 'Reserved', state: 'V', value: 0b11 },
+          { field: 3,title: 'Industry Group', state: 'V', value: this.#addrMngr.name[9] },
+          { field: 4,title: 'Type ID', state: 'V', value: typ },
+          { field: 5,title: 'Instance', state: 'V', value: ins },
+          { field: 6,title: 'Data ID', state: 'V', value: dat },
+          { field: 7,title: 'Content', state: 'V', value: val },
+        ],
+      };
+      return this.sendMsg(msg);
+    }
+    return false;
+  };
+
   /*
     Processes Proprietary Request / Command message
 
@@ -804,24 +826,6 @@ class NMEAEngine {
     if (this.#addrMngr.state == 'Valid') {
       let msg = {
         key: 'nmea2000/059392/-/-/-/-/-',
-        header: { pgn: 59392, src: this.#addrMngr.address, dst: dst },
-        fields: [
-          { field: 1,title: 'Control Byte', state: 'V', value: ctr },
-          { field: 2,title: 'Group Function Value', state: 'V', value: grp },
-          { field: 3,title: 'NMEA Reserved', state: 'V', value: 0xFFFFFF },
-          { field: 4,title: 'PGN of Requested Information', state: 'V', value: pgn },
-        ],
-      };
-      return this.sendMsg(msg);
-    }
-    return false;
-  };
-
-  // Sends Proprietary SF Config Command message
-  send065445(ctr, grp, pgn, dst) {
-    if (this.#addrMngr.state == 'Valid') {
-      let msg = {
-        key: 'nmea2000/065445/-/-/-/-/-',
         header: { pgn: 59392, src: this.#addrMngr.address, dst: dst },
         fields: [
           { field: 1,title: 'Control Byte', state: 'V', value: ctr },

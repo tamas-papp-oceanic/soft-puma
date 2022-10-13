@@ -14,7 +14,7 @@
   let timer = null;
   let data = {
     instance: params.instance,
-    circuit: '0',
+    circuit: null,
   };
   let running = false;
   let notify = false;
@@ -42,6 +42,7 @@
         }
       }
     });
+    getcircuit();
   });
   
   onDestroy(() => {
@@ -106,29 +107,29 @@
   //   window.pumaAPI.send('volfile-write', JSON.parse(JSON.stringify(data)));
   // };
 
-  // function getmode(e) {
-  //   running = true;
-  //   timer = setTimeout(() => {
-  //     kind = 'error'
-  //     title = 'Error';
-  //     subttl = 'Error reading mode with this fluid type and instance.';
-  //     notify = true;
-  //     running = false;
-  //   }, timeout);
-  //   data.mode = null;
-  //   // Receives volume mode result
-  //   window.pumaAPI.recv('volmode-done', (e, res) => {
-  //     if (!res) {
-  //       kind = 'error'
-  //       title = 'Error';
-  //       subttl = 'Error reading mode with this fluid type and instance.';
-  //       notify = true;
-  //       stop('volmode');
-  //       running = false;
-  //     }
-  //   });
-  //   window.pumaAPI.send('volmode-read', [data.fluid, data.instance]);
-  // };
+   function getcircuit(e) {
+    running = true;
+    timer = setTimeout(() => {
+      kind = 'error'
+      title = 'Error';
+      subttl = 'Error reading circuit type with this instance.';
+      notify = true;
+      running = false;
+    }, timeout);
+    data.circuit = null;
+    // Receives volume mode result
+    window.pumaAPI.recv('circuit-done', (e, res) => {
+      if (!res) {
+        kind = 'error'
+        title = 'Error';
+        subttl = 'Error reading circuit with this instance.';
+        notify = true;
+        stop('circuit');
+        running = false;
+      }
+    });
+    window.pumaAPI.send('circuit-read', [data.instance]);
+  };
 
   // function setmode(e) {
   //   running = true;

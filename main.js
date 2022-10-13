@@ -480,6 +480,21 @@ ipcMain.on('voltable-write', (e, args) => {
   }
 });
 
+// Starts circuit type reading
+ipcMain.on('circuit-read', (e, args) => {
+  const [instance] = args;
+  let res = true;
+  for (const [key, val] of Object.entries(devices)) {
+    // Send Fluid Sender Control proprietary PGN
+    // Request for Mode Data
+    let ret = val.engine.send065445(0x08, instance, 0x00, 0xFFFFFF);
+    res ||= ret;
+  }
+  if ((mainWindow != null) && (typeof mainWindow.webContents !== 'undefined')) {
+    mainWindow.webContents.send('circuit-done', res);
+  }
+});
+
 // Closes the application
 ipcMain.on('app-quit', (e, ...args) => {
   if (timer != null) {
