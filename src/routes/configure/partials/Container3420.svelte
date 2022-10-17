@@ -10,36 +10,21 @@
 
   const dispatch = createEventDispatcher();
   
-  const paras = new Array(
-    { id: '0', text: 'Device Instance' },
-    { id: '1', text: 'Circuit Type' },
-  );
-  const insts = new Array(
-    { id: '0', text: '0' },
-    { id: '1', text: '1' },
-    { id: '2', text: '2' },
-    { id: '3', text: '3' },
-    { id: '4', text: '4' },
-    { id: '5', text: '5' },
-    { id: '6', text: '6' },
-    { id: '7', text: '7' },
-    { id: '8', text: '8' },
-    { id: '9', text: '9' },
-    { id: '10', text: '10' },
-    { id: '11', text: '11' },
-    { id: '12', text: '12' },
-    { id: '13', text: '13' },
-    { id: '14', text: '14' },
-    { id: '15', text: '15' },
-  );
+  const insts = new Array();
   const circs = new Array(
     { id: '0', text: 'Single Phase' },
     { id: '1', text: 'Double Phase' },
     { id: '2', text: 'Three Phase' },
     { id: '3', text: 'Split Phase' },
+    );
+  const paras = new Array(
+    { id: '0', text: 'Device Instance' },
+    { id: '1', text: 'Circuit Type' },
   );
-
-let param = 0;
+    
+  let inst = '0';
+  let circ = '0';
+  let para = '0';
     
   // // Re-calculates data.table values
   // function calculate() {
@@ -154,8 +139,12 @@ let param = 0;
   //   dispatch("upload");
   // };
 
+  function select(e) {
+    dispatch("select");
+  };
+
   function program(e) {
-    dispatch("program");
+    dispatch("program", { parameter: para, instance: inst, circuit: circ });
   };
 
   function cancel(e) {
@@ -233,18 +222,10 @@ let param = 0;
   //   valid.vol = e.detail.isNumber();
   // };
 
-  // function unitselect(e) {
-  //   unit = e.detail.selectedItem.id;
-  //   let lvl = document.getElementById('volume');
-  //   if (lvl != null) {
-  //     const lbs = document.getElementsByTagName("label");
-  //     for (const lab of lbs) {
-  //       if (lab.htmlFor === 'volume') {
-  //         lab.innerHTML = 'Volume (' + e.detail.selectedItem.text + ')';
-  //       }
-  //     }
-  //   }
-  // };
+  for (let i = 0; i < 256; i++) {
+    insts.push({ id: i.toString(), text: i.toString() })
+  }
+
 
   // Data getters / setters
   // $: valid.int = (typeof data.capacity !== 'undefined') && (data.capacity != null) && data.capacity.toString().isNumber();
@@ -268,22 +249,43 @@ let param = 0;
     <div class="tilecont">
       <Grid fullWidth noGutter>
         <Row>
-          <Column sm={1} md={3} lg={5} padding>
+          <Column sm={1} md={1} lg={1} padding>
           </Column>
-          <Column sm={1} md={3} lg={5} padding>
+          <Column sm={1} md={2} lg={3} padding>
+            <Row padding>
+              <Column>Current configuration</Column>
+            </Row>
             <Row padding>
               <Column>
-                <Dropdown titleText="AC instance" size="sm" bind:selectedId={data.instance} items={insts} />
+                <Dropdown titleText="AC instance" size="sm" bind:selectedId={data.instance} items={insts}
+                  on:select={(e) => select(e)} />
               </Column>
             </Row>
             <Row padding>
               <Column>
-                <Dropdown titleText="Circuit type" size="sm" bind:selectedId={data.circuit} items={circs} />
+                <TextInput readonly labelText="Circuit type" value={circs[data.circuit]} />
+              </Column>
+            </Row>
+          </Column>
+          <Column sm={1} md={1} lg={1} padding>
+          </Column>
+          <Column sm={1} md={2} lg={3} padding>
+            <Row padding>
+              <Column>Parameters for change</Column>
+            </Row>
+            <Row padding>
+              <Column>
+                <Dropdown titleText="AC instance" size="sm" bind:selectedId={inst} items={insts} />
               </Column>
             </Row>
             <Row padding>
               <Column>
-                <Dropdown titleText="Parameter to change" size="sm" bind:selectedId={param} items={paras} />
+                <Dropdown titleText="Circuit type" size="sm" bind:selectedId={circ} items={circs} />
+              </Column>
+            </Row>
+            <Row padding>
+              <Column>
+                <Dropdown titleText="Parameter to change" size="sm" bind:selectedId={para} items={paras} />
               </Column>
             </Row>
             <Row padding>
@@ -292,8 +294,6 @@ let param = 0;
                   disabled={running} on:click={(e) => program(e)}>Write to Sensor</Button>
               </Column>
             </Row>
-          </Column>
-          <Column sm={1} md={3} lg={5} padding>
           </Column>
         </Row>
       </Grid>

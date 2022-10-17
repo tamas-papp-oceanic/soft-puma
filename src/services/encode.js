@@ -49,17 +49,6 @@ function encode(msg) {
     let raw = Buffer.alloc(Math.ceil(ptr / 8));
     ptr = 0;
     for (let i in def.fields) {
-
-
-
-
-      console.log(def.fields[i])
-
-
-
-
-
-
       let fld = def.fields[i];
       let mfl = com.getFld(fld.field, msg.fields);
       if (mfl == null) {

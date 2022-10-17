@@ -42,7 +42,7 @@
         }
       }
     });
-    getcircuit();
+    select();
   });
   
   onDestroy(() => {
@@ -107,7 +107,7 @@
   //   window.pumaAPI.send('volfile-write', JSON.parse(JSON.stringify(data)));
   // };
 
-   function getcircuit(e) {
+   function select(e) {
     running = true;
     timer = setTimeout(() => {
       kind = 'error'
@@ -131,6 +131,10 @@
     window.pumaAPI.send('circuit-read', [data.instance]);
   };
 
+  function program(e) {
+
+    console.log(e.detail)
+  }
   // function setmode(e) {
   //   running = true;
   //   timer = setTimeout(() => {
@@ -231,7 +235,7 @@
   <Row>
     <Column>
       <h2>{device + ' ' + getname(device) + ' - Configuration'}</h2>
-      <Container3420 style="height: 80vh;" bind:data={data} running={running} on:cancel={cancel} />
+      <Container3420 style="height: 80vh;" bind:data={data} running={running} on:select={select} on:program={program} on:cancel={cancel} />
       {#if notify}
         <div class="error">
           <ToastNotification

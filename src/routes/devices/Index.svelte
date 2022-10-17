@@ -30,6 +30,7 @@
   }];
   const paths = {
     '3271': '/:instance/:fluid',
+    '3420': '/:instance',
     '4291': '/:instance/:fluid',
   };
 
@@ -68,12 +69,18 @@
         let dat = $data[$devices[selected]];
         for (let i in dat) {
           if (dat[i].header.src == parseInt(add)) {
-            if (typeof dat[i].header.ins !== 'undefined') {
-              pat = pat.replace(':instance', dat[i].header.ins.toString());
+            if (typeof dat[i].header['ins'] !== 'undefined') {
+
+              console.log(pat)
+
+              pat = pat.replace(':instance', dat[i].header['ins'].toString());
+
+              console.log(pat)
+
             }
-            if (typeof dat[i].header.typ !== 'undefined') {
+            if (typeof dat[i].header['typ'] !== 'undefined') {
               if (dat[i].header.pgn == 127505) {
-                pat = pat.replace(':fluid', dat[i].header.typ.toString());
+                pat = pat.replace(':fluid', dat[i].header['typ'].toString());
               }
             }
             break;
