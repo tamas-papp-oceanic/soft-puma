@@ -69,18 +69,18 @@
         let dat = $data[$devices[selected]];
         for (let i in dat) {
           if (dat[i].header.src == parseInt(add)) {
-            if (typeof dat[i].header['ins'] !== 'undefined') {
+            if (typeof dat[i].header.ins !== 'undefined') {
 
               console.log(pat)
 
-              pat = pat.replace(':instance', dat[i].header['ins'].toString());
+              pat = pat.replace(':instance', dat[i].header.ins.toString());
 
               console.log(pat)
 
             }
-            if (typeof dat[i].header['typ'] !== 'undefined') {
+            if (typeof dat[i].header.typ !== 'undefined') {
               if (dat[i].header.pgn == 127505) {
-                pat = pat.replace(':fluid', dat[i].header['typ'].toString());
+                pat = pat.replace(':fluid', dat[i].header.typ.toString());
               }
             }
             break;
