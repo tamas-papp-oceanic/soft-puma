@@ -23,20 +23,20 @@
   let subttl = null;
 
   onMount(() => {
-    window.pumaAPI.recv('n2k-3420', (e, args) => {
+    window.pumaAPI.recv('n2k-acconf', (e, args) => {
       const [ dev, msg ] = args;
       if (msg.fields[4].value == data.instance) {
         switch (msg.fields[5].value) {
           case 0:
             // Circuit Type (1 = Single Phase, 2 = Duble Phase, 3 = Three Phase, 4 = Split Phase)
-            data.circuit = (msg.fields[6].value - 1).toString();
-            stop('circuit');
+            data.circuit = msg.fields[6].value.toString();
+            stop('c3420');
             running = false;
             break;
           case 1:
             // Device Instance
             data.instance = msg.fields[6].value.toString();
-            stop('instance');
+            stop('c3420');
             running = false;
             break;
         }
@@ -63,50 +63,6 @@
     window.pumaAPI.reml(lis + '-done');
   };
 
-  // function load(e) {
-  //   running = true;
-  //   data.table = new Array();
-  //   // Receives volume file data
-  //   window.pumaAPI.recv('volfile-data', (e, res) => {
-  //     if (res instanceof Error) {
-  //       kind = 'error'
-  //       title = 'Error';
-  //       subttl = res;
-  //       notify = true;
-  //     } else {
-  //       data = JSON.parse(JSON.stringify(res));
-  //     }
-  //   });
-  //   // Receives volume file result
-  //   window.pumaAPI.recv('volfile-done', (e) => {
-  //     running = false;
-  //     stop('volfile');
-  //     window.pumaAPI.reml('volfile-data');
-  //   });
-  //   window.pumaAPI.send('volfile-read');
-  // };
-
-  // function save(e) {
-  //   running = true;
-  //   // Receives volume file result
-  //   window.pumaAPI.recv('volfile-done', (e, res) => {
-  //     if (res instanceof Error) {
-  //       kind = 'error'
-  //       title = 'Error';
-  //       subttl = res;
-  //       notify = true;
-  //     } else {
-  //       kind = 'info'
-  //       title = 'Success';
-  //       subttl = 'Volume table has been saved.';
-  //       notify = true;
-  //     }
-  //     stop('volfile');
-  //     running = false;
-  //   });
-  //   window.pumaAPI.send('volfile-write', JSON.parse(JSON.stringify(data)));
-  // };
-
    function select(e) {
     running = true;
     timer = setTimeout(() => {
@@ -117,125 +73,70 @@
       running = false;
     }, timeout);
     data.circuit = null;
-    // Receives volume mode result
-    window.pumaAPI.recv('circuit-done', (e, res) => {
+    // Receives circuit type result
+    window.pumaAPI.recv('c3420-done', (e, res) => {
       if (!res) {
         kind = 'error'
         title = 'Error';
         subttl = 'Error reading circuit with this instance.';
         notify = true;
-        stop('circuit');
+        stop('c3420');
         running = false;
       }
     });
-    window.pumaAPI.send('circuit-read', [data.instance]);
+    window.pumaAPI.send('c3420-read', [parseInt(data.instance), 0x00]);
   };
 
   function program(e) {
-
-    console.log(e.detail)
-  }
-  // function setmode(e) {
-  //   running = true;
-  //   timer = setTimeout(() => {
-  //     kind = 'error'
-  //     title = 'Error';
-  //     subttl = 'Error writing mode with this fluid type and instance.';
-  //     notify = true;
-  //     stop('volmode');
-  //     running = false;
-  //   }, timeout);
-  //   // Receives volume mode result
-  //   window.pumaAPI.recv('volmode-done', (e, res) => {
-  //     if (res) {
-  //       kind = 'info'
-  //       title = 'Success';
-  //       subttl = 'Volume mode has been sent.';
-  //       notify = true;
-  //     } else {
-  //       kind = 'error'
-  //       title = 'Error';
-  //       subttl = 'Error writing mode with this fluid type and instance.';
-  //       notify = true;
-  //     }
-  //     stop('volmode');
-  //     running = false;
-  //   });
-  //   window.pumaAPI.send('volmode-write', [data.fluid, data.instance, data.mode]);
-  // };
-
-  // function download(e) {
-  //   running = true;
-  //   timer = setTimeout(() => {
-  //     kind = 'error'
-  //     title = 'Error';
-  //     subttl = 'Error reading table with this fluid type and instance.';
-  //     notify = true;
-  //     running = false;
-  //   }, timeout);
-  //   data.table = new Array();
-  //   // Receives volume table result
-  //   window.pumaAPI.recv('voltable-done', (e, res) => {
-  //     if (!res) {
-  //       kind = 'error'
-  //       title = 'Error';
-  //       subttl = 'Error reading table with this fluid type and instance.';
-  //       notify = true;
-  //       stop('voltable');
-  //       running = false;
-  //     }
-  //   });
-  //   window.pumaAPI.send('voltable-read', [data.fluid, data.instance]);
-  // };
-
-  // function upload(e) {
-  //   running = true;
-  //   timer = setTimeout(() => {
-  //     kind = 'error'
-  //     title = 'Error';
-  //     subttl = 'Error writing table with this fluid type and instance.';
-  //     notify = true;
-  //     stop('voltable');
-  //     running = false;
-  //   }, timeout);
-  //   // Receives volume table result
-  //   window.pumaAPI.recv('voltable-done', (e, res) => {
-  //     if (res) {
-  //       kind = 'info'
-  //       title = 'Success';
-  //       subttl = 'Volume table has been sent.';
-  //       notify = true;
-  //     } else {
-  //       kind = 'error'
-  //       title = 'Error';
-  //       subttl = 'Error writing table with this fluid type and instance.';
-  //       notify = true;
-  //     }
-  //     stop('voltable');
-  //     running = false;
-  //   });
-  //   let dat = '';
-  //   data.table.forEach((elm) => {
-  //     dat += String.fromCharCode(elm.pervol);
-  //   });
-  //   window.pumaAPI.send('voltable-write', [data.fluid, data.instance, dat, data.capacity]);
-  // };
+    running = true;
+    timer = setTimeout(() => {
+      kind = 'error'
+      title = 'Error';
+      subttl = 'Error writing parameter with this instance.';
+      notify = true;
+      stop('c3420');
+      running = false;
+    }, timeout);
+    // Receives program result
+    window.pumaAPI.recv('c3420-done', (e, res) => {
+      if (res) {
+        kind = 'info'
+        title = 'Success';
+        subttl = 'Parameter has been sent.';
+        notify = true;
+      } else {
+        kind = 'error'
+        title = 'Error';
+        subttl = 'Error writing parameter with this instance.';
+        notify = true;
+      }
+      stop('c3420');
+      running = false;
+    });
+    let conf = e.detail.parameter == '0' ? parseInt(e.detail.instance) : parseInt(e.detail.circuit);
+    window.pumaAPI.send('c3420-write', [parseInt(data.instance), conf]);
+  };
 
   function cancel(e) {
-    // stop('volfile');
-    // stop('volmode');
-    // stop('voltable');
+    stop('c3420');
     running = false;
     pop();
-
   };
+
+  function error(e) {
+    kind = 'error'
+    title = 'Error';
+    subttl = e.detail.title;
+    notify = true;
+  }
 </script>
 
 <Grid>
   <Row>
     <Column>
       <h2>{device + ' ' + getname(device) + ' - Configuration'}</h2>
-      <Container3420 style="height: 80vh;" bind:data={data} running={running} on:select={select} on:program={program} on:cancel={cancel} />
+      <Container3420 style="height: 80vh;" bind:data={data} running={running}
+        on:select={select} on:program={program} on:cancel={cancel} on:error={error} />
       {#if notify}
         <div class="error">
           <ToastNotification

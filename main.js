@@ -194,29 +194,29 @@ function proc(dev, frm) {
     if (msg != null) {
       switch (msg.header.pgn) {
       case 60928:
-        mainWindow.webContents.send('n2k-name', [ dev, msg ]);
+        mainWindow.webContents.send('n2k-name', [dev, msg]);
         break;
       case 65289:
       case 130825:
-        mainWindow.webContents.send('n2k-volume', [ dev, msg ]);
+        mainWindow.webContents.send('n2k-volume', [dev, msg]);
         break;
       case 65446:
         if ((msg.fields[0].value == 161) && (msg.fields[2].value == 4)) {
           switch (msg.fields[3]) {
             case 8:
-              mainWindow.webContents.send('n2k-3420', [ dev, msg ]);
+              mainWindow.webContents.send('n2k-acconf', [dev, msg]);
               break;
           }
         }
         break;
       case 65477:
-        mainWindow.webContents.send('test-data', [ dev, msg ]);
+        mainWindow.webContents.send('test-data', [dev, msg]);
         break;
       case 126996:
-        mainWindow.webContents.send('n2k-prod', [ dev, msg ]);
+        mainWindow.webContents.send('n2k-prod', [dev, msg]);
         break;
       default:
-        mainWindow.webContents.send('n2k-data', [ dev, msg ]);
+        mainWindow.webContents.send('n2k-data', [dev, msg]);
         break;
       }
     }
@@ -322,6 +322,8 @@ ipcMain.on('dev-start', (e, ...args) => {
   for (const [key, val] of Object.entries(devices)) {
     val.device.start(val.process);  
     val.engine.init();
+    // Send ISO Request for Address Claim
+    val.engine.send059904(60928, 0xFF);
   }
 });
 
@@ -480,18 +482,33 @@ ipcMain.on('voltable-write', (e, args) => {
   }
 });
 
-// Starts circuit type reading
-ipcMain.on('circuit-read', (e, args) => {
-  const [instance] = args;
+// Starts 3420 configuration reading
+ipcMain.on('c3420-read', (e, args) => {
+  const [inst, conf] = args;
   let res = true;
   for (const [key, val] of Object.entries(devices)) {
     // Send Fluid Sender Control proprietary PGN
     // Request for Mode Data
-    let ret = val.engine.send065445(0x08, instance, 0x00, 0xFFFFFF);
+    let ret = val.engine.send065445(0x08, inst, 0x00, (0xFF00 << 8) + conf);
     res ||= ret;
   }
   if ((mainWindow != null) && (typeof mainWindow.webContents !== 'undefined')) {
-    mainWindow.webContents.send('circuit-done', res);
+    mainWindow.webContents.send('c3420-done', res);
+  }
+});
+
+// Starts 3420 configuration writing
+ipcMain.on('c3420-write', (e, args) => {
+  const [inst, conf] = args;
+  let res = true;
+  for (const [key, val] of Object.entries(devices)) {
+    // Send Fluid Sender Control proprietary PGN
+    // Request for Mode Data
+    let ret = val.engine.send065445(0x08, inst, 0x00, conf);
+    res ||= ret;
+  }
+  if ((mainWindow != null) && (typeof mainWindow.webContents !== 'undefined')) {
+    mainWindow.webContents.send('c3420-done', res);
   }
 });
 

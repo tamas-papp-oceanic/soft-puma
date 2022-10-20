@@ -217,7 +217,7 @@ export function restart() {
 export function stop(key) {
   filter.set(null);
 };
-// Searches product code in name records
+// Searches for product code in name records
 export function findProduct(pro) {
   let dat = get(name);
   for (const [key1, val1] of Object.entries(dat)) {
@@ -228,6 +228,31 @@ export function findProduct(pro) {
     }
   }
   return null;
+};
+// Searches for instances in name records
+export function getInstances(mod) {
+  let dat = get(name);
+  let ret = new Array();
+  for (const [key1, val1] of Object.entries(dat)) {
+    for (const [key2, val2] of Object.entries(val1)) {
+      if (val2.modelVersion == mod) {
+       ret.push({ id: val2.deviceInstance.toString(), text: val2.deviceInstance.toString() })
+      }
+    }
+  }
+  return ret;
+};
+// Searches for device in name records
+export function isAlive(ins, mod) {
+  let dat = get(name);
+  for (const [key1, val1] of Object.entries(dat)) {
+    for (const [key2, val2] of Object.entries(val1)) {
+      if ((val2.deviceInstance == ins) && (val2.modelVersion == mod)) {
+        return true;
+      }
+    }
+  }
+  return false;
 };
 // NMEA other messages
 window.pumaAPI.recv('n2k-data', (e, args) => {

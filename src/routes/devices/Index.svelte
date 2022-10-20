@@ -61,22 +61,16 @@
       (typeof $name[$devices[selected]] !== 'undefined') &&
       (typeof $name[$devices[selected]][add] !== 'undefined')) {
       let nam = $name[$devices[selected]][add];
-      let pat = '/configure/' + nam.modelVersion;
+      let pat = '/configure';
       if (typeof paths[nam.modelVersion] !== 'undefined') {
-        pat += paths[nam.modelVersion];
+        pat += '/' + nam.modelVersion + paths[nam.modelVersion];
       }
       if (typeof $data[$devices[selected]] !== 'undefined') {
         let dat = $data[$devices[selected]];
         for (let i in dat) {
           if (dat[i].header.src == parseInt(add)) {
             if (typeof dat[i].header.ins !== 'undefined') {
-
-              console.log(pat)
-
               pat = pat.replace(':instance', dat[i].header.ins.toString());
-
-              console.log(pat)
-
             }
             if (typeof dat[i].header.typ !== 'undefined') {
               if (dat[i].header.pgn == 127505) {
