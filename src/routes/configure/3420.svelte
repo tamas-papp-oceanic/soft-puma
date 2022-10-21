@@ -26,16 +26,17 @@
     window.pumaAPI.recv('n2k-acconf', (e, args) => {
       const [ dev, msg ] = args;
       if (msg.fields[4].value == data.instance) {
+        let val = msg.fields[6].value & 0xFF;
         switch (msg.fields[5].value) {
           case 0:
             // Circuit Type (1 = Single Phase, 2 = Duble Phase, 3 = Three Phase, 4 = Split Phase)
-            data.circuit = msg.fields[6].value.toString();
+            data.circuit = val.toString();
             stop('c3420');
             running = false;
             break;
           case 1:
             // Device Instance
-            data.instance = msg.fields[6].value.toString();
+            data.instance = val.toString();
             stop('c3420');
             running = false;
             break;
@@ -113,8 +114,8 @@
       stop('c3420');
       running = false;
     });
-    let conf = e.detail.parameter == '0' ? parseInt(e.detail.instance) : parseInt(e.detail.circuit);
-    window.pumaAPI.send('c3420-write', [parseInt(data.instance), conf]);
+    let val = e.detail.parameter == '0' ? parseInt(e.detail.circuit) : parseInt(e.detail.instance);
+    window.pumaAPI.send('c3420-write', [parseInt(data.instance), parseInt(e.detail.parameter), val]);
   };
 
   function cancel(e) {

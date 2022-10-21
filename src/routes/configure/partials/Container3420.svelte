@@ -18,8 +18,8 @@
     { id: '4', text: 'Split Phase' },
     );
   const paras = new Array(
-    { id: '0', text: 'Device Instance' },
-    { id: '1', text: 'Circuit Type' },
+    { id: '0', text: 'Circuit Type' },
+    { id: '1', text: 'Device Instance' },
   );
     
   let inst1 = new Array();
@@ -38,12 +38,25 @@
   };
 
   function program(e) {
+
+console.log({ parameter: para, instance: inst, circuit: circ })
+
     dispatch("program", { parameter: para, instance: inst, circuit: circ });
   };
 
   function cancel(e) {
     dispatch("cancel");
   };
+
+  function getCircuit(id) {
+    for (let i in circs) {
+      if (circs[i].id == id) {
+        return circs[i].text;
+      }
+    }
+    return null;
+  };
+
 
   for (let i = 0; i < 253; i++) {
     inst2.push({ id: i.toString(), text: i.toString() })
@@ -73,7 +86,7 @@
             </Row>
             <Row padding>
               <Column>
-                <TextInput disabled={running || !alive} readonly={!running && alive} labelText="Circuit type" value={circs[data.circuit]} />
+                <TextInput disabled={running || !alive} readonly={!running && alive} labelText="Circuit type" value={getCircuit(data.circuit)} />
               </Column>
             </Row>
           </Column>
