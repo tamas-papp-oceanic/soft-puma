@@ -202,7 +202,7 @@ function proc(dev, frm) {
         break;
       case 65446:
         if ((msg.fields[0].value == 161) && (msg.fields[2].value == 4)) {
-          switch (msg.fields[3]) {
+          switch (msg.fields[3].value) {
             case 8:
               mainWindow.webContents.send('n2k-acconf', [dev, msg]);
               break;
@@ -489,7 +489,7 @@ ipcMain.on('c3420-read', (e, args) => {
   for (const [key, val] of Object.entries(devices)) {
     // Send Fluid Sender Control proprietary PGN
     // Request for Mode Data
-    let ret = val.engine.send065445(0x08, inst, 0x00, (0xFF00 << 8) + conf);
+    let ret = val.engine.send065445(0x08, inst, 0xFF, (0xFF00 << 8) + conf);
     res ||= ret;
   }
   if ((mainWindow != null) && (typeof mainWindow.webContents !== 'undefined')) {
@@ -499,12 +499,12 @@ ipcMain.on('c3420-read', (e, args) => {
 
 // Starts 3420 configuration writing
 ipcMain.on('c3420-write', (e, args) => {
-  const [inst, conf] = args;
+  const [inst, parm, data] = args;
   let res = true;
   for (const [key, val] of Object.entries(devices)) {
     // Send Fluid Sender Control proprietary PGN
     // Request for Mode Data
-    let ret = val.engine.send065445(0x08, inst, 0x00, conf);
+    let ret = val.engine.send065445(0x08, inst, parm, data);
     res ||= ret;
   }
   if ((mainWindow != null) && (typeof mainWindow.webContents !== 'undefined')) {
