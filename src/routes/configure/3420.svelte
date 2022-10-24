@@ -4,6 +4,7 @@
   import { location, pop } from "svelte-spa-router";
   import Container3420 from './partials/Container3420.svelte';
   import { getname } from '../../stores/common.js';
+    import { deleteData } from "../../stores/data";
 
   export let params;
 
@@ -13,6 +14,7 @@
   const timeout = 2000;
   let timer = null;
   let data = {
+    source: params.source,
     instance: params.instance,
     circuit: null,
   };
@@ -29,16 +31,19 @@
         let val = msg.fields[6].value & 0xFF;
         switch (msg.fields[5].value) {
           case 0:
-            // Circuit Type (1 = Single Phase, 2 = Duble Phase, 3 = Three Phase, 4 = Split Phase)
+            // Circuit Type (1 = Single Phase, 2 = Double Phase, 3 = Three Phase, 4 = Split Phase)
             data.circuit = val.toString();
             stop('c3420');
             running = false;
             break;
           case 1:
             // Device Instance
-            data.instance = val.toString();
-            stop('c3420');
-            running = false;
+            deleteData(msg.header.src);
+            setTimeout(() => {
+              data.instance = val.toString();
+              stop('c3420');
+              running = false;
+            }, 1000);
             break;
         }
       }
@@ -110,9 +115,9 @@
         title = 'Error';
         subttl = 'Error writing parameter with this instance.';
         notify = true;
+        stop('c3420');
+        running = false;
       }
-      stop('c3420');
-      running = false;
     });
     let val = e.detail.parameter == '0' ? parseInt(e.detail.circuit) : parseInt(e.detail.instance);
     window.pumaAPI.send('c3420-write', [parseInt(data.instance), parseInt(e.detail.parameter), val]);

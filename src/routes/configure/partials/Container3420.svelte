@@ -3,7 +3,7 @@
   import { ButtonSet, Button, Tile, Grid, Row, Column, Dropdown,
     TextInput } from "carbon-components-svelte";
   import Program from "carbon-icons-svelte/lib/Download16";
-  import { getInstances, isAlive } from '../../../stores/data.js';
+  import { isAlive } from '../../../stores/data.js';
 
   export let data;
   export let style;
@@ -38,9 +38,6 @@
   };
 
   function program(e) {
-
-console.log({ parameter: para, instance: inst, circuit: circ })
-
     dispatch("program", { parameter: para, instance: inst, circuit: circ });
   };
 
@@ -59,12 +56,12 @@ console.log({ parameter: para, instance: inst, circuit: circ })
 
 
   for (let i = 0; i < 253; i++) {
+    inst1.push({ id: i.toString(), text: i.toString() })
     inst2.push({ id: i.toString(), text: i.toString() })
   }
 
   // Data getters / setters
-  $: alive = isAlive(parseInt(data.instance), '3420');
-  $: inst1 = getInstances('3420');
+  $: alive = isAlive(parseInt(data.source));
 </script>
 
 <div class="container" style={style}>

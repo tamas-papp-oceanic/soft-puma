@@ -81,8 +81,7 @@
           }
         }
       }
-      pat.replace(':instance', '0');
-      pat.replace(':fluid', '0');
+      pat = pat.replace(':instance', '0').replace(':fluid', '0');
       push(pat);
     }
   }
