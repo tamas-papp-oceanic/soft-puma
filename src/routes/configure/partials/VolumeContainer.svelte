@@ -242,7 +242,7 @@
         let elm = find(data.table, parseFloat(lvl.value));
         if (elm != null) {
           data.table[elm].pervol = val
-          data.table[elm].volume = parseFloat(vol.value.toFixed(2));;
+          data.table[elm].volume = parseFloat(parseFloat(vol.value).toFixed(2));;
         } else {
           data.table.push({ 'id': next(), 'perlvl': parseFloat(lvl.value), 'pervol': val, 'volume': parseFloat(vol.value.toFixed(2)) });
         }
