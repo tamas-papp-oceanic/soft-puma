@@ -61,7 +61,8 @@
     { key: 'pervol', value: 'Volume (%)', sort: false },
     { key: 'volume', value: 'Volume (L)', sort: false },
   );
-  const rounding = false;
+  const rounding = true;
+  const decimals = 1;
   let height;
   let pagination = {
     pageSize: 10,
@@ -76,18 +77,97 @@
   // Re-calculates data.table values
   function calculate() {
     for (let i in data.table) {
-      let val = Math.round(data.capacity * data.table[i].pervol * (units[unit].text == '%' ? 0.01 : 1) * 100) / 100;
-      data.table[i].volume = rounding ? Math.round(val) : val;
+      data.table[i].volume = parseFloat(
+        (Math.round(data.capacity * data.table[i].pervol * (units[unit].text == '%' ? 0.01 : 1) * 100) / 100).toFixed(2)
+      );
     }
   }
 
-  function find(lvl) {
-    for (let i in data.table) {
-      if (data.table[i].perlvl == lvl) {
+  function find(tab, lvl) {
+    for (let i in tab) {
+      if (tab[i].perlvl == lvl) {
         return i;
       }
     }
     return null;
+  };
+
+  /* interpolation calculation
+      hes - height % start
+      hee - height % end
+      vos - volume % start
+      voe - volume % end
+  */
+	function range(hes, hee, vos, voe) {
+    let dec = rounding ? 0 : decimals;
+    let mul = 10 ** dec;
+    let stp = (voe - vos) / (hee - hes);
+    var ret = new Array();
+    for (let i = hes; (i < hee) || (i == 100); i = parseFloat((Math.round((i * mul) + 1) / mul).toFixed(dec))) {
+      if ((!rounding) || (rounding && i.toString().isInteger())) {
+        let cap = document.getElementById('capacity');
+        if (cap != null) {
+          let per = parseFloat((Math.round((vos + ((i - hes) * stp)) * mul) / mul).toFixed(dec));
+          let vol = parseFloat((Math.round(per * cap.value) / 100).toFixed(2));
+          if (rounding) {
+            per = Math.round(per);
+          }
+          ret.push({ 'id': null, 'perlvl': i, 'pervol': per, 'volume': vol });
+        }
+      }
+    }
+    return ret;
+	};
+
+  function interpolate(e) {
+    selected = new Array();
+    let cap = document.getElementById('capacity');
+    if (cap != null) {
+      let dec = rounding ? 0 : decimals;
+      let mul = 10 ** dec;
+      if (find(data.table, 0) == null) {
+        data.table.push({ 'id': next(), 'perlvl': 0, 'pervol': 0, 'volume': 0 });
+      };
+      if (find(data.table, 100) == null) {
+        let cap = document.getElementById('capacity');
+        if (cap != null) {
+          data.table.push({ 'id': next(), 'perlvl': 100, 'pervol': 100, 'volume': parseFloat(parseFloat(cap.value).toFixed(2)) });
+        }
+      };
+      data.table.sort((a, b) => a.perlvl - b.perlvl);
+      let tmp = new Array();
+      let res = new Array();
+      for (let i in data.table) {
+        let cur = JSON.parse(JSON.stringify(data.table[i]));
+        cur.perlvl = parseFloat((Math.round(cur.perlvl * mul) / mul).toFixed(dec));
+        if ((cur.perlvl == 0) || (cur.perlvl == 100) || (find(tmp, cur.perlvl) == null)) {
+          cur.pervol = parseFloat((Math.round(cur.pervol * mul) / mul).toFixed(dec));
+          cur.volume = parseFloat((Math.round(cap.value * cur.pervol) / 100).toFixed(2));
+          tmp = [...tmp, cur];
+        }
+      }
+      for (let i in tmp) {
+        let cur = tmp[i];
+        if (i > 0) {
+          let prv = tmp[i - 1];
+          let diff = cur.perlvl - prv.perlvl;
+          if (diff > (1 / mul)) {
+            let tmp = range(prv.perlvl, cur.perlvl, prv.pervol, cur.pervol);
+            res = [...res, ...tmp];
+          } else {
+            res = [...res, prv];
+          }
+        }
+        if ((cur.perlvl == 100) && (find(res, 100) == null)) {
+          res = [...res, cur];
+        }
+      }
+      for (let i in res) {
+        res[i].id = i.toString();
+      }
+      data.table = JSON.parse(JSON.stringify(res));
+      rows = JSON.parse(JSON.stringify(res));
+    }
   };
 
   function next() {
@@ -100,26 +180,6 @@
     }
     return ret.toString();
   };
-
-  /* interpolation calculation
-      hes - height % start
-      hee - height % end
-      vos - volume % start
-      voe - volume % end
-  */
-	function range(hes, hee, vos, voe) {
-    let stp = (voe - vos) / (hee - hes);
-    var ret = new Array();
-    for (let i = hes; (i < hee) || (i == 100); i++) {
-      let cap = document.getElementById('capacity');
-      if (cap != null) {
-        let per = Math.round((vos + ((i - hes) * stp)) * 100) / 100;
-        let vol = Math.round(per * cap.value) / 100;
-        ret.push({ 'id': null, 'perlvl': i, 'pervol': per, 'volume': vol });
-      }
-    }
-    return ret;
-	}
 
   function load(e) {
     dispatch("load");
@@ -148,40 +208,6 @@
     dispatch("download");
   };
 
-  function interpolate(e) {
-    selected = new Array();
-    if (find(0) == null) {
-      data.table.push({ 'id': next(), 'perlvl': 0, 'pervol': 0, 'volume': 0 });
-    };
-    if (find(100) == null) {
-      let cap = document.getElementById('capacity');
-      if (cap != null) {
-        data.table.push({ 'id': next(), 'perlvl': 100, 'pervol': 100, 'volume': parseFloat(cap.value) });
-      }
-    };
-    data.table.sort((a, b) => a.perlvl - b.perlvl);
-    let res = new Array();
-    for (let i in data.table) {
-      let curr = data.table[i];
-      if (i > 0) {
-        let prev = data.table[i - 1];
-        let diff = curr.perlvl - prev.perlvl;
-        if (diff > 1) {
-          let tmp = range(prev.perlvl, curr.perlvl, prev.pervol, curr.pervol);
-          res = [...res, ...tmp];
-        } else {
-          res = [...res, prev];
-        }
-      }
-    }
-    res.sort((a, b) => a.perlvl - b.perlvl);
-    for (let i in res) {
-      res[i].id = i.toString();
-    }
-    data.table = JSON.parse(JSON.stringify(res));
-    rows = JSON.parse(JSON.stringify(res));
-  };
-
   function upload(e) {
     dispatch("upload");
   };
@@ -190,29 +216,35 @@
     dispatch("cancel");
   };
 
+  function interpol(e) {
+    interpolate();
+  };
+
   function addrow(e) {
+    let dec = rounding ? 0 : decimals;
+    let mul = 10 ** dec;
     let cap = document.getElementById('capacity');
     let lvl = document.getElementById('level');
     let vol = document.getElementById('volume');
     if ((cap != null) && (lvl != null) && (vol != null)) {
       let val = null;
       if (units[unit].text == '%') {
-        val = cap.value * vol.value * (units[unit].text == '%' ? 0.01 : 1);
-        let elm = find(parseInt(lvl.value));
+        val = parseFloat((cap.value * vol.value * (units[unit].text == '%' ? 0.01 : 1)).toFixed(2));
+        let elm = find(data.table, parseFloat(lvl.value));
         if (elm != null) {
           data.table[elm].pervol = parseFloat(vol.value);
           data.table[elm].volume = val;
         } else {
-          data.table.push({ 'id': next(), 'perlvl': parseInt(lvl.value), 'pervol': parseFloat(vol.value), 'volume': val });
+          data.table.push({ 'id': next(), 'perlvl': parseFloat(lvl.value), 'pervol': parseFloat(vol.value), 'volume': val });
         }
       } else {
         val = vol.value / cap.value * 100;
-        let elm = find(parseInt(lvl.value));
+        let elm = find(data.table, parseFloat(lvl.value));
         if (elm != null) {
           data.table[elm].pervol = val
-          data.table[elm].volume = parseFloat(vol.value);;
+          data.table[elm].volume = parseFloat(vol.value.toFixed(2));;
         } else {
-          data.table.push({ 'id': next(), 'perlvl': parseInt(lvl.value), 'pervol': val, 'volume': parseFloat(vol.value) });
+          data.table.push({ 'id': next(), 'perlvl': parseFloat(lvl.value), 'pervol': val, 'volume': parseFloat(vol.value.toFixed(2)) });
         }
       }
       data.table.sort((a, b) => a.perlvl - b.perlvl);
@@ -254,7 +286,7 @@
   };
 
   function lvlinput(e) {
-    valid.lvl = e.detail.isInteger();
+    valid.lvl = e.detail.isNumber();
   };
 
   function volinput(e) {
@@ -321,7 +353,7 @@
                 <ButtonSet stacked style="padding: 0.2rem;">
                   <Button style="margin: 0.2rem 0" disabled={running} on:click={(e) => clear(e)}>Clear table</Button>
                   <Button style="margin: 0.2rem 0" disabled={running} on:click={(e) => download(e)}>Read from Sender</Button>
-                  <Button style="margin: 0.2rem 0" disabled={running || !valid.int} on:click={(e) => interpolate(e)}>Interpolate</Button>
+                  <Button style="margin: 0.2rem 0" disabled={running || !valid.int} on:click={(e) => interpol(e)}>Interpolate</Button>
                   <Button style="margin: 0.2rem 0" disabled={running} on:click={(e) => upload(e)}>Write to Sender</Button>
                 </ButtonSet>
               </Column>
