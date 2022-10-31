@@ -50,7 +50,7 @@
                 // Stored Volumetric Data
                 if ((msg.fields[3].value == data.instance) && (msg.fields[4].value == data.fluid)) {
                   data.table = new Array();
-                  data.capacity = msg.fields[7].value;
+                  data.capacity = msg.fields[7].value * 1000; // m3 -> L
                   let arr = Array.from(msg.fields[6].value, (x) => x.charCodeAt(0));
                   for (let i in arr) {
                     data.table.push({
@@ -246,7 +246,7 @@
     data.table.forEach((elm) => {
       dat += String.fromCharCode(elm.pervol);
     });
-    window.pumaAPI.send('voltable-write', [data.fluid, data.instance, dat, data.capacity]);
+    window.pumaAPI.send('voltable-write', [data.fluid, data.instance, dat, data.capacity / 1000]);  // L -> m3
   };
 
   function cancel(e) {
