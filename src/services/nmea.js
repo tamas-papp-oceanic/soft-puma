@@ -871,8 +871,8 @@ class NMEAEngine {
           { field: 1,title: 'Manufacturer Code', state: 'V', value: this.#addrMngr.name[2] },
           { field: 2,title: 'Reserved', state: 'V', value: 0b11 },
           { field: 3,title: 'Industry Group', state: 'V', value: this.#addrMngr.name[9] },
-          { field: 4,title: 'Fluid Type', state: 'V', value: fluid },
-          { field: 5,title: 'Instance', state: 'V', value: inst },
+          { field: 4,title: 'Instance', state: 'V', value: inst },
+          { field: 5,title: 'Fluid Type', state: 'V', value: fluid },
           { field: 6,title: 'Data ID', state: 'V', value: code },
         ],
       };
