@@ -16743,6 +16743,611 @@
       }
     ]
   },
+  "nmea2000/131011/0/161/4": {
+    "title": "Proprietary - DMX Control",
+    "single": false,
+    "priority": 6,
+    "interval": null,
+    "fields": [
+      {
+        "field": 1,
+        "title": "Manufacturer Code",
+        "type": "bit(11)",
+        "unit": null,
+        "multiplier": null,
+        "reserved": null
+      },
+      {
+        "field": 2,
+        "title": "NMEA Reserved",
+        "type": "bit(2)",
+        "unit": null,
+        "multiplier": null,
+        "reserved": "DD001"
+      },
+      {
+        "field": 3,
+        "title": "Industry Group",
+        "type": "bit(3)",
+        "unit": null,
+        "multiplier": null,
+        "reserved": null
+      },
+      {
+        "field": 4,
+        "title": "Instance",
+        "type": "uint8",
+        "unit": null,
+        "multiplier": null,
+        "reserved": null,
+        "instance": true
+      },
+      {
+        "field": 5,
+        "title": "Zone",
+        "type": "uint8",
+        "unit": null,
+        "multiplier": null,
+        "reserved": null
+      },
+      {
+        "field": 6,
+        "title": "Data ID",
+        "type": "uint8",
+        "unit": null,
+        "multiplier": null,
+        "reserved": null
+      },
+      {
+        "field": 7,
+        "title": "Global Enable",
+        "type": "uint8",
+        "unit": null,
+        "multiplier": null,
+        "reserved": null
+      },
+      {
+        "field": 8,
+        "title": "NMEA Reserved",
+        "type": "bit(32)",
+        "unit": null,
+        "multiplier": null,
+        "reserved": "DD001"
+      }
+    ]
+  },
+  "nmea2000/131011/1/161/4": {
+    "title": "Proprietary - DMX Control",
+    "single": false,
+    "priority": 6,
+    "interval": null,
+    "fields": [
+      {
+        "field": 1,
+        "title": "Manufacturer Code",
+        "type": "bit(11)",
+        "unit": null,
+        "multiplier": null,
+        "reserved": null
+      },
+      {
+        "field": 2,
+        "title": "NMEA Reserved",
+        "type": "bit(2)",
+        "unit": null,
+        "multiplier": null,
+        "reserved": "DD001"
+      },
+      {
+        "field": 3,
+        "title": "Industry Group",
+        "type": "bit(3)",
+        "unit": null,
+        "multiplier": null,
+        "reserved": null
+      },
+      {
+        "field": 4,
+        "title": "Instance",
+        "type": "uint8",
+        "unit": null,
+        "multiplier": null,
+        "reserved": null,
+        "instance": true
+      },
+      {
+        "field": 5,
+        "title": "Zone",
+        "type": "uint8",
+        "unit": null,
+        "multiplier": null,
+        "reserved": null
+      },
+      {
+        "field": 6,
+        "title": "Data ID",
+        "type": "uint8",
+        "unit": null,
+        "multiplier": null,
+        "reserved": null
+      },
+      {
+        "field": 7,
+        "title": "Tween Rate",
+        "type": "uint8",
+        "unit": null,
+        "multiplier": null,
+        "reserved": null
+      },
+      {
+        "field": 8,
+        "title": "RED Command",
+        "type": "uint8",
+        "unit": null,
+        "multiplier": null,
+        "reserved": null
+      },
+      {
+        "field": 9,
+        "title": "GREEN Command",
+        "type": "uint8",
+        "unit": null,
+        "multiplier": null,
+        "reserved": null
+      },
+      {
+        "field": 10,
+        "title": "BLUE Command",
+        "type": "uint8",
+        "unit": null,
+        "multiplier": null,
+        "reserved": null
+      },
+      {
+        "field": 11,
+        "title": "WHITE Command",
+        "type": "uint8",
+        "unit": null,
+        "multiplier": null,
+        "reserved": null
+      }
+    ]
+  },
+  "nmea2000/131011/2/161/4": {
+    "title": "Proprietary - DMX Control",
+    "single": false,
+    "priority": 6,
+    "interval": null,
+    "fields": [
+      {
+        "field": 1,
+        "title": "Manufacturer Code",
+        "type": "bit(11)",
+        "unit": null,
+        "multiplier": null,
+        "reserved": null
+      },
+      {
+        "field": 2,
+        "title": "NMEA Reserved",
+        "type": "bit(2)",
+        "unit": null,
+        "multiplier": null,
+        "reserved": "DD001"
+      },
+      {
+        "field": 3,
+        "title": "Industry Group",
+        "type": "bit(3)",
+        "unit": null,
+        "multiplier": null,
+        "reserved": null
+      },
+      {
+        "field": 4,
+        "title": "Instance",
+        "type": "uint8",
+        "unit": null,
+        "multiplier": null,
+        "reserved": null,
+        "instance": true
+      },
+      {
+        "field": 5,
+        "title": "Zone",
+        "type": "uint8",
+        "unit": null,
+        "multiplier": null,
+        "reserved": null
+      },
+      {
+        "field": 6,
+        "title": "Data ID",
+        "type": "uint8",
+        "unit": null,
+        "multiplier": null,
+        "reserved": null
+      },
+      {
+        "field": 7,
+        "title": "Program Enable",
+        "type": "uint8",
+        "unit": null,
+        "multiplier": null,
+        "reserved": null
+      },
+      {
+        "field": 8,
+        "title": "Program ID",
+        "type": "uint8",
+        "unit": null,
+        "multiplier": null,
+        "reserved": null
+      },
+      {
+        "field": 9,
+        "title": "NMEA Reserved",
+        "type": "bit(24)",
+        "unit": null,
+        "multiplier": null,
+        "reserved": "DD001"
+      }
+    ]
+  },
+  "nmea2000/131011/3/161/4": {
+    "title": "Proprietary - DMX Control",
+    "single": false,
+    "priority": 6,
+    "interval": null,
+    "fields": [
+      {
+        "field": 1,
+        "title": "Manufacturer Code",
+        "type": "bit(11)",
+        "unit": null,
+        "multiplier": null,
+        "reserved": null
+      },
+      {
+        "field": 2,
+        "title": "NMEA Reserved",
+        "type": "bit(2)",
+        "unit": null,
+        "multiplier": null,
+        "reserved": "DD001"
+      },
+      {
+        "field": 3,
+        "title": "Industry Group",
+        "type": "bit(3)",
+        "unit": null,
+        "multiplier": null,
+        "reserved": null
+      },
+      {
+        "field": 4,
+        "title": "Instance",
+        "type": "uint8",
+        "unit": null,
+        "multiplier": null,
+        "reserved": null,
+        "instance": true
+      },
+      {
+        "field": 5,
+        "title": "Zone",
+        "type": "uint8",
+        "unit": null,
+        "multiplier": null,
+        "reserved": null
+      },
+      {
+        "field": 6,
+        "title": "Data ID",
+        "type": "uint8",
+        "unit": null,
+        "multiplier": null,
+        "reserved": null
+      },
+      {
+        "field": 7,
+        "title": "Program Rate",
+        "type": "uint8",
+        "unit": null,
+        "multiplier": null,
+        "reserved": null
+      },
+      {
+        "field": 8,
+        "title": "NMEA Reserved",
+        "type": "bit(32)",
+        "unit": null,
+        "multiplier": null,
+        "reserved": "DD001"
+      }
+    ]
+  },
+  "nmea2000/131012/-/161/4": {
+    "title": "Proprietary - DMX Status",
+    "single": false,
+    "priority": 6,
+    "interval": null,
+    "fields": [
+      {
+        "field": 1,
+        "title": "Manufacturer Code",
+        "type": "bit(11)",
+        "unit": null,
+        "multiplier": null,
+        "reserved": null
+      },
+      {
+        "field": 2,
+        "title": "NMEA Reserved",
+        "type": "bit(2)",
+        "unit": null,
+        "multiplier": null,
+        "reserved": "DD001"
+      },
+      {
+        "field": 3,
+        "title": "Industry Group",
+        "type": "bit(3)",
+        "unit": null,
+        "multiplier": null,
+        "reserved": null
+      },
+      {
+        "field": 4,
+        "title": "Instance",
+        "type": "uint8",
+        "unit": null,
+        "multiplier": null,
+        "reserved": null,
+        "instance": true
+      },
+      {
+        "field": 5,
+        "title": "Global Enable",
+        "type": "uint8",
+        "unit": null,
+        "multiplier": null,
+        "reserved": null
+      },
+      {
+        "field": 6,
+        "title": "Program Rate",
+        "type": "uint8",
+        "unit": null,
+        "multiplier": null,
+        "reserved": null
+      },
+      {
+        "field": 7,
+        "title": "Zone 1 Enable",
+        "type": "uint8",
+        "unit": null,
+        "multiplier": null,
+        "reserved": null
+      },
+      {
+        "field": 8,
+        "title": "Program 1 Enable",
+        "type": "uint8",
+        "unit": null,
+        "multiplier": null,
+        "reserved": null
+      },
+      {
+        "field": 9,
+        "title": "Program 1 ID",
+        "type": "uint8",
+        "unit": null,
+        "multiplier": null,
+        "reserved": null
+      },
+      {
+        "field": 10,
+        "title": "RED 1 Value",
+        "type": "uint8",
+        "unit": null,
+        "multiplier": null,
+        "reserved": null
+      },
+      {
+        "field": 11,
+        "title": "GREEN 1 Value",
+        "type": "uint8",
+        "unit": null,
+        "multiplier": null,
+        "reserved": null
+      },
+      {
+        "field": 12,
+        "title": "BLUE 1 Value",
+        "type": "uint8",
+        "unit": null,
+        "multiplier": null,
+        "reserved": null
+      },
+      {
+        "field": 13,
+        "title": "WHITE 1 Value",
+        "type": "uint8",
+        "unit": null,
+        "multiplier": null,
+        "reserved": null
+      },
+      {
+        "field": 14,
+        "title": "Zone 2 Enable",
+        "type": "uint8",
+        "unit": null,
+        "multiplier": null,
+        "reserved": null
+      },
+      {
+        "field": 15,
+        "title": "Program 2 Enable",
+        "type": "uint8",
+        "unit": null,
+        "multiplier": null,
+        "reserved": null
+      },
+      {
+        "field": 16,
+        "title": "Program 2 ID",
+        "type": "uint8",
+        "unit": null,
+        "multiplier": null,
+        "reserved": null
+      },
+      {
+        "field": 17,
+        "title": "RED 2 Value",
+        "type": "uint8",
+        "unit": null,
+        "multiplier": null,
+        "reserved": null
+      },
+      {
+        "field": 18,
+        "title": "GREEN 2 Value",
+        "type": "uint8",
+        "unit": null,
+        "multiplier": null,
+        "reserved": null
+      },
+      {
+        "field": 19,
+        "title": "BLUE 2 Value",
+        "type": "uint8",
+        "unit": null,
+        "multiplier": null,
+        "reserved": null
+      },
+      {
+        "field": 20,
+        "title": "WHITE 2 Value",
+        "type": "uint8",
+        "unit": null,
+        "multiplier": null,
+        "reserved": null
+      },
+      {
+        "field": 21,
+        "title": "Zone 3 Enable",
+        "type": "uint8",
+        "unit": null,
+        "multiplier": null,
+        "reserved": null
+      },
+      {
+        "field": 22,
+        "title": "Program 3 Enable",
+        "type": "uint8",
+        "unit": null,
+        "multiplier": null,
+        "reserved": null
+      },
+      {
+        "field": 23,
+        "title": "Program 3 ID",
+        "type": "uint8",
+        "unit": null,
+        "multiplier": null,
+        "reserved": null
+      },
+      {
+        "field": 24,
+        "title": "RED 3 Value",
+        "type": "uint8",
+        "unit": null,
+        "multiplier": null,
+        "reserved": null
+      },
+      {
+        "field": 25,
+        "title": "GREEN 3 Value",
+        "type": "uint8",
+        "unit": null,
+        "multiplier": null,
+        "reserved": null
+      },
+      {
+        "field": 26,
+        "title": "BLUE 3 Value",
+        "type": "uint8",
+        "unit": null,
+        "multiplier": null,
+        "reserved": null
+      },
+      {
+        "field": 27,
+        "title": "WHITE 3 Value",
+        "type": "uint8",
+        "unit": null,
+        "multiplier": null,
+        "reserved": null
+      },
+      {
+        "field": 28,
+        "title": "Zone 4 Enable",
+        "type": "uint8",
+        "unit": null,
+        "multiplier": null,
+        "reserved": null
+      },
+      {
+        "field": 29,
+        "title": "Program 4 Enable",
+        "type": "uint8",
+        "unit": null,
+        "multiplier": null,
+        "reserved": null
+      },
+      {
+        "field": 30,
+        "title": "Program 4 ID",
+        "type": "uint8",
+        "unit": null,
+        "multiplier": null,
+        "reserved": null
+      },
+      {
+        "field": 31,
+        "title": "RED 4 Value",
+        "type": "uint8",
+        "unit": null,
+        "multiplier": null,
+        "reserved": null
+      },
+      {
+        "field": 32,
+        "title": "GREEN 4 Value",
+        "type": "uint8",
+        "unit": null,
+        "multiplier": null,
+        "reserved": null
+      },
+      {
+        "field": 33,
+        "title": "BLUE 4 Value",
+        "type": "uint8",
+        "unit": null,
+        "multiplier": null,
+        "reserved": null
+      },
+      {
+        "field": 34,
+        "title": "WHITE 4 Value",
+        "type": "uint8",
+        "unit": null,
+        "multiplier": null,
+        "reserved": null
+      }
+    ]
+  },
   "nmea2000/065280/-/257/4": {
     "title": "Honda Engine Status Parameters, Dynamic",
     "single": true,
