@@ -236,7 +236,7 @@ export function getInstances(mod) {
   for (const [key1, val1] of Object.entries(dat)) {
     for (const [key2, val2] of Object.entries(val1)) {
       if (val2.modelVersion == mod) {
-       ret.push({ id: val2.deviceInstance.toString(), text: val2.deviceInstance.toString() });
+        ret.push({ id: val2.deviceInstance.toString(), text: val2.deviceInstance.toString() });
       }
     }
   }
@@ -247,11 +247,11 @@ export function isAlive(src) {
   let dev = get(device);
   let dat = get(data);
   if (typeof dat[dev] !== 'undefined') {
-    Object.entries(dat[dev]).forEach(([key, val]) => {
+    for (const val of Object.values(dat[dev])) {
       if (val.header.src == src) {
         return true;
       }
-    });
+    }
   }
   return false;
 };

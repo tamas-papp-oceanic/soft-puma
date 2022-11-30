@@ -40,8 +40,8 @@
   let rows = new Array();
   let pagination = {
     pageSize: 10,
-    page: 1,
     totalItems: 0,
+    page: 1,
   };
 
   function getSelected() {
@@ -175,7 +175,6 @@
       </DataTable>
       {#if pagination.totalItems > pagination.pageSize}
         <Pagination
-          pageSizes={pagination.pageSizes}
           bind:pageSize={pagination.pageSize}
           totalItems={pagination.totalItems}
           bind:page={pagination.page}

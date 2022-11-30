@@ -37,8 +37,8 @@
   let title = '';
   let pagination = {
     pageSize: 10,
-    page: 1,
     totalItems: 0,
+    page: 1,
   };
 
   function buf2hex(buffer) {
@@ -128,7 +128,6 @@
       </DataTable>
       {#if pagination.totalItems > pagination.pageSize}
         <Pagination
-          pageSizes={pagination.pageSizes}
           bind:pageSize={pagination.pageSize}
           totalItems={pagination.totalItems}
           bind:page={pagination.page}

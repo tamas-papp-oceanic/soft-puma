@@ -11,6 +11,9 @@
   "nmea2000/126720": {
     "function": 2
   },
+  "nmea2000/130825": {
+    "function": 3
+  },
   "nmea2000/131011": {
     "function": 4
   }

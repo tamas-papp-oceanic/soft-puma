@@ -1,7 +1,7 @@
 <script>
   import { push } from 'svelte-spa-router'
   import { Row, Grid, Column, Tabs, Tab, TabContent } from "carbon-components-svelte";
-  import { selected } from '../../stores/data.js'
+  import { getInstances, selected } from '../../stores/data.js'
   import { getname } from '../../stores/common.js'
 
   let tab;
@@ -18,7 +18,12 @@
 
   function select(e, dev) {
     $selected.device = dev;
-    push('/configure/' + dev + '/0' + (dev.includes('3271') || dev.includes('3281') || dev.includes('4291') ? '/0' : ''));
+    let ins = '0';
+    let ina = getInstances(dev);
+    if (ina.length > 0) {
+      ins = ina[0].id;
+    }
+    push('/configure/' + dev + '/' + ins + (dev.includes('3271') || dev.includes('3281') || dev.includes('4291') ? '/0' : ''));
   };
 
   $: tab = $selected.config;

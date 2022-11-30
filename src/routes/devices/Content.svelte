@@ -16,8 +16,8 @@
   let title = null;
   let pagination = {
     pageSize: 10,
-    page: 1,
     totalItems: 0,
+    page: 1,
   };
   let headers = new Array({
     key: 'wait',

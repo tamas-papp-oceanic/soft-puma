@@ -17071,7 +17071,7 @@
     "title": "Proprietary - DMX Status",
     "single": false,
     "priority": 6,
-    "interval": null,
+    "interval": 500,
     "fields": [
       {
         "field": 1,
