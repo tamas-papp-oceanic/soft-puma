@@ -278,10 +278,11 @@ async function writeBoot(dev, func) {
   });
 }
 
-async function writeProg(dev, func) {
+async function writeProg(args, func) {
   return new Promise((resolve, reject) => {
+    const [dev, mod, ins] = args;
     let file = null;
-    switch (dev) {
+    switch (mod) {
       case '3420':
         file = '3420.bin'
         break;
@@ -294,6 +295,9 @@ async function writeProg(dev, func) {
     }
     dwl(progURL + '/prog?file=' + file, path.join(app.getAppPath(), 'downloads')).then((res) => {
       log.info('Download successful:', file);
+      func('Download successful: ' + file);
+   
+
       resolve(true);
     }).catch((err) => {
       reject(err);

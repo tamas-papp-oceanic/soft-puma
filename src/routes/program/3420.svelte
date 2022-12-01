@@ -3,12 +3,14 @@
   import { location, pop } from "svelte-spa-router";
   import ProgramContainer from './partials/ProgramContainer.svelte';
   import { getname } from '../../stores/common.js';
+  import { device } from '../../stores/data.js';
 
   export let params;
 
   const plf = navigator?.userAgentData?.platform || navigator?.platform || 'unknown';
   
-  const device = $location.split('/')[2];
+  const model = $location.split('/')[2];
+  const iface = $device;
   const instance = params.instance;
   const timeout = 5000;
   let timer = null;
@@ -41,7 +43,7 @@
       stop('boot');
       running = false;
     });
-    window.pumaAPI.send('boot-start', device);
+    window.pumaAPI.send('boot-start', model);
   };
 
   function program(e) {
@@ -60,7 +62,7 @@
       stop('prog');
       running = false;
     });
-    window.pumaAPI.send('prog-start', device);
+    window.pumaAPI.send('prog-start', [iface, model, instance]);
   };
 
   function cancel(e) {
@@ -74,7 +76,7 @@
 <Grid>
   <Row>
     <Column>
-      <h2>{device + ' ' + getname(device) + ' - Programming'}</h2>
+      <h2>{model + ' ' + getname(model) + ' - Programming'}</h2>
       <ProgramContainer message={message} running={running} style="height: 80vh;"
         on:loader={loader} on:program={program} on:cancel={cancel} />
     </Column>

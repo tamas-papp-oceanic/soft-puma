@@ -369,14 +369,23 @@ function bootMessage(msg) {
 }
 
 // Start device programing
-ipcMain.on('prog-start', (e, ...args) => {
-  writeProg(args[0], progMessage).then((res) => {
-    if ((mainWindow != null) && (typeof mainWindow.webContents !== 'undefined')) {
-      mainWindow.webContents.send('prog-done', res);
-    }
-  }).catch((err) => {
-    log.error(err);
-  });
+ipcMain.on('prog-start', (e, args) => {
+
+console.log(args)
+
+  const [dev, mod, ins] = args;
+
+  if (typeof dev === 'string') {
+    writeProg(args, progMessage).then((res) => {
+      if ((mainWindow != null) && (typeof mainWindow.webContents !== 'undefined')) {
+        mainWindow.webContents.send('prog-done', res);
+      }
+    }).catch((err) => {
+      log.error(err);
+    });
+  } else {
+    progMessage("No device selected!");
+  }
 });
 
 // Sends programmer console message
@@ -385,15 +394,6 @@ function progMessage(msg) {
     mainWindow.webContents.send('prog-data', msg);
   }
 }
-// Sends SF Config Command
-ipcMain.on('prog-boot', (e, args) => {
-  const [code, param] = args;
-  for (const [key, val] of Object.entries(devices)) {
-    // Send Device Test Control proprietary PGN
-    val.engine.send065477(code, param);
-  }
-});
-
 // Starts volume file reading
 ipcMain.on('volfile-read', (e, ...args) => {
   readFile(args[0]).then((res) => {

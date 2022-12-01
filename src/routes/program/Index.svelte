@@ -1,7 +1,7 @@
 <script>
   import { Row, Grid, Column, Tabs, Tab, TabContent } from "carbon-components-svelte";
   import { push } from 'svelte-spa-router'
-  import { selected } from '../../stores/data.js'
+  import { findModel, getInstances, selected } from '../../stores/data.js'
   import { checkAccess } from '../../auth/auth'
   import { getname } from '../../stores/common.js'
 
@@ -19,7 +19,12 @@
 
   function select(e, grp, dev) {
     $selected.device = dev;
-    push('/program/' + dev + (grp != 'displays' ? '/0' : ''));
+    let ins = '0';
+    let pro = findModel(dev);
+    if (pro.length > 0) {
+      ins = pro[0].deviceInstance.toString();
+    }
+    push('/program/' + dev + (grp != 'displays' ? '/' + ins : ''));
   };
 
   $: tab = $selected.program;
