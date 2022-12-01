@@ -278,7 +278,7 @@ async function writeBoot(dev, func) {
   });
 }
 
-async function writeProg(args, func) {
+async function writeProg(args, eng, func) {
   return new Promise((resolve, reject) => {
     const [dev, mod, ins] = args;
     let file = null;
@@ -296,9 +296,20 @@ async function writeProg(args, func) {
     dwl(progURL + '/prog?file=' + file, path.join(app.getAppPath(), 'downloads')).then((res) => {
       log.info('Download successful:', file);
       func('Download successful: ' + file);
-   
+      // Re-booting to bootloader...
+      let ret = eng.send065445(0x08, ins, 0xAA, 0xFFFFFF);
+      if (!ret) {
+        reject(new Error('Re-boot to bootloader Failed'));
+      }
+      func('Bootloader successfuly re-booted');
+      // Erasing program area
+      ret = eng.send130981(0x08, ins, 0xAA, 0xFFFFFF);
+      if (!ret) {
+        reject(new Error('Re-boot to bootloader Failed'));
+      }
 
-      resolve(true);
+
+        resolve(true);
     }).catch((err) => {
       reject(err);
     });

@@ -59,7 +59,7 @@
       timer = null
     }
     running = false;
-    window.pumaAPI.reml('n2k-3420');
+    window.pumaAPI.reml('n2k-acconf');
   });
 
   function stop(lis) {

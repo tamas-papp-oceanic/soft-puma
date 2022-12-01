@@ -21,7 +21,7 @@
     $selected.device = dev;
     let ins = '0';
     let pro = findModel(dev);
-    if (pro.length > 0) {
+    if ((pro !== null) && (typeof pro === 'object') && (Object.keys(pro).length > 0)) {
       ins = pro[0].deviceInstance.toString();
     }
     push('/program/' + dev + (grp != 'displays' ? '/' + ins : ''));

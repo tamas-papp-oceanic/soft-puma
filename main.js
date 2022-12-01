@@ -15,7 +15,7 @@ const bwipjs = require('bwip-js');
 const PDFDocument = require('pdfkit');
 const prt = 'HP-LaserJet-Pro-M404-M405';
 const { writeBoot, writeProg } = require('./src/services/program.js')
-const { readFile, writeFile } = require('./src/services/volume.js')
+const { readFile, writeFile } = require('./src/services/volume.js');
 
 // Keep a global reference of the window object, if you don't, the window will
 // be closed automatically when the JavaScript object is garbage collected.
@@ -201,6 +201,7 @@ function proc(dev, frm) {
         mainWindow.webContents.send('n2k-volume', [dev, msg]);
         break;
       case 65446:
+      case 130982:
         if ((msg.fields[0].value == 161) && (msg.fields[2].value == 4)) {
           switch (msg.fields[3].value) {
             case 8:
@@ -370,13 +371,9 @@ function bootMessage(msg) {
 
 // Start device programing
 ipcMain.on('prog-start', (e, args) => {
-
-console.log(args)
-
   const [dev, mod, ins] = args;
-
-  if (typeof dev === 'string') {
-    writeProg(args, progMessage).then((res) => {
+  if ((typeof dev === 'string') && (typeof devices[dev] !== 'undefined')) {
+    writeProg(args, devices[dev].engine, progMessage).then((res) => {
       if ((mainWindow != null) && (typeof mainWindow.webContents !== 'undefined')) {
         mainWindow.webContents.send('prog-done', res);
       }
