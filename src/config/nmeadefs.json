@@ -16606,6 +16606,136 @@
       }
     ]
   },
+  "nmea2000/130981/-/161/4": {
+    "title": "Proprietary - Configuration Commmand",
+    "single": true,
+    "priority": 6,
+    "interval": null,
+    "fields": [
+      {
+        "field": 1,
+        "title": "Manufacturer Code",
+        "type": "bit(11)",
+        "unit": null,
+        "multiplier": null,
+        "reserved": null
+      },
+      {
+        "field": 2,
+        "title": "NMEA Reserved",
+        "type": "bit(2)",
+        "unit": null,
+        "multiplier": null,
+        "reserved": "DD001"
+      },
+      {
+        "field": 3,
+        "title": "Industry Group",
+        "type": "bit(3)",
+        "unit": null,
+        "multiplier": null,
+        "reserved": null
+      },
+      {
+        "field": 4,
+        "title": "Type ID",
+        "type": "bit(8)",
+        "unit": null,
+        "multiplier": null,
+        "reserved": null
+      },
+      {
+        "field": 5,
+        "title": "Instance",
+        "type": "bit(8)",
+        "unit": null,
+        "multiplier": null,
+        "reserved": null,
+        "instance": true
+      },
+      {
+        "field": 6,
+        "title": "Data ID",
+        "type": "bit(8)",
+        "unit": null,
+        "multiplier": null,
+        "reserved": null
+      },
+      {
+        "field": 7,
+        "title": "Content",
+        "type": "bit(32)",
+        "unit": null,
+        "multiplier": null,
+        "reserved": null
+      }
+    ]
+  },
+  "nmea2000/130982/-/161/4": {
+    "title": "Proprietary - Configuration Acknowledgement / Status",
+    "single": true,
+    "priority": 6,
+    "interval": null,
+    "fields": [
+      {
+        "field": 1,
+        "title": "Manufacturer Code",
+        "type": "bit(11)",
+        "unit": null,
+        "multiplier": null,
+        "reserved": null
+      },
+      {
+        "field": 2,
+        "title": "NMEA Reserved",
+        "type": "bit(2)",
+        "unit": null,
+        "multiplier": null,
+        "reserved": "DD001"
+      },
+      {
+        "field": 3,
+        "title": "Industry Group",
+        "type": "bit(3)",
+        "unit": null,
+        "multiplier": null,
+        "reserved": null
+      },
+      {
+        "field": 4,
+        "title": "Type ID",
+        "type": "bit(8)",
+        "unit": null,
+        "multiplier": null,
+        "reserved": null
+      },
+      {
+        "field": 5,
+        "title": "Instance",
+        "type": "bit(8)",
+        "unit": null,
+        "multiplier": null,
+        "reserved": null,
+        "instance": true
+      },
+      {
+        "field": 6,
+        "title": "Data ID",
+        "type": "bit(8)",
+        "unit": null,
+        "multiplier": null,
+        "reserved": null
+      },
+      {
+        "field": 7,
+        "title": "Content",
+        "type": "bit(32)",
+        "unit": null,
+        "multiplier": null,
+        "reserved": null
+      }
+    ]
+  },
   "nmea2000/131010/-/161/4": {
     "title": "Proprietary - DM1",
     "single": false,
