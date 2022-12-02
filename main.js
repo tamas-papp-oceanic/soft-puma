@@ -14,7 +14,7 @@ const NMEAEngine = require('./src/services/nmea.js');
 const bwipjs = require('bwip-js');
 const PDFDocument = require('pdfkit');
 const prt = 'HP-LaserJet-Pro-M404-M405';
-const { writeBoot, writeProg } = require('./src/services/program.js')
+const { writeBoot, downProg } = require('./src/services/program.js')
 const { readFile, writeFile } = require('./src/services/volume.js');
 
 // Keep a global reference of the window object, if you don't, the window will
@@ -201,11 +201,10 @@ function proc(dev, frm) {
         mainWindow.webContents.send('n2k-volume', [dev, msg]);
         break;
       case 65446:
-      case 130982:
         if ((msg.fields[0].value == 161) && (msg.fields[2].value == 4)) {
           switch (msg.fields[3].value) {
             case 8:
-              mainWindow.webContents.send('n2k-acconf', [dev, msg]);
+              mainWindow.webContents.send('n2k-ac-data', [dev, msg]);
               break;
           }
         }
@@ -215,6 +214,15 @@ function proc(dev, frm) {
         break;
       case 126996:
         mainWindow.webContents.send('n2k-prod', [dev, msg]);
+        break;
+      case 130982:
+        if ((msg.fields[0].value == 161) && (msg.fields[2].value == 4)) {
+          switch (msg.fields[3].value) {
+            case 8:
+              // progStatus(msg);
+              break;
+          }
+        }
         break;
       default:
         mainWindow.webContents.send('n2k-data', [dev, msg]);
@@ -373,7 +381,26 @@ function bootMessage(msg) {
 ipcMain.on('prog-start', (e, args) => {
   const [dev, mod, ins] = args;
   if ((typeof dev === 'string') && (typeof devices[dev] !== 'undefined')) {
-    writeProg(args, devices[dev].engine, progMessage).then((res) => {
+    // downProg([devices[dev].engine, mod, ins], progMessage).then((res) => {
+      // // Re-booting to bootloader...
+    // let ret = eng.send065445(0x08, ins, 0xAA, 0xFFFFFF);
+    // if (!ret) {
+    //   reject(new Error('Re-boot to bootloader Failed'));
+    // }
+    // func('Bootloader successfuly re-booted');
+    // // Erasing program area
+    // ret = eng.send130981(0x08, ins, 0xAA, 0xFFFFFF);
+    // if (!ret) {
+    //   reject(new Error('Re-boot to bootloader Failed'));
+    // }
+    downProg(mod, progMessage).then((res) => {
+
+
+
+console.log(res)
+
+
+
       if ((mainWindow != null) && (typeof mainWindow.webContents !== 'undefined')) {
         mainWindow.webContents.send('prog-done', res);
       }

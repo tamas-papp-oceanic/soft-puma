@@ -19,32 +19,6 @@
   let running = false;
 
   onMount(() => {
-    window.pumaAPI.recv('n2k-acconf', (e, args) => {
-      const [ dev, msg ] = args;
-      if (msg.fields[4].value == instance) {
-        // let val = msg.fields[6].value & 0xFF;
-        // switch (msg.fields[5].value) {
-        //   case 0:
-        //     // Circuit Type (1 = Single Phase, 2 = Double Phase, 3 = Three Phase, 4 = Split Phase)
-        //     data.source = msg.header.src;
-        //     data.circuit = val.toString();
-        //     stop('c3420');
-        //     running = false;
-        //     break;
-        //   case 1:
-        //     // Device Instance
-        //     data.source = msg.header.src;
-        //     deleteData(msg.header.src);
-        //     setTimeout(() => {
-        //       data.instance = val.toString();
-        //       stop('c3420');
-        //       running = false;
-        //     }, 1000);
-        //     break;
-        // }
-      }
-    });
-    select();
   });
   
   onDestroy(() => {
@@ -53,7 +27,6 @@
       timer = null
     }
     running = false;
-    window.pumaAPI.reml('n2k-acconf');
   });
 
   function stop(lis) {

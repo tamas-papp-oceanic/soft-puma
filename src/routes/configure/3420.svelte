@@ -25,7 +25,7 @@
   let subttl = null;
 
   onMount(() => {
-    window.pumaAPI.recv('n2k-acconf', (e, args) => {
+    window.pumaAPI.recv('n2k-ac-data', (e, args) => {
       const [ dev, msg ] = args;
       if (msg.fields[4].value == data.instance) {
         let val = msg.fields[6].value & 0xFF;
@@ -59,7 +59,7 @@
       timer = null
     }
     running = false;
-    window.pumaAPI.reml('n2k-acconf');
+    window.pumaAPI.reml('n2k-ac-data');
   });
 
   function stop(lis) {
