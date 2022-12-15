@@ -381,6 +381,7 @@ function bootMessage(msg) {
 ipcMain.on('prog-start', (e, args) => {
   const [dev, mod, ins] = args;
   if ((typeof dev === 'string') && (typeof devices[dev] !== 'undefined')) {
+    let eng = devices[dev].engine;
     // downProg([devices[dev].engine, mod, ins], progMessage).then((res) => {
       // // Re-booting to bootloader...
     // let ret = eng.send065445(0x08, ins, 0xAA, 0xFFFFFF);
@@ -393,18 +394,21 @@ ipcMain.on('prog-start', (e, args) => {
     // if (!ret) {
     //   reject(new Error('Re-boot to bootloader Failed'));
     // }
-    downProg(mod, progMessage).then((res) => {
-
-
-
-console.log(res)
-
-
-
-      if ((mainWindow != null) && (typeof mainWindow.webContents !== 'undefined')) {
-        mainWindow.webContents.send('prog-done', res);
-      }
-    }).catch((err) => {
+    Promise.resolve()
+    .then(() => downProg(mod, progMessage))
+    .then(() => bootReboot(eng, ins, progMessage))
+    .then((res) => { 
+      progMessage(res + '\n');
+      log.info(res);
+    })
+    .then(() => {
+      setTimeout(() => {
+        if ((mainWindow != null) && (typeof mainWindow.webContents !== 'undefined')) {
+          mainWindow.webContents.send('prog-done', 'OK');
+        }
+      }, 500);
+    })
+    .catch((err) => {
       log.error(err);
     });
   } else {
@@ -418,6 +422,22 @@ function progMessage(msg) {
     mainWindow.webContents.send('prog-data', msg);
   }
 }
+
+function bootReboot(eng, ins, func) {
+  return new Promise((resolve, reject) => {
+    // Re-booting to bootloader...
+    let ret = eng.send065445(0x08, ins, 0xAA, 0xFFFFFF);
+    if (ret) {
+      func('Waiting for re-boot...\n');
+      setTimeout(() => {
+        resolve('Bootloader successfuly re-booted');
+      }, 5000);
+    } else {
+      reject(new Error('Re-boot to bootloader Failed'));
+    }
+  });
+}
+
 // Starts volume file reading
 ipcMain.on('volfile-read', (e, ...args) => {
   readFile(args[0]).then((res) => {
