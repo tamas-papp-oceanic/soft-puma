@@ -219,7 +219,14 @@ function proc(dev, frm) {
         if ((msg.fields[0].value == 161) && (msg.fields[2].value == 4)) {
           switch (msg.fields[3].value) {
             case 8:
-              // progStatus(msg);
+              switch (msg.fields[5].value) {
+                case 0xEB:
+                  ipcMain.emit('erase-ack', msg);
+                  break;
+                case 0xEC:
+                  ipcMain.emit('flag-ack', msg);
+                  break;
+                }
               break;
           }
         }
@@ -377,6 +384,10 @@ function bootMessage(msg) {
   }
 }
 
+function sleep(ms) {
+  return new Promise(resolve => setTimeout(resolve, ms));
+}
+
 // Start device programing
 ipcMain.on('prog-start', (e, args) => {
   const [dev, mod, ins] = args;
@@ -394,19 +405,17 @@ ipcMain.on('prog-start', (e, args) => {
     // if (!ret) {
     //   reject(new Error('Re-boot to bootloader Failed'));
     // }
+    let byt = 0;
     Promise.resolve()
     .then(() => downProg(mod, progMessage))
+    .then((res) => { byt = res.length; console.log(byt) })
     .then(() => bootReboot(eng, ins, progMessage))
-    .then((res) => { 
-      progMessage(res + '\n');
-      log.info(res);
-    })
+    .then(() => bootErase(eng, ins, byt, progMessage))
+    .then(() => bootFinish(eng, ins, progMessage))
     .then(() => {
-      setTimeout(() => {
         if ((mainWindow != null) && (typeof mainWindow.webContents !== 'undefined')) {
-          mainWindow.webContents.send('prog-done', 'OK');
-        }
-      }, 500);
+        mainWindow.webContents.send('prog-done');
+      }
     })
     .catch((err) => {
       log.error(err);
@@ -429,11 +438,56 @@ function bootReboot(eng, ins, func) {
     let ret = eng.send065445(0x08, ins, 0xAA, 0xFFFFFF);
     if (ret) {
       func('Waiting for re-boot...\n');
-      setTimeout(() => {
-        resolve('Bootloader successfuly re-booted');
-      }, 5000);
+      sleep(5000).then(() => {
+        let msg = 'Bootloader successfuly re-booted.';
+        log.info(msg);
+        func(msg + '\n');
+        resolve(true);
+      });
     } else {
-      reject(new Error('Re-boot to bootloader Failed'));
+      reject(new Error('Re-boot to bootloader failed!'));
+    }
+  });
+}
+
+function bootErase(eng, ins, len,  func) {
+  return new Promise((resolve, reject) => {
+    // Erasing program area...
+    let ret = eng.send130981(0x08, ins, 0xEB, len);
+    if (ret) {
+      func('Erasing program area......\n');
+      ipcMain.on('erase-ack', (e, args) => {
+console.log("ACK"), args;
+      });
+      sleep(5000).then(() => {
+        let msg = 'Program area successfuly erased.';
+        log.info(msg);
+        func(msg + '\n');
+        resolve(true);
+      });
+    } else {
+      reject(new Error('Erasing program area failed!'));
+    }
+  });
+}
+
+function bootFinish(eng, ins, func) {
+  return new Promise((resolve, reject) => {
+    // Erasing boot flag...
+    let ret = eng.send130981(0x08, ins, 0xEC, 0xFFFFFF);
+    if (ret) {
+      func('Erasing boot flag...\n');
+      ipcMain.on('flag-ack', (e, args) => {
+        console.log("ACK"), args;
+      });
+      sleep(5000).then(() => {
+        let msg = 'Boot flag successfuly erased.';
+        log.info(msg);
+        func(msg + '\n');
+        resolve(true);
+      });
+    } else {
+      reject(new Error('Erasing boot flag failed!'));
     }
   });
 }

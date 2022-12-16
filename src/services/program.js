@@ -293,8 +293,9 @@ async function downProg(mod, func) {
       return;
     }
     dwl(progURL + '/prog?file=' + file, path.join(app.getAppPath(), 'downloads')).then((res) => {
-      log.info('Download successful:', file);
-      func('Download successful: ' + file + '\n');
+      let msg = 'Download successful: ' + file;
+      log.info(msg);
+      func(msg + '\n');
       resolve(res);
     }).catch((err) => {
       reject(err);

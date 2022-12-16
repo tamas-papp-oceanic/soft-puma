@@ -13,7 +13,7 @@
   const model = $location.split('/')[2];
   const iface = $device;
   const instance = params.instance;
-  const timeout = 5000;
+  const timeout = 60000;
   let timer = null;
   let message = '';
   let running = false;
