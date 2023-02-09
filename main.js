@@ -204,7 +204,7 @@ function proc(dev, frm) {
         mainWindow.webContents.send('n2k-volume', [dev, msg]);
         break;
       case 65446:
-        if ((msg.fields[0].value == 161) && (msg.fields[2].value == 4)) {
+        if ((msg.fields[0].value == devices[dev].engine.name[2]) && (msg.fields[2].value == devices[dev].engine.name[9])) {
           switch (msg.fields[3].value) {
             case 8:
               mainWindow.webContents.send('n2k-ac-data', [dev, msg]);
@@ -219,7 +219,7 @@ function proc(dev, frm) {
         mainWindow.webContents.send('n2k-prod', [dev, msg]);
         break;
       case 130982:
-        if ((msg.fields[0].value == 161) && (msg.fields[2].value == 4)) {
+        if ((msg.fields[0].value == devices[dev].engine.name[2]) && (msg.fields[2].value == devices[dev].engine.name[9])) {
           switch (msg.fields[3].value) {
             case 8:
               switch (msg.fields[5].value) {
