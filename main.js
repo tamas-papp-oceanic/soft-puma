@@ -466,8 +466,8 @@ function bootErase(eng, ins, len,  func) {
         btimer = null;
         reject(new Error('Erasing program area failed!'));
       }, 5000);
-      pub.once('erase-ack', (e, args) => {
-        console.log("ACK"), args;
+      pub.once('erase-ack', (args) => {
+        console.log("ACK", args);
         clearTimeout(btimer);
         btimer = null;
         let msg = 'Program area successfuly erased.';
@@ -487,8 +487,8 @@ function bootFinish(eng, ins, func) {
     let ret = eng.send130981(0x08, ins, 0xEC, 0xFFFFFF);
     if (ret) {
       func('Erasing boot flag...\n');
-      pub.on('flag-ack', (e, args) => {
-        console.log("ACK"), args;
+      pub.on('flag-ack', (args) => {
+        console.log("ACK", args);
       });
       sleep(5000).then(() => {
         let msg = 'Boot flag successfuly erased.';
