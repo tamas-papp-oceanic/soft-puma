@@ -194,6 +194,8 @@ async function discover() {
 function proc(dev, frm) {
   if ((mainWindow != null) && (typeof mainWindow.webContents !== 'undefined')) {
     let msg = devices[dev].engine.process(frm);
+    let manu = devices[dev].engine.name[2];
+    let indu = devices[dev].engine.name[9];
     if (msg != null) {
       switch (msg.header.pgn) {
       case 60928:
@@ -204,7 +206,7 @@ function proc(dev, frm) {
         mainWindow.webContents.send('n2k-volume', [dev, msg]);
         break;
       case 65446:
-        if ((msg.fields[0].value == devices[dev].engine.name[2]) && (msg.fields[2].value == devices[dev].engine.name[9])) {
+        if ((msg.fields[0].value == manu) && (msg.fields[2].value == indu)) {
           switch (msg.fields[3].value) {
             case 8:
               mainWindow.webContents.send('n2k-ac-data', [dev, msg]);
@@ -219,7 +221,7 @@ function proc(dev, frm) {
         mainWindow.webContents.send('n2k-prod', [dev, msg]);
         break;
       case 130982:
-        if ((msg.fields[0].value == devices[dev].engine.name[2]) && (msg.fields[2].value == devices[dev].engine.name[9])) {
+        if ((msg.fields[0].value == manu) && (msg.fields[2].value == indu)) {
           switch (msg.fields[3].value) {
             case 8:
               switch (msg.fields[5].value) {
