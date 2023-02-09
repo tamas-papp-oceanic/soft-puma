@@ -69,6 +69,10 @@ class NMEAEngine {
   get productInfo() {
     return this.#productInfo;
   };
+  // Gets Name Record function
+  get name() {
+    return this.#addrMngr.name;
+  };
   // NMEA data processing function
   process(frm) {
     let tmp = dec.unpack(frm);
