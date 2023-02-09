@@ -16,6 +16,9 @@ const PDFDocument = require('pdfkit');
 const prt = 'HP-LaserJet-Pro-M404-M405';
 const { writeBoot, downProg } = require('./src/services/program.js')
 const { readFile, writeFile } = require('./src/services/volume.js');
+const EventEmitter = require('node:events');
+
+const pub = new EventEmitter();
 
 // Keep a global reference of the window object, if you don't, the window will
 // be closed automatically when the JavaScript object is garbage collected.
@@ -221,10 +224,10 @@ function proc(dev, frm) {
             case 8:
               switch (msg.fields[5].value) {
                 case 0xEB:
-                  ipcMain.emit('erase-ack', msg);
+                  pub.emit('erase-ack', msg);
                   break;
                 case 0xEC:
-                  ipcMain.emit('flag-ack', msg);
+                  pub.emit('flag-ack', msg);
                   break;
                 }
               break;
@@ -419,6 +422,7 @@ ipcMain.on('prog-start', (e, args) => {
     })
     .catch((err) => {
       log.error(err);
+      progMessage(err);
     });
   } else {
     progMessage("No device selected!");
@@ -450,16 +454,22 @@ function bootReboot(eng, ins, func) {
   });
 }
 
+let btimer = null;
+
 function bootErase(eng, ins, len,  func) {
   return new Promise((resolve, reject) => {
     // Erasing program area...
     let ret = eng.send130981(0x08, ins, 0xEB, len);
     if (ret) {
       func('Erasing program area......\n');
-      ipcMain.on('erase-ack', (e, args) => {
-console.log("ACK"), args;
-      });
-      sleep(5000).then(() => {
+      btimer = setTimeout(() => {
+        btimer = null;
+        reject(new Error('Erasing program area failed!'));
+      }, 5000);
+      pub.once('erase-ack', (e, args) => {
+        console.log("ACK"), args;
+        clearTimeout(btimer);
+        btimer = null;
         let msg = 'Program area successfuly erased.';
         log.info(msg);
         func(msg + '\n');
@@ -477,7 +487,7 @@ function bootFinish(eng, ins, func) {
     let ret = eng.send130981(0x08, ins, 0xEC, 0xFFFFFF);
     if (ret) {
       func('Erasing boot flag...\n');
-      ipcMain.on('flag-ack', (e, args) => {
+      pub.on('flag-ack', (e, args) => {
         console.log("ACK"), args;
       });
       sleep(5000).then(() => {

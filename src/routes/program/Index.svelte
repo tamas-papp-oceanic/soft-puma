@@ -18,7 +18,10 @@
   };
 
   function select(e, grp, dev) {
-    $selected.device = dev;
+
+console.log(grp, dev);
+
+  $selected.device = dev;
     let ins = '0';
     let pro = findModel(dev);
     if ((pro !== null) && (typeof pro === 'object') && (Object.keys(pro).length > 0)) {
