@@ -18,14 +18,11 @@
   };
 
   function select(e, grp, dev) {
-
-console.log(grp, dev);
-
   $selected.device = dev;
     let ins = '0';
     let pro = findModel(dev);
-    if ((pro !== null) && (typeof pro === 'object') && (Object.keys(pro).length > 0)) {
-      ins = pro[0].deviceInstance.toString();
+    if ((pro !== null) && (Array.isArray(pro)) && (pro.length > 0)) {
+      ins = pro[0].name.deviceInstance.toString();
     }
     push('/program/' + dev + (grp != 'displays' ? '/' + ins : ''));
   };

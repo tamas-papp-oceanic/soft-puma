@@ -232,14 +232,15 @@ export function findProduct(pro) {
 // Searches for model version in name records
 export function findModel(mod) {
   let dat = get(name);
+  let res = new Array();
   for (const [key1, val1] of Object.entries(dat)) {
     for (const [key2, val2] of Object.entries(val1)) {
       if (val2.modelVersion == mod) {
-        return { device: key1, address: key2, name: val2 };
+        res.push({ device: key1, address: key2, name: val2 });
       }
     }
   }
-  return null;
+  return res;
 };
 // Searches for instances in name records
 export function getInstances(mod) {
