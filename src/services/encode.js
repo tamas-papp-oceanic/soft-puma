@@ -37,15 +37,9 @@ function encode(msg) {
       let fld = def.fields[i];
       let mfl = com.getFld(fld.field, msg.fields);
       let len = null;
-
-
-      console.log(mfl);
-
-
-
       if ((fld.type == 'chr(x)') || (fld.type == 'str')) {
         len = com.calcLength(fld.type, mfl != null ? mfl.value.length : 0);
-      } else if (fld.type.startsWith('chr(') && (mfl.value.type == 'Buffer'))  {
+      } else if (fld.type.startsWith('chr(') && (typeof mfl.value.type !== 'undefined') && (mfl.value.type == 'Buffer'))  {
         len = com.calcLength(fld.type, mfl != null ? mfl.value.data.length : 0);
       } else {
         len = com.calcLength(fld.type);
@@ -66,7 +60,7 @@ function encode(msg) {
       let len = null;
       if ((fld.type == 'chr(x)') || (fld.type == 'str')) {
         len = com.calcLength(fld.type, mfl != null ? mfl.value.length : 0);
-      } else if (fld.type.startsWith('chr(') && (mfl.value.type == 'Buffer'))  {
+      } else if (fld.type.startsWith('chr(') && (typeof mfl.value.type !== 'undefined') && (mfl.value.type == 'Buffer'))  {
         len = com.calcLength(fld.type, mfl != null ? mfl.value.data.length : 0);
       } else {
         len = com.calcLength(fld.type);
@@ -90,8 +84,11 @@ function encode(msg) {
         } else if (fld.type.startsWith('chr(')) {
           if (typeof mfl.value === 'string') {
             raw.write(mfl.value.padEnd(Math.ceil(len / 8), ' '), byt, 'utf8');
-          } else if (Buffer.isBuffer(mfl.value)) {
-            mfl.value.copy(raw, byt);
+          } else if ((typeof mfl.value.type !== 'undefined') && (mfl.value.type == 'Buffer')) {
+
+console.log(typeof mfl.value.data, Array.isArray(mfl.value.data), Buffer.isBuffer(mfl.value.data))
+
+            mfl.value.data.copy(raw, byt);
           }
         } else if (fld.type == 'str') {
           raw.writeUInt8(Math.ceil((len - 2) / 8), byt);

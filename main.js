@@ -423,7 +423,7 @@ ipcMain.on('prog-start', (e, args) => {
       console.log(byt)
     })
     .then(() => bootReboot(eng, ins, progMessage))
-    .then(() => bootErase(eng, ins, byt, progMessage))
+    // .then(() => bootErase(eng, ins, byt, progMessage))
     .then(() => bootProgram(eng, ins, dat, progMessage))
     .then(() => bootFinish(eng, ins, progMessage))
     .then(() => {
@@ -506,8 +506,12 @@ function bootProgram(eng, ins, dat, func) {
     while (len > 0)
     {
       let out = Buffer.alloc(Math.min(len, 128));
-      dat.copy(out, 0, blk * 128, (blk * 128) + Math.min(len, 128) - 1);
-      len -= Math.min(len, 128);
+      let cnt = Math.min(len, 128);
+      dat.copy(out, 0, blk * 128, (blk * 128) + cnt - 1);
+      len -= cnt;
+
+console.log(out);
+
       let ret = eng.send130981(0x08, ins, 0xF0, out);
       if (ret) {
         sleep(1000);
