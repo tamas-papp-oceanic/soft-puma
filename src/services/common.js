@@ -158,7 +158,11 @@ function calcLength(typ, val) {
     } else if (typ.startsWith('chr(')) {
       let tmp = typ.replace('chr(', '').replace(')', '');
       if (tmp != 'x') {
-        len = parseInt(tmp) * 8;
+        if (typeof val !== 'undefined') {
+          len = val * 8;
+        } else {
+          len = parseInt(tmp) * 8;
+        }
       } else {
         len = (val + 1) * 8;
       }

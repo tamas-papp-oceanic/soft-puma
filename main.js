@@ -231,7 +231,10 @@ function proc(dev, frm) {
                 case 0xEC:
                   pub.emit('flag-ack', msg);
                   break;
-                }
+                case 0xF0:
+                  pub.emit('prog-ack', msg);
+                  break;
+              }
               break;
           }
         }
@@ -411,11 +414,17 @@ ipcMain.on('prog-start', (e, args) => {
     //   reject(new Error('Re-boot to bootloader Failed'));
     // }
     let byt = 0;
+    let dat;
     Promise.resolve()
     .then(() => downProg(mod, progMessage))
-    .then((res) => { byt = res.length; console.log(byt) })
+    .then((res) => {
+      byt = res.length;
+      dat = Buffer.from(res);
+      console.log(byt)
+    })
     .then(() => bootReboot(eng, ins, progMessage))
     .then(() => bootErase(eng, ins, byt, progMessage))
+    .then(() => bootProgram(eng, ins, dat, progMessage))
     .then(() => bootFinish(eng, ins, progMessage))
     .then(() => {
         if ((mainWindow != null) && (typeof mainWindow.webContents !== 'undefined')) {
@@ -461,15 +470,16 @@ let btimer = null;
 function bootErase(eng, ins, len,  func) {
   return new Promise((resolve, reject) => {
     // Erasing program area...
-    let ret = eng.send130981(0x08, ins, 0xEB, len);
+    let dat = Buffer.alloc(4);
+    dat.writeUInt32LE(len);
+    let ret = eng.send130981(0x08, ins, 0xEB, dat);
     if (ret) {
-      func('Erasing program area......\n');
+      func('Erasing program area...\n');
       btimer = setTimeout(() => {
         btimer = null;
         reject(new Error('Erasing program area failed!'));
       }, 5000);
       pub.once('erase-ack', (args) => {
-        console.log("ACK", args);
         clearTimeout(btimer);
         btimer = null;
         let msg = 'Program area successfuly erased.';
@@ -483,16 +493,56 @@ function bootErase(eng, ins, len,  func) {
   });
 }
 
+function bootProgram(eng, ins, dat, func) {
+  return new Promise((resolve, reject) => {
+    // Uploading program...
+    let blk = 0;
+    let len = dat.length;
+    func('Uploading program...\n');
+    btimer = setTimeout(() => {
+      btimer = null;
+      reject(new Error('Uploading program failed!'));
+    }, ((len / 128) + 1) * 1000);
+    while (len > 0)
+    {
+      let out = Buffer.alloc(Math.min(len, 128));
+      dat.copy(out, 0, blk * 128, (blk * 128) + Math.min(len, 128) - 1);
+      len -= Math.min(len, 128);
+      let ret = eng.send130981(0x08, ins, 0xF0, out);
+      if (ret) {
+        sleep(1000);
+        blk++;
+      } else {
+        clearTimeout(btimer);
+        btimer = null;
+        reject(new Error('Uploading program failed!'));
+        return;
+      }
+    }
+    pub.once('prog-ack', (args) => {
+      clearTimeout(btimer);
+      btimer = null;
+      let msg = 'Program successfuly uploaded.';
+      log.info(msg);
+      func(msg + '\n');
+      resolve(true);
+    });
+  });
+}
+
 function bootFinish(eng, ins, func) {
   return new Promise((resolve, reject) => {
     // Erasing boot flag...
     let ret = eng.send130981(0x08, ins, 0xEC, 0xFFFFFF);
     if (ret) {
       func('Erasing boot flag...\n');
-      pub.on('flag-ack', (args) => {
-        console.log("ACK", args);
-      });
-      sleep(5000).then(() => {
+      btimer = setTimeout(() => {
+        btimer = null;
+        reject(new Error('Erasing boot flag failed!'));
+      }, 5000);
+      pub.once('flag-ack', (args) => {
+        clearTimeout(btimer);
+        btimer = null;
         let msg = 'Boot flag successfuly erased.';
         log.info(msg);
         func(msg + '\n');

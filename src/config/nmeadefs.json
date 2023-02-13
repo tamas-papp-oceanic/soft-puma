@@ -16664,7 +16664,7 @@
       {
         "field": 7,
         "title": "Content",
-        "type": "bit(32)",
+        "type": "chr(128)",
         "unit": null,
         "multiplier": null,
         "reserved": null
