@@ -85,10 +85,8 @@ function encode(msg) {
           if (typeof mfl.value === 'string') {
             raw.write(mfl.value.padEnd(Math.ceil(len / 8), ' '), byt, 'utf8');
           } else if ((typeof mfl.value.type !== 'undefined') && (mfl.value.type == 'Buffer')) {
-
-console.log(typeof mfl.value.data, Array.isArray(mfl.value.data), Buffer.isBuffer(mfl.value.data))
-
-            mfl.value.data.copy(raw, byt);
+            let buf = Buffer.from(mfl.value.data);
+            buf.copy(raw, byt);
           }
         } else if (fld.type == 'str') {
           raw.writeUInt8(Math.ceil((len - 2) / 8), byt);

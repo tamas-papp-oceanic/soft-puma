@@ -225,6 +225,9 @@ function proc(dev, frm) {
           switch (msg.fields[3].value) {
             case 8:
               switch (msg.fields[5].value) {
+                case 0xC2:
+                  pub.emit('crc-ack', msg);
+                  break;
                 case 0xEB:
                   pub.emit('erase-ack', msg);
                   break;
@@ -234,7 +237,7 @@ function proc(dev, frm) {
                 case 0xF0:
                   pub.emit('prog-ack', msg);
                   break;
-              }
+                }
               break;
           }
         }
@@ -423,8 +426,9 @@ ipcMain.on('prog-start', (e, args) => {
       console.log(byt)
     })
     .then(() => bootReboot(eng, ins, progMessage))
-    // .then(() => bootErase(eng, ins, byt, progMessage))
+    .then(() => bootErase(eng, ins, byt, progMessage))
     .then(() => bootProgram(eng, ins, dat, progMessage))
+    .then(() => bootCRC(eng, ins, progMessage))
     .then(() => bootFinish(eng, ins, progMessage))
     .then(() => {
         if ((mainWindow != null) && (typeof mainWindow.webContents !== 'undefined')) {
@@ -467,7 +471,7 @@ function bootReboot(eng, ins, func) {
 
 let btimer = null;
 
-function bootErase(eng, ins, len,  func) {
+function bootErase(eng, ins, len, func) {
   return new Promise((resolve, reject) => {
     // Erasing program area...
     let dat = Buffer.alloc(4);
@@ -493,51 +497,85 @@ function bootErase(eng, ins, len,  func) {
   });
 }
 
-function bootProgram(eng, ins, dat, func) {
+async function blockWrite(eng, ins, out, func) {
   return new Promise((resolve, reject) => {
-    // Uploading program...
-    let blk = 0;
-    let len = dat.length;
-    func('Uploading program...\n');
     btimer = setTimeout(() => {
       btimer = null;
-      reject(new Error('Uploading program failed!'));
-    }, ((len / 128) + 1) * 1000);
-    while (len > 0)
-    {
-      let out = Buffer.alloc(Math.min(len, 128));
-      let cnt = Math.min(len, 128);
-      dat.copy(out, 0, blk * 128, (blk * 128) + cnt - 1);
-      len -= cnt;
-
-console.log(out);
-
-      let ret = eng.send130981(0x08, ins, 0xF0, out);
-      if (ret) {
-        sleep(1000);
-        blk++;
-      } else {
-        clearTimeout(btimer);
-        btimer = null;
-        reject(new Error('Uploading program failed!'));
-        return;
-      }
+      reject(new Error('Uploading block failed!'));
+    }, 1000);
+    let ret = eng.send130981(0x08, ins, 0xF0, out);
+    if (!ret) {
+      clearTimeout(btimer);
+      btimer = null;
+      reject(new Error('Uploading block failed!'));
     }
     pub.once('prog-ack', (args) => {
       clearTimeout(btimer);
       btimer = null;
-      let msg = 'Program successfuly uploaded.';
-      log.info(msg);
-      func(msg + '\n');
+      // let msg = 'Block successfuly uploaded.';
+      // log.info(msg);
+      // func(msg + '\n');
       resolve(true);
     });
+  });
+}
+
+async function bootProgram(eng, ins, dat, func) {
+  // Uploading program...
+  func('Uploading program...\n');
+  let blk = 0;
+  let len = dat.length;
+  let prc = 0;
+  func('[');
+  while (len > 0) {
+    let cnt = Math.min(len, 128);
+    let out = Buffer.alloc(cnt);
+    dat.copy(out, 0, blk * 128, (blk * 128) + cnt - 1);
+    await blockWrite(eng, ins, out, func);
+    len -= cnt;
+    blk++;
+    let tmp = (Math.round((blk * 128) / dat.length * 100 / 2));
+    if (tmp != prc) {
+      prc = tmp;
+      func('=');
+    }
+  }
+  func(']100%\n');
+  let msg = 'Program successfuly uploaded.';
+  log.info(msg);
+  func(msg + '\n');
+  return true;
+}
+
+function bootCRC(eng, ins, func) {
+  return new Promise((resolve, reject) => {
+    // Request for CRC...
+    let ret = eng.send065445(0x08, ins, 0xFF, 0xFFC201);
+    if (ret) {
+      func('Requesting CRC...\n');
+      btimer = setTimeout(() => {
+        btimer = null;
+        reject(new Error('Requesting CRC failed!'));
+      }, 5000);
+      pub.once('crc-ack', (args) => {
+        clearTimeout(btimer);
+        btimer = null;
+        let msg = 'CRC successfuly requested.';
+        log.info(msg);
+        func(msg + '\n');
+        resolve(true);
+      });
+    } else {
+      reject(new Error('Requesting CRC failed!'));
+    }
   });
 }
 
 function bootFinish(eng, ins, func) {
   return new Promise((resolve, reject) => {
     // Erasing boot flag...
-    let ret = eng.send130981(0x08, ins, 0xEC, 0xFFFFFF);
+    let dat = Buffer.alloc(4, 0xFF);
+    let ret = eng.send130981(0x08, ins, 0xEC, dat);
     if (ret) {
       func('Erasing boot flag...\n');
       btimer = setTimeout(() => {
