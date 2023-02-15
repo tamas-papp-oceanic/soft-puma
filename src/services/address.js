@@ -223,12 +223,11 @@ class Address {
     if (typeof this.#timers[nam] !== 'undefined') {
       clearTimeout(this.#timers[nam]);
       delete this.#timers[nam];
-    } else {
-      this.#timers[nam] = setTimeout((key, src) => {
-        this.send059904(126996, src);
-        delete this.#timers[key];
-      }, 2000, nam, msg.header.src);
     }
+    this.#timers[nam] = setTimeout((key, src) => {
+      this.send059904(126996, src);
+      delete this.#timers[key];
+    }, 2000, nam, msg.header.src);
     switch (this.#asm.currentState.name) {
       case 'WaitForContention':
       case 'Valid':
@@ -252,7 +251,6 @@ class Address {
     }
     return;
   };
-
   // Sends ISO Address Claim message
   send060928() {
     if (this.#send != null) {

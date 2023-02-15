@@ -1,7 +1,7 @@
 <script>
   import { Row, Grid, Column, Tabs, Tab, TabContent } from "carbon-components-svelte";
   import { push } from 'svelte-spa-router'
-  import { findModel, getInstances, selected } from '../../stores/data.js'
+  import { findModel, selected } from '../../stores/data.js'
   import { checkAccess } from '../../auth/auth'
   import { getname } from '../../stores/common.js'
 
@@ -18,7 +18,7 @@
   };
 
   function select(e, grp, dev) {
-  $selected.device = dev;
+    $selected.device = dev;
     let ins = '0';
     let pro = findModel(dev);
     if ((pro !== null) && (Array.isArray(pro)) && (pro.length > 0)) {

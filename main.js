@@ -17,6 +17,7 @@ const prt = 'HP-LaserJet-Pro-M404-M405';
 const { writeBoot, downProg } = require('./src/services/program.js')
 const { readFile, writeFile } = require('./src/services/volume.js');
 const EventEmitter = require('node:events');
+const crc32 = require('buffer-crc32');
 
 const pub = new EventEmitter();
 
@@ -190,6 +191,7 @@ async function discover() {
     log.error(err);
   });
 }
+
 // NMEA processing
 function proc(dev, frm) {
   if ((mainWindow != null) && (typeof mainWindow.webContents !== 'undefined')) {
@@ -207,9 +209,16 @@ function proc(dev, frm) {
         break;
       case 65446:
         if ((msg.fields[0].value == manu) && (msg.fields[2].value == indu)) {
-          switch (msg.fields[3].value) {
-            case 8:
-              mainWindow.webContents.send('n2k-ac-data', [dev, msg]);
+          switch (msg.fields[5].value) {
+            case 0xB0:
+              pub.emit('reboot-ack', msg);
+              break;
+            default:
+              switch (msg.fields[3].value) {
+                case 8:
+                  mainWindow.webContents.send('n2k-ac-data', [dev, msg]);
+                  break;
+              }
               break;
           }
         }
@@ -222,24 +231,21 @@ function proc(dev, frm) {
         break;
       case 130982:
         if ((msg.fields[0].value == manu) && (msg.fields[2].value == indu)) {
-          switch (msg.fields[3].value) {
-            case 8:
-              switch (msg.fields[5].value) {
-                case 0xC2:
-                  pub.emit('crc-ack', msg);
-                  break;
-                case 0xEB:
-                  pub.emit('erase-ack', msg);
-                  break;
-                case 0xEC:
-                  pub.emit('flag-ack', msg);
-                  break;
-                case 0xF0:
-                  pub.emit('prog-ack', msg);
-                  break;
-                }
+          switch (msg.fields[5].value) {
+            case 0xC2:
+              pub.emit('crc-ack', msg);
               break;
-          }
+            case 0xEB:
+              pub.emit('erase-ack', msg);
+              break;
+            case 0xEC:
+              pub.emit('flag-ack', msg);
+              break;
+            case 0xF0:
+              pub.emit('prog-ack', msg);
+              break;
+            }
+          break;
         }
         break;
       default:
@@ -249,14 +255,17 @@ function proc(dev, frm) {
     }
   }
 }
+
 // Initialize NMEA translator
 com.init();
+
 // Start discovery loop
 log.info('Discovering interfaces...')
 discover();
 timer = setInterval(() => {
   discover();
 }, 10000);
+
 // Load configurations
 ipcMain.on('n2k-ready', (e, ...args) => {
   if ((mainWindow != null) && (typeof mainWindow.webContents !== 'undefined')) {
@@ -271,6 +280,7 @@ ipcMain.on('n2k-ready', (e, ...args) => {
     }
   }
 });
+
 // Processing outgoing message
 ipcMain.on('n2k-data', (e, ...args) => {
   let dev = devices[args[0]];
@@ -278,6 +288,8 @@ ipcMain.on('n2k-data', (e, ...args) => {
     dev.engine.sendMsg(args[1]);
   }
 });
+
+// Processing bus scan request
 ipcMain.on('bus-scan', (e) => {
   if ((mainWindow != null) && (typeof mainWindow.webContents !== 'undefined')) {
     mainWindow.webContents.send('n2k-clear');
@@ -287,6 +299,7 @@ ipcMain.on('bus-scan', (e) => {
     val.engine.send059904(60928, 0xFF);
   }
 });
+
 ipcMain.on('ser-num', (e, args) => {
   const [serial] = args;
   for (const [key, val] of Object.entries(devices)) {
@@ -294,6 +307,7 @@ ipcMain.on('ser-num', (e, args) => {
     val.engine.send065280(serial);
   }
 });
+
 ipcMain.on('test-data', (e, args) => {
   const [code, param] = args;
   for (const [key, val] of Object.entries(devices)) {
@@ -301,6 +315,7 @@ ipcMain.on('test-data', (e, args) => {
     val.engine.send065477(code, param);
   }
 });
+
 ipcMain.on('bar-code', (e, args) => {
   const [code] = args;
   let fil = path.join(__dirname, 'barcode.pdf');
@@ -401,21 +416,9 @@ function sleep(ms) {
 
 // Start device programing
 ipcMain.on('prog-start', (e, args) => {
-  const [dev, mod, ins] = args;
+  const [dev, mod, typ, ins] = args;
   if ((typeof dev === 'string') && (typeof devices[dev] !== 'undefined')) {
     let eng = devices[dev].engine;
-    // downProg([devices[dev].engine, mod, ins], progMessage).then((res) => {
-      // // Re-booting to bootloader...
-    // let ret = eng.send065445(0x08, ins, 0xAA, 0xFFFFFF);
-    // if (!ret) {
-    //   reject(new Error('Re-boot to bootloader Failed'));
-    // }
-    // func('Bootloader successfuly re-booted');
-    // // Erasing program area
-    // ret = eng.send130981(0x08, ins, 0xAA, 0xFFFFFF);
-    // if (!ret) {
-    //   reject(new Error('Re-boot to bootloader Failed'));
-    // }
     let byt = 0;
     let dat;
     Promise.resolve()
@@ -425,11 +428,12 @@ ipcMain.on('prog-start', (e, args) => {
       dat = Buffer.from(res);
       console.log(byt)
     })
-    .then(() => bootReboot(eng, ins, progMessage))
-    .then(() => bootErase(eng, ins, byt, progMessage))
-    .then(() => bootProgram(eng, ins, dat, progMessage))
-    .then(() => bootCRC(eng, ins, progMessage))
-    .then(() => bootFinish(eng, ins, progMessage))
+    .then(() => bootToLoader(eng, typ, ins, progMessage))
+    .then(() => bootErase(eng, typ, ins, byt, progMessage))
+    .then(() => bootProgram(eng, typ, ins, dat, progMessage))
+    .then(() => bootCRC(eng, typ, ins, dat, progMessage))
+    .then(() => bootFlag(eng, typ, ins, progMessage))
+    .then(() => bootToProgram(eng, typ, ins, progMessage))
     .then(() => {
         if ((mainWindow != null) && (typeof mainWindow.webContents !== 'undefined')) {
         mainWindow.webContents.send('prog-done');
@@ -451,17 +455,30 @@ function progMessage(msg) {
   }
 }
 
-function bootReboot(eng, ins, func) {
+let btimer = null;
+
+function bootToLoader(eng, typ, ins, func) {
   return new Promise((resolve, reject) => {
     // Re-booting to bootloader...
-    let ret = eng.send065445(0x08, ins, 0xAA, 0xFFFFFF);
+    let ret = eng.send065445(typ, ins, 0xAA, 0xFFFFFF);
     if (ret) {
       func('Waiting for re-boot...\n');
-      sleep(5000).then(() => {
-        let msg = 'Bootloader successfuly re-booted.';
-        log.info(msg);
-        func(msg + '\n');
-        resolve(true);
+      btimer = setTimeout(() => {
+        btimer = null;
+        reject(new Error('Re-boot to bootloader failed!'));
+      }, 5000);
+      pub.once('reboot-ack', (res) => {
+        clearTimeout(btimer);
+        btimer = null;
+        if ((typeof res.fields !== 'undefined') && Array.isArray(res.fields) &&
+          (res.fields[3].value == 0xFF)) {
+          let msg = 'Successfuly re-booted to Bootloader.';
+          log.info(msg);
+          func(msg + '\n');
+          resolve(true);
+        } else {
+          reject(new Error('Re-boot to bootloader failed!'));
+        }
       });
     } else {
       reject(new Error('Re-boot to bootloader failed!'));
@@ -469,27 +486,30 @@ function bootReboot(eng, ins, func) {
   });
 }
 
-let btimer = null;
-
-function bootErase(eng, ins, len, func) {
+function bootErase(eng, typ, ins, len, func) {
   return new Promise((resolve, reject) => {
     // Erasing program area...
     let dat = Buffer.alloc(4);
     dat.writeUInt32LE(len);
-    let ret = eng.send130981(0x08, ins, 0xEB, dat);
+    let ret = eng.send130981(typ, ins, 0xEB, dat);
     if (ret) {
       func('Erasing program area...\n');
       btimer = setTimeout(() => {
         btimer = null;
         reject(new Error('Erasing program area failed!'));
       }, 5000);
-      pub.once('erase-ack', (args) => {
+      pub.once('erase-ack', (res) => {
         clearTimeout(btimer);
         btimer = null;
-        let msg = 'Program area successfuly erased.';
-        log.info(msg);
-        func(msg + '\n');
-        resolve(true);
+        if ((typeof res.fields !== 'undefined') && Array.isArray(res.fields) &&
+          (res.fields[3].value == typ)) {
+          let msg = 'Program area successfuly erased.';
+          log.info(msg);
+          func(msg + '\n');
+          resolve(true);
+        } else {
+          reject(new Error('Erasing program area failed!'));
+        }
       });
     } else {
       reject(new Error('Erasing program area failed!'));
@@ -497,30 +517,32 @@ function bootErase(eng, ins, len, func) {
   });
 }
 
-async function blockWrite(eng, ins, out, func) {
+async function blockWrite(eng, typ, ins, out, func) {
   return new Promise((resolve, reject) => {
     btimer = setTimeout(() => {
       btimer = null;
       reject(new Error('Uploading block failed!'));
     }, 1000);
-    let ret = eng.send130981(0x08, ins, 0xF0, out);
+    let ret = eng.send130981(typ, ins, 0xF0, out);
     if (!ret) {
       clearTimeout(btimer);
       btimer = null;
       reject(new Error('Uploading block failed!'));
     }
-    pub.once('prog-ack', (args) => {
+    pub.once('prog-ack', (res) => {
       clearTimeout(btimer);
       btimer = null;
-      // let msg = 'Block successfuly uploaded.';
-      // log.info(msg);
-      // func(msg + '\n');
-      resolve(true);
+      if ((typeof res.fields !== 'undefined') && Array.isArray(res.fields) &&
+        (res.fields[3].value == typ)) {
+        resolve(true);
+      } else {
+        reject(new Error('Uploading block failed!'));
+      }
     });
   });
 }
 
-async function bootProgram(eng, ins, dat, func) {
+async function bootProgram(eng, typ, ins, dat, func) {
   // Uploading program...
   func('Uploading program...\n');
   let blk = 0;
@@ -529,9 +551,10 @@ async function bootProgram(eng, ins, dat, func) {
   func('[');
   while (len > 0) {
     let cnt = Math.min(len, 128);
-    let out = Buffer.alloc(cnt);
-    dat.copy(out, 0, blk * 128, (blk * 128) + cnt - 1);
-    await blockWrite(eng, ins, out, func);
+    let out = Buffer.alloc(cnt + 2);
+    out.writeUInt16LE(blk);
+    dat.copy(out, 2, blk * 128, (blk * 128) + cnt);
+    await blockWrite(eng, typ, ins, out, func);
     len -= cnt;
     blk++;
     let tmp = (Math.round((blk * 128) / dat.length * 100 / 2));
@@ -547,23 +570,41 @@ async function bootProgram(eng, ins, dat, func) {
   return true;
 }
 
-function bootCRC(eng, ins, func) {
+function bootCRC(eng, typ, ins, dat, func) {
   return new Promise((resolve, reject) => {
     // Request for CRC...
-    let ret = eng.send065445(0x08, ins, 0xFF, 0xFFC201);
+    let ret = eng.send065445(typ, ins, 0xFF, 0xFFC201);
     if (ret) {
       func('Requesting CRC...\n');
       btimer = setTimeout(() => {
         btimer = null;
         reject(new Error('Requesting CRC failed!'));
       }, 5000);
-      pub.once('crc-ack', (args) => {
+      pub.once('crc-ack', (res) => {
         clearTimeout(btimer);
         btimer = null;
-        let msg = 'CRC successfuly requested.';
-        log.info(msg);
-        func(msg + '\n');
-        resolve(true);
+        if ((typeof res.fields !== 'undefined') && Array.isArray(res.fields) &&
+          (res.fields[3].value == typ)) {
+          let msg = 'CRC successfuly requested.';
+          log.info(msg);
+          func(msg + '\n');
+          let dev = Buffer.alloc(4);
+          dev.writeUInt32BE(res.fields[6].value);
+          let crc = crc32(dat);
+          msg = 'Comparing CRCs...';
+          log.info(msg);
+          func(msg + '\n');
+          if (dev.compare(crc) == 0) {
+            msg = 'CRCs are equal.';
+            log.info(msg);
+            func(msg + '\n');
+            resolve(true);
+          } else {
+            reject(new Error('Comparing CRCs failed!'));
+          }
+        } else {
+          reject(new Error('Requesting CRC failed!'));
+        }
       });
     } else {
       reject(new Error('Requesting CRC failed!'));
@@ -571,27 +612,47 @@ function bootCRC(eng, ins, func) {
   });
 }
 
-function bootFinish(eng, ins, func) {
+function bootFlag(eng, typ, ins, func) {
   return new Promise((resolve, reject) => {
     // Erasing boot flag...
     let dat = Buffer.alloc(4, 0xFF);
-    let ret = eng.send130981(0x08, ins, 0xEC, dat);
+    let ret = eng.send130981(typ, ins, 0xEC, dat);
     if (ret) {
       func('Erasing boot flag...\n');
       btimer = setTimeout(() => {
         btimer = null;
         reject(new Error('Erasing boot flag failed!'));
       }, 5000);
-      pub.once('flag-ack', (args) => {
+      pub.once('flag-ack', (res) => {
         clearTimeout(btimer);
         btimer = null;
-        let msg = 'Boot flag successfuly erased.';
-        log.info(msg);
-        func(msg + '\n');
-        resolve(true);
+        if ((typeof res.fields !== 'undefined') && Array.isArray(res.fields) &&
+          (res.fields[3].value == typ)) {
+          let msg = 'Boot flag successfuly erased.';
+          log.info(msg);
+          func(msg + '\n');
+          resolve(true);
+        } else {
+          reject(new Error('Erasing boot flag failed!'));
+        }
       });
     } else {
       reject(new Error('Erasing boot flag failed!'));
+    }
+  });
+}
+
+function bootToProgram(eng, typ, ins, func) {
+  return new Promise((resolve, reject) => {
+    // Re-booting to Program...
+    let ret = eng.send065445(typ, ins, 0xAA, 0xFFFFFF);
+    if (ret) {
+      let msg = 'Successfuly re-booted to Program.';
+      log.info(msg);
+      func(msg + '\n');
+      resolve(true);
+    } else {
+      reject(new Error('Re-boot to bootloader failed!'));
     }
   });
 }

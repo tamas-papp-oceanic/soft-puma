@@ -74,7 +74,13 @@
       stop('prog');
       running = false;
     });
-    window.pumaAPI.send('prog-start', [iface, model, instance]);
+    let dtype = 0x00;
+    switch (model) {
+      case '3420':
+        dtype = 0x08;
+        break;
+    }
+    window.pumaAPI.send('prog-start', [iface, model, dtype, instance]);
   };
 
   function cancel(e) {
