@@ -58,6 +58,7 @@
       <HeaderNavItem class="{routeParsed === '/simulate' ? 'active' : ''}" on:click={() => push('/simulate')} text="Simulate" />
       <HeaderNavItem class="{routeParsed === '/program' ? 'active' : ''}"disabled on:click={() => push('/program')} text="Program" />
       <HeaderNavItem class="{routeParsed === '/configure' ? 'active' : ''}" on:click={() => push('/configure')} text="Configure" />
+      <HeaderNavItem class="{routeParsed === '/testing' ? 'active' : ''}" on:click={() => push('/testing')} text="Testing" />
     </HeaderNav>
     <HeaderUtilities>
       {#if $update}

@@ -8,13 +8,13 @@
   let tab;
   let dev;
   let devs = {
-    'senders': ['3420'],
+    'senders': ['3478', '4410'],
     'adaptors': new Array(),
     'displays': new Array(),
   };
 
   function change(e) {
-    $selected.program = e.detail;
+    $selected.test = e.detail;
   };
 
   function select(e, grp, dev) {
@@ -24,11 +24,16 @@
     if ((pro !== null) && (Array.isArray(pro)) && (pro.length > 0)) {
       ins = pro[0].name.deviceInstance.toString();
     }
-    push('/program/' + dev + (grp != 'displays' ? '/' + ins : ''));
+    push('/testing/' + dev + (grp != 'displays' ? '/' + ins : ''));
   };
 
-  $: tab = $selected.program;
+  $: tab = $selected.test;
   $: dev = $selected.device;
+  $: if (checkAccess('test', 'write')) {
+    devs['displays'] = ['5185',  '5185-H'];
+  } else {
+    devs['displays'] = new Array();
+  }
 </script>
 
 <Grid>

@@ -18,7 +18,10 @@
 	import ConfigureFluid from './routes/configure/fluid.svelte';
 	import Program from './routes/program/Index.svelte';
 	import Program3420 from './routes/program/3420.svelte';
-	import Program5185 from './routes/program/5185.svelte';
+	import Testing from './routes/testing/Index.svelte';
+	import Test3478 from './routes/testing/3478.svelte';
+	import Test4410 from './routes/testing/4410.svelte';
+	import Test5185 from './routes/testing/5185.svelte';
 	import { loggedIn } from './stores/user.js';
   import { update, updmsg, download, progress } from './stores/update.js';
 
@@ -40,12 +43,16 @@
 		"/simulate": Simulate,
 		"/program": Program,
 		"/program/3420/:instance": Program3420,
-		"/program/5185": Program5185,
-		"/program/5185-H": Program5185,
+		"/testing": Testing,
+    "/testing/3478/:instance": Test3478,
+		"/testing/4410/:instance": Test4410,
+		"/testing/5185": Test5185,
+    "/testing/5185-H": Test5185,
 		"/configure": Configure,
 		"/configure/3271/:instance/:fluid": ConfigureFluid,
 		"/configure/3281/:instance/:fluid": ConfigureFluid,
 		"/configure/3420/:instance": Configure3420,
+		"/configure/3125/:instance/:fluid": ConfigureFluid,
 		"/configure/4291/:instance/:fluid": ConfigureFluid,
 		"/Welcome": wrap({
 			component: Welcome,

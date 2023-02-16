@@ -8,7 +8,7 @@
   let dev;
   let devs = {
     'senders': ['3271', '3281', '3420'],
-    'adaptors': ['4291'],
+    'adaptors': ['3125', '4291'],
     'displays': new Array(),
   };
 
@@ -23,7 +23,7 @@
     if ((pro !== null) && (Array.isArray(pro)) && (pro.length > 0)) {
       ins = pro[0].name.deviceInstance.toString();
     }
-    push('/configure/' + dev + '/' + ins + ((grp != 'displays') && ((dev.includes('3271') || dev.includes('3281') || dev.includes('4291')) ? '/0' : '')));
+    push('/configure/' + dev + '/' + ins + ((grp != 'displays') && ((dev.includes('3125') || dev.includes('3271') || dev.includes('3281') || dev.includes('4291')) ? '/0' : '')));
   };
 
   $: tab = $selected.config;

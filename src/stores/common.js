@@ -3,8 +3,11 @@ const devnames = {
     '3271': 'Volumetric Fuel Sender',
     '3281': 'Water Level Sender',
     '3420': 'AC Monitor',
+    '3478': '8 Channel Relay Output Module',
+    '4410': '16 Channel Switch Input Module',
   },
   'adaptors': {
+    '3125': 'Tank Sender Adaptor',
     '4291': 'Tank Level Adaptor',
   },
   'displays': {
