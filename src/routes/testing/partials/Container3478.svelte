@@ -1,7 +1,7 @@
 <script>
   import { createEventDispatcher } from "svelte";
   import { ButtonSet, Button, Tile, Grid, Row, Column, Dropdown,
-    ImageLoader} from "carbon-components-svelte";
+    ImageLoader, Toggle, DataTable} from "carbon-components-svelte";
   import ButtonOff from "carbon-icons-svelte/lib/RadioButton20";
   import ButtonOn from "carbon-icons-svelte/lib/RadioButtonChecked20";
   import { isAlive } from '../../../stores/data.js';
@@ -14,6 +14,9 @@
   let insts = new Array();
   let banks = new Array();
   let alive = false;
+  let header = new Array();
+  let rows = new Array();
+
 
   function select(e) {
     if (alive) {
@@ -37,7 +40,18 @@
 
   for (let i = 0; i < 8; i++) {
     banks.push(false);
+    header.push({ key: i.toString(), value: (i + 1).toString() });
   }
+
+  for (let j of ['a', 'b']) {
+    let row = { id: j };
+    for (let i = 0; i < 8; i++) {
+      row[i.toString()] = i.toString();
+    }
+    rows.push(row);
+  }
+
+  console.log(rows)
 
   // Data getters / setters
   $: alive = isAlive(parseInt(data.source));
@@ -60,14 +74,31 @@
           </Column>
           <Column sm={1} md={1} lg={1} padding>
           </Column>
-          <Column sm={1} md={3} lg={6} padding>
+          <Column sm={1} md={4} lg={6} padding>
             <Row padding>
-              <Column>Statuses</Column>
+              <Column>Channels</Column>
             </Row>
             <Row padding>
-              <Grid noGutter>
+              <DataTable useStaticWidth size="tall" headers={header} rows={rows}>
+                <svelte:fragment slot="cell" let:row let:cell>
+                  {#if row.id === "a"}
+                    <ImageLoader src="/images/circle-red.png" style="width: 50%;" />
+                  {:else}
+                    <Toggle labelText={cell.key} hideLabel />
+                    <!-- <Button icon={banks[cell.key] ? ButtonOn : ButtonOff} on:click={(e) => button(e, cell.key)}></Button> -->
+                  {/if}
+                </svelte:fragment>
+              </DataTable>
+              <!-- <Grid noGutter>
                 <Row padding>
-                  {#each banks as _, idx}
+                  {#each banks as bank, idx}
+                    <Column>
+                      {idx}
+                      <ImageLoader src="/images/circle-red.png" style="width: 60%; padding: 10%;"/>
+                      <Button icon={bank ? ButtonOn : ButtonOff} on:click={(e) => button(e, idx)}>{bank ? 'OFF' : 'ON'}</Button>
+                    </Column>
+                    {/each} -->
+                  <!-- {#each banks as _, idx}
                     <Column>
                       {idx}
                     </Column>
@@ -83,15 +114,11 @@
                 <Row padding>
                   {#each banks as bank, idx}
                     <Column>
-                      {#if bank}
-                        <Button icon={ButtonOn} iconDescripiton="" on:click={(e) => button(e, idx)} />
-                      {:else}
-                        <Button icon={ButtonOff} on:click={(e) => button(e, idx)} />
-                      {/if}
+                      <Button icon={bank ? ButtonOn : ButtonOff} on:click={(e) => button(e, idx)}>{bank ? 'OFF' : 'ON'}</Button>
                     </Column>
-                  {/each}
-                </Row>
-              </Grid>
+                  {/each} -->
+                <!-- </Row>
+              </Grid> -->
             </Row>
           </Column>
           <Column sm={1} md={1} lg={1} padding>
@@ -105,7 +132,7 @@
   </ButtonSet>
 </div>
 
-<style>
+<style global>
   .container {
     display: flex;
     flex-flow: column nowrap;
@@ -116,5 +143,27 @@
   .container .tilecont {
     width: 100%;
     height: 100%;
+  }
+  /* .bx--col {
+    display: flex;
+    flex-flow: column nowrap;
+    justify-content: center;
+    align-items: center;
+  }
+  .bx--col img {
+    width: 80%;
+  } */
+  .bx--data-table--static th {
+    text-align: center;
+    vertical-align: middle;
+  }
+  .bx--data-table--static tr, .bx--data-table--static th {
+    border: none;
+  }
+  .bx--data-table--static td {
+    text-align: center;
+    vertical-align: middle;
+    padding: 0 1.2rem;
+    border: none;
   }
 </style>
