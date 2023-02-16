@@ -1,7 +1,7 @@
 <script>
   import { push } from 'svelte-spa-router'
   import { Row, Grid, Column, Tabs, Tab, TabContent } from "carbon-components-svelte";
-  import { getInstances, selected } from '../../stores/data.js'
+  import { findModel, selected } from '../../stores/data.js'
   import { getname } from '../../stores/common.js'
 
   let tab;
@@ -16,14 +16,14 @@
     $selected.config = e.detail;
   };
 
-  function select(e, dev) {
+  function select(e, grp, dev) {
     $selected.device = dev;
     let ins = '0';
-    let ina = getInstances(dev);
-    if (ina.length > 0) {
-      ins = ina[0].id;
+    let pro = findModel(dev);
+    if ((pro !== null) && (Array.isArray(pro)) && (pro.length > 0)) {
+      ins = pro[0].name.deviceInstance.toString();
     }
-    push('/configure/' + dev + '/' + ins + (dev.includes('3271') || dev.includes('3281') || dev.includes('4291') ? '/0' : ''));
+    push('/configure/' + dev + '/' + ins + ((grp != 'displays') && ((dev.includes('3271') || dev.includes('3281') || dev.includes('4291')) ? '/0' : '')));
   };
 
   $: tab = $selected.config;
@@ -44,7 +44,7 @@
               <Row>
                 {#each devs[group] as device}
                   <Column sm={4} md={3} lg={4}>
-                    <div class="product-card" class:selected={dev == device} on:pointerdown={(e) => select(e, device)}>
+                    <div class="product-card" class:selected={dev == device} on:pointerdown={(e) => select(e, group, device)}>
                       <div class="product-number">{device}</div>
                       <div class="product-title">{getname(device)}</div>
                       <div class="product-image"><img src={'images/' + device + '.webp'} alt={device} /></div>
