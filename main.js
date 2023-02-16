@@ -591,16 +591,16 @@ function bootCRC(eng, typ, ins, dat, func) {
           let dev = Buffer.alloc(4);
           dev.writeUInt32BE(res.fields[6].value);
           let crc = crc32(dat);
-          msg = 'Comparing CRCs...';
+          msg = 'Calculating CRC...';
           log.info(msg);
           func(msg + '\n');
           if (dev.compare(crc) == 0) {
-            msg = 'CRCs are equal.';
+            msg = 'CRC is correct.';
             log.info(msg);
             func(msg + '\n');
             resolve(true);
           } else {
-            reject(new Error('Comparing CRCs failed!'));
+            reject(new Error('CRC isn\'t correct !'));
           }
         } else {
           reject(new Error('Requesting CRC failed!'));
