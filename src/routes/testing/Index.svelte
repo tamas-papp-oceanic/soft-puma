@@ -3,6 +3,7 @@
   import { push } from 'svelte-spa-router'
   import { findModel, selected } from '../../stores/data.js'
   import { checkAccess } from '../../auth/auth'
+  import { loggedIn } from '../../stores/user.js'
   import { getname } from '../../stores/common.js'
 
   let tab;
@@ -29,7 +30,7 @@
 
   $: tab = $selected.test;
   $: dev = $selected.device;
-  $: if (checkAccess('test', 'write')) {
+  $: if (checkAccess('test', 'write') && $loggedIn) {
     devs['displays'] = ['5185',  '5185-H'];
   } else {
     devs['displays'] = new Array();

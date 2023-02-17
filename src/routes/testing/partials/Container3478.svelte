@@ -116,35 +116,25 @@
   <Tile style="height: -webkit-fill-available;">
     <div class="tilecont">
       <Grid fullWidth noGutter>
-        <Row>
-          <Column sm={1} md={1} lg={1} padding>
+        <Row padding>
+          <Column sm={1} md={1} lg={1}>
           </Column>
-          <Column sm={1} md={1} lg={2} padding>
-            <Row padding>
-              <Column>
-                <Dropdown titleText="Relay instance" size="lg" bind:selectedId={data.instance} items={insts} on:select={(e) => select(e)}/>
-              </Column>
-            </Row>
+          <Column sm={1} md={1} lg={2}>
+            <Dropdown titleText="Relay instance" size="lg" bind:selectedId={data.instance} items={insts} on:select={(e) => select(e)}/>
           </Column>
-          <Column sm={1} md={1} lg={1} padding>
+          <Column sm={1} md={1} lg={1}>
           </Column>
-          <Column sm={1} md={4} lg={7} padding>
-            <Row>
-              <Column><Tile>Channels</Tile></Column>
-            </Row>
-            <Row padding>
-              <DataTable useStaticWidth size="tall" headers={header} rows={rows} class="relay">
-                <svelte:fragment slot="cell" let:row let:cell>
-                  {#if row.id === "a"}
-                    <img src={banks[cell.key].status == 0 ? redImage : banks[cell.key].status == 1 ? greenImage : banks[cell.key].status == 2 ? yellowImage : greyImage} alt style="width: 50%;" />
-                  {:else}
-                    <Toggle labelText={cell.key} hideLabel bind:toggled={banks[cell.key].command} on:toggle={(e) => toggle(e, cell.key)}/>
-                  {/if}
-                </svelte:fragment>
-              </DataTable>
-            </Row>
-          </Column>
-          <Column sm={1} md={1} lg={1} padding>
+          <Column sm={1} md={4} lg={8}>
+            <Tile>Channels</Tile>
+            <DataTable useStaticWidth size="tall" headers={header} rows={rows} class="relay">
+              <svelte:fragment slot="cell" let:row let:cell>
+                {#if row.id === "a"}
+                  <img src={banks[cell.key].status == 0 ? redImage : banks[cell.key].status == 1 ? greenImage : banks[cell.key].status == 2 ? yellowImage : greyImage} alt style="width: 2rem;" />
+                {:else}
+                  <Toggle labelText={cell.key} hideLabel bind:toggled={banks[cell.key].command} on:toggle={(e) => toggle(e, cell.key)}/>
+                {/if}
+              </svelte:fragment>
+            </DataTable>
           </Column>
         </Row>
       </Grid>

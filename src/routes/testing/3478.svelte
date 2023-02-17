@@ -21,7 +21,7 @@
 <Grid>
   <Row>
     <Column>
-      <h2>{model + ' ' + getname(model) + ' - Testing'}</h2>
+      <h2>{model + ' ' + getname(model) + ' - Test'}</h2>
       <Container3478 bind:data={data} style="height: 80vh;" on:cancel={cancel} />
     </Column>
   </Row>

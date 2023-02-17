@@ -1,14 +1,21 @@
 <script>
   import { createEventDispatcher } from "svelte";
-  import { ButtonSet, Button, Tile } from "carbon-components-svelte";
+  import { ButtonSet, Button, Tile, Grid, Row, Column, Dropdown } from "carbon-components-svelte";
   import { checkAccess } from "../../../auth/auth.js";
+  import { loggedIn } from "../../../stores/user.js";
+  import Download from "carbon-icons-svelte/lib/Download16";
 
+  export let data;
   export let message;
   export let style;
   export let running;
 
   const dispatch = createEventDispatcher();
   let access = false;
+  let insts = new Array();
+
+  function select(e) {
+  };
 
   function loader(e) {
     dispatch("loader", e);
@@ -22,8 +29,12 @@
     dispatch("cancel", e);
   };
 
+  for (let i = 0; i < 253; i++) {
+    insts.push({ id: i.toString(), text: i.toString() });
+  }
+
   // Data getters
-  $: access = checkAccess('boot', 'write');
+  $: access = checkAccess('boot', 'write') && $loggedIn;
   $: {
     let msg = message;
     let con = document.getElementsByClassName('console');
@@ -40,10 +51,27 @@
     <div class="tilecont">
       <div class="title">Connect the device to CAN network and press a button below.</div>
       <div class="buttons">
-        {#if access}
-          <Button kind="primary" disabled={running} on:click={(e) => loader(e)}>Boot loader</Button>
-        {/if}
-        <Button kind="primary" disabled={running} on:click={(e) => program(e)}>Program</Button>
+        <Grid fullWidth noGutter>
+          <Row padding>
+            <Column sm={1} md={1} lg={1}>
+            </Column>
+            <Column sm={1} md={1} lg={2}>
+              <Dropdown titleText="Device Instance" size="lg" bind:selectedId={data.instance} items={insts} on:select={(e) => select(e)}/>
+            </Column>
+            <Column sm={1} md={1} lg={2}>
+            </Column>
+            <Column sm={1} md={3} lg={5}>
+              {#if access}
+                <Button disabled={running} icon={Download} on:click={(e) => loader(e)}>Boot loader</Button>
+              {/if}
+            </Column>
+            <Column sm={1} md={1} lg={1}>
+            </Column>
+            <Column sm={1} md={3} lg={5}>
+              <Button disabled={running} icon={Download} on:click={(e) => program(e)}>Program Update</Button>
+            </Column>
+          </Row>
+        </Grid>
       </div>
       <h5>Console</h5>
       <div class="console">
@@ -81,10 +109,10 @@
   }
   .container .tilecont .buttons {
     width: 100%;
-    display: flex;
+    /* display: flex;
     flex-flow: row nowrap;
     justify-content: space-around;
-    margin-bottom: 1rem;
+    margin-bottom: 1rem; */
   }
   .container .tilecont .console {
     width: 100%;

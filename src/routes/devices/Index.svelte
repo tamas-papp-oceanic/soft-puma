@@ -31,7 +31,9 @@
   const paths = {
     '3271': '/:instance/:fluid',
     '3420': '/:instance',
+    '3478': '/:instance',
     '4291': '/:instance/:fluid',
+    '4410': '/:instance',
   };
 
   let items = new Array();
@@ -82,6 +84,56 @@
         }
       }
       pat = pat.replace(':instance', '0').replace(':fluid', '0');
+      push(pat);
+    }
+  }
+
+  function test(e, add) {
+    if ((typeof $devices[selected] !== 'undefined') &&
+      (typeof $name[$devices[selected]] !== 'undefined') &&
+      (typeof $name[$devices[selected]][add] !== 'undefined')) {
+      let nam = $name[$devices[selected]][add];
+      let pat = '/testing';
+      if (typeof paths[nam.modelVersion] !== 'undefined') {
+        pat += '/' + nam.modelVersion + paths[nam.modelVersion];
+      }
+      if (typeof $data[$devices[selected]] !== 'undefined') {
+        let dat = $data[$devices[selected]];
+        for (let i in dat) {
+          if (dat[i].header.src == parseInt(add)) {
+            if (typeof dat[i].header.ins !== 'undefined') {
+              pat = pat.replace(':instance', dat[i].header.ins.toString());
+            }
+            break;
+          }
+        }
+      }
+      pat = pat.replace(':instance', '0');
+      push(pat);
+    }
+  }
+
+  function update(e, add) {
+    if ((typeof $devices[selected] !== 'undefined') &&
+      (typeof $name[$devices[selected]] !== 'undefined') &&
+      (typeof $name[$devices[selected]][add] !== 'undefined')) {
+      let nam = $name[$devices[selected]][add];
+      let pat = '/program';
+      if (typeof paths[nam.modelVersion] !== 'undefined') {
+        pat += '/' + nam.modelVersion + paths[nam.modelVersion];
+      }
+      if (typeof $data[$devices[selected]] !== 'undefined') {
+        let dat = $data[$devices[selected]];
+        for (let i in dat) {
+          if (dat[i].header.src == parseInt(add)) {
+            if (typeof dat[i].header.ins !== 'undefined') {
+              pat = pat.replace(':instance', dat[i].header.ins.toString());
+            }
+            break;
+          }
+        }
+      }
+      pat = pat.replace(':instance', '0');
       push(pat);
     }
   }
@@ -165,8 +217,8 @@
             <OverflowMenu flipped>
               <OverflowMenuItem text="Configure" on:click={(e) => conf(e, row.id)} />
               <OverflowMenuItem text="Monitor" on:click={(e) => push('/monitor/'+row.id)} />
-              <OverflowMenuItem disabled text="Test" />
-              <OverflowMenuItem text="Check for Updates" />
+              <OverflowMenuItem text="Test" on:click={(e) => test(e, row.id)} />
+              <OverflowMenuItem text="Update" on:click={(e) => update(e, row.id)} />
             </OverflowMenu>
           {:else}
             {cell.value}

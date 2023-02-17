@@ -2,7 +2,7 @@
   import { createEventDispatcher } from "svelte";
   import { ButtonSet, Button, Tile, Grid, Row, Column, Dropdown,
     TextInput } from "carbon-components-svelte";
-  import Program from "carbon-icons-svelte/lib/Download16";
+  import Download from "carbon-icons-svelte/lib/Download16";
   import { isAlive } from '../../../stores/data.js';
 
   export let data;
@@ -109,7 +109,7 @@
             </Row>
             <Row padding>
               <Column style="display: flex; flex-flow: row nowrap; justify-content: center;">
-                <Button tooltipPosition="top" tooltipAlignment="center" iconDescription="Write to sender" icon={Program}
+                <Button tooltipPosition="top" tooltipAlignment="center" iconDescription="Write to sender" icon={Download}
                   disabled={running || !alive} on:click={(e) => program(e)}>Write to Sensor</Button>
               </Column>
             </Row>

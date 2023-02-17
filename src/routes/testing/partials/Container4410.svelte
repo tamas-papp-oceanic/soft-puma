@@ -77,38 +77,26 @@
   <Tile style="height: -webkit-fill-available;">
     <div class="tilecont">
       <Grid fullWidth noGutter>
-        <Row>
-          <Column sm={1} md={1} lg={1} padding>
+        <Row padding>
+          <Column sm={1} md={1} lg={1}>
           </Column>
-          <Column sm={1} md={1} lg={2} padding>
-            <Row padding>
-              <Column>
-                <Dropdown titleText="Relay instance" size="lg" bind:selectedId={data.instance} items={insts} on:select={(e) => select(e)}/>
-              </Column>
-            </Row>
+          <Column sm={1} md={1} lg={2}>
+            <Dropdown titleText="Relay instance" size="lg" bind:selectedId={data.instance} items={insts} on:select={(e) => select(e)}/>
           </Column>
-          <Column sm={1} md={1} lg={1} padding>
+          <Column sm={1} md={1} lg={1}>
           </Column>
-          <Column sm={1} md={4} lg={7} padding>
-            <Row>
-              <Column><Tile>Channels</Tile></Column>
-            </Row>
-            <Row padding>
-              <DataTable size="tall" headers={header1} rows={rows1} class="relay">
-                <svelte:fragment slot="cell" let:row let:cell>
-                  <img src={banks[cell.key].status == 0 ? redImage : banks[cell.key].status == 1 ? greenImage : banks[cell.key].status == 2 ? yellowImage : greyImage} alt style="width: 100%;" />
-                </svelte:fragment>
-              </DataTable>
-            </Row>
-            <Row padding>
-              <DataTable size="tall" headers={header2} rows={rows2} class="relay">
-                <svelte:fragment slot="cell" let:row let:cell>
-                  <img src={banks[cell.key].status == 0 ? redImage : banks[cell.key].status == 1 ? greenImage : banks[cell.key].status == 2 ? yellowImage : greyImage} alt style="width: 100%;" />
-                </svelte:fragment>
-              </DataTable>
-            </Row>
-          </Column>
-          <Column sm={1} md={1} lg={1} padding>
+          <Column sm={1} md={4} lg={8}>
+            <Tile>Channels</Tile>
+            <DataTable size="tall" headers={header1} rows={rows1} class="relay">
+              <svelte:fragment slot="cell" let:row let:cell>
+                <img src={banks[cell.key].status == 0 ? redImage : banks[cell.key].status == 1 ? greenImage : banks[cell.key].status == 2 ? yellowImage : greyImage} alt style="width: 2rem;" />
+              </svelte:fragment>
+            </DataTable>
+            <DataTable size="tall" headers={header2} rows={rows2} class="relay">
+              <svelte:fragment slot="cell" let:row let:cell>
+                <img src={banks[cell.key].status == 0 ? redImage : banks[cell.key].status == 1 ? greenImage : banks[cell.key].status == 2 ? yellowImage : greyImage} alt style="width: 2rem;" />
+              </svelte:fragment>
+            </DataTable>
           </Column>
         </Row>
       </Grid>

@@ -40,6 +40,12 @@
 				}
 			}],
 		}),
+		"/configure": Configure,
+		"/configure/3271/:instance/:fluid": ConfigureFluid,
+		"/configure/3281/:instance/:fluid": ConfigureFluid,
+		"/configure/3420/:instance": Configure3420,
+		"/configure/3125/:instance/:fluid": ConfigureFluid,
+		"/configure/4291/:instance/:fluid": ConfigureFluid,
 		"/simulate": Simulate,
 		"/program": Program,
 		"/program/3420/:instance": Program3420,
@@ -48,12 +54,6 @@
 		"/testing/4410/:instance": Test4410,
 		"/testing/5185": Test5185,
     "/testing/5185-H": Test5185,
-		"/configure": Configure,
-		"/configure/3271/:instance/:fluid": ConfigureFluid,
-		"/configure/3281/:instance/:fluid": ConfigureFluid,
-		"/configure/3420/:instance": Configure3420,
-		"/configure/3125/:instance/:fluid": ConfigureFluid,
-		"/configure/4291/:instance/:fluid": ConfigureFluid,
 		"/Welcome": wrap({
 			component: Welcome,
 			conditions: [() =>{
