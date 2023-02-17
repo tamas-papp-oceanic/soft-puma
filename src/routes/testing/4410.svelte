@@ -1,5 +1,4 @@
 <script>
-  import { onMount, onDestroy } from "svelte";
   import { Row, Grid, Column } from "carbon-components-svelte";
   import { location, pop } from "svelte-spa-router";
   import Container4410 from './partials/Container4410.svelte';
@@ -10,12 +9,9 @@
   const plf = navigator?.userAgentData?.platform || navigator?.platform || 'unknown';
   
   const model = $location.split('/')[2];
-
-  onMount(() => {
-  });
-  
-  onDestroy(() => {
-  });
+  let data = {
+    instance: params.instance,
+  }
 
   function cancel(e) {
     pop();
@@ -26,7 +22,7 @@
   <Row>
     <Column>
       <h2>{model + ' ' + getname(model) + ' - Testing'}</h2>
-      <Container4410 instance={params.instance} style="height: 80vh;" on:cancel={cancel} />
+      <Container4410 bind:data={data} style="height: 80vh;" on:cancel={cancel} />
     </Column>
   </Row>
 </Grid>

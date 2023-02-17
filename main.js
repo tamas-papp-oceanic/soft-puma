@@ -229,6 +229,9 @@ function proc(dev, frm) {
       case 126996:
         mainWindow.webContents.send('n2k-prod', [dev, msg]);
         break;
+      case 127501:
+        mainWindow.webContents.send('n2k-digists-data', [dev, msg]);
+        break;
       case 130982:
         if ((msg.fields[0].value == manu) && (msg.fields[2].value == indu)) {
           switch (msg.fields[5].value) {
@@ -772,6 +775,21 @@ ipcMain.on('c3420-write', (e, args) => {
   }
   if ((mainWindow != null) && (typeof mainWindow.webContents !== 'undefined')) {
     mainWindow.webContents.send('c3420-done', res);
+  }
+});
+
+// Starts 3478 data writing
+ipcMain.on('c3478-write', (e, args) => {
+  const [inst, bank, data] = args;
+  let res = true;
+  for (const [key, val] of Object.entries(devices)) {
+    // Send Fluid Sender Control proprietary PGN
+    // Request for Mode Data
+    let ret = val.engine.send127502(inst, bank, data);
+    res ||= ret;
+  }
+  if ((mainWindow != null) && (typeof mainWindow.webContents !== 'undefined')) {
+    mainWindow.webContents.send('c3478-done', res);
   }
 });
 

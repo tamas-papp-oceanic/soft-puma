@@ -1,5 +1,4 @@
 <script>
-  import { onMount, onDestroy } from "svelte";
   import { Row, Grid, Column } from "carbon-components-svelte";
   import { location, pop } from "svelte-spa-router";
   import Container3478 from './partials/Container3478.svelte';
@@ -12,14 +11,7 @@
   const model = $location.split('/')[2];
   let data = {
     instance: params.instance,
-    source: null,
   }
-
-  onMount(() => {
-  });
-  
-  onDestroy(() => {
-  });
 
   function cancel(e) {
     pop();

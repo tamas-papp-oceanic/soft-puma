@@ -284,6 +284,28 @@ class NMEAEngine {
     return false;
   };
 
+  // Sends Switch Command message
+  send127502(ins, bank, val) {
+    if (this.#addrMngr.state == 'Valid') {
+      let msg = {
+        key: 'nmea2000/127502/-/-/-/-/-',
+        header: { pgn: 127502, src: this.#addrMngr.address, dst: 0xFF },
+        fields: [{ field: 1,title: 'Switch Bank Instance', state: 'V', value: ins }],
+      };
+      for (let i = 0; i < 28; i++) {
+        let sts = '-';
+        let out = 3;
+        if (bank == (i + 1)) {
+          out = val ? 1 : 0;
+          sts = 'V';
+        }
+        msg.fields.push({ field: i + 2,title: 'Switch' + (i + 1), state: sts, value: out });
+      }
+      return this.sendMsg(msg);
+    }
+    return false;
+  };
+
   // Sends Proprietary FP Config Request / Command message
   send130981(typ, ins, dat, val) {
     if (this.#addrMngr.state == 'Valid') {

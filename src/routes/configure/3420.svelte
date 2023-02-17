@@ -71,7 +71,7 @@
     window.pumaAPI.reml(lis + '-done');
   };
 
-   function select(e) {
+  function select(e) {
     running = true;
     timer = setTimeout(() => {
       kind = 'error'
@@ -86,7 +86,7 @@
       if (!res) {
         kind = 'error'
         title = 'Error';
-        subttl = 'Error reading circuit with this instance.';
+        subttl = 'Error reading circuit type with this instance.';
         notify = true;
         stop('c3420');
         running = false;

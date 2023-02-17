@@ -1,33 +1,92 @@
 <script>
-  import { createEventDispatcher } from "svelte";
+  import { onMount, onDestroy, createEventDispatcher } from "svelte";
   import { ButtonSet, Button, Tile, Grid, Row, Column, Dropdown,
-    ImageLoader, Toggle, DataTable} from "carbon-components-svelte";
-  import ButtonOff from "carbon-icons-svelte/lib/RadioButton20";
-  import ButtonOn from "carbon-icons-svelte/lib/RadioButtonChecked20";
-  import { isAlive } from '../../../stores/data.js';
+    Toggle, DataTable} from "carbon-components-svelte";
 
   export let data;
   export let style;
 
   const dispatch = createEventDispatcher();
+  const greyImage = "/images/circle-grey.png";
+  const redImage = "/images/circle-red.png";
+  const greenImage = "/images/circle-green.png";
+  const yellowImage = "/images/circle-yellow.png";
   
+  const timeout = 2000;
+  let timer = null;
   let insts = new Array();
   let banks = new Array();
-  let alive = false;
   let header = new Array();
   let rows = new Array();
+  let running = false;
+  let notify = false;
+  let kind = null;
+  let title = null;
+  let subttl = null;
 
+  onMount(() => {
+    window.pumaAPI.recv('n2k-digists-data', (e, args) => {
+      const [ dev, msg ] = args;
+      if (msg.fields[0].value == data.instance) {
+        for (let i = 0; i < 8; i++) {
+          banks[i].status = msg.fields[i + 1].value;
+          if (banks[i].status == 0) {
+            banks[i].command = false;
+          } else if (banks[i].status == 1) {
+            banks[i].command = true;
+          }
+        }
+      }
+    });
+  });
+  
+  onDestroy(() => {
+    window.pumaAPI.reml('n2k-digists-data');
+  });
+
+  function stop(lis) {
+    if (timer != null) {
+      clearTimeout(timer);
+      timer = null
+    }
+    // Remove listeners
+    window.pumaAPI.reml(lis + '-done');
+  };
 
   function select(e) {
-    if (alive) {
-      dispatch("select");
-    } else {
-      dispatch("error", { title: 'Device not found' });
+    banks = new Array();
+    for (let i = 0; i < 8; i++) {
+      banks.push({ status: 3, command: false });
     }
   };
 
-  function button(e, idx) {
-    banks[idx] = !banks[idx];
+  function toggle(e, idx) {
+    running = true;
+    timer = setTimeout(() => {
+      kind = 'error'
+      title = 'Error';
+      subttl = 'Error writing channel data with this instance.';
+      notify = true;
+      stop('c3478');
+      running = false;
+    }, timeout);
+    // Receives program result
+    window.pumaAPI.recv('c3478-done', (e, res) => {
+      if (res) {
+        kind = 'info'
+        title = 'Success';
+        subttl = 'Channel data has been sent.';
+        notify = true;
+      } else {
+        kind = 'error'
+        title = 'Error';
+        subttl = 'Error writing channel data with this instance.';
+        notify = true;
+        stop('c3478');
+        running = false;
+      }
+    });
+    window.pumaAPI.send('c3478-write', [parseInt(data.instance), parseInt(idx) + 1, banks[idx].command]);
   };
 
   function cancel(e) {
@@ -39,7 +98,6 @@
   }
 
   for (let i = 0; i < 8; i++) {
-    banks.push(false);
     header.push({ key: i.toString(), value: (i + 1).toString() });
   }
 
@@ -51,10 +109,7 @@
     rows.push(row);
   }
 
-  console.log(rows)
-
-  // Data getters / setters
-  $: alive = isAlive(parseInt(data.source));
+  select();
 </script>
 
 <div class="container" style={style}>
@@ -64,61 +119,29 @@
         <Row>
           <Column sm={1} md={1} lg={1} padding>
           </Column>
-          <Column sm={1} md={2} lg={3} padding>
+          <Column sm={1} md={1} lg={2} padding>
             <Row padding>
               <Column>
-                <Dropdown titleText="Relay instance" size="sm" bind:selectedId={data.instance} items={insts}
-                  on:select={(e) => select(e)} />
+                <Dropdown titleText="Relay instance" size="lg" bind:selectedId={data.instance} items={insts} on:select={(e) => select(e)}/>
               </Column>
             </Row>
           </Column>
           <Column sm={1} md={1} lg={1} padding>
           </Column>
-          <Column sm={1} md={4} lg={6} padding>
-            <Row padding>
-              <Column>Channels</Column>
+          <Column sm={1} md={4} lg={7} padding>
+            <Row>
+              <Column><Tile>Channels</Tile></Column>
             </Row>
             <Row padding>
-              <DataTable useStaticWidth size="tall" headers={header} rows={rows}>
+              <DataTable useStaticWidth size="tall" headers={header} rows={rows} class="relay">
                 <svelte:fragment slot="cell" let:row let:cell>
                   {#if row.id === "a"}
-                    <ImageLoader src="/images/circle-red.png" style="width: 50%;" />
+                    <img src={banks[cell.key].status == 0 ? redImage : banks[cell.key].status == 1 ? greenImage : banks[cell.key].status == 2 ? yellowImage : greyImage} alt style="width: 50%;" />
                   {:else}
-                    <Toggle labelText={cell.key} hideLabel />
-                    <!-- <Button icon={banks[cell.key] ? ButtonOn : ButtonOff} on:click={(e) => button(e, cell.key)}></Button> -->
+                    <Toggle labelText={cell.key} hideLabel bind:toggled={banks[cell.key].command} on:toggle={(e) => toggle(e, cell.key)}/>
                   {/if}
                 </svelte:fragment>
               </DataTable>
-              <!-- <Grid noGutter>
-                <Row padding>
-                  {#each banks as bank, idx}
-                    <Column>
-                      {idx}
-                      <ImageLoader src="/images/circle-red.png" style="width: 60%; padding: 10%;"/>
-                      <Button icon={bank ? ButtonOn : ButtonOff} on:click={(e) => button(e, idx)}>{bank ? 'OFF' : 'ON'}</Button>
-                    </Column>
-                    {/each} -->
-                  <!-- {#each banks as _, idx}
-                    <Column>
-                      {idx}
-                    </Column>
-                  {/each}
-                </Row>
-                <Row padding>
-                  {#each banks as bank, idx}
-                    <Column>
-                      <ImageLoader src="/images/circle-red.png" />
-                    </Column>
-                  {/each}
-                </Row>
-                <Row padding>
-                  {#each banks as bank, idx}
-                    <Column>
-                      <Button icon={bank ? ButtonOn : ButtonOff} on:click={(e) => button(e, idx)}>{bank ? 'OFF' : 'ON'}</Button>
-                    </Column>
-                  {/each} -->
-                <!-- </Row>
-              </Grid> -->
             </Row>
           </Column>
           <Column sm={1} md={1} lg={1} padding>
@@ -144,23 +167,22 @@
     width: 100%;
     height: 100%;
   }
-  /* .bx--col {
-    display: flex;
-    flex-flow: column nowrap;
-    justify-content: center;
-    align-items: center;
-  }
-  .bx--col img {
-    width: 80%;
-  } */
-  .bx--data-table--static th {
+  .relay th {
     text-align: center;
     vertical-align: middle;
+    background: #262626;
   }
-  .bx--data-table--static tr, .bx--data-table--static th {
+  .relay tr, .relay th {
     border: none;
   }
-  .bx--data-table--static td {
+  .relay thead, .relay tbody {
+    background: none;
+  }
+  .relay tbody tr:hover td {
+    background: #262626;
+    border: none;
+  }
+  .relay td {
     text-align: center;
     vertical-align: middle;
     padding: 0 1.2rem;
