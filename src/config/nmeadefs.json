@@ -2518,7 +2518,7 @@
         "type": "bit(2)",
         "unit": null,
         "multiplier": null,
-        "reserved": "DD002"
+        "reserved": null
       },
       {
         "field": 2,
@@ -2526,7 +2526,7 @@
         "type": "bit(2)",
         "unit": null,
         "multiplier": null,
-        "reserved": "DD002"
+        "reserved": null
       },
       {
         "field": 3,
@@ -2534,7 +2534,7 @@
         "type": "bit(2)",
         "unit": null,
         "multiplier": null,
-        "reserved": "DD002"
+        "reserved": null
       },
       {
         "field": 4,
@@ -3414,7 +3414,7 @@
         "type": "bit(2)",
         "unit": null,
         "multiplier": null,
-        "reserved": "DD002"
+        "reserved": null
       },
       {
         "field": 3,
@@ -3422,7 +3422,7 @@
         "type": "bit(2)",
         "unit": null,
         "multiplier": null,
-        "reserved": "DD002"
+        "reserved": null
       },
       {
         "field": 4,
@@ -3430,7 +3430,7 @@
         "type": "bit(2)",
         "unit": null,
         "multiplier": null,
-        "reserved": "DD002"
+        "reserved": null
       },
       {
         "field": 5,
@@ -3438,7 +3438,7 @@
         "type": "bit(2)",
         "unit": null,
         "multiplier": null,
-        "reserved": "DD002"
+        "reserved": null
       },
       {
         "field": 6,
@@ -3446,7 +3446,7 @@
         "type": "bit(2)",
         "unit": null,
         "multiplier": null,
-        "reserved": "DD002"
+        "reserved": null
       },
       {
         "field": 7,
@@ -3454,7 +3454,7 @@
         "type": "bit(2)",
         "unit": null,
         "multiplier": null,
-        "reserved": "DD002"
+        "reserved": null
       },
       {
         "field": 8,
@@ -3462,7 +3462,7 @@
         "type": "bit(2)",
         "unit": null,
         "multiplier": null,
-        "reserved": "DD002"
+        "reserved": null
       },
       {
         "field": 9,
@@ -3470,7 +3470,7 @@
         "type": "bit(2)",
         "unit": null,
         "multiplier": null,
-        "reserved": "DD002"
+        "reserved": null
       },
       {
         "field": 10,
@@ -3478,7 +3478,7 @@
         "type": "bit(2)",
         "unit": null,
         "multiplier": null,
-        "reserved": "DD002"
+        "reserved": null
       },
       {
         "field": 11,
@@ -3486,7 +3486,7 @@
         "type": "bit(2)",
         "unit": null,
         "multiplier": null,
-        "reserved": "DD002"
+        "reserved": null
       },
       {
         "field": 12,
@@ -3494,7 +3494,7 @@
         "type": "bit(2)",
         "unit": null,
         "multiplier": null,
-        "reserved": "DD002"
+        "reserved": null
       },
       {
         "field": 13,
@@ -3502,7 +3502,7 @@
         "type": "bit(2)",
         "unit": null,
         "multiplier": null,
-        "reserved": "DD002"
+        "reserved": null
       },
       {
         "field": 14,
@@ -3510,7 +3510,7 @@
         "type": "bit(2)",
         "unit": null,
         "multiplier": null,
-        "reserved": "DD002"
+        "reserved": null
       },
       {
         "field": 15,
@@ -3518,7 +3518,7 @@
         "type": "bit(2)",
         "unit": null,
         "multiplier": null,
-        "reserved": "DD002"
+        "reserved": null
       },
       {
         "field": 16,
@@ -3526,7 +3526,7 @@
         "type": "bit(2)",
         "unit": null,
         "multiplier": null,
-        "reserved": "DD002"
+        "reserved": null
       },
       {
         "field": 17,
@@ -3534,7 +3534,7 @@
         "type": "bit(2)",
         "unit": null,
         "multiplier": null,
-        "reserved": "DD002"
+        "reserved": null
       },
       {
         "field": 18,
@@ -3542,7 +3542,7 @@
         "type": "bit(2)",
         "unit": null,
         "multiplier": null,
-        "reserved": "DD002"
+        "reserved": null
       },
       {
         "field": 19,
@@ -3550,7 +3550,7 @@
         "type": "bit(2)",
         "unit": null,
         "multiplier": null,
-        "reserved": "DD002"
+        "reserved": null
       },
       {
         "field": 20,
@@ -3558,7 +3558,7 @@
         "type": "bit(2)",
         "unit": null,
         "multiplier": null,
-        "reserved": "DD002"
+        "reserved": null
       },
       {
         "field": 21,
@@ -3566,7 +3566,7 @@
         "type": "bit(2)",
         "unit": null,
         "multiplier": null,
-        "reserved": "DD002"
+        "reserved": null
       },
       {
         "field": 22,
@@ -3574,7 +3574,7 @@
         "type": "bit(2)",
         "unit": null,
         "multiplier": null,
-        "reserved": "DD002"
+        "reserved": null
       },
       {
         "field": 23,
@@ -3582,7 +3582,7 @@
         "type": "bit(2)",
         "unit": null,
         "multiplier": null,
-        "reserved": "DD002"
+        "reserved": null
       },
       {
         "field": 24,
@@ -3590,7 +3590,7 @@
         "type": "bit(2)",
         "unit": null,
         "multiplier": null,
-        "reserved": "DD002"
+        "reserved": null
       },
       {
         "field": 25,
@@ -3598,7 +3598,7 @@
         "type": "bit(2)",
         "unit": null,
         "multiplier": null,
-        "reserved": "DD002"
+        "reserved": null
       },
       {
         "field": 26,
@@ -3606,7 +3606,7 @@
         "type": "bit(2)",
         "unit": null,
         "multiplier": null,
-        "reserved": "DD002"
+        "reserved": null
       },
       {
         "field": 27,
@@ -3614,7 +3614,7 @@
         "type": "bit(2)",
         "unit": null,
         "multiplier": null,
-        "reserved": "DD002"
+        "reserved": null
       },
       {
         "field": 28,
@@ -3622,7 +3622,7 @@
         "type": "bit(2)",
         "unit": null,
         "multiplier": null,
-        "reserved": "DD002"
+        "reserved": null
       },
       {
         "field": 29,
@@ -3630,7 +3630,7 @@
         "type": "bit(2)",
         "unit": null,
         "multiplier": null,
-        "reserved": "DD002"
+        "reserved": null
       }
     ]
   },
@@ -3655,7 +3655,7 @@
         "type": "bit(2)",
         "unit": null,
         "multiplier": null,
-        "reserved": "DD003"
+        "reserved": null
       },
       {
         "field": 3,
@@ -3663,7 +3663,7 @@
         "type": "bit(2)",
         "unit": null,
         "multiplier": null,
-        "reserved": "DD003"
+        "reserved": null
       },
       {
         "field": 4,
@@ -3671,7 +3671,7 @@
         "type": "bit(2)",
         "unit": null,
         "multiplier": null,
-        "reserved": "DD003"
+        "reserved": null
       },
       {
         "field": 5,
@@ -3679,7 +3679,7 @@
         "type": "bit(2)",
         "unit": null,
         "multiplier": null,
-        "reserved": "DD003"
+        "reserved": null
       },
       {
         "field": 6,
@@ -3687,7 +3687,7 @@
         "type": "bit(2)",
         "unit": null,
         "multiplier": null,
-        "reserved": "DD003"
+        "reserved": null
       },
       {
         "field": 7,
@@ -3695,7 +3695,7 @@
         "type": "bit(2)",
         "unit": null,
         "multiplier": null,
-        "reserved": "DD003"
+        "reserved": null
       },
       {
         "field": 8,
@@ -3703,7 +3703,7 @@
         "type": "bit(2)",
         "unit": null,
         "multiplier": null,
-        "reserved": "DD003"
+        "reserved": null
       },
       {
         "field": 9,
@@ -3711,7 +3711,7 @@
         "type": "bit(2)",
         "unit": null,
         "multiplier": null,
-        "reserved": "DD003"
+        "reserved": null
       },
       {
         "field": 10,
@@ -3719,7 +3719,7 @@
         "type": "bit(2)",
         "unit": null,
         "multiplier": null,
-        "reserved": "DD003"
+        "reserved": null
       },
       {
         "field": 11,
@@ -3727,7 +3727,7 @@
         "type": "bit(2)",
         "unit": null,
         "multiplier": null,
-        "reserved": "DD003"
+        "reserved": null
       },
       {
         "field": 12,
@@ -3735,7 +3735,7 @@
         "type": "bit(2)",
         "unit": null,
         "multiplier": null,
-        "reserved": "DD003"
+        "reserved": null
       },
       {
         "field": 13,
@@ -3743,7 +3743,7 @@
         "type": "bit(2)",
         "unit": null,
         "multiplier": null,
-        "reserved": "DD003"
+        "reserved": null
       },
       {
         "field": 14,
@@ -3751,7 +3751,7 @@
         "type": "bit(2)",
         "unit": null,
         "multiplier": null,
-        "reserved": "DD003"
+        "reserved": null
       },
       {
         "field": 15,
@@ -3759,7 +3759,7 @@
         "type": "bit(2)",
         "unit": null,
         "multiplier": null,
-        "reserved": "DD003"
+        "reserved": null
       },
       {
         "field": 16,
@@ -3767,7 +3767,7 @@
         "type": "bit(2)",
         "unit": null,
         "multiplier": null,
-        "reserved": "DD003"
+        "reserved": null
       },
       {
         "field": 17,
@@ -3775,7 +3775,7 @@
         "type": "bit(2)",
         "unit": null,
         "multiplier": null,
-        "reserved": "DD003"
+        "reserved": null
       },
       {
         "field": 18,
@@ -3783,7 +3783,7 @@
         "type": "bit(2)",
         "unit": null,
         "multiplier": null,
-        "reserved": "DD003"
+        "reserved": null
       },
       {
         "field": 19,
@@ -3791,7 +3791,7 @@
         "type": "bit(2)",
         "unit": null,
         "multiplier": null,
-        "reserved": "DD003"
+        "reserved": null
       },
       {
         "field": 20,
@@ -3799,7 +3799,7 @@
         "type": "bit(2)",
         "unit": null,
         "multiplier": null,
-        "reserved": "DD003"
+        "reserved": null
       },
       {
         "field": 21,
@@ -3807,7 +3807,7 @@
         "type": "bit(2)",
         "unit": null,
         "multiplier": null,
-        "reserved": "DD003"
+        "reserved": null
       },
       {
         "field": 22,
@@ -3815,7 +3815,7 @@
         "type": "bit(2)",
         "unit": null,
         "multiplier": null,
-        "reserved": "DD003"
+        "reserved": null
       },
       {
         "field": 23,
@@ -3823,7 +3823,7 @@
         "type": "bit(2)",
         "unit": null,
         "multiplier": null,
-        "reserved": "DD003"
+        "reserved": null
       },
       {
         "field": 24,
@@ -3831,7 +3831,7 @@
         "type": "bit(2)",
         "unit": null,
         "multiplier": null,
-        "reserved": "DD003"
+        "reserved": null
       },
       {
         "field": 25,
@@ -3839,7 +3839,7 @@
         "type": "bit(2)",
         "unit": null,
         "multiplier": null,
-        "reserved": "DD003"
+        "reserved": null
       },
       {
         "field": 26,
@@ -3847,7 +3847,7 @@
         "type": "bit(2)",
         "unit": null,
         "multiplier": null,
-        "reserved": "DD003"
+        "reserved": null
       },
       {
         "field": 27,
@@ -3855,7 +3855,7 @@
         "type": "bit(2)",
         "unit": null,
         "multiplier": null,
-        "reserved": "DD003"
+        "reserved": null
       },
       {
         "field": 28,
@@ -3863,7 +3863,7 @@
         "type": "bit(2)",
         "unit": null,
         "multiplier": null,
-        "reserved": "DD003"
+        "reserved": null
       },
       {
         "field": 29,
@@ -3871,7 +3871,7 @@
         "type": "bit(2)",
         "unit": null,
         "multiplier": null,
-        "reserved": "DD003"
+        "reserved": null
       }
     ]
   },
@@ -4252,7 +4252,7 @@
         "type": "bit(2)",
         "unit": null,
         "multiplier": null,
-        "reserved": "DD002"
+        "reserved": null
       },
       {
         "field": 6,
@@ -4260,7 +4260,7 @@
         "type": "bit(2)",
         "unit": null,
         "multiplier": null,
-        "reserved": "DD002"
+        "reserved": null
       },
       {
         "field": 7,
@@ -4374,7 +4374,7 @@
         "type": "bit(2)",
         "unit": null,
         "multiplier": null,
-        "reserved": "DD002"
+        "reserved": null
       },
       {
         "field": 6,
@@ -4415,7 +4415,7 @@
         "type": "bit(2)",
         "unit": null,
         "multiplier": null,
-        "reserved": "DD003"
+        "reserved": null
       },
       {
         "field": 4,
@@ -4463,7 +4463,7 @@
         "type": "bit(2)",
         "unit": null,
         "multiplier": null,
-        "reserved": "DD003"
+        "reserved": null
       },
       {
         "field": 10,
@@ -4471,7 +4471,7 @@
         "type": "bit(2)",
         "unit": null,
         "multiplier": null,
-        "reserved": "DD003"
+        "reserved": null
       },
       {
         "field": 11,
@@ -4520,7 +4520,7 @@
         "type": "bit(2)",
         "unit": null,
         "multiplier": null,
-        "reserved": "DD003"
+        "reserved": null
       },
       {
         "field": 5,
@@ -4536,7 +4536,7 @@
         "type": "bit(2)",
         "unit": null,
         "multiplier": null,
-        "reserved": "DD003"
+        "reserved": null
       },
       {
         "field": 7,
@@ -4626,7 +4626,7 @@
         "type": "bit(2)",
         "unit": null,
         "multiplier": null,
-        "reserved": "DD002"
+        "reserved": null
       },
       {
         "field": 4,
@@ -5387,7 +5387,7 @@
         "type": "bit(2)",
         "unit": null,
         "multiplier": null,
-        "reserved": "DD002"
+        "reserved": null
       }
     ]
   },
@@ -6754,7 +6754,7 @@
         "type": "bit(2)",
         "unit": null,
         "multiplier": null,
-        "reserved": "DD002"
+        "reserved": null
       },
       {
         "field": 5,
@@ -6810,7 +6810,7 @@
         "type": "bit(2)",
         "unit": null,
         "multiplier": null,
-        "reserved": "DD002"
+        "reserved": null
       },
       {
         "field": 5,
@@ -6818,7 +6818,7 @@
         "type": "bit(2)",
         "unit": null,
         "multiplier": null,
-        "reserved": "DD002"
+        "reserved": null
       },
       {
         "field": 6,
@@ -6961,7 +6961,7 @@
         "type": "bit(2)",
         "unit": null,
         "multiplier": null,
-        "reserved": "DD002"
+        "reserved": null
       },
       {
         "field": 7,
@@ -7281,7 +7281,7 @@
         "type": "bit(2)",
         "unit": null,
         "multiplier": null,
-        "reserved": "DD002"
+        "reserved": null
       },
       {
         "field": 8,
@@ -7305,7 +7305,7 @@
         "type": "bit(2)",
         "unit": null,
         "multiplier": null,
-        "reserved": "DD002"
+        "reserved": null
       },
       {
         "field": 11,
@@ -8177,7 +8177,7 @@
         "type": "bit(2)",
         "unit": null,
         "multiplier": null,
-        "reserved": "DD002"
+        "reserved": null
       },
       {
         "field": 11,
@@ -10585,7 +10585,7 @@
         "type": "bit(2)",
         "unit": null,
         "multiplier": null,
-        "reserved": "DD002"
+        "reserved": null
       },
       {
         "field": 17,
@@ -13796,7 +13796,7 @@
         "type": "bit(2)",
         "unit": null,
         "multiplier": null,
-        "reserved": "DD002"
+        "reserved": null
       },
       {
         "field": 3,
@@ -13804,7 +13804,7 @@
         "type": "bit(2)",
         "unit": null,
         "multiplier": null,
-        "reserved": "DD002"
+        "reserved": null
       },
       {
         "field": 4,
@@ -13812,7 +13812,7 @@
         "type": "bit(2)",
         "unit": null,
         "multiplier": null,
-        "reserved": "DD002"
+        "reserved": null
       },
       {
         "field": 5,
@@ -13820,7 +13820,7 @@
         "type": "bit(2)",
         "unit": null,
         "multiplier": null,
-        "reserved": "DD002"
+        "reserved": null
       },
       {
         "field": 6,
@@ -13828,7 +13828,7 @@
         "type": "bit(2)",
         "unit": null,
         "multiplier": null,
-        "reserved": "DD002"
+        "reserved": null
       },
       {
         "field": 7,
@@ -13844,7 +13844,7 @@
         "type": "bit(2)",
         "unit": null,
         "multiplier": null,
-        "reserved": "DD002"
+        "reserved": null
       },
       {
         "field": 9,
@@ -14196,7 +14196,7 @@
         "type": "bit(2)",
         "unit": null,
         "multiplier": null,
-        "reserved": "DD002"
+        "reserved": null
       }
     ]
   },
@@ -14482,7 +14482,7 @@
         "type": "bit(2)",
         "unit": null,
         "multiplier": null,
-        "reserved": "DD002"
+        "reserved": null
       },
       {
         "field": 11,
@@ -14490,7 +14490,7 @@
         "type": "bit(2)",
         "unit": null,
         "multiplier": null,
-        "reserved": "DD002"
+        "reserved": null
       },
       {
         "field": 12,
@@ -14777,7 +14777,7 @@
         "type": "bit(2)",
         "unit": null,
         "multiplier": null,
-        "reserved": "DD002"
+        "reserved": null
       },
       {
         "field": 2,
@@ -14945,7 +14945,7 @@
         "type": "bit(2)",
         "unit": null,
         "multiplier": null,
-        "reserved": "DD002"
+        "reserved": null
       },
       {
         "field": 5,
@@ -15128,7 +15128,7 @@
         "type": "bit(2)",
         "unit": null,
         "multiplier": null,
-        "reserved": "DD002"
+        "reserved": null
       },
       {
         "field": 4,

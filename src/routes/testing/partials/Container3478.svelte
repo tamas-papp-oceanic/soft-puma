@@ -1,5 +1,5 @@
 <script>
-  import { onMount, onDestroy, createEventDispatcher } from "svelte";
+  import { createEventDispatcher } from "svelte";
   import { ButtonSet, Button, Tile, Grid, Row, Column, Dropdown,
     Toggle, DataTable} from "carbon-components-svelte";
   import Auto from "carbon-icons-svelte/lib/Automatic16";

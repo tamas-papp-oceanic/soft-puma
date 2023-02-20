@@ -86,11 +86,7 @@ function create() {
           mul = (mul != null ? mul : 1) / fld.divider;
         }
         let res = null;
-        if ((fld.dictionary != null) && (
-          (fld.dictionary == 'DD001') ||
-          (fld.dictionary == 'DD002') ||
-          (fld.dictionary == 'DD003') 
-        )) {
+        if ((fld.dictionary != null) && (fld.dictionary == 'DD001')) {
           res = fld.dictionary;
         }
         let tmp = {

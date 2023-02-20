@@ -1,5 +1,5 @@
 <script>
-  import { onMount, onDestroy, createEventDispatcher } from "svelte";
+  import { createEventDispatcher } from "svelte";
   import { ButtonSet, Button, Tile, Grid, Row, Column, Dropdown,
     Toggle, DataTable} from "carbon-components-svelte";
 
@@ -13,31 +13,15 @@
   const yellowImage = "/images/circle-yellow.png";
   
   let insts = new Array();
-  let banks = new Array();
   let header1 = new Array();
   let header2 = new Array();
   let rows1 = new Array();
   let rows2 = new Array();
 
-  onMount(() => {
-    window.pumaAPI.recv('n2k-digists-data', (e, args) => {
-      const [ dev, msg ] = args;
-      if (msg.fields[0].value == data.instance) {
-        for (let i = 0; i < 16; i++) {
-          banks[i].status = msg.fields[i + 1].value;
-        }
-      }
-    });
-  });
-  
-  onDestroy(() => {
-    window.pumaAPI.reml('n2k-digists-data');
-  });
-
   function select(e) {
-    banks = new Array();
+    data.banks = new Array();
     for (let i = 0; i < 16; i++) {
-      banks.push({ status: 3 });
+      data.banks.push({ status: 3 });
     }
   };
 
@@ -93,12 +77,12 @@
             <Tile>Channels</Tile>
             <DataTable size="tall" headers={header1} rows={rows1} class="relay">
               <svelte:fragment slot="cell" let:row let:cell>
-                <img src={banks[cell.key].status == 0 ? redImage : banks[cell.key].status == 1 ? greenImage : banks[cell.key].status == 2 ? yellowImage : greyImage} alt style="width: 2rem;" />
+                <img src={data.banks[cell.key].status == 0 ? redImage : data.banks[cell.key].status == 1 ? greenImage : data.banks[cell.key].status == 2 ? yellowImage : greyImage} alt style="width: 2rem;" />
               </svelte:fragment>
             </DataTable>
             <DataTable size="tall" headers={header2} rows={rows2} class="relay">
               <svelte:fragment slot="cell" let:row let:cell>
-                <img src={banks[cell.key].status == 0 ? redImage : banks[cell.key].status == 1 ? greenImage : banks[cell.key].status == 2 ? yellowImage : greyImage} alt style="width: 2rem;" />
+                <img src={data.banks[cell.key].status == 0 ? redImage : data.banks[cell.key].status == 1 ? greenImage : data.banks[cell.key].status == 2 ? yellowImage : greyImage} alt style="width: 2rem;" />
               </svelte:fragment>
             </DataTable>
           </Column>
