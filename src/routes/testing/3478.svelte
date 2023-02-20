@@ -29,9 +29,9 @@
       if (msg.fields[0].value == data.instance) {
         for (let i = 0; i < 8; i++) {
           data.banks[i].status = msg.fields[i + 1].value;
-          if (banks[i].status == 0) {
+          if (data.banks[i].status == 0) {
             data.banks[i].command = false;
-          } else if (banks[i].status == 1) {
+          } else if (data.banks[i].status == 1) {
             data.banks[i].command = true;
           }
         }
