@@ -97,9 +97,17 @@
       if (typeof paths[nam.modelVersion] !== 'undefined') {
         pat += '/' + nam.modelVersion + paths[nam.modelVersion];
       }
+
+      console.log($data)
+
       if (typeof $data[$devices[selected]] !== 'undefined') {
         let dat = $data[$devices[selected]];
         for (let i in dat) {
+
+
+
+
+
           if (dat[i].header.src == parseInt(add)) {
             if (typeof dat[i].header.ins !== 'undefined') {
               pat = pat.replace(':instance', dat[i].header.ins.toString());

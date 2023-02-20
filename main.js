@@ -230,7 +230,8 @@ function proc(dev, frm) {
         mainWindow.webContents.send('n2k-prod', [dev, msg]);
         break;
       case 127501:
-        mainWindow.webContents.send('n2k-digists-data', [dev, msg]);
+        mainWindow.webContents.send('n2k-data', [dev, msg]);
+        mainWindow.webContents.send('n2k-digi-data', [dev, msg]);
         break;
       case 130982:
         if ((msg.fields[0].value == manu) && (msg.fields[2].value == indu)) {
