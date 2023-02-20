@@ -16,17 +16,12 @@
     { id: '2', text: 'Double Phase' },
     { id: '3', text: 'Three Phase' },
     { id: '4', text: 'Split Phase' },
-    );
-  const paras = new Array(
-    { id: '0', text: 'Circuit Type' },
-    { id: '1', text: 'Device Instance' },
   );
     
   let inst1 = new Array();
   let inst2 = new Array();
   let inst = data.instance;
   let circ = data.circuit ? data.circuit : '1';
-  let para = '0';
   let alive = false;
     
   function select(e) {
@@ -38,7 +33,7 @@
   };
 
   function program(e) {
-    dispatch("program", { parameter: para, instance: inst, circuit: circ });
+    dispatch("program", { instance: inst, circuit: circ });
   };
 
   function cancel(e) {
@@ -100,11 +95,6 @@
             <Row padding>
               <Column>
                 <Dropdown disabled={running || !alive} titleText="Circuit type" size="sm" bind:selectedId={circ} items={circs} />
-              </Column>
-            </Row>
-            <Row padding>
-              <Column>
-                <Dropdown disabled={running || !alive} titleText="Parameter to change" size="sm" bind:selectedId={para} items={paras} />
               </Column>
             </Row>
             <Row padding>

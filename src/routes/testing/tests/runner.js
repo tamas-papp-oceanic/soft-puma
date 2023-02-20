@@ -14,6 +14,7 @@ import { get } from 'svelte/store';
 import { testURL, _scriptData, _steps, _actions, _events, _current } from '../../../stores/tests.js';
 import { userData } from '../../../stores/user.js';
 import { afetch } from '../../../auth/auth.js';
+import { device } from '../../../stores/data.js';
 
 let timer = null;
 
@@ -131,12 +132,14 @@ export async function setStoreValue(script) {
 };
 // Sets device in test mode
 export async function startTests(script) {
-  window.pumaAPI.send('test-data', [0x80]);
+  let dev = get(device);
+  window.pumaAPI.send('test-data', [dev, 0x80]);
 };
 // Starts device's test
 export async function startTest(script) {
   if (typeof script.testCode !== 'undefined') {
-    window.pumaAPI.send('test-data', [script.testCode, script.testParam]);
+    let dev = get(device);
+    window.pumaAPI.send('test-data', [dev, script.testCode, script.testParam]);
   }
 };
 // Waits for device's test to finish
@@ -162,7 +165,8 @@ export async function waitTest(script) {
 };
 // Sets device in normal mode
 export async function stopTests() {
-  window.pumaAPI.send('test-data', [0]);
+  let dev = get(device);
+  window.pumaAPI.send('test-data', [dev, 0]);
 };
 // Starts device update
 export async function startUpdate(script) {

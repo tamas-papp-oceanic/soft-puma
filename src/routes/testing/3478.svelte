@@ -1,9 +1,10 @@
 <script>
   import { onMount, onDestroy } from "svelte";
-  import { Row, Grid, Column } from "carbon-components-svelte";
+  import { Row, Grid, Column, ToastNotification } from "carbon-components-svelte";
   import { location, pop } from "svelte-spa-router";
   import Container3478 from './partials/Container3478.svelte';
   import { getname } from '../../stores/common.js';
+  import { device } from '../../stores/data.js';
 
   export let params;
 
@@ -61,12 +62,7 @@
     data.autorun = true;
     // Receives program result
     window.pumaAPI.recv('a3478-done', (e, res) => {
-      if (res) {
-        kind = 'info'
-        title = 'Success';
-        subttl = 'Channel data has been sent.';
-        notify = true;
-      } else {
+      if (!res) {
         kind = 'error'
         title = 'Error';
         subttl = 'Error writing channel data with this instance.';
@@ -75,7 +71,7 @@
       data.autorun = false;
       stop('a3478');
     });
-    window.pumaAPI.send('a3478-write', [parseInt(data.instance)]);
+    window.pumaAPI.send('a3478-write', [$device, parseInt(data.instance)]);
   };
 
   function toggle(e) {
@@ -91,12 +87,7 @@
       }, timeout);
       // Receives program result
       window.pumaAPI.recv('c3478-done', (e, res) => {
-        if (res) {
-          kind = 'info'
-          title = 'Success';
-          subttl = 'Channel data has been sent.';
-          notify = true;
-        } else {
+        if (!res) {
           kind = 'error'
           title = 'Error';
           subttl = 'Error writing channel data with this instance.';
@@ -105,11 +96,18 @@
         stop('c3478');
         running = false;
       });
-      window.pumaAPI.send('c3478-write', [parseInt(data.instance), parseInt(e.detail.cell) + 1, data.banks[e.detail.cell].command]);
+      window.pumaAPI.send('c3478-write', [$device, parseInt(data.instance), parseInt(e.detail.cell) + 1, data.banks[e.detail.cell].command]);
     }
   };
 
   function cancel(e) {
+    if (data.autorun) {
+      window.pumaAPI.send('a3478-cancel');
+    }
+    data.autorun = false;
+    running = false;
+    stop('c3478');
+    stop('a3478');
     pop();
   };
 </script>
@@ -119,6 +117,17 @@
     <Column>
       <h2>{model + ' ' + getname(model) + ' - Test'}</h2>
       <Container3478 bind:data={data} style="height: 80vh;" on:auto={auto} on:toggle={toggle} on:cancel={cancel} />
+      {#if notify}
+        <div class="error">
+          <ToastNotification
+            kind={kind}
+            title={title}
+            subtitle={subttl}
+            caption={new Date().toLocaleString()}
+            on:close={(e) => (notify = false)}
+          />
+        </div>
+      {/if}
     </Column>
   </Row>
 </Grid>

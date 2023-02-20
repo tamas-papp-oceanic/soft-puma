@@ -11,7 +11,6 @@
   const plf = navigator?.userAgentData?.platform || navigator?.platform || 'unknown';
   
   const model = $location.split('/')[2];
-  const iface = $device;
   const instance = params.instance;
   const timeout = 60000;
   let timer = null;
@@ -83,7 +82,7 @@
         dtype = 0x08;
         break;
     }
-    window.pumaAPI.send('prog-start', [iface, model, dtype, instance]);
+    window.pumaAPI.send('prog-start', [$device, model, dtype, instance]);
   };
 
   function cancel(e) {

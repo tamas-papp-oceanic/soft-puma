@@ -305,18 +305,21 @@ ipcMain.on('bus-scan', (e) => {
 });
 
 ipcMain.on('ser-num', (e, args) => {
-  const [serial] = args;
-  for (const [key, val] of Object.entries(devices)) {
+  const [dev, serial] = args;
+  if ((typeof dev === 'string') && (typeof devices[dev] !== 'undefined')) {
+    let eng = devices[dev].engine;
     // Send Proprietary Set serial PGN
-    val.engine.send065280(serial);
+    eng.send065280(serial);
   }
 });
 
 ipcMain.on('test-data', (e, args) => {
-  const [code, param] = args;
-  for (const [key, val] of Object.entries(devices)) {
-    // Send Device Test Control proprietary PGN
-    val.engine.send065477(code, param);
+  const [dev, code, param] = args;
+  if ((typeof dev === 'string') && (typeof devices[dev] !== 'undefined')) {
+    let eng = devices[dev].engine;
+    eng.send065477(code, param);
+  } else {
+    console.log("No device seleted!")
   }
 });
 
@@ -690,165 +693,169 @@ ipcMain.on('volfile-write', (e, ...args) => {
 
 // Starts volume mode reading
 ipcMain.on('volmode-read', (e, args) => {
-  const [fluid, instance] = args;
-  let res = true;
-  for (const [key, val] of Object.entries(devices)) {
-    // Send Fluid Sender Control proprietary PGN
-    // Request for Mode Data
-    let ret = val.engine.send130825(fluid, instance, 0x05);
-    res ||= ret;
-  }
-  if ((mainWindow != null) && (typeof mainWindow.webContents !== 'undefined')) {
-    mainWindow.webContents.send('volmode-done', res);
+  const [dev, fluid, instance] = args;
+  if ((typeof dev === 'string') && (typeof devices[dev] !== 'undefined')) {
+    let eng = devices[dev].engine;
+    let res = eng.send130825(fluid, instance, 0x05);
+    if ((mainWindow != null) && (typeof mainWindow.webContents !== 'undefined')) {
+      mainWindow.webContents.send('volmode-done', res);
+    }
+  } else {
+    progMessage("No device selected!");
   }
 });
 
 // Starts volume mode writing
 ipcMain.on('volmode-write', (e, args) => {
-  const [fluid, instance, mode] = args;
-  let res = true;
-  for (const [key, val] of Object.entries(devices)) {
-    // Send Fluid Sender Control proprietary PGN
-    // Send Mode Data
-    let ret = val.engine.send130825(fluid, instance, 0x04, mode);
-    res ||= ret;
-  }
-  if ((mainWindow != null) && (typeof mainWindow.webContents !== 'undefined')) {
-    mainWindow.webContents.send('volmode-done', res);
+  const [dev, fluid, instance, mode] = args;
+  if ((typeof dev === 'string') && (typeof devices[dev] !== 'undefined')) {
+    let eng = devices[dev].engine;
+    let res = eng.send130825(fluid, instance, 0x04, mode);
+    if ((mainWindow != null) && (typeof mainWindow.webContents !== 'undefined')) {
+      mainWindow.webContents.send('volmode-done', res);
+    }
+  } else {
+    progMessage("No device selected!");
   }
 });
 
 // Starts volume table reading
 ipcMain.on('voltable-read', (e, args) => {
-  const [fluid, instance] = args;
-  let res = true;
-  for (const [key, val] of Object.entries(devices)) {
-    // Send Fluid Sender Control proprietary PGN
-    // Request for Volumetric Data
-    let ret = val.engine.send130825(fluid, instance, 0x02);
-    res ||= ret;
-  }
-  if ((mainWindow != null) && (typeof mainWindow.webContents !== 'undefined')) {
-    mainWindow.webContents.send('voltable-done', res);
+  const [dev, fluid, instance] = args;
+  if ((typeof dev === 'string') && (typeof devices[dev] !== 'undefined')) {
+    let eng = devices[dev].engine;
+    let res = eng.send130825(fluid, instance, 0x02);
+    if ((mainWindow != null) && (typeof mainWindow.webContents !== 'undefined')) {
+      mainWindow.webContents.send('voltable-done', res);
+    }
+  } else {
+    progMessage("No device selected!");
   }
 });
 
 // Starts volume table writing
 ipcMain.on('voltable-write', (e, args) => {
-  const [fluid, instance, table, capacity] = args;
-  let res = true;
-  for (const [key, val] of Object.entries(devices)) {
-    // Send Fluid Sender Control proprietary PGN
-    // Send Table and Capacity Data
-    let ret = val.engine.send130825(fluid, instance, 0x01, table, capacity);
-    res ||= ret;
-  }
-  if ((mainWindow != null) && (typeof mainWindow.webContents !== 'undefined')) {
-    mainWindow.webContents.send('voltable-done', res);
+  const [dev, fluid, instance, table, capacity] = args;
+  if ((typeof dev === 'string') && (typeof devices[dev] !== 'undefined')) {
+    let eng = devices[dev].engine;
+    let res = eng.send130825(fluid, instance, 0x01, table, capacity);
+    if ((mainWindow != null) && (typeof mainWindow.webContents !== 'undefined')) {
+      mainWindow.webContents.send('voltable-done', res);
+    }
+  } else {
+    progMessage("No device selected!");
   }
 });
 
 // Starts 3420 configuration reading
 ipcMain.on('c3420-read', (e, args) => {
-  const [inst, conf] = args;
-  let res = true;
-  for (const [key, val] of Object.entries(devices)) {
-    // Send Fluid Sender Control proprietary PGN
-    // Request for Mode Data
-    let ret = val.engine.send065445(0x08, inst, 0xFF, (0xFF00 << 8) + conf);
-    res ||= ret;
-  }
-  if ((mainWindow != null) && (typeof mainWindow.webContents !== 'undefined')) {
-    mainWindow.webContents.send('c3420-done', res);
+  const [dev, inst, conf] = args;
+  if ((typeof dev === 'string') && (typeof devices[dev] !== 'undefined')) {
+    let eng = devices[dev].engine;
+    let res = eng.send065445(0x08, inst, 0xFF, (0xFF00 << 8) + conf);
+    if ((mainWindow != null) && (typeof mainWindow.webContents !== 'undefined')) {
+      mainWindow.webContents.send('c3420-done', res);
+    }
+  } else {
+    console.log("No device selected!");
   }
 });
 
 // Starts 3420 configuration writing
 ipcMain.on('c3420-write', (e, args) => {
-  const [inst, parm, data] = args;
-  let res = true;
-  for (const [key, val] of Object.entries(devices)) {
-    // Send Fluid Sender Control proprietary PGN
-    console.log(ins, out, devices)
-
-
-    // Request for Mode Data
-    let ret = val.engine.send065445(0x08, inst, parm, data);
-    res ||= ret;
-  }
-  if ((mainWindow != null) && (typeof mainWindow.webContents !== 'undefined')) {
-    mainWindow.webContents.send('c3420-done', res);
+  const [dev, inst, ins2, circ] = args;
+  if ((typeof dev === 'string') && (typeof devices[dev] !== 'undefined')) {
+    let eng = devices[dev].engine;
+    let res = eng.send065445(0x08, inst, 0, circ);
+    res ||= eng.send065445(0x08, inst, 1, ins2);
+    if ((mainWindow != null) && (typeof mainWindow.webContents !== 'undefined')) {
+      mainWindow.webContents.send('c3420-done', res);
+    }
+  } else {
+    console.log("No device selected!");
   }
 });
 
 // Starts 3478 data writing
 ipcMain.on('c3478-write', (e, args) => {
-  const [inst, bank, data] = args;
-  let res = true;
-  for (const [key, val] of Object.entries(devices)) {
-    // Send Fluid Sender Control proprietary PGN
-    // Request for Mode Data
-    let ret = val.engine.send127502(inst, bank, data);
-    res ||= ret;
-  }
-  if ((mainWindow != null) && (typeof mainWindow.webContents !== 'undefined')) {
-    mainWindow.webContents.send('c3478-done', res);
+  const [dev, inst, bank, data] = args;
+  if ((typeof dev === 'string') && (typeof devices[dev] !== 'undefined')) {
+    let eng = devices[dev].engine;
+    let res = eng.send127502(inst, bank, data);
+    if ((mainWindow != null) && (typeof mainWindow.webContents !== 'undefined')) {
+      mainWindow.webContents.send('c3478-done', res);
+    }
+  } else {
+    console.log("No device selected!");
   }
 });
 
-async function switchWrite(ins, idx) {
-  let out = new Buffer.alloc(28, 3);
-  if (idx == 8) {
-    out.fill(1, 0, 8);
-  } else {
-    out.fill(0, 0, 8);
-    if (idx != -1) {
-      if (idx > 0) {
-        out[idx - 1] = 0;
+let swcancel = false;
+
+async function switchWrite(eng, ins, idx) {
+  if (!swcancel) {
+    let out = new Buffer.alloc(28, 3);
+    if (idx == 8) {
+      out.fill(1, 0, 8);
+    } else {
+      out.fill(0, 0, 8);
+      if (idx != -1) {
+        if (idx > 0) {
+          out[idx - 1] = 0;
+        }
+        out[idx] = 1;
       }
-      out[idx] = 1;
     }
-  }
-  let res = true;
-  for (const [key, val] of Object.entries(devices)) {
-    // Send Switch Bank Control PGN
-    let ret = val.engine.send127502(ins, out);
-    res ||= ret;
-  }
-  await sleep(1000);
-  if (res) {
-    await Promise.resolve(true);
+    let res =  eng.send127502(ins, out);
+    await sleep(1000);
+    if (res) {
+      await Promise.resolve(true);
+    } else {
+      await Promise.reject(new Error('Writing switch data failed!'));
+    }
   } else {
-    await Promise.reject(new Error('Writing switch data failed!'));
+    await Promise.reject(new Error('Switch test cancelled!'));
   }
 }
 
 // Starts 3478 auto tests
 ipcMain.on('a3478-write', (e, args) => {
-  const [ins] = args;
-  Promise.resolve()
-  .then(() => switchWrite(ins, -1))
-  .then(() => switchWrite(ins, 0))
-  .then(() => switchWrite(ins, 1))
-  .then(() => switchWrite(ins, 2))
-  .then(() => switchWrite(ins, 3))
-  .then(() => switchWrite(ins, 4))
-  .then(() => switchWrite(ins, 5))
-  .then(() => switchWrite(ins, 6))
-  .then(() => switchWrite(ins, 7))
-  .then(() => switchWrite(ins, 8))
-  .then(() => switchWrite(ins, -1))
-  .then(() => {
-    if ((mainWindow != null) && (typeof mainWindow.webContents !== 'undefined')) {
-      mainWindow.webContents.send('a3478-done', true);
-    }
-  })
-  .catch((err) => {
-    log.error(err);
-    if ((mainWindow != null) && (typeof mainWindow.webContents !== 'undefined')) {
-      mainWindow.webContents.send('a3478-done', false);
-    }
-  });
+  const [dev, ins] = args;
+  swcancel = false;
+  if ((typeof dev === 'string') && (typeof devices[dev] !== 'undefined')) {
+    let eng = devices[dev].engine;
+    Promise.resolve()
+    .then(() => switchWrite(eng, ins, -1))
+    .then(() => switchWrite(eng, ins, 0))
+    .then(() => switchWrite(eng, ins, 1))
+    .then(() => switchWrite(eng, ins, 2))
+    .then(() => switchWrite(eng, ins, 3))
+    .then(() => switchWrite(eng, ins, 4))
+    .then(() => switchWrite(eng, ins, 5))
+    .then(() => switchWrite(eng, ins, 6))
+    .then(() => switchWrite(eng, ins, 7))
+    .then(() => switchWrite(eng, ins, -1))
+    .then(() => switchWrite(eng, ins, 8))
+    .then(() => switchWrite(eng, ins, -1))
+    .then(() => {
+      if ((mainWindow != null) && (typeof mainWindow.webContents !== 'undefined')) {
+        mainWindow.webContents.send('a3478-done', true);
+      }
+    })
+    .catch((err) => {
+      log.error(err);
+      if ((mainWindow != null) && (typeof mainWindow.webContents !== 'undefined')) {
+        mainWindow.webContents.send('a3478-done', false);
+      }
+    });
+  } else {
+    console.log("No device selected!");
+  }
+});
+
+// Cancels 3478 auto tests
+ipcMain.on('a3478-cancel', (e, args) => {
+  swcancel = true;
 });
 
 // Closes the application
@@ -857,17 +864,18 @@ ipcMain.on('app-quit', (e, ...args) => {
     clearInterval(timer);
     timer = null;
   }
+  log.info('Stopping devices...');
   for (const [key, val] of Object.entries(devices)) {
-    log.info('Stopping NMEA engines...');
-    for (const [key, val] of Object.entries(devices)) {
-      val.engine.destroy();
-    }
     if (val.type == 'serial') {
       log.info('Closing Serial (' + key + ')...');
     } else if (val.type == 'can') {
       log.info('Stopping CAN (' + key + ')...');
     }
     val.device.stop();
+  }
+  log.info('Destroying devices...');
+  for (const [key, val] of Object.entries(devices)) {
+    val.engine.destroy();
   }
   log.info('Quit...')
   app.quit();

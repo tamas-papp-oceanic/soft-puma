@@ -4,12 +4,13 @@
   import { location, pop } from "svelte-spa-router";
   import VolumeContainer from './partials/VolumeContainer.svelte';
   import { getname } from '../../stores/common.js';
+  import { device } from '../../stores/data.js';
 
   export let params;
 
   const plf = navigator?.userAgentData?.platform || navigator?.platform || 'unknown';
 
-  const device = $location.split('/')[2];
+  const model = $location.split('/')[2];
   const timeout = 2000;
   let timer = null;
   let data = {
@@ -160,7 +161,7 @@
         running = false;
       }
     });
-    window.pumaAPI.send('volmode-read', [data.fluid, data.instance]);
+    window.pumaAPI.send('volmode-read', [$device, data.fluid, data.instance]);
   };
 
   function setmode(e) {
@@ -189,7 +190,7 @@
       stop('volmode');
       running = false;
     });
-    window.pumaAPI.send('volmode-write', [data.fluid, data.instance, data.mode]);
+    window.pumaAPI.send('volmode-write', [$device, data.fluid, data.instance, data.mode]);
   };
 
   function download(e) {
@@ -213,7 +214,7 @@
         running = false;
       }
     });
-    window.pumaAPI.send('voltable-read', [data.fluid, data.instance]);
+    window.pumaAPI.send('voltable-read', [$device, data.fluid, data.instance]);
   };
 
   function upload(e) {
@@ -246,7 +247,7 @@
     data.table.forEach((elm) => {
       dat += String.fromCharCode(elm.pervol);
     });
-    window.pumaAPI.send('voltable-write', [data.fluid, data.instance, dat, data.capacity / 1000]);  // L -> m3
+    window.pumaAPI.send('voltable-write', [$device, data.fluid, data.instance, dat, data.capacity / 1000]);  // L -> m3
   };
 
   function cancel(e) {
@@ -261,7 +262,7 @@
 <Grid>
   <Row>
     <Column>
-      <h2>{device + ' ' + getname(device) + ' - Configuration'}</h2>
+      <h2>{model + ' ' + getname(model) + ' - Configuration'}</h2>
       <VolumeContainer style="height: 80vh;" bind:data={data} running={running}
         on:load={load} on:save={save} on:getmode={getmode} on:setmode={setmode} on:download={download}
         on:upload={upload} on:cancel={cancel} />

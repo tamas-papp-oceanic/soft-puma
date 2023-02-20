@@ -4,13 +4,13 @@
   import { location, pop } from "svelte-spa-router";
   import Container3420 from './partials/Container3420.svelte';
   import { getname } from '../../stores/common.js';
-  import { deleteData } from '../../stores/data';
+  import { deleteData, device } from '../../stores/data';
 
   export let params;
 
   const plf = navigator?.userAgentData?.platform || navigator?.platform || 'unknown';
 
-  const device = $location.split('/')[2];
+  const model = $location.split('/')[2];
   const timeout = 2000;
   let timer = null;
   let data = {
@@ -92,7 +92,7 @@
         running = false;
       }
     });
-    window.pumaAPI.send('c3420-read', [parseInt(data.instance), 0x00]);
+    window.pumaAPI.send('c3420-read', [$device, parseInt(data.instance), 0x00]);
   };
 
   function program(e) {
@@ -121,8 +121,7 @@
         running = false;
       }
     });
-    let val = e.detail.parameter == '0' ? parseInt(e.detail.circuit) : parseInt(e.detail.instance);
-    window.pumaAPI.send('c3420-write', [parseInt(data.instance), parseInt(e.detail.parameter), val]);
+    window.pumaAPI.send('c3420-write', [$device, parseInt(data.instance), parseInt(e.detail.instance), parseInt(e.detail.circuit)]);
   };
 
   function cancel(e) {
@@ -142,7 +141,7 @@
 <Grid>
   <Row>
     <Column>
-      <h2>{device + ' ' + getname(device) + ' - Configuration'}</h2>
+      <h2>{model + ' ' + getname(model) + ' - Configuration'}</h2>
       <Container3420 style="height: 80vh;" bind:data={data} running={running}
         on:select={select} on:program={program} on:cancel={cancel} on:error={error} />
       {#if notify}
