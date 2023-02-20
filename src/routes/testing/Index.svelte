@@ -9,8 +9,9 @@
   let tab;
   let dev;
   let devs = {
-    'senders': ['3478', '4410'],
+    'senders': new Array(),
     'adaptors': new Array(),
+    'modules': ['3478', '4410'],
     'displays': new Array(),
   };
 
@@ -43,9 +44,10 @@
     <Tabs type="container" bind:selected={tab} on:change={(e) => change(e)}>
       <Tab label="Sensors" />
       <Tab label="Adaptors" />
+      <Tab label="Modules" />
       <Tab label="Displays" />
       <div slot="content">
-        {#each ['senders', 'adaptors', 'displays'] as group}
+        {#each ['senders', 'adaptors', 'modules', 'displays'] as group}
           <TabContent>
             <Grid padding fullWidth noGutter>
               <Row>

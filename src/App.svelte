@@ -12,7 +12,6 @@
 	import Monitor from './routes/devices/Monitor.svelte';
 	import Content from './routes/devices/Content.svelte';
 	// import Details from './routes/Details.svelte';
-	import Simulate from './routes/Simulate.svelte';
 	import Configure from './routes/configure/Index.svelte';
 	import Configure3420 from './routes/configure/3420.svelte';
 	import ConfigureFluid from './routes/configure/fluid.svelte';
@@ -46,7 +45,6 @@
 		"/configure/3420/:instance": Configure3420,
 		"/configure/3125/:instance/:fluid": ConfigureFluid,
 		"/configure/4291/:instance/:fluid": ConfigureFluid,
-		"/simulate": Simulate,
 		"/program": Program,
 		"/program/3420/:instance": Program3420,
 		"/testing": Testing,

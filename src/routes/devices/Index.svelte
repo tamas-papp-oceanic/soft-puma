@@ -10,17 +10,23 @@
     key: "id",
     value: "Address"
   },{
+    key: "instance",
+    value: "Instance"
+  },{
     key: "manufacturer",
     value: "Manufacturer"
+  },{
+    key: "modelID",
+    value: "Description"
   },{
     key: "productCode",
     value: "Product Code"
   },{
-    key: "instance",
-    value: "Instance"
+    key: "modelVersion",
+    value: "Part Number"
   },{
-    key: "modelID",
-    value: "Description"
+    key: "softwareVersion",
+    value: "Version"
   },{
     key: "uniqueNumber",
     value: "Unique Number"
@@ -58,11 +64,11 @@
     }
   };
 
-  function conf(e, add) {
+  function conf(e, row) {
     if ((typeof $devices[selected] !== 'undefined') &&
       (typeof $name[$devices[selected]] !== 'undefined') &&
-      (typeof $name[$devices[selected]][add] !== 'undefined')) {
-      let nam = $name[$devices[selected]][add];
+      (typeof $name[$devices[selected]][row.id] !== 'undefined')) {
+      let nam = $name[$devices[selected]][row.id];
       let pat = '/configure';
       if (typeof paths[nam.modelVersion] !== 'undefined') {
         pat += '/' + nam.modelVersion + paths[nam.modelVersion];
@@ -71,8 +77,8 @@
         let dat = $data[$devices[selected]];
         for (let i in dat) {
           if (dat[i].header.src == parseInt(add)) {
-            if (typeof dat[i].header.ins !== 'undefined') {
-              pat = pat.replace(':instance', dat[i].header.ins.toString());
+            if ((dat[i].header.src == parseInt(row.id)) && (dat[i].header.ins == parseInt(row.instance))) {
+              pat = pat.replace(':instance', row.instance);
             }
             if (typeof dat[i].header.typ !== 'undefined') {
               if (dat[i].header.pgn == 127505) {
@@ -88,30 +94,20 @@
     }
   }
 
-  function test(e, add) {
+  function test(e, row) {
     if ((typeof $devices[selected] !== 'undefined') &&
       (typeof $name[$devices[selected]] !== 'undefined') &&
-      (typeof $name[$devices[selected]][add] !== 'undefined')) {
-      let nam = $name[$devices[selected]][add];
+      (typeof $name[$devices[selected]][row.id] !== 'undefined')) {
+      let nam = $name[$devices[selected]][row.id];
       let pat = '/testing';
       if (typeof paths[nam.modelVersion] !== 'undefined') {
         pat += '/' + nam.modelVersion + paths[nam.modelVersion];
       }
-
-      console.log($data)
-
       if (typeof $data[$devices[selected]] !== 'undefined') {
         let dat = $data[$devices[selected]];
         for (let i in dat) {
-
-
-
-
-
-          if (dat[i].header.src == parseInt(add)) {
-            if (typeof dat[i].header.ins !== 'undefined') {
-              pat = pat.replace(':instance', dat[i].header.ins.toString());
-            }
+          if ((dat[i].header.src == parseInt(row.id)) && (dat[i].header.ins == parseInt(row.instance))) {
+            pat = pat.replace(':instance', row.instance);
             break;
           }
         }
@@ -121,11 +117,11 @@
     }
   }
 
-  function update(e, add) {
+  function update(e, row) {
     if ((typeof $devices[selected] !== 'undefined') &&
       (typeof $name[$devices[selected]] !== 'undefined') &&
-      (typeof $name[$devices[selected]][add] !== 'undefined')) {
-      let nam = $name[$devices[selected]][add];
+      (typeof $name[$devices[selected]][row.id] !== 'undefined')) {
+      let nam = $name[$devices[selected]][row.id];
       let pat = '/program';
       if (typeof paths[nam.modelVersion] !== 'undefined') {
         pat += '/' + nam.modelVersion + paths[nam.modelVersion];
@@ -133,10 +129,8 @@
       if (typeof $data[$devices[selected]] !== 'undefined') {
         let dat = $data[$devices[selected]];
         for (let i in dat) {
-          if (dat[i].header.src == parseInt(add)) {
-            if (typeof dat[i].header.ins !== 'undefined') {
-              pat = pat.replace(':instance', dat[i].header.ins.toString());
-            }
+          if ((dat[i].header.src == parseInt(row.id)) && (dat[i].header.ins == parseInt(row.instance))) {
+            pat = pat.replace(':instance', row.instance);
             break;
           }
         }
@@ -173,11 +167,13 @@
       for (const [key, val] of Object.entries($name[$device])) {
         let nam = {
           id: key,
-          uniqueNumber: val.uniqueNumber != null ? val.uniqueNumber : '',
-          manufacturer: val.decoded.manufacturer != null ? val.decoded.manufacturer : '',
-          productCode: val.productCode != null ? val.productCode : '',
-          modelID: val.modelID != null ? val.modelID : '',
           instance: val.deviceInstance != null ? val.deviceInstance : '',
+          manufacturer: val.decoded.manufacturer != null ? val.decoded.manufacturer : '',
+          modelID: val.modelID != null ? val.modelID : '',
+          productCode: val.productCode != null ? val.productCode : '',
+          modelVersion: val.modelVersion != null ? val.modelVersion : '',
+          softwareVersion: val.softwareVersion != null ? val.softwareVersion : '',
+          uniqueNumber: val.uniqueNumber != null ? val.uniqueNumber : '',
         };
         tmp.push(nam);
       }
@@ -223,10 +219,10 @@
         <span slot="cell" let:cell let:row>
           {#if cell.key === 'overflow'}
             <OverflowMenu flipped>
-              <OverflowMenuItem text="Configure" on:click={(e) => conf(e, row.id)} />
+              <OverflowMenuItem text="Configure" on:click={(e) => conf(e, row)} />
               <OverflowMenuItem text="Monitor" on:click={(e) => push('/monitor/'+row.id)} />
-              <OverflowMenuItem text="Test" on:click={(e) => test(e, row.id)} />
-              <OverflowMenuItem text="Update" on:click={(e) => update(e, row.id)} />
+              <OverflowMenuItem text="Test" on:click={(e) => test(e, row)} />
+              <OverflowMenuItem text="Update" on:click={(e) => update(e, row)} />
             </OverflowMenu>
           {:else}
             {cell.value}

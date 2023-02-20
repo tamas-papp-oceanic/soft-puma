@@ -81,7 +81,11 @@
           <Column sm={1} md={1} lg={1}>
           </Column>
           <Column sm={1} md={1} lg={2}>
-            <Dropdown titleText="Relay instance" size="lg" bind:selectedId={data.instance} items={insts} on:select={(e) => select(e)}/>
+            <Row padding>
+              <Column>
+                <Dropdown titleText="Relay instance" size="lg" bind:selectedId={data.instance} items={insts} on:select={(e) => select(e)}/>
+              </Column>
+            </Row>
           </Column>
           <Column sm={1} md={1} lg={1}>
           </Column>

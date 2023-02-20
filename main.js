@@ -430,7 +430,6 @@ ipcMain.on('prog-start', (e, args) => {
     .then((res) => {
       byt = res.length;
       dat = Buffer.from(res);
-      console.log(byt)
     })
     .then(() => bootToLoader(eng, typ, ins, progMessage))
     .then(() => bootErase(eng, typ, ins, byt, progMessage))
@@ -521,7 +520,7 @@ function bootErase(eng, typ, ins, len, func) {
   });
 }
 
-async function blockWrite(eng, typ, ins, out, func) {
+async function blockWrite(eng, typ, ins, out) {
   return new Promise((resolve, reject) => {
     btimer = setTimeout(() => {
       btimer = null;
@@ -770,6 +769,9 @@ ipcMain.on('c3420-write', (e, args) => {
   let res = true;
   for (const [key, val] of Object.entries(devices)) {
     // Send Fluid Sender Control proprietary PGN
+    console.log(ins, out, devices)
+
+
     // Request for Mode Data
     let ret = val.engine.send065445(0x08, inst, parm, data);
     res ||= ret;
@@ -792,6 +794,61 @@ ipcMain.on('c3478-write', (e, args) => {
   if ((mainWindow != null) && (typeof mainWindow.webContents !== 'undefined')) {
     mainWindow.webContents.send('c3478-done', res);
   }
+});
+
+async function switchWrite(ins, idx) {
+  let out = new Buffer.alloc(28, 3);
+  if (idx == 8) {
+    out.fill(1, 0, 8);
+  } else {
+    out.fill(0, 0, 8);
+    if (idx != -1) {
+      if (idx > 0) {
+        out[idx - 1] = 0;
+      }
+      out[idx] = 1;
+    }
+  }
+  let res = true;
+  for (const [key, val] of Object.entries(devices)) {
+    // Send Switch Bank Control PGN
+    let ret = val.engine.send127502(ins, out);
+    res ||= ret;
+  }
+  await sleep(1000);
+  if (res) {
+    await Promise.resolve(true);
+  } else {
+    await Promise.reject(new Error('Writing switch data failed!'));
+  }
+}
+
+// Starts 3478 auto tests
+ipcMain.on('a3478-write', (e, args) => {
+  const [ins] = args;
+  Promise.resolve()
+  .then(() => switchWrite(ins, -1))
+  .then(() => switchWrite(ins, 0))
+  .then(() => switchWrite(ins, 1))
+  .then(() => switchWrite(ins, 2))
+  .then(() => switchWrite(ins, 3))
+  .then(() => switchWrite(ins, 4))
+  .then(() => switchWrite(ins, 5))
+  .then(() => switchWrite(ins, 6))
+  .then(() => switchWrite(ins, 7))
+  .then(() => switchWrite(ins, 8))
+  .then(() => switchWrite(ins, -1))
+  .then(() => {
+    if ((mainWindow != null) && (typeof mainWindow.webContents !== 'undefined')) {
+      mainWindow.webContents.send('a3478-done', true);
+    }
+  })
+  .catch((err) => {
+    log.error(err);
+    if ((mainWindow != null) && (typeof mainWindow.webContents !== 'undefined')) {
+      mainWindow.webContents.send('a3478-done', false);
+    }
+  });
 });
 
 // Closes the application

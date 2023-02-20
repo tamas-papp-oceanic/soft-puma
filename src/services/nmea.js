@@ -292,14 +292,24 @@ class NMEAEngine {
         header: { pgn: 127502, src: this.#addrMngr.address, dst: 0xFF },
         fields: [{ field: 1,title: 'Switch Bank Instance', state: 'V', value: ins }],
       };
-      for (let i = 0; i < 28; i++) {
-        let sts = '-';
-        let out = 3;
-        if (bank == (i + 1)) {
-          out = val ? 1 : 0;
-          sts = 'V';
+      if (typeof bank === "number") {
+        for (let i = 0; i < 28; i++) {
+          let sts = '-';
+          let out = 3;
+          if (bank == (i + 1)) {
+            out = val ? 1 : 0;
+            sts = 'V';
+          }
+          msg.fields.push({ field: i + 2,title: 'Switch' + (i + 1), state: sts, value: out });
         }
-        msg.fields.push({ field: i + 2,title: 'Switch' + (i + 1), state: sts, value: out });
+      } else if ((typeof bank === "object") && Buffer.isBuffer(bank)) {
+        for (let i = 0; i < 28; i++) {
+          let sts = '-';
+          if ((bank[i] == 0) || (bank[i] == 1)) {
+            sts = 'V';
+          }
+          msg.fields.push({ field: i + 2,title: 'Switch' + (i + 1), state: sts, value: bank[i] });
+        }
       }
       return this.sendMsg(msg);
     }

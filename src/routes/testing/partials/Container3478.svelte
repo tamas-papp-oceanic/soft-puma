@@ -2,6 +2,7 @@
   import { onMount, onDestroy, createEventDispatcher } from "svelte";
   import { ButtonSet, Button, Tile, Grid, Row, Column, Dropdown,
     Toggle, DataTable} from "carbon-components-svelte";
+  import Auto from "carbon-icons-svelte/lib/Automatic16";
 
   export let data;
   export let style;
@@ -12,81 +13,23 @@
   const greenImage = "/images/circle-green.png";
   const yellowImage = "/images/circle-yellow.png";
   
-  const timeout = 2000;
-  let timer = null;
   let insts = new Array();
-  let banks = new Array();
   let header = new Array();
   let rows = new Array();
-  let running = false;
-  let notify = false;
-  let kind = null;
-  let title = null;
-  let subttl = null;
-
-  onMount(() => {
-    window.pumaAPI.recv('n2k-digi-data', (e, args) => {
-      const [ dev, msg ] = args;
-      if (msg.fields[0].value == data.instance) {
-        for (let i = 0; i < 8; i++) {
-          banks[i].status = msg.fields[i + 1].value;
-          if (banks[i].status == 0) {
-            banks[i].command = false;
-          } else if (banks[i].status == 1) {
-            banks[i].command = true;
-          }
-        }
-      }
-    });
-  });
-  
-  onDestroy(() => {
-    window.pumaAPI.reml('n2k-digi-data');
-  });
-
-  function stop(lis) {
-    if (timer != null) {
-      clearTimeout(timer);
-      timer = null
-    }
-    // Remove listeners
-    window.pumaAPI.reml(lis + '-done');
-  };
 
   function select(e) {
-    banks = new Array();
+    data.banks = new Array();
     for (let i = 0; i < 8; i++) {
-      banks.push({ status: 3, command: false });
+      data.banks.push({ status: 3, command: false });
     }
+  };
+
+  function auto(e) {
+    dispatch("auto");
   };
 
   function toggle(e, idx) {
-    running = true;
-    timer = setTimeout(() => {
-      kind = 'error'
-      title = 'Error';
-      subttl = 'Error writing channel data with this instance.';
-      notify = true;
-      stop('c3478');
-      running = false;
-    }, timeout);
-    // Receives program result
-    window.pumaAPI.recv('c3478-done', (e, res) => {
-      if (res) {
-        kind = 'info'
-        title = 'Success';
-        subttl = 'Channel data has been sent.';
-        notify = true;
-      } else {
-        kind = 'error'
-        title = 'Error';
-        subttl = 'Error writing channel data with this instance.';
-        notify = true;
-        stop('c3478');
-        running = false;
-      }
-    });
-    window.pumaAPI.send('c3478-write', [parseInt(data.instance), parseInt(idx) + 1, banks[idx].command]);
+    dispatch("toggle", { cell: idx });
   };
 
   function cancel(e) {
@@ -120,7 +63,16 @@
           <Column sm={1} md={1} lg={1}>
           </Column>
           <Column sm={1} md={1} lg={2}>
-            <Dropdown titleText="Relay instance" size="lg" bind:selectedId={data.instance} items={insts} on:select={(e) => select(e)}/>
+            <Row padding>
+              <Column>
+                <Dropdown disabled={data.autorun} titleText="Relay instance" size="lg" bind:selectedId={data.instance} items={insts} on:select={(e) => select(e)}/>
+              </Column>
+            </Row>
+            <Row padding>
+              <Column>
+                <Button disabled={data.autorun} icon={Auto} on:click={(e) => auto(e)}>Auto test</Button>
+              </Column>
+            </Row>
           </Column>
           <Column sm={1} md={1} lg={1}>
           </Column>
@@ -129,11 +81,15 @@
             <DataTable useStaticWidth size="tall" headers={header} rows={rows} class="relay">
               <svelte:fragment slot="cell" let:row let:cell>
                 {#if row.id === "a"}
-                  <img src={banks[cell.key].status == 0 ? redImage : banks[cell.key].status == 1 ? greenImage : banks[cell.key].status == 2 ? yellowImage : greyImage} alt style="width: 2rem;" />
-                {:else}
-                  <Toggle labelText={cell.key} hideLabel bind:toggled={banks[cell.key].command} on:toggle={(e) => toggle(e, cell.key)}/>
+                  <img src={data.banks[cell.key].status == 0 ? redImage : data.banks[cell.key].status == 1 ? greenImage : data.banks[cell.key].status == 2 ? yellowImage : greyImage} alt style="width: 2rem;" />
+                {:else if row.id === "b"}
+                  <Toggle disabled={data.autorun} labelText={cell.key} hideLabel bind:toggled={data.banks[cell.key].command} on:toggle={(e) => toggle(e, cell.key)}/>
                 {/if}
               </svelte:fragment>
+              <Row>
+                <Column>
+                </Column>
+              </Row>
             </DataTable>
           </Column>
         </Row>
