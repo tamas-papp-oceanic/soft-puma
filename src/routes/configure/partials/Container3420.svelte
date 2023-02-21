@@ -21,7 +21,7 @@
   let inst1 = new Array();
   let inst2 = new Array();
   let inst = data.instance;
-  let circ = data.circuit ? data.circuit : '1';
+  let circ = '1';
   let alive = false;
     
   function select(e) {
@@ -54,8 +54,16 @@
     inst2.push({ id: i.toString(), text: i.toString() })
   }
 
+  function setCircuit(val) {
+    if (val != null) {
+      circ = val;
+    }
+  };
+
   // Data getters / setters
   $: alive = isAlive(parseInt(data.source));
+  $: data.circuit, setCircuit(data.circuit);
+
 </script>
 
 <div class="container" style={style}>

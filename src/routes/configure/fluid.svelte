@@ -262,7 +262,7 @@
 <Grid>
   <Row>
     <Column>
-      <h2>{model + ' ' + getname(model) + ' - Configuration'}</h2>
+      <h2>{model + ' - ' + getname(model) + ' - Configuration'}</h2>
       <VolumeContainer style="height: 80vh;" bind:data={data} running={running}
         on:load={load} on:save={save} on:getmode={getmode} on:setmode={setmode} on:download={download}
         on:upload={upload} on:cancel={cancel} />

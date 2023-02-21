@@ -217,6 +217,7 @@ function proc(dev, frm) {
               switch (msg.fields[3].value) {
                 case 8:
                   mainWindow.webContents.send('n2k-ac-data', [dev, msg]);
+                  pub.emit('conf-ack', msg);
                   break;
               }
               break;
@@ -747,30 +748,105 @@ ipcMain.on('voltable-write', (e, args) => {
   }
 });
 
+function c3420Read(eng, ins, cmd) {
+  return new Promise((resolve, reject) => {
+    // Reading configuration...
+    let ret = eng.send065445(0x08, ins, 0xFF, (((0xFF << 8) + cmd) << 8) + 0x00);
+    if (ret) {
+      btimer = setTimeout(() => {
+        btimer = null;
+        reject(new Error('Reading configuration failed!'));
+      }, 5000);
+      pub.once('conf-ack', (res) => {
+        clearTimeout(btimer);
+        btimer = null;
+        if ((typeof res.fields !== 'undefined') && Array.isArray(res.fields) &&
+          (res.fields[3].value == 0x08) && (res.fields[4].value == ins) &&
+          (res.fields[5].value == cmd)) {
+          let msg = 'Configuration successfuly read.';
+          log.info(msg);
+          resolve(true);
+        } else {
+          reject(new Error('Reading configuration failed!'));
+        }
+      });
+    } else {
+      reject(new Error('Reading configuration failed!'));
+    }
+  });
+}
+
 // Starts 3420 configuration reading
 ipcMain.on('c3420-read', (e, args) => {
-  const [dev, inst, conf] = args;
+  const [dev, inst] = args;
   if ((typeof dev === 'string') && (typeof devices[dev] !== 'undefined')) {
     let eng = devices[dev].engine;
-    let res = eng.send065445(0x08, inst, 0xFF, (0xFF00 << 8) + conf);
-    if ((mainWindow != null) && (typeof mainWindow.webContents !== 'undefined')) {
-      mainWindow.webContents.send('c3420-done', res);
-    }
+    Promise.resolve()
+    .then(() => c3420Read(eng, inst, 0))
+    .then(() => c3420Read(eng, inst, 1))
+    .then(() => {
+      if ((mainWindow != null) && (typeof mainWindow.webContents !== 'undefined')) {
+        mainWindow.webContents.send('r3420-done', true);
+      }
+    })
+    .catch((err) => {
+      log.error(err);
+      if ((mainWindow != null) && (typeof mainWindow.webContents !== 'undefined')) {
+        mainWindow.webContents.send('r3420-done', false);
+      }
+    });
   } else {
     console.log("No device selected!");
   }
 });
+
+function c3420Write(eng, ins, cmd, dat) {
+  return new Promise((resolve, reject) => {
+    // Writing configuration...
+    let ret = eng.send065445(0x08, ins, cmd, dat);
+    if (ret) {
+      btimer = setTimeout(() => {
+        btimer = null;
+        reject(new Error('Writing configuration failed!'));
+      }, 5000);
+      pub.once('conf-ack', (res) => {
+        clearTimeout(btimer);
+        btimer = null;
+        if ((typeof res.fields !== 'undefined') && Array.isArray(res.fields) &&
+          (res.fields[3].value == 0x08) && (res.fields[4].value == ins) &&
+          (res.fields[5].value == cmd) && ((res.fields[6].value & 0xFF) == dat)) {
+          let msg = 'Configuration successfuly written.';
+          log.info(msg);
+          resolve(true);
+        } else {
+          reject(new Error('Writing configuration failed!'));
+        }
+      });
+    } else {
+      reject(new Error('Writing configuration failed!'));
+    }
+  });
+}
 
 // Starts 3420 configuration writing
 ipcMain.on('c3420-write', (e, args) => {
   const [dev, inst, ins2, circ] = args;
   if ((typeof dev === 'string') && (typeof devices[dev] !== 'undefined')) {
     let eng = devices[dev].engine;
-    let res = eng.send065445(0x08, inst, 0, circ);
-    res ||= eng.send065445(0x08, inst, 1, ins2);
-    if ((mainWindow != null) && (typeof mainWindow.webContents !== 'undefined')) {
-      mainWindow.webContents.send('c3420-done', res);
-    }
+    Promise.resolve()
+    .then(() => c3420Write(eng, inst, 0, circ))
+    .then(() => c3420Write(eng, inst, 1, ins2))
+    .then(() => {
+      if ((mainWindow != null) && (typeof mainWindow.webContents !== 'undefined')) {
+        mainWindow.webContents.send('w3420-done', true);
+      }
+    })
+    .catch((err) => {
+      log.error(err);
+      if ((mainWindow != null) && (typeof mainWindow.webContents !== 'undefined')) {
+        mainWindow.webContents.send('w3420-done', false);
+      }
+    });
   } else {
     console.log("No device selected!");
   }

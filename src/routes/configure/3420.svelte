@@ -4,7 +4,7 @@
   import { location, pop } from "svelte-spa-router";
   import Container3420 from './partials/Container3420.svelte';
   import { getname } from '../../stores/common.js';
-  import { deleteData, device } from '../../stores/data';
+  import { device } from '../../stores/data';
 
   export let params;
 
@@ -12,7 +12,8 @@
 
   const model = $location.split('/')[2];
   const timeout = 2000;
-  let timer = null;
+  let rtimer = null;
+  let wtimer = null;
   let data = {
     instance: params.instance,
     source: null,
@@ -34,38 +35,32 @@
             // Circuit Type (1 = Single Phase, 2 = Double Phase, 3 = Three Phase, 4 = Split Phase)
             data.source = msg.header.src;
             data.circuit = val.toString();
-            stop('c3420');
-            running = false;
             break;
           case 1:
             // Device Instance
             data.source = msg.header.src;
-            deleteData(msg.header.src);
-            setTimeout(() => {
-              data.instance = val.toString();
-              stop('c3420');
-              running = false;
-            }, 1000);
+            data.instance = val.toString();
             break;
         }
       }
     });
-    select();
   });
   
   onDestroy(() => {
-    if (timer != null) {
-      clearTimeout(timer);
-      timer = null
-    }
-    running = false;
     window.pumaAPI.reml('n2k-ac-data');
   });
 
   function stop(lis) {
-    if (timer != null) {
-      clearTimeout(timer);
-      timer = null
+    if (lis == 'r3420') {
+      if (rtimer != null) {
+        clearTimeout(rtimer);
+        rtimer = null;
+      }
+    } else if (lis == 'w3420') {
+      if (wtimer != null) {
+        clearTimeout(wtimer);
+        wtimer = null;
+      }
     }
     // Remove listeners
     window.pumaAPI.reml(lis + '-done');
@@ -73,40 +68,43 @@
 
   function select(e) {
     running = true;
-    timer = setTimeout(() => {
+    rtimer = setTimeout(() => {
+      stop('r3420');
+      running = false;
       kind = 'error'
       title = 'Error';
       subttl = 'Error reading circuit type with this instance.';
       notify = true;
-      running = false;
     }, timeout);
     data.circuit = null;
     // Receives circuit type result
-    window.pumaAPI.recv('c3420-done', (e, res) => {
+    window.pumaAPI.recv('r3420-done', (e, res) => {
+      stop('r3420');
+      running = false;
       if (!res) {
         kind = 'error'
         title = 'Error';
         subttl = 'Error reading circuit type with this instance.';
         notify = true;
-        stop('c3420');
-        running = false;
       }
     });
-    window.pumaAPI.send('c3420-read', [$device, parseInt(data.instance), 0x00]);
+    window.pumaAPI.send('c3420-read', [$device, parseInt(data.instance)]);
   };
 
   function program(e) {
     running = true;
-    timer = setTimeout(() => {
+    wtimer = setTimeout(() => {
+      stop('w3420');
+      running = false;
       kind = 'error'
       title = 'Error';
       subttl = 'Error writing parameter with this instance.';
       notify = true;
-      stop('c3420');
-      running = false;
     }, timeout);
     // Receives program result
-    window.pumaAPI.recv('c3420-done', (e, res) => {
+    window.pumaAPI.recv('w3420-done', (e, res) => {
+      stop('w3420');
+      running = false;
       if (res) {
         kind = 'info'
         title = 'Success';
@@ -117,15 +115,14 @@
         title = 'Error';
         subttl = 'Error writing parameter with this instance.';
         notify = true;
-        stop('c3420');
-        running = false;
       }
     });
     window.pumaAPI.send('c3420-write', [$device, parseInt(data.instance), parseInt(e.detail.instance), parseInt(e.detail.circuit)]);
   };
 
   function cancel(e) {
-    stop('c3420');
+    stop('r3420');
+    stop('w3420');
     running = false;
     pop();
   };
@@ -136,21 +133,19 @@
     subttl = e.detail.title;
     notify = true;
   }
+
+  select();
 </script>
 
 <Grid>
   <Row>
     <Column>
-      <h2>{model + ' ' + getname(model) + ' - Configuration'}</h2>
+      <h2>{model + ' - ' + getname(model) + ' - Configuration'}</h2>
       <Container3420 style="height: 80vh;" bind:data={data} running={running}
         on:select={select} on:program={program} on:cancel={cancel} on:error={error} />
       {#if notify}
         <div class="error">
-          <ToastNotification
-            kind={kind}
-            title={title}
-            subtitle={subttl}
-            caption={new Date().toLocaleString()}
+          <ToastNotification kind={kind} title={title} subtitle={subttl} caption={new Date().toLocaleString()}
             on:close={(e) => (notify = false)}
           />
         </div>

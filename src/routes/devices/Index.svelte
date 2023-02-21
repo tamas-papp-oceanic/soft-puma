@@ -4,6 +4,7 @@
     OverflowMenuItem, Pagination, Dropdown, Tag } from "carbon-components-svelte";
   import Scan from "carbon-icons-svelte/lib/SearchLocate16";
   import { push } from 'svelte-spa-router'
+  import { allRoutes } from "../../stores/common.js";
   import { name, devices, device, data } from "../../stores/data.js";
 
   const headers = [{
@@ -76,7 +77,7 @@
       if (typeof $data[$devices[selected]] !== 'undefined') {
         let dat = $data[$devices[selected]];
         for (let i in dat) {
-          if (dat[i].header.src == parseInt(add)) {
+          if (dat[i].header.src == parseInt(row.id)) {
             if ((dat[i].header.src == parseInt(row.id)) && (dat[i].header.ins == parseInt(row.instance))) {
               pat = pat.replace(':instance', row.instance);
             }
@@ -147,8 +148,26 @@
 
   function select(e) {
     $device = e.detail.selectedItem.text;
-  }
+  };
   
+  function isRoute(prf, add) {
+
+    if ((typeof $devices[selected] !== 'undefined') &&
+      (typeof $name[$devices[selected]] !== 'undefined') &&
+      (typeof $name[$devices[selected]][add] !== 'undefined')) {
+      let nam = $name[$devices[selected]][add];
+      if (typeof paths[nam.modelVersion] !== 'undefined') {
+        prf += '/' + nam.modelVersion;
+        for (let r of $allRoutes) {
+          if (r.startsWith('/' + prf)) {
+            return true;
+          }
+        }
+      }
+    }
+    return false;
+  };
+
   getSelected();
 
   // Data getters, setters
@@ -219,10 +238,10 @@
         <span slot="cell" let:cell let:row>
           {#if cell.key === 'overflow'}
             <OverflowMenu flipped>
-              <OverflowMenuItem text="Configure" on:click={(e) => conf(e, row)} />
+              <OverflowMenuItem text="Configure" disabled={!isRoute('configure', row.id)} on:click={(e) => conf(e, row)} />
               <OverflowMenuItem text="Monitor" on:click={(e) => push('/monitor/'+row.id)} />
-              <OverflowMenuItem text="Test" on:click={(e) => test(e, row)} />
-              <OverflowMenuItem text="Update" on:click={(e) => update(e, row)} />
+              <OverflowMenuItem text="Test" disabled={!isRoute('testing', row.id)} on:click={(e) => test(e, row)} />
+              <OverflowMenuItem text="Update" disabled={!isRoute('program', row.id)} on:click={(e) => update(e, row)} />
             </OverflowMenu>
           {:else}
             {cell.value}

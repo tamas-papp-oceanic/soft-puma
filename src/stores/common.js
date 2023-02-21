@@ -1,4 +1,8 @@
-const devnames = {
+import { writable } from 'svelte/store';
+
+export const allRoutes = writable(new Array());
+
+export const devnames = {
   'senders': {
     '3271': 'Volumetric Fuel Sender',
     '3281': 'Water Level Sender',
@@ -16,7 +20,7 @@ const devnames = {
   }
 };
 
-function getname(cod) {
+export function getname(cod) {
   for (const grp of Object.values(devnames)) {
     if (typeof grp[cod] !== 'undefined') {
       return grp[cod];
@@ -25,4 +29,4 @@ function getname(cod) {
   return null;
 };
 
-export { devnames, getname };
+// export { devnames, getname };

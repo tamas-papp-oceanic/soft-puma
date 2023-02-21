@@ -96,7 +96,7 @@
 <Grid>
   <Row>
     <Column>
-      <h2>{model + ' ' + getname(model) + ' - Update'}</h2>
+      <h2>{model + ' - ' + getname(model) + ' - Update'}</h2>
       <ProgramContainer bind:data={data} message={message} running={running} style="height: 80vh;"
         on:loader={loader} on:program={program} on:cancel={cancel} />
     </Column>

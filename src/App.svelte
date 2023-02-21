@@ -23,6 +23,7 @@
 	import Test5185 from './routes/testing/5185.svelte';
 	import { loggedIn } from './stores/user.js';
   import { update, updmsg, download, progress } from './stores/update.js';
+	import { allRoutes } from './stores/common.js';
 
 	export let version;
 	export let appName;
@@ -109,7 +110,14 @@
 		started = false;
 	}
 
-	window.pumaAPI.send('dev-start');
+  $allRoutes = new Array();
+  for (const [key, val] of Object.entries(routes)) {
+    if (key.startsWith('/configure/') || key.startsWith('/program/') || key.startsWith('/testing/')) {
+      $allRoutes.push(key);
+    }
+  }
+
+  window.pumaAPI.send('dev-start');
 
 	$: prc = $progress && $progress.percent ? $progress.percent : 0;
 	$: max = $progress && $progress.total ? $progress.total / (1024 * 1024) : 100;

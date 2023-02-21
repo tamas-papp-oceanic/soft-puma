@@ -115,7 +115,7 @@
 <Grid>
   <Row>
     <Column>
-      <h2>{model + ' ' + getname(model) + ' - Test'}</h2>
+      <h2>{model + ' - ' + getname(model) + ' - Test'}</h2>
       <Container3478 bind:data={data} style="height: 80vh;" on:auto={auto} on:toggle={toggle} on:cancel={cancel} />
       {#if notify}
         <div class="error">
