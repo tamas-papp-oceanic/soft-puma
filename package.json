@@ -78,6 +78,7 @@
     "bwip-js": "^3.1.0",
     "carbon-components-svelte": "^0.67.0",
     "carbon-icons-svelte": "^10.45.1",
+    "compare-versions": "^6.0.0-rc.1",
     "crypto": "^1.0.1",
     "download": "^8.0.0",
     "electron-is-dev": "^2.0.0",

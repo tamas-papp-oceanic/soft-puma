@@ -13,6 +13,8 @@ export const data = writable({});
 export const queue = writable({});
 export const filter = writable(null);
 export const selected = writable({program: null, config: null, device: null, test: null});
+export const allRoutes = writable(new Array());
+export const versions = writable({});
 
 window.pumaAPI.send('n2k-ready');
 

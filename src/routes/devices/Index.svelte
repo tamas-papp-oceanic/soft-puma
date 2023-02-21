@@ -4,8 +4,8 @@
     OverflowMenuItem, Pagination, Dropdown, Tag } from "carbon-components-svelte";
   import Scan from "carbon-icons-svelte/lib/SearchLocate16";
   import { push } from 'svelte-spa-router'
-  import { allRoutes } from "../../stores/common.js";
-  import { name, devices, device, data } from "../../stores/data.js";
+  import { name, devices, device, data, allRoutes, versions } from "../../stores/data.js";
+  import { compareVersions } from 'compare-versions';
 
   const headers = [{
     key: "id",
@@ -151,7 +151,6 @@
   };
   
   function isRoute(prf, add) {
-
     if ((typeof $devices[selected] !== 'undefined') &&
       (typeof $name[$devices[selected]] !== 'undefined') &&
       (typeof $name[$devices[selected]][add] !== 'undefined')) {
@@ -167,6 +166,21 @@
     }
     return false;
   };
+
+  function isUpdate(add) {
+    if ((typeof $devices[selected] !== 'undefined') &&
+      (typeof $name[$devices[selected]] !== 'undefined') &&
+      (typeof $name[$devices[selected]][add] !== 'undefined')) {
+      let nam = $name[$devices[selected]][add];
+      let mod = nam.modelVersion;
+      let dve = nam.softwareVersion;
+      let cve = $versions[mod];
+      if (compareVersions(dve, cve) > 0) {
+        return true;
+      }
+    }
+    return false;
+  }
 
   getSelected();
 
@@ -241,7 +255,7 @@
               <OverflowMenuItem text="Configure" disabled={!isRoute('configure', row.id)} on:click={(e) => conf(e, row)} />
               <OverflowMenuItem text="Monitor" on:click={(e) => push('/monitor/'+row.id)} />
               <OverflowMenuItem text="Test" disabled={!isRoute('testing', row.id)} on:click={(e) => test(e, row)} />
-              <OverflowMenuItem text="Update" disabled={!isRoute('program', row.id)} on:click={(e) => update(e, row)} />
+              <OverflowMenuItem text="Update" disabled={!isRoute('program', row.id) || !isUpdate(row.id)} on:click={(e) => update(e, row)} />
             </OverflowMenu>
           {:else}
             {cell.value}

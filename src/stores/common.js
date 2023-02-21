@@ -1,7 +1,3 @@
-import { writable } from 'svelte/store';
-
-export const allRoutes = writable(new Array());
-
 export const devnames = {
   'senders': {
     '3271': 'Volumetric Fuel Sender',
@@ -28,5 +24,3 @@ export function getname(cod) {
   }
   return null;
 };
-
-// export { devnames, getname };

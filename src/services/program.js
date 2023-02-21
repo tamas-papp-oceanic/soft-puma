@@ -13,6 +13,7 @@ const log = require('electron-log');
 const dwl = require('download');
 const path = require('path');
 const cp = require('child_process');
+const http = require('http');
 
 function erase(func) {
   return new Promise((resolve, reject) => {
@@ -117,6 +118,26 @@ async function writeBoot(dev, func) {
   });
 }
 
+async function downVersion(func) {
+  return new Promise((resolve, reject) => {
+    http.get(progURL + '/prog', (res) => {
+      if ((res.statusCode >= 200) && (res.statusCode <= 299)) {
+        let data = [];
+        res.on('data', (chunk) => {
+          data.push(chunk);
+        });
+        res.on('end', () => {
+          resolve(JSON.parse(Buffer.concat(data).toString()));
+        });
+      } else {
+        reject(new Error('Invalid request'));
+      }
+    }).on('error', (err) => {
+      reject(err)
+    });
+  });
+}
+
 async function downProg(mod, func) {
   return new Promise((resolve, reject) => {
     let file = null;
@@ -144,5 +165,6 @@ async function downProg(mod, func) {
 
 module.exports = {
   writeBoot,
+  downVersion,
   downProg,
 };

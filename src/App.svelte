@@ -23,7 +23,7 @@
 	import Test5185 from './routes/testing/5185.svelte';
 	import { loggedIn } from './stores/user.js';
   import { update, updmsg, download, progress } from './stores/update.js';
-	import { allRoutes } from './stores/common.js';
+	import { allRoutes, versions } from './stores/data.js';
 
 	export let version;
 	export let appName;
@@ -98,7 +98,14 @@
 		$progress = val;
   });
 
-	function _start(e) {
+	// Versions download hook
+  window.pumaAPI.recv('versions', (e, val) => {
+    $versions = JSON.parse(JSON.stringify(val));
+  });
+
+  window.pumaAPI.send('versions');
+
+  function _start(e) {
 		started = true;
 		window.pumaAPI.send('upd-start');
 	}
