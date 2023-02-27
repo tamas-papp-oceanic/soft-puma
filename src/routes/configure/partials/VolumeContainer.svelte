@@ -422,7 +422,7 @@
             </Row>
             <Row>
               <Column>
-                <Button kind="primary" disabled={running} on:click={(e) => setmode(e)}>Set mode</Button>
+                <Button kind="primary" disabled={running || (data.mode == null)} on:click={(e) => setmode(e)}>Set mode</Button>
               </Column>
             </Row>
           </Column>
