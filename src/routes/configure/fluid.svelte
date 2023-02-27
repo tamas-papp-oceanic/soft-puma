@@ -18,7 +18,7 @@
     instance: params.instance,
     capacity: null,
     table: new Array(),
-    mode: '0',
+    mode: null,
   };
   let running = false;
   let notify = false;
