@@ -22,6 +22,7 @@
   const dispatch = createEventDispatcher();
   
   const modes = new Array(
+    { id: null, text: 'Invalid' },
     { id: '0', text: 'Level' },
     { id: '1', text: 'Volumetric' },
   );
@@ -354,7 +355,7 @@
                   <Button style="margin: 0.2rem 0" disabled={running} on:click={(e) => clear(e)}>Clear table</Button>
                   <Button style="margin: 0.2rem 0" disabled={running} on:click={(e) => download(e)}>Read from Sender</Button>
                   <Button style="margin: 0.2rem 0" disabled={running || !valid.int} on:click={(e) => interpol(e)}>Interpolate</Button>
-                  <Button style="margin: 0.2rem 0" disabled={running} on:click={(e) => upload(e)}>Write to Sender</Button>
+                  <Button style="margin: 0.2rem 0" disabled={running || (rows.length < 2)} on:click={(e) => upload(e)}>Write to Sender</Button>
                 </ButtonSet>
               </Column>
             </Row>
@@ -417,7 +418,8 @@
             </Row>
             <Row padding>
               <Column>
-                <Dropdown hideLabel titleText="Select mode" size="xl" bind:selectedId={data.mode} items={modes} />
+                <Dropdown hideLabel titleText="Select mode" size="xl" bind:selectedId={data.mode} items={modes}
+                  invalid={data.mode == null} />
               </Column>
             </Row>
             <Row>
