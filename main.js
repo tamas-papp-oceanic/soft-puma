@@ -92,25 +92,36 @@ function createWindow() {
 
 autoUpdater.logger = log;
 autoUpdater.disableWebInstaller = true;
+
 // AutoUpdater callbacks
+
 // autoUpdater.on('checking-for-update', () => {
-// })
+//   log.info("Checking for program update...");
+// });
+
 autoUpdater.on('update-available', (info) => {
+  // log.info("Program update available.", info.version);
   setTimeout(() => {
     if ((mainWindow != null) && (typeof mainWindow.webContents !== 'undefined')) {
       mainWindow.webContents.send('upd-available', info.version);
     }
   }, 3000);
-})
+});
+
 // autoUpdater.on('update-not-available', (info) => {
-// })
+//   log.info("No program update available.");
+// });
+
 // autoUpdater.on('error', (err) => {
-// })
+//   log.error("Program update error!", err);
+// });
+
 autoUpdater.on('download-progress', (progObj) => {
   if ((mainWindow != null) && (typeof mainWindow.webContents !== 'undefined')) {
     mainWindow.webContents.send('upd-progress', progObj);
   }
-})
+});
+
 autoUpdater.on('update-downloaded', (info) => {
   mainWindow.webContents.send('upd-download', false);
 });
