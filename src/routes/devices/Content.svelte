@@ -13,6 +13,7 @@
   let key = null;
   let first = true;
   let rows = new Array();
+  let curr = new Array();
   let title = null;
   let pagination = {
     pageSize: 10,
@@ -76,6 +77,23 @@
       first = false;
     }
   }
+  $: {
+    if ($queue.length > 0) {
+      let tmp = new Array();
+      let lst = JSON.parse(JSON.stringify($queue[$queue.length - 1]));
+      lst.id = 'first';
+      let obj = {
+        id: lst.id,
+        cnt: lst.cnt,
+      };
+      for (let i in lst.fields) {
+        let fld = lst.fields[i];
+        obj['fld' + fld.field] = (fld.state == 'V') ? fld.value : '-';
+      }
+      tmp.push(obj);
+      curr = JSON.parse(JSON.stringify(tmp));
+    }
+  }
   $: if (key != null) {
     let tmp = new Array();
     for (let i in $queue) {
@@ -101,12 +119,7 @@
   <Row>
     <Column>
       {#if headers.length > 0}
-        <DataTable
-          sortable
-          {headers}
-          {rows}
-          pageSize={pagination.pageSize}
-          page={pagination.page}>
+        <DataTable {headers} {rows} pageSize={pagination.pageSize} page={pagination.page} class="last">
           <Toolbar>
             <Tile>{title}</Tile>
             <ToolbarContent>
@@ -115,9 +128,12 @@
             </ToolbarContent>
           </Toolbar>
           <span slot="cell" let:cell let:row>
+            {#if ((row.cnt - 1) % pagination.pageSize) == 0}
+              {curr[0][cell.key]}
+            {/if}
             {#if cell.key === 'overflow'}
-            <OverflowMenu flipped>
-              <OverflowMenuItem text="Details" disabled on:click={() => push('/details/'+ row.key)} />
+              <OverflowMenu flipped>
+                <OverflowMenuItem text="Details" disabled on:click={() => push('/details/'+ row.key)} />
               </OverflowMenu>
             {:else}
               {cell.value}
@@ -136,3 +152,13 @@
     </Column>
   </Row>
 </Grid>
+
+<style global>
+  .last table thead {
+    display: none;
+  }
+  .last table tbody tr:first-child td {
+    background: #c6c6c6;
+    color: #000000;
+  }
+</style>

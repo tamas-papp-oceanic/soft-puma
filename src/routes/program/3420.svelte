@@ -102,6 +102,3 @@
     </Column>
   </Row>
 </Grid>
-
-<style lang="css">
-</style>
