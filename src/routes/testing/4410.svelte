@@ -7,8 +7,6 @@
 
   export let params;
 
-  const plf = navigator?.userAgentData?.platform || navigator?.platform || 'unknown';
-  
   const model = $location.split('/')[2];
   let data = {
     instance: params.instance,

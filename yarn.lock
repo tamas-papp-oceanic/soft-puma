@@ -5500,6 +5500,11 @@
   dependencies:
     "regexparam" "2.0.0"
 
+"svelte-system-info@^1.0.0":
+  "integrity" "sha512-2mVvB+DX5nkjoJ/yv6e8OKGYX+qh8Zsw4GsH6hxSAI0I5eO/PeEV5Ty879/ZLSXAwNL+EY8vUFgG8oXNkHw4OQ=="
+  "resolved" "https://registry.npmjs.org/svelte-system-info/-/svelte-system-info-1.0.0.tgz"
+  "version" "1.0.0"
+
 "svelte@^3.0.0", "svelte@^3.23.0", "svelte@>=3.5.0":
   "integrity" "sha512-fN2YRm/bGumvjUpu6yI3BpvZnpIm9I6A7HR4oUNYd7ggYyIwSA/BX7DJ+UXXffLp6XNcUijyLvttbPVCYa/3xQ=="
   "resolved" "https://registry.npmjs.org/svelte/-/svelte-3.48.0.tgz"

@@ -1,7 +1,8 @@
 import { writable } from 'svelte/store';
+import { platform } from '../stores/user.js';
 
-const plf = navigator?.userAgentData?.platform || navigator?.platform || 'unknown';
-const testURL = (plf == 'Win32') ? 'http://192.168.16.52:8080' : 'http://localhost:8080';
+const testURL = platform.toLowerCase().includes('windows') ? 'http://192.168.16.52:8080' : 'http://localhost:8080';
+
 const _scriptData = writable({});
 const _steps = writable({});
 const _actions = writable({});

@@ -94,10 +94,25 @@
       curr = JSON.parse(JSON.stringify(tmp));
     }
   }
+  $: pagination.pageSize = Math.round(((height * 0.9) / getComputedStyle(document.documentElement).fontSize.replace('px', '')) / 3) - 4;
   $: if (key != null) {
     let tmp = new Array();
     for (let i in $queue) {
       let dat = $queue[i];
+      if (((dat.cnt - 1) % (pagination.pageSize - 1)) == 0) {
+        let lst = JSON.parse(JSON.stringify($queue[$queue.length - 1]));
+        lst.id = 'first';
+        let end = {
+          id: lst.id,
+          cnt: lst.cnt,
+        };
+        for (let i in lst.fields) {
+          let fld = lst.fields[i];
+          end['fld' + fld.field] = (fld.state == 'V') ? fld.value : '-';
+        }
+        end['overflow'] = '';
+        tmp.push(end);
+      }
       let obj = {
         id: dat.id,
         cnt: dat.cnt,
@@ -111,7 +126,6 @@
     rows = JSON.parse(JSON.stringify(tmp));
     pagination.totalItems = rows.length;
   }
-  $: pagination.pageSize = Math.round(((height * 0.9) / getComputedStyle(document.documentElement).fontSize.replace('px', '')) / 3) - 4;
 </script>
 
 <svelte:window bind:innerHeight={height} />
@@ -128,10 +142,7 @@
             </ToolbarContent>
           </Toolbar>
           <span slot="cell" let:cell let:row>
-            {#if ((row.cnt - 1) % pagination.pageSize) == 0}
-              {curr[0][cell.key]}
-            {/if}
-            {#if cell.key === 'overflow'}
+            {#if (cell.key === 'overflow') && (row.id !== 'first')}
               <OverflowMenu flipped>
                 <OverflowMenuItem text="Details" disabled on:click={() => push('/details/'+ row.key)} />
               </OverflowMenu>
@@ -154,9 +165,6 @@
 </Grid>
 
 <style global>
-  .last table thead {
-    display: none;
-  }
   .last table tbody tr:first-child td {
     background: #c6c6c6;
     color: #000000;
