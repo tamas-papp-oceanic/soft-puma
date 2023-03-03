@@ -22,10 +22,12 @@
     },
     "mac": {},
     "win": {
-      "target": [{
-        "target": "nsis",
-        "arch": "x64"
-    }],
+      "target": [
+        {
+          "target": "nsis",
+          "arch": "x64"
+        }
+      ],
       "publish": {
         "provider": "generic",
         "url": "http://192.168.16.52:8080/release/win64"
@@ -49,7 +51,7 @@
     "electron": "wait-on http://localhost:5000 && electron .",
     "electron-dev": "concurrently \"yarn run dev\" \"yarn run electron\"",
     "preelectron-pack": "yarn run build",
-    "electron-pack": "electron-builder -l snap -w"
+    "electron-pack": "electron-builder"
   },
   "devDependencies": {
     "@rollup/plugin-commonjs": "^17.0.0",
@@ -57,10 +59,10 @@
     "@rollup/plugin-node-resolve": "^11.0.0",
     "autoprefixer": "^10.2.5",
     "concurrently": "^6.0.2",
-    "electron": "^19.0.0",
-    "electron-builder": "^22.14.13",
+    "electron": "^23.1.2",
+    "electron-builder": "^22.10.3",
     "electron-rebuild": "^3.2.7",
-    "node-sass": "^6.0.0",
+    "node-sass": "^8.0.0",
     "postcss": "^8.2.15",
     "rebuild": "^0.1.2",
     "rollup": "^2.3.4",
@@ -83,7 +85,6 @@
     "carbon-icons-svelte": "^10.45.1",
     "compare-versions": "^6.0.0-rc.1",
     "crypto": "^1.0.1",
-    "dmg-builder": "^24.0.0-alpha.13",
     "download": "^8.0.0",
     "electron-is-dev": "^2.0.0",
     "electron-log": "^4.4.8",
