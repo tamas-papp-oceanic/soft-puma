@@ -230,54 +230,53 @@
   <Row>
     <Column>
       <DataTable
-      sortable
-      {headers}
-      {rows}
-      pageSize={pagination.pageSize}
-      page={pagination.page}>
-      <Toolbar>
-        <Dropdown
-        style="margin-left: 1rem; grid-gap: 0 1rem;"
-        titleText="Interface"
-        type="inline"
-        size="xl"
-        bind:selectedId={selected}
-        items={items}
-        on:select={(e) => select(e)}
-        />
-        <ToolbarContent>
-          <ToolbarSearch />
-          <!-- <ToolbarMenu>
-            <ToolbarMenuItem primaryFocus>Restart all</ToolbarMenuItem>
-            <ToolbarMenuItem href="https://cloud.ibm.com/docs/loadbalancer-service">
-              API documentation
-            </ToolbarMenuItem>
-            <ToolbarMenuItem danger>Stop all</ToolbarMenuItem>
-          </ToolbarMenu> -->
-          <Button icon={Scan} on:click={(e) => scan(e)}>Scan</Button>
-        </ToolbarContent>
-      </Toolbar>
-      <span slot="cell" let:cell let:row>
-        {#if cell.key === 'overflow'}
-        <OverflowMenu flipped>
-          <OverflowMenuItem text="Configure" disabled={!isRoute('configure', row.id)} on:click={(e) => conf(e, row)} />
-            <OverflowMenuItem text="Monitor" on:click={(e) => push('/monitor/'+row.id)} />
+        sortable
+        {headers}
+        {rows}
+        pageSize={pagination.pageSize}
+        page={pagination.page}>
+        <Toolbar>
+          <Dropdown
+            style="margin-left: 1rem; grid-gap: 0 1rem;"
+            titleText="Interface"
+            type="inline"
+            size="xl"
+            bind:selectedId={selected}
+            items={items}
+            on:select={(e) => select(e)} />
+          <ToolbarContent>
+            <ToolbarSearch />
+            <!-- <ToolbarMenu>
+              <ToolbarMenuItem primaryFocus>Restart all</ToolbarMenuItem>
+              <ToolbarMenuItem href="https://cloud.ibm.com/docs/loadbalancer-service">
+                API documentation
+              </ToolbarMenuItem>
+              <ToolbarMenuItem danger>Stop all</ToolbarMenuItem>
+            </ToolbarMenu> -->
+            <Button icon={Scan} on:click={(e) => scan(e)}>Scan</Button>
+          </ToolbarContent>
+        </Toolbar>
+        <span slot="cell" let:cell let:row>
+          {#if cell.key === 'overflow'}
+            <OverflowMenu flipped>
+              <OverflowMenuItem text="Configure" disabled={!isRoute('configure', row.id)} on:click={(e) => conf(e, row)} />
+              <OverflowMenuItem text="Monitor" on:click={(e) => push('/monitor/'+row.id)} />
               <OverflowMenuItem text="Test" disabled={!isRoute('testing', row.id)} on:click={(e) => test(e, row)} />
-                <OverflowMenuItem text="Update" disabled={!isRoute('program', row.id) || !isUpdate(row.id)} on:click={(e) => update(e, row)} />
-                </OverflowMenu>
-                {:else}
+              <OverflowMenuItem text="Update" disabled={!isRoute('program', row.id) || !isUpdate(row.id)} on:click={(e) => update(e, row)} />
+            </OverflowMenu>
+          {:else}
             {cell.value}
           {/if}
         </span>
       </DataTable>
       {#if pagination.totalItems > pagination.pageSize}
-      <Pagination
-      bind:pageSize={pagination.pageSize}
-      totalItems={pagination.totalItems}
-      bind:page={pagination.page}
-      pageSizeInputDisabled
-      pageInputDisabled
-      />
+        <Pagination
+          bind:pageSize={pagination.pageSize}
+          totalItems={pagination.totalItems}
+          bind:page={pagination.page}
+          pageSizeInputDisabled
+          pageInputDisabled
+        />
       {/if}
     </Column>
   </Row>

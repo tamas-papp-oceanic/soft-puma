@@ -133,24 +133,26 @@
   <Row>
     <Column>
       {#if headers.length > 0}
-        <DataTable {headers} {rows} pageSize={pagination.pageSize} page={pagination.page} class="last">
-          <Toolbar>
-            <Tile>{title}</Tile>
-            <ToolbarContent>
-              <Button icon={Restart} on:click={(e) => rest(e)}>Restart</Button>
-              <Button icon={SkipBack} on:click={(e) => back(e)}>Back</Button>
-            </ToolbarContent>
-          </Toolbar>
-          <span slot="cell" let:cell let:row>
-            {#if (cell.key === 'overflow') && (row.id !== 'first')}
-              <OverflowMenu flipped>
-                <OverflowMenuItem text="Details" disabled on:click={() => push('/details/'+ row.key)} />
-              </OverflowMenu>
-            {:else}
-              {cell.value}
-            {/if}
-          </span>
-        </DataTable>
+        <div class="cont">
+          <DataTable {headers} {rows} pageSize={pagination.pageSize} page={pagination.page} class="last">
+            <Toolbar>
+              <Tile>{title}</Tile>
+              <ToolbarContent>
+                <Button icon={Restart} on:click={(e) => rest(e)}>Restart</Button>
+                <Button icon={SkipBack} on:click={(e) => back(e)}>Back</Button>
+              </ToolbarContent>
+            </Toolbar>
+            <span slot="cell" let:cell let:row>
+              {#if (cell.key === 'overflow') && (row.id !== 'first')}
+                <OverflowMenu flipped>
+                  <OverflowMenuItem text="Details" disabled on:click={() => push('/details/'+ row.key)} />
+                </OverflowMenu>
+              {:else}
+                {cell.value}
+              {/if}
+            </span>
+          </DataTable>
+        </div>
       {/if}
       {#if pagination.totalItems > pagination.pageSize}
         <Pagination
@@ -165,6 +167,10 @@
 </Grid>
 
 <style global>
+  .cont {
+    overflow-x: auto;
+    overflow-y: hidden;
+  }
   .last table tbody tr:first-child td {
     background: #c6c6c6;
     color: #000000;
