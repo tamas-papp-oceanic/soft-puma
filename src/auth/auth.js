@@ -110,7 +110,8 @@ async function afetch(url, options) {
 }
 // route refers to a API route
 // type = read write or delete
-function checkAccess(route, type) {
+async function checkAccess(route, type) {
+  await getPerms();
   let prm = get(permissions);
   if ((prm != null) && (typeof prm[route] !== 'undefined') &&
     (typeof prm[route][type] !== 'undefined')) {

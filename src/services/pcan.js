@@ -71,6 +71,9 @@ class Can {
         this.#device.on('data', (frm) => {
           frm.data = frm.buf;
           delete frm.buf;
+
+console.log(frm)
+
           // log.debug('(' + (msg.ts_sec + msg.ts_usec / 1000000).toFixed(6) + ') ' + msg.id.toString(16).toUpperCase().padStart(8, '0') + '#' + msg.data.toString('hex').toUpperCase());
           fun(this.#devices[0].path, frm);
         });
