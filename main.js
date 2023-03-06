@@ -30,7 +30,7 @@ let Can = null;
 let cancelToken;
 
 if (os.platform() == 'linux') {
-   Can = require('./src/services/can.js');
+  Can = require('./src/services/can.js');
 } else if (os.platform() == 'win32') {
   Can = require('./src/services/pcan.js');
 }

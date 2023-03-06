@@ -63,7 +63,7 @@ class Can {
         this.#channel = can.createRawChannel(this.#device, true);
         if (this.#channel != null) {
           this.#channel.addListener('onMessage', (frm) => {
-            // log.debug('(' + (msg.ts_sec + msg.ts_usec / 1000000).toFixed(6) + ') ' + msg.id.toString(16).toUpperCase().padStart(8, '0') + '#' + msg.data.toString('hex').toUpperCase());
+            // log.debug('(' + (frm.ts_sec + frm.ts_usec / 1000000).toFixed(6) + ') ' + frm.id.toString(16).toUpperCase().padStart(8, '0') + '#' + frm.data.toString('hex').toUpperCase());
             fun(this.#device, frm);
           });
           this.#channel.addListener('onStopped', () => {

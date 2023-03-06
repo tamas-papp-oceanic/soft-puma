@@ -1,9 +1,9 @@
 <script>
+  import { push } from 'svelte-spa-router'
   import { Grid, Row, Column, Button, DataTable, Toolbar,
     ToolbarContent, ToolbarSearch,  OverflowMenu, 
     OverflowMenuItem, Pagination, Dropdown, Tag } from "carbon-components-svelte";
   import Scan from "carbon-icons-svelte/lib/SearchLocate16";
-  import { push } from 'svelte-spa-router'
   import { name, devices, device, data, allRoutes, versions } from "../../stores/data.js";
   import { compareVersions } from 'compare-versions';
 
@@ -53,22 +53,10 @@
     page: 1,
   };
 
-  function getSelected() {
-    if ($device != null) {
-      for (let i in $devices) {
-        if ($devices[i] == $device) {
-          selected = i.toString();
-        }
-      }
-    } else {
-      selected = '0';
-    }
-  };
-
   function conf(e, row) {
     if ((typeof $devices[selected] !== 'undefined') &&
-      (typeof $name[$devices[selected]] !== 'undefined') &&
-      (typeof $name[$devices[selected]][row.id] !== 'undefined')) {
+    (typeof $name[$devices[selected]] !== 'undefined') &&
+    (typeof $name[$devices[selected]][row.id] !== 'undefined')) {
       let nam = $name[$devices[selected]][row.id];
       let pat = '/configure';
       if (typeof paths[nam.modelVersion] !== 'undefined') {
@@ -94,11 +82,11 @@
       push(pat);
     }
   }
-
+  
   function test(e, row) {
     if ((typeof $devices[selected] !== 'undefined') &&
-      (typeof $name[$devices[selected]] !== 'undefined') &&
-      (typeof $name[$devices[selected]][row.id] !== 'undefined')) {
+    (typeof $name[$devices[selected]] !== 'undefined') &&
+    (typeof $name[$devices[selected]][row.id] !== 'undefined')) {
       let nam = $name[$devices[selected]][row.id];
       let pat = '/testing';
       if (typeof paths[nam.modelVersion] !== 'undefined') {
@@ -117,11 +105,11 @@
       push(pat);
     }
   }
-
+  
   function update(e, row) {
     if ((typeof $devices[selected] !== 'undefined') &&
-      (typeof $name[$devices[selected]] !== 'undefined') &&
-      (typeof $name[$devices[selected]][row.id] !== 'undefined')) {
+    (typeof $name[$devices[selected]] !== 'undefined') &&
+    (typeof $name[$devices[selected]][row.id] !== 'undefined')) {
       let nam = $name[$devices[selected]][row.id];
       let pat = '/program';
       if (typeof paths[nam.modelVersion] !== 'undefined') {
@@ -140,20 +128,20 @@
       push(pat);
     }
   }
-
+  
   function scan(e) {
     rows = new Array();
     window.pumaAPI.send('bus-scan');
   };
-
+  
   function select(e) {
     $device = e.detail.selectedItem.text;
   };
   
   function isRoute(prf, add) {
     if ((typeof $devices[selected] !== 'undefined') &&
-      (typeof $name[$devices[selected]] !== 'undefined') &&
-      (typeof $name[$devices[selected]][add] !== 'undefined')) {
+    (typeof $name[$devices[selected]] !== 'undefined') &&
+    (typeof $name[$devices[selected]][add] !== 'undefined')) {
       let nam = $name[$devices[selected]][add];
       if (typeof paths[nam.modelVersion] !== 'undefined') {
         prf += '/' + nam.modelVersion;
@@ -166,7 +154,7 @@
     }
     return false;
   };
-
+  
   function isUpdate(add) {
     if ((typeof $devices[selected] !== 'undefined') &&
       (typeof $name[$devices[selected]] !== 'undefined') &&
@@ -180,12 +168,26 @@
       }
     }
     return false;
-  }
+  };
+    
+  function getSelected() {
+    if (typeof selected === "undefined") {
+      if ($device != null) {
+        for (let i in $devices) {
+          if ($devices[i] == $device) {
+            selected = i.toString();
+          }
+        }
+      } else {
+        if (Object.keys($devices).length > 0) {
+          $device = Object.values($devices)[0];          
+          selected = '0';
+        }
+      }
+    }
+  };
 
-  getSelected();
-
-  // Data getters, setters
-  $: {
+  function getItems() {
     let tmp = new Array();
     for (let i in $devices) {
       tmp.push(
@@ -194,7 +196,8 @@
     }
     items = JSON.parse(JSON.stringify(tmp));
   };
-  $: {
+  
+  function getRows() {
     let tmp = new Array();
     if (typeof $name[$device] !== "undefined") {
       for (const [key, val] of Object.entries($name[$device])) {
@@ -214,6 +217,11 @@
     rows = JSON.parse(JSON.stringify(tmp));
     pagination.totalItems = rows.length;
   };
+
+  // Data getters, setters
+  $: $devices, getSelected();
+  $: $devices, getItems();
+  $: $name[$device], getRows();
   $: pagination.pageSize = Math.round(((height * 0.9) / getComputedStyle(document.documentElement).fontSize.replace('px', '')) / 3) - 4;
 </script>
 
@@ -222,54 +230,54 @@
   <Row>
     <Column>
       <DataTable
-        sortable
-        {headers}
-        {rows}
-        pageSize={pagination.pageSize}
-        page={pagination.page}>
-        <Toolbar>
-          <Dropdown
-            style="margin-left: 1rem; grid-gap: 0 1rem;"
-            titleText="Interface"
-            type="inline"
-            size="xl"
-            bind:selectedId={selected}
-            items={items}
-            on:select={(e) => select(e)}
-          />
-          <ToolbarContent>
-            <ToolbarSearch />
-            <!-- <ToolbarMenu>
-              <ToolbarMenuItem primaryFocus>Restart all</ToolbarMenuItem>
-              <ToolbarMenuItem href="https://cloud.ibm.com/docs/loadbalancer-service">
-                API documentation
-              </ToolbarMenuItem>
-              <ToolbarMenuItem danger>Stop all</ToolbarMenuItem>
-            </ToolbarMenu> -->
-            <Button icon={Scan} on:click={(e) => scan(e)}>Scan</Button>
-          </ToolbarContent>
-        </Toolbar>
-        <span slot="cell" let:cell let:row>
-          {#if cell.key === 'overflow'}
-            <OverflowMenu flipped>
-              <OverflowMenuItem text="Configure" disabled={!isRoute('configure', row.id)} on:click={(e) => conf(e, row)} />
-              <OverflowMenuItem text="Monitor" on:click={(e) => push('/monitor/'+row.id)} />
+      sortable
+      {headers}
+      {rows}
+      pageSize={pagination.pageSize}
+      page={pagination.page}>
+      <Toolbar>
+        <Dropdown
+        style="margin-left: 1rem; grid-gap: 0 1rem;"
+        titleText="Interface"
+        type="inline"
+        size="xl"
+        bind:selectedId={selected}
+        items={items}
+        on:select={(e) => select(e)}
+        />
+        <ToolbarContent>
+          <ToolbarSearch />
+          <!-- <ToolbarMenu>
+            <ToolbarMenuItem primaryFocus>Restart all</ToolbarMenuItem>
+            <ToolbarMenuItem href="https://cloud.ibm.com/docs/loadbalancer-service">
+              API documentation
+            </ToolbarMenuItem>
+            <ToolbarMenuItem danger>Stop all</ToolbarMenuItem>
+          </ToolbarMenu> -->
+          <Button icon={Scan} on:click={(e) => scan(e)}>Scan</Button>
+        </ToolbarContent>
+      </Toolbar>
+      <span slot="cell" let:cell let:row>
+        {#if cell.key === 'overflow'}
+        <OverflowMenu flipped>
+          <OverflowMenuItem text="Configure" disabled={!isRoute('configure', row.id)} on:click={(e) => conf(e, row)} />
+            <OverflowMenuItem text="Monitor" on:click={(e) => push('/monitor/'+row.id)} />
               <OverflowMenuItem text="Test" disabled={!isRoute('testing', row.id)} on:click={(e) => test(e, row)} />
-              <OverflowMenuItem text="Update" disabled={!isRoute('program', row.id) || !isUpdate(row.id)} on:click={(e) => update(e, row)} />
-            </OverflowMenu>
-          {:else}
+                <OverflowMenuItem text="Update" disabled={!isRoute('program', row.id) || !isUpdate(row.id)} on:click={(e) => update(e, row)} />
+                </OverflowMenu>
+                {:else}
             {cell.value}
           {/if}
         </span>
       </DataTable>
       {#if pagination.totalItems > pagination.pageSize}
-        <Pagination
-          bind:pageSize={pagination.pageSize}
-          totalItems={pagination.totalItems}
-          bind:page={pagination.page}
-          pageSizeInputDisabled
-          pageInputDisabled
-        />
+      <Pagination
+      bind:pageSize={pagination.pageSize}
+      totalItems={pagination.totalItems}
+      bind:page={pagination.page}
+      pageSizeInputDisabled
+      pageInputDisabled
+      />
       {/if}
     </Column>
   </Row>
