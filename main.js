@@ -184,7 +184,7 @@ async function discover() {
           }
         }
       }
-    } else {
+    } else if (os.platform() == 'win32') {
       let can = new Can();
       can.discover().then((cls) => {
         if (cls.length > 0) {

@@ -8,7 +8,7 @@ const ser = require('./serial.js');
 
 if (os.platform() == 'linux') {
   can = require('./can.js');
-} else if (os.platform() == 'windows') {
+} else if (os.platform() == 'win32') {
   can = require('./pcan.js');
 }
 
