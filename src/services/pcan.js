@@ -70,10 +70,10 @@ class Can {
       this.#device.open(this.#devices[0].path).then(() => {
         this.#device.on('data', (frm) => {
           frm.data = frm.buf;
+          let tim = new Date().getTime();
+          frm.ts_sec = Math.floor(tim / 1000);
+          frm.ts_usec = (tim % 1000) * 1000;
           delete frm.buf;
-
-console.log(frm)
-
           // log.debug('(' + (msg.ts_sec + msg.ts_usec / 1000000).toFixed(6) + ') ' + msg.id.toString(16).toUpperCase().padStart(8, '0') + '#' + msg.data.toString('hex').toUpperCase());
           fun(this.#devices[0].path, frm);
         });
