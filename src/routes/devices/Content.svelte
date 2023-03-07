@@ -12,8 +12,8 @@
   let height;
   let key = null;
   let first = true;
-  let rows = new Array();
   let curr = new Array();
+  let rows = new Array();
   let title = null;
   let pagination = {
     pageSize: 10,
@@ -40,7 +40,15 @@
 
   function rest(e) {
     pagination.page = 1;
+    curr = new Array();
+    rows = new Array();
+    headers = new Array({
+      key: 'wait',
+      value: 'Waiting for first record...',
+      sort: false
+    });
     restart();
+    first = true;
   };
 
   function back(e) {
