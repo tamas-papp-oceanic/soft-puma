@@ -39,6 +39,7 @@
   });
 
   function rest(e) {
+    pagination.page = 1;
     restart();
   };
 
@@ -53,16 +54,14 @@
         title += ' - ' + dat.title;
       }
       if ((typeof dat.fields !== 'undefined') && Array.isArray(dat.fields) && (dat.fields.length > 0)) {
-        let tmp = new Array();
-        tmp.push({
+        let tmp = new Array([{
           key: "overflow",
           empty: true,
-        });
-        tmp.push({
+        },{
           key: "cnt",
           value: 'Count',
           sort: false,
-        });
+        }]);
         for (let i in dat.fields) {
           let fld = dat.fields[i];
           if (fld.reserved == null) {
