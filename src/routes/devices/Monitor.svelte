@@ -8,6 +8,9 @@
   export let params;
 
   const headers = [{
+    key: "overflow",
+    empty: true
+  },{
     key: "msg",
     value: "Message",
     sort: false,
@@ -27,9 +30,6 @@
     key: "raw",
     value: "Raw data",
     sort: false,
-  },{
-    key: "overflow",
-    empty: true,
   }];
 
   let height;
@@ -118,7 +118,7 @@
         </Toolbar>
         <span slot="cell" let:cell let:row>
           {#if cell.key === 'overflow'}
-            <OverflowMenu flipped>
+            <OverflowMenu>
               <OverflowMenuItem text="Content" on:click={(e) => { push('/messages/'+row.id); }} />
             </OverflowMenu>
           {:else}

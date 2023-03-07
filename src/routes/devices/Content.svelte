@@ -9,7 +9,6 @@
 
   export let params;
 
-  let width;
   let height;
   let key = null;
   let first = true;
@@ -132,25 +131,37 @@
     }
   };
 
-  function getWidth(sel) {
+  function scrollVisible(sel) {
     let box = document.querySelector(sel);
     if (box != null) {
-
-      console.log(box, box.scrollWidth, box.offsetWidth)
-
-      return box.scrollWidth;
+      return box.scrollWidth > box.clientWidth;
     }
-    return 0;
+    return false;
+  };
+
+  function reDraw() {
+    let hdh = 32, tlh = 32;
+    let tlb = document.querySelector('.tlbr');
+    if (tlb !== null) {
+      tlh = tlb.clientHeight;
+    }
+    let hdr = document.querySelector('.cont table thead tr');
+    if (hdr !== null) {
+      hdh = hdr.clientHeight;
+    }
+    let sub = scrollVisible('.cont') ? 3 : 2;
+    pagination.pageSize = Math.round(((height - tlh - hdh) / getComputedStyle(document.documentElement).fontSize.replace('px', '')) / 2.25) - sub;
+    getHeaders(); 
+    getCurrent(); 
+    getRows();
   };
 
   // Data getters, setters
-  $: pagination.pageSize = Math.round(((height * 0.9) / getComputedStyle(document.documentElement).fontSize.replace('px', '')) / 3) - (getWidth('.tlbr') < getWidth('.last table') ? 5 : 4);
-  $: $queue, getHeaders(); 
-  $: $queue, getCurrent(); 
-  $: $queue, getRows(); 
+  $: height, reDraw();
+  $: $queue, reDraw();
 </script>
 
-<svelte:window bind:innerHeight={height} bind:innerWidth={width} />
+<svelte:window bind:innerHeight={height} />
 <Grid>
   <Row>
     <Column>
@@ -162,9 +173,9 @@
             <Button icon={SkipBack} on:click={(e) => back(e)}>Back</Button>
           </ToolbarContent>
         </Toolbar>
-        <div class="ctnr flip">
+        <div class="wrap flip">
           <div class="cont">
-            <DataTable {headers} {rows} pageSize={pagination.pageSize} page={pagination.page} class="last">
+            <DataTable {headers} {rows} pageSize={pagination.pageSize} page={pagination.page} size="short" class="last">
               <span slot="cell" let:cell let:row>
                 {#if (cell.key === 'overflow') && (row.id !== 'first')}
                   <OverflowMenu>
@@ -191,12 +202,9 @@
 </Grid>
 
 <style global>
-  .ctnr {
+  .wrap {
     overflow-x: auto;
     overflow-y: hidden;
-  }
-  .cont {
-    width: 100%;
   }
   .flip, .flip .cont{
     transform: rotateX(180deg);

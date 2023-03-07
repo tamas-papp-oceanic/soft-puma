@@ -8,6 +8,9 @@
   import { compareVersions } from 'compare-versions';
 
   const headers = [{
+    key: "overflow",
+    empty: true
+  },{
     key: "id",
     value: "Address"
   },{
@@ -31,9 +34,6 @@
   },{
     key: "uniqueNumber",
     value: "Unique Number"
-  },{
-    key: "overflow",
-    empty: true
   }];
   const paths = {
     '3271': '/:instance/:fluid',
@@ -258,7 +258,7 @@
         </Toolbar>
         <span slot="cell" let:cell let:row>
           {#if cell.key === 'overflow'}
-            <OverflowMenu flipped>
+            <OverflowMenu>
               <OverflowMenuItem text="Configure" disabled={!isRoute('configure', row.id)} on:click={(e) => conf(e, row)} />
               <OverflowMenuItem text="Monitor" on:click={(e) => push('/monitor/'+row.id)} />
               <OverflowMenuItem text="Test" disabled={!isRoute('testing', row.id)} on:click={(e) => test(e, row)} />
