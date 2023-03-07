@@ -54,14 +54,14 @@
         title += ' - ' + dat.title;
       }
       if ((typeof dat.fields !== 'undefined') && Array.isArray(dat.fields) && (dat.fields.length > 0)) {
-        let tmp = new Array([{
+        let tmp = new Array({
           key: "overflow",
           empty: true,
         },{
           key: "cnt",
           value: 'Count',
           sort: false,
-        }]);
+        });
         for (let i in dat.fields) {
           let fld = dat.fields[i];
           if (fld.reserved == null) {
