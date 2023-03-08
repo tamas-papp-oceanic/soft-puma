@@ -138,7 +138,11 @@ function isProprietary(pgn) {
 
 function isSingle(pgn) {
   if (isProprietary(pgn)) {
-    return (pgn <= 65535);
+    if ((pgn == 65287) || (pgn == 65289)) {
+      return false;
+    } else {
+      return (pgn <= 65535);
+    }
   } else {
     for (const [key, val] of Object.entries(nmeadefs)) {
       if (key.startsWith('nmea2000/' + pgn)) {

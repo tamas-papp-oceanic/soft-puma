@@ -27,11 +27,14 @@
   onMount(() => {
     window.pumaAPI.recv('n2k-volume', (e, args) => {
       const [ dev, msg ] = args;
+      
+      console.log(msg)
+
       // <protocol>/<pgn>/<function>/<manufacturer>/<industry>/<instance>/<type>
-      let spl = msg.key.split('/');
+      let spl = msg.key.split('/');  
       if ((spl[0] == 'nmea2000') && (spl[3] == '161')  && (spl[4] == '4')) {
         switch (spl[1]) {
-          case '065289':
+          case '065289':          
             switch (spl[2]) {
               case '6':
                 // Stored Mode Data (0 = Level Mode, 1 = Volumetric Mode)

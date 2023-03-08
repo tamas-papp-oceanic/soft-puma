@@ -263,6 +263,26 @@ class NMEAEngine {
     return false;
   };
 
+  // Sends Fluid Sender Control message
+  send065289(fluid, inst, code) {
+    if (this.#addrMngr.state == 'Valid') {
+      let msg = {
+        key: 'nmea2000/065289/' + code + '/161/4/-/-',
+        header: { pgn: 65289, src: this.#addrMngr.address, dst: 0xFF },
+        fields: [
+          { field: 1,title: 'Manufacturer Code', state: 'V', value: this.#addrMngr.name[2] },
+          { field: 2,title: 'Reserved', state: 'V', value: 0b11 },
+          { field: 3,title: 'Industry Group', state: 'V', value: this.#addrMngr.name[9] },
+          { field: 4,title: 'Instance', state: 'V', value: inst },
+          { field: 5,title: 'Fluid Type', state: 'V', value: fluid },
+          { field: 6,title: 'Data ID', state: 'V', value: code },
+        ],
+      };
+      return this.sendMsg(msg);
+    }
+    return false;
+  };
+
   // Sends Proprietary SF Config Request / Command message
   send065445(typ, ins, dat, val) {
     if (this.#addrMngr.state == 'Valid') {
@@ -316,6 +336,32 @@ class NMEAEngine {
     return false;
   };
 
+  // Sends Fluid Sender Control message
+  send130825(fluid, inst, code, data1, data2) {
+    if (this.#addrMngr.state == 'Valid') {
+      let msg = {
+        key: 'nmea2000/130825/' + code + '/161/4/-/-',
+        header: { pgn: 130825, src: this.#addrMngr.address, dst: 0xFF },
+        fields: [
+          { field: 1,title: 'Manufacturer Code', state: 'V', value: this.#addrMngr.name[2] },
+          { field: 2,title: 'Reserved', state: 'V', value: 0b11 },
+          { field: 3,title: 'Industry Group', state: 'V', value: this.#addrMngr.name[9] },
+          { field: 4,title: 'Instance', state: 'V', value: inst },
+          { field: 5,title: 'Fluid Type', state: 'V', value: fluid },
+          { field: 6,title: 'Data ID', state: 'V', value: code },
+        ],
+      };
+      if (typeof data1 !== 'undefined') {
+        msg.fields.push({ field: 7,title: 'Data1', state: 'V', value: data1 })
+      }
+      if (typeof data2 !== 'undefined') {
+        msg.fields.push({ field: 8,title: 'Data2', state: 'V', value: data2 })
+      }
+      return this.sendMsg(msg);
+    }
+    return false;
+  };
+  
   // Sends Proprietary FP Config Request / Command message
   send130981(typ, ins, dat, val) {
     if (this.#addrMngr.state == 'Valid') {
@@ -913,32 +959,6 @@ class NMEAEngine {
       };
       this.#heartbeat.sequence++;
       this.#heartbeat.sequence %= 252;
-      return this.sendMsg(msg);
-    }
-    return false;
-  };
-
-  // Sends Fluid Sender Control message
-  send130825(fluid, inst, code, data1, data2) {
-    if (this.#addrMngr.state == 'Valid') {
-      let msg = {
-        key: 'nmea2000/130825/' + code + '/161/4/-/-',
-        header: { pgn: 130825, src: this.#addrMngr.address, dst: 0xFF },
-        fields: [
-          { field: 1,title: 'Manufacturer Code', state: 'V', value: this.#addrMngr.name[2] },
-          { field: 2,title: 'Reserved', state: 'V', value: 0b11 },
-          { field: 3,title: 'Industry Group', state: 'V', value: this.#addrMngr.name[9] },
-          { field: 4,title: 'Instance', state: 'V', value: inst },
-          { field: 5,title: 'Fluid Type', state: 'V', value: fluid },
-          { field: 6,title: 'Data ID', state: 'V', value: code },
-        ],
-      };
-      if (typeof data1 !== 'undefined') {
-        msg.fields.push({ field: 7,title: 'Data1', state: 'V', value: data1 })
-      }
-      if (typeof data2 !== 'undefined') {
-        msg.fields.push({ field: 8,title: 'Data2', state: 'V', value: data2 })
-      }
       return this.sendMsg(msg);
     }
     return false;

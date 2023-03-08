@@ -720,10 +720,11 @@ ipcMain.on('volfile-write', (e, ...args) => {
 
 // Starts volume mode reading
 ipcMain.on('volmode-read', (e, args) => {
-  const [dev, fluid, instance] = args;
+  const [dev, fluid, inst] = args;
   if ((typeof dev === 'string') && (typeof devices[dev] !== 'undefined')) {
     let eng = devices[dev].engine;
-    let res = eng.send130825(fluid, instance, 0x05);
+    let res = eng.send065289(fluid, inst, 0x05);
+    res |= eng.send130825(fluid, inst, 0x05);
     if ((mainWindow != null) && (typeof mainWindow.webContents !== 'undefined')) {
       mainWindow.webContents.send('volmode-done', res);
     }
