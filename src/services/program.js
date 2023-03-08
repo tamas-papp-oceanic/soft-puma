@@ -6,7 +6,7 @@
 
   Application: 0x0800A000
 */
-const progURL = 'http://localhost:4000';
+
 
 const { app } = require('electron');
 const log = require('electron-log');
@@ -14,6 +14,7 @@ const dwl = require('download');
 const path = require('path');
 const cp = require('child_process');
 const http = require('http');
+const com = require("../stores/common.js");
 
 function erase(func) {
   return new Promise((resolve, reject) => {
@@ -118,9 +119,9 @@ async function writeBoot(dev, func) {
   });
 }
 
-async function downVersion(func) {
+async function downUpdates(func) {
   return new Promise((resolve, reject) => {
-    http.get(progURL + '/prog', (res) => {
+    http.get(com.authURL + '/updates', (res) => {
       if ((res.statusCode >= 200) && (res.statusCode <= 299)) {
         let data = [];
         res.on('data', (chunk) => {
@@ -152,7 +153,7 @@ async function downProg(mod, func) {
       reject(new Error('Invalid request'));
       return;
     }
-    dwl(progURL + '/prog?file=' + file, path.join(app.getAppPath(), 'downloads')).then((res) => {
+    dwl(com.progURL + '/prog?file=' + file, path.join(app.getAppPath(), 'downloads')).then((res) => {
       let msg = 'Download successful: ' + file;
       log.info(msg);
       func(msg + '\n');
@@ -165,6 +166,6 @@ async function downProg(mod, func) {
 
 module.exports = {
   writeBoot,
-  downVersion,
+  downUpdates,
   downProg,
 };

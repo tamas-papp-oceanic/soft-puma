@@ -1,11 +1,11 @@
 import { get } from "svelte/store";
 import jwt_decode from "jwt-decode";
-import { authURL, userData, accessToken, refreshToken, loggedIn,
-  permissions } from '../stores/user.js';
+import * as common from '../stores/common.js';
+import { userData, accessToken, refreshToken, loggedIn, permissions } from '../stores/user.js';
 
 async function refreshLogin() {
   let token = get(refreshToken);
-  let res = await fetch(authURL + '/refresh', {
+  let res = await fetch(common.authURL + '/refresh', {
     method: 'POST',
     body: JSON.stringify({
       'refresh_token': token,
@@ -28,7 +28,7 @@ async function refreshLogin() {
 }
 
 async function getPerms() {
-  let res = await afetch(authURL + '/roles', {method: 'GET'});
+  let res = await afetch(common.authURL + '/roles', {method: 'GET'});
   if (res.status == 200) {
     let perms = await res.json();
     let permsObject= {};
@@ -43,7 +43,7 @@ async function getPerms() {
 }
 
 async function login(username, password) {
-  const res = await fetch(authURL + '/login', {
+  const res = await fetch(common.authURL + '/login', {
     method: 'POST',
     body: JSON.stringify({
       username,
@@ -66,7 +66,7 @@ async function login(username, password) {
 }
 
 async function logout() {
-  const res = await afetch(authURL + '/logout', {method: 'POST'})
+  const res = await afetch(common.authURL + '/logout', {method: 'POST'})
   if (res.status == 200) {
     permissions.set({});
     userData.set({});

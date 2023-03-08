@@ -1,4 +1,7 @@
-export const devnames = {
+const authURL = 'http://localhost:8080';
+const progURL = 'http://localhost:4000';
+
+const devnames = {
   'senders': {
     '3271': 'Volumetric Fuel Sender',
     '3281': 'Water Level Sender',
@@ -16,7 +19,7 @@ export const devnames = {
   }
 };
 
-export function getname(cod) {
+function getname(cod) {
   for (const grp of Object.values(devnames)) {
     if (typeof grp[cod] !== 'undefined') {
       return grp[cod];
@@ -24,3 +27,5 @@ export function getname(cod) {
   }
   return null;
 };
+
+module.exports = { authURL, progURL, devnames, getname };

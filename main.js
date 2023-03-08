@@ -14,7 +14,7 @@ const NMEAEngine = require('./src/services/nmea.js');
 const bwipjs = require('bwip-js');
 const PDFDocument = require('pdfkit');
 const prt = 'HP-LaserJet-Pro-M404-M405';
-const { writeBoot, downProg, downVersion } = require('./src/services/program.js')
+const { writeBoot, downProg, downUpdates } = require('./src/services/program.js')
 const { readFile, writeFile } = require('./src/services/volume.js');
 const EventEmitter = require('node:events');
 const crc32 = require('buffer-crc32');
@@ -378,15 +378,15 @@ ipcMain.on('bar-code', (e, args) => {
   });
 });
 
-// Download program bin versions
-ipcMain.on('versions', (e, ...args) => {
-  let versions = {};
-  downVersion().then((res) => {
+// Download program bin updates
+ipcMain.on('updates', (e, ...args) => {
+  let updates = {};
+  downUpdates().then((res) => {
     for (let f of res) {
-      versions[f.replaceAll('.bin', '')] = 'v0.0.1';
+      updates[res.model] = res.version;
     }
     if ((mainWindow != null) && (typeof mainWindow.webContents !== 'undefined')) {
-      mainWindow.webContents.send('versions', versions);
+      mainWindow.webContents.send('updates', updates);
     }
   }).catch((err) => {
     console.log(err);

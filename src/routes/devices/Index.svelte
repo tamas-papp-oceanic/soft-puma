@@ -4,7 +4,7 @@
     ToolbarContent, ToolbarSearch,  OverflowMenu, 
     OverflowMenuItem, Pagination, Dropdown, Tag } from "carbon-components-svelte";
   import Scan from "carbon-icons-svelte/lib/SearchLocate16";
-  import { name, devices, device, data, allRoutes, versions } from "../../stores/data.js";
+  import { name, devices, device, data, allRoutes, updates } from "../../stores/data.js";
   import { compareVersions } from 'compare-versions';
 
   const headers = [{
@@ -139,10 +139,16 @@
   };
   
   function isRoute(prf, add) {
-    if ((typeof $devices[selected] !== 'undefined') &&
+  if ((typeof $devices[selected] !== 'undefined') &&
     (typeof $name[$devices[selected]] !== 'undefined') &&
     (typeof $name[$devices[selected]][add] !== 'undefined')) {
       let nam = $name[$devices[selected]][add];
+
+
+      console.log("ISROUTE", nam, paths)
+
+
+
       if (typeof paths[nam.modelVersion] !== 'undefined') {
         prf += '/' + nam.modelVersion;
         for (let r of $allRoutes) {
@@ -156,15 +162,20 @@
   };
   
   function isUpdate(add) {
+
+console.log("ISUPDATE", $updates)
+
     if ((typeof $devices[selected] !== 'undefined') &&
       (typeof $name[$devices[selected]] !== 'undefined') &&
       (typeof $name[$devices[selected]][add] !== 'undefined')) {
       let nam = $name[$devices[selected]][add];
       let mod = nam.modelVersion;
       let dve = nam.softwareVersion;
-      let cve = $versions[mod];
-      if (compareVersions(dve, cve) > 0) {
-        return true;
+      let cve = $updates[mod];
+      if (typeof cve !== "undefined") {
+        if (compareVersions(dve, cve) > 0) {
+          return true;
+        }
       }
     }
     return false;
@@ -222,6 +233,7 @@
   $: $devices, getSelected();
   $: $devices, getItems();
   $: $name[$device], getRows();
+  $: $name[$device], window.pumaAPI.send('updates');
   $: pagination.pageSize = Math.round(((height * 0.9) / getComputedStyle(document.documentElement).fontSize.replace('px', '')) / 3) - 4;
 </script>
 

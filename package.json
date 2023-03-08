@@ -30,7 +30,7 @@
       ],
       "publish": {
         "provider": "generic",
-        "url": "http://192.168.16.52:8080/release/win64"
+        "url": "http://localhost:8080/release/win64"
       }
     },
     "appImage": {

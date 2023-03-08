@@ -1,8 +1,5 @@
-import { writable, derived } from 'svelte/store';
-import System from 'svelte-system-info'
+import { writable } from 'svelte/store';
 
-const platform = System.OSName;
-const authURL = platform.toLowerCase().includes('windows') ? 'http://192.168.16.52:8080' : 'http://localhost:8080';
 const user = JSON.parse(localStorage.getItem('userData'));
 const userData = writable(user);
 userData.subscribe((val) =>{
@@ -28,5 +25,5 @@ const loggedIn = writable(logg);
 loggedIn.subscribe((val) =>{
   localStorage.setItem('loggedIn', JSON.stringify(val));
 });
-export { platform, authURL, userData, accessToken, refreshToken, loggedIn, permissions }
+export { userData, accessToken, refreshToken, loggedIn, permissions }
 //TODO save this data to filesystem so that you can work somewhat offline

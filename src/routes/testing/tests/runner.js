@@ -11,7 +11,8 @@
   the results at the end of the test.
  */
 import { get } from 'svelte/store';
-import { testURL, _scriptData, _steps, _actions, _events, _current } from '../../../stores/tests.js';
+import { authURL } from '../../../stores/common.js';
+import { _scriptData, _steps, _actions, _events, _current } from '../../../stores/tests.js';
 import { userData } from '../../../stores/user.js';
 import { afetch } from '../../../auth/auth.js';
 import { device } from '../../../stores/data.js';
@@ -186,7 +187,7 @@ export async function result() {
 export async function addToLog(script) {
   let tmp = get(_scriptData);
   let usr = get(userData);
-  const res = await afetch(testURL + '/test', {
+  const res = await afetch(authURL + '/test', {
     method: 'POST',
     body: JSON.stringify({
       user: parseInt(usr.user_id),
