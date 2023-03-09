@@ -7,7 +7,6 @@
   Application: 0x0800A000
 */
 
-
 const { app } = require('electron');
 const log = require('electron-log');
 const dwl = require('download');
@@ -75,6 +74,9 @@ function reboot(func) {
 
 async function writeBoot(dev, func) {
   return new Promise((resolve, reject) => {
+
+// IMPORT updates
+
     let prog = null;
     let file = null;
     switch (dev) {
@@ -91,7 +93,7 @@ async function writeBoot(dev, func) {
       return;
     }
     let dwn = path.join(app.getAppPath(), 'downloads');
-    dwl(progURL + '/boot?file=' + file, dwn).then((res) => {
+    dwl(com.progURL + '/boot?file=' + file, dwn).then((res) => {
       log.info('Download successful:', file);
       dwn = path.join(dwn, file);
       erase(func).then((res) => {

@@ -205,7 +205,6 @@
   function getRows() {
     let tmp = new Array();
     if (typeof $name[$device] !== "undefined") {
-      window.pumaAPI.send('updates');
       for (const [key, val] of Object.entries($name[$device])) {
         let nam = {
           id: key,
@@ -222,6 +221,9 @@
     }
     rows = JSON.parse(JSON.stringify(tmp));
     pagination.totalItems = rows.length;
+    if (rows.length > 0) {
+      window.pumaAPI.send('updates');
+    }
   };
 
   // Data getters, setters

@@ -128,17 +128,20 @@ window.pumaAPI.recv('n2k-name', (e, args) => {
     dat[dev] = {};
   }
   let tmp = dat[dev][src];
+  let cur = JSON.stringify(nam);
+  let old = JSON.stringify(tmp);
   if ((typeof tmp !== 'undefined') && (
     (tmp.uniqueNumber != nam.uniqueNumber) ||
     (tmp.manufacturer != nam.manufacturer) ||
     (tmp.function != nam.function) ||
     (tmp.class != nam.class) ||
-    (tmp.industry != nam.industry))
-  ) {
+    (tmp.industry != nam.industry))) {
     delete dat[dev][src];
   }
-  dat[dev][src] = nam;
-  name.set(dat);
+  if (cur !== old) {
+    dat[dev][src] = nam;
+    name.set(dat);
+  }
 });
 // NMEA product info message
 window.pumaAPI.recv('n2k-prod', (e, args) => {
@@ -205,6 +208,39 @@ window.pumaAPI.recv('n2k-prod', (e, args) => {
   }
   dat[dev][src] = nam;
   name.set(dat);
+});
+// NMEA other messages
+window.pumaAPI.recv('n2k-data', (e, args) => {
+  const [ dev, msg ] = args;
+  if (typeof msg.key !== 'undefined') {
+    let key = msg.key;
+    delete msg.key;
+    let dat = get(data);
+    if (typeof dat[dev] === 'undefined') {
+      dat[dev] = {};
+    }
+    if (typeof dat[dev][key] === 'undefined') {
+      dat[dev][key] = { header: { tim: msg.header.tim }};
+      msg.cnt = 0;
+    } else {
+      msg.cnt = dat[dev][key].cnt;
+    }
+    msg.int = Math.round((msg.header.tim - dat[dev][key].header.tim) * 1000);
+    msg.cnt++;
+    dat[dev][key] = msg;
+    data.set(dat);
+    // Queue handling
+    let flt = get(filter);
+    let de2 = get(device);
+    if ((flt != null) && (de2 == dev) && (key == flt)) {
+      let que = get(queue);
+      if (que.length < qlimit) {
+        msg.cnt = que.length + 1;
+        que.push(msg);
+      }
+      queue.set(que);
+    }
+  }
 });
 // Starts capture
 export function start(key) {
@@ -283,36 +319,3 @@ export function deleteData(src) {
   }
   data.set(dat);
 };
-// NMEA other messages
-window.pumaAPI.recv('n2k-data', (e, args) => {
-  const [ dev, msg ] = args;
-  if (typeof msg.key !== 'undefined') {
-    let key = msg.key;
-    delete msg.key;
-    let dat = get(data);
-    if (typeof dat[dev] === 'undefined') {
-      dat[dev] = {};
-    }
-    if (typeof dat[dev][key] === 'undefined') {
-      dat[dev][key] = { header: { tim: msg.header.tim }};
-      msg.cnt = 0;
-    } else {
-      msg.cnt = dat[dev][key].cnt;
-    }
-    msg.int = Math.round((msg.header.tim - dat[dev][key].header.tim) * 1000);
-    msg.cnt++;
-    dat[dev][key] = msg;
-    data.set(dat);
-    // Queue handling
-    let flt = get(filter);
-    let de2 = get(device);
-    if ((flt != null) && (de2 == dev) && (key == flt)) {
-      let que = get(queue);
-      if (que.length < qlimit) {
-        msg.cnt = que.length + 1;
-        que.push(msg);
-      }
-      queue.set(que);
-    }
-  }
-});
