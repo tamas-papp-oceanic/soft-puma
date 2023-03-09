@@ -380,11 +380,8 @@ ipcMain.on('bar-code', (e, args) => {
 
 // Download program bin updates
 ipcMain.on('updates', (e, ...args) => {
-  let updates = {};
   downUpdates().then((res) => {
-    for (let f of res) {
-      updates[res.model] = res.version;
-    }
+    let updates = JSON.parse(JSON.stringify(res));
     if ((mainWindow != null) && (typeof mainWindow.webContents !== 'undefined')) {
       mainWindow.webContents.send('updates', updates);
     }
@@ -738,7 +735,8 @@ ipcMain.on('volmode-write', (e, args) => {
   const [dev, fluid, instance, mode] = args;
   if ((typeof dev === 'string') && (typeof devices[dev] !== 'undefined')) {
     let eng = devices[dev].engine;
-    let res = eng.send130825(fluid, instance, 0x04, mode);
+    let res = eng.send065289(fluid, instance, 0x04, mode);
+    res |= eng.send130825(fluid, instance, 0x04, mode);
     if ((mainWindow != null) && (typeof mainWindow.webContents !== 'undefined')) {
       mainWindow.webContents.send('volmode-done', res);
     }
@@ -752,7 +750,8 @@ ipcMain.on('voltable-read', (e, args) => {
   const [dev, fluid, instance] = args;
   if ((typeof dev === 'string') && (typeof devices[dev] !== 'undefined')) {
     let eng = devices[dev].engine;
-    let res = eng.send130825(fluid, instance, 0x02);
+    let res = eng.send065289(fluid, instance, 0x02);
+    res |= eng.send130825(fluid, instance, 0x02);
     if ((mainWindow != null) && (typeof mainWindow.webContents !== 'undefined')) {
       mainWindow.webContents.send('voltable-done', res);
     }
@@ -766,7 +765,8 @@ ipcMain.on('voltable-write', (e, args) => {
   const [dev, fluid, instance, table, capacity] = args;
   if ((typeof dev === 'string') && (typeof devices[dev] !== 'undefined')) {
     let eng = devices[dev].engine;
-    let res = eng.send130825(fluid, instance, 0x01, table, capacity);
+    let res = eng.send065289(fluid, instance, 0x01, table, capacity);
+    res |= eng.send130825(fluid, instance, 0x01, table, capacity);
     if ((mainWindow != null) && (typeof mainWindow.webContents !== 'undefined')) {
       mainWindow.webContents.send('voltable-done', res);
     }

@@ -24,6 +24,7 @@
 	import { loggedIn } from './stores/user.js';
   import { update, updmsg, download, progress } from './stores/update.js';
 	import { allRoutes, updates } from './stores/data.js';
+  import { compareVersions } from 'compare-versions';
 
 	export let version;
 	export let appName;
@@ -100,10 +101,16 @@
 
 	// Updates download hook
   window.pumaAPI.recv('updates', (e, val) => {
-    $updates = JSON.parse(JSON.stringify(val));
+    let res = JSON.parse(JSON.stringify(val));
+    for (const [key1, val1] of Object.entries(res)) {
+      for (const [key2, val2] of Object.entries(val1)) {
+        val2.sort((a, b) => {
+          return -compareVersions(a.version, b.version);
+        })
+      }
+    }
+    $updates = JSON.parse(JSON.stringify(res));
   });
-
-  window.pumaAPI.send('updates');
 
   function _start(e) {
 		started = true;

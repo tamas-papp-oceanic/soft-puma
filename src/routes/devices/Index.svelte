@@ -1,9 +1,10 @@
 <script>
   import { push } from 'svelte-spa-router'
   import { Grid, Row, Column, Button, DataTable, Toolbar,
-    ToolbarContent, ToolbarSearch,  OverflowMenu, 
-    OverflowMenuItem, Pagination, Dropdown, Tag } from "carbon-components-svelte";
+    ToolbarContent, ToolbarSearch,  OverflowMenu, TooltipIcon,
+    OverflowMenuItem, Pagination, Dropdown } from "carbon-components-svelte";
   import Scan from "carbon-icons-svelte/lib/SearchLocate16";
+  import Warning from "carbon-icons-svelte/lib/WarningAltFilled16";
   import { name, devices, device, data, allRoutes, updates } from "../../stores/data.js";
   import { compareVersions } from 'compare-versions';
 
@@ -139,16 +140,10 @@
   };
   
   function isRoute(prf, add) {
-  if ((typeof $devices[selected] !== 'undefined') &&
-    (typeof $name[$devices[selected]] !== 'undefined') &&
-    (typeof $name[$devices[selected]][add] !== 'undefined')) {
+    if ((typeof $devices[selected] !== 'undefined') &&
+      (typeof $name[$devices[selected]] !== 'undefined') &&
+      (typeof $name[$devices[selected]][add] !== 'undefined')) {
       let nam = $name[$devices[selected]][add];
-
-
-      console.log("ISROUTE", nam, paths)
-
-
-
       if (typeof paths[nam.modelVersion] !== 'undefined') {
         prf += '/' + nam.modelVersion;
         for (let r of $allRoutes) {
@@ -162,9 +157,6 @@
   };
   
   function isUpdate(add) {
-
-console.log("ISUPDATE", $updates)
-
     if ((typeof $devices[selected] !== 'undefined') &&
       (typeof $name[$devices[selected]] !== 'undefined') &&
       (typeof $name[$devices[selected]][add] !== 'undefined')) {
@@ -172,8 +164,10 @@ console.log("ISUPDATE", $updates)
       let mod = nam.modelVersion;
       let dve = nam.softwareVersion;
       let cve = $updates[mod];
-      if (typeof cve !== "undefined") {
-        if (compareVersions(dve, cve) > 0) {
+      if ((typeof cve !== "undefined") && (typeof cve.main !== "undefined") &&
+        Array.isArray(cve.main) && (cve.main.length > 0) &&
+        (typeof cve.main[0].version !== "undefined")) {
+        if (compareVersions(dve, cve.main[0].version) < 0) {
           return true;
         }
       }
@@ -211,6 +205,7 @@ console.log("ISUPDATE", $updates)
   function getRows() {
     let tmp = new Array();
     if (typeof $name[$device] !== "undefined") {
+      window.pumaAPI.send('updates');
       for (const [key, val] of Object.entries($name[$device])) {
         let nam = {
           id: key,
@@ -233,7 +228,6 @@ console.log("ISUPDATE", $updates)
   $: $devices, getSelected();
   $: $devices, getItems();
   $: $name[$device], getRows();
-  $: $name[$device], window.pumaAPI.send('updates');
   $: pagination.pageSize = Math.round(((height * 0.9) / getComputedStyle(document.documentElement).fontSize.replace('px', '')) / 3) - 4;
 </script>
 
@@ -258,13 +252,6 @@ console.log("ISUPDATE", $updates)
             on:select={(e) => select(e)} />
           <ToolbarContent>
             <ToolbarSearch />
-            <!-- <ToolbarMenu>
-              <ToolbarMenuItem primaryFocus>Restart all</ToolbarMenuItem>
-              <ToolbarMenuItem href="https://cloud.ibm.com/docs/loadbalancer-service">
-                API documentation
-              </ToolbarMenuItem>
-              <ToolbarMenuItem danger>Stop all</ToolbarMenuItem>
-            </ToolbarMenu> -->
             <Button icon={Scan} on:click={(e) => scan(e)}>Scan</Button>
           </ToolbarContent>
         </Toolbar>
@@ -278,6 +265,9 @@ console.log("ISUPDATE", $updates)
             </OverflowMenu>
           {:else}
             {cell.value}
+            {#if (cell.key === 'softwareVersion') && isUpdate(row.id)}
+              <TooltipIcon tooltipText="Software update is available" icon={Warning} class="icon" />
+            {/if}
           {/if}
         </span>
       </DataTable>
@@ -293,3 +283,9 @@ console.log("ISUPDATE", $updates)
     </Column>
   </Row>
 </Grid>
+
+<style global>
+  .icon.bx--tooltip__trigger svg {
+    fill: #ffc000;
+  }
+</style>

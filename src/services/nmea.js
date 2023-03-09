@@ -264,7 +264,7 @@ class NMEAEngine {
   };
 
   // Sends Fluid Sender Control message
-  send065289(fluid, inst, code) {
+  send065289(fluid, inst, code, data1, data2) {
     if (this.#addrMngr.state == 'Valid') {
       let msg = {
         key: 'nmea2000/065289/' + code + '/161/4/-/-',
@@ -278,6 +278,12 @@ class NMEAEngine {
           { field: 6,title: 'Data ID', state: 'V', value: code },
         ],
       };
+      if (typeof data1 !== 'undefined') {
+        msg.fields.push({ field: 7,title: 'Data1', state: 'V', value: data1 })
+      }
+      if (typeof data2 !== 'undefined') {
+        msg.fields.push({ field: 8,title: 'Data2', state: 'V', value: data2 })
+      }
       return this.sendMsg(msg);
     }
     return false;
