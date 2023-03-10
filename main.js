@@ -425,7 +425,8 @@ ipcMain.on('upd-cancel', (e, ...args) => {
 
 // Start bootloader programing
 ipcMain.on('boot-start', (e, ...args) => {
-  writeBoot(args[0], bootMessage).then((res) => {
+  const [file] = args;
+  writeBoot(file, bootMessage).then((res) => {
     if ((mainWindow != null) && (typeof mainWindow.webContents !== 'undefined')) {
       mainWindow.webContents.send('boot-done', res);
     }
@@ -447,13 +448,13 @@ function sleep(ms) {
 
 // Start device programing
 ipcMain.on('prog-start', (e, args) => {
-  const [dev, mod, typ, ins] = args;
+  const [dev, file, typ, ins] = args;
   if ((typeof dev === 'string') && (typeof devices[dev] !== 'undefined')) {
     let eng = devices[dev].engine;
     let byt = 0;
     let dat;
     Promise.resolve()
-    .then(() => downProg(mod, progMessage))
+    .then(() => downProg(file, progMessage))
     .then((res) => {
       byt = res.length;
       dat = Buffer.from(res);

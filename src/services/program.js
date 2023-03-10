@@ -72,28 +72,10 @@ function reboot(func) {
   });
 }
 
-async function writeBoot(dev, func) {
+async function writeBoot(file, func) {
   return new Promise((resolve, reject) => {
-
-// IMPORT updates
-
-    let prog = null;
-    let file = null;
-    switch (dev) {
-      case '3420':
-        prog = 'STM32';
-        file = '3420-Bootloader.bin'
-        break;
-      default:
-        prog = 'Atmel';
-        break;
-    }
-    if (file == null) {
-      reject(new Error('Invalid request'));
-      return;
-    }
     let dwn = path.join(app.getAppPath(), 'downloads');
-    dwl(com.progURL + '/boot?file=' + file, dwn).then((res) => {
+    dwl(com.authURL + '/download?file=' + file, dwn).then((res) => {
       log.info('Download successful:', file);
       dwn = path.join(dwn, file);
       erase(func).then((res) => {
@@ -141,21 +123,9 @@ async function downUpdates(func) {
   });
 }
 
-async function downProg(mod, func) {
+async function downProg(file, func) {
   return new Promise((resolve, reject) => {
-    let file = null;
-    switch (mod) {
-      case '3420':
-        file = '3420.bin'
-        break;
-      default:
-        break;
-    }
-    if (file == null) {
-      reject(new Error('Invalid request'));
-      return;
-    }
-    dwl(com.progURL + '/prog?file=' + file, path.join(app.getAppPath(), 'downloads')).then((res) => {
+    dwl(com.authURL + '/download?file=' + file, path.join(app.getAppPath(), 'downloads')).then((res) => {
       let msg = 'Download successful: ' + file;
       log.info(msg);
       func(msg + '\n');

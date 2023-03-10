@@ -319,3 +319,15 @@ export function deleteData(src) {
   }
   data.set(dat);
 };
+// Get model's last update
+export function getUpdate(mod) {
+  let ret = {};
+  let ups = get(updates);
+  let upd = ups[mod];
+  if (typeof upd !== "undefined") {
+    for (const [key, val] of Object.entries(upd)) {
+      ret[key] = val[0];
+    }
+  }
+  return ret;
+};

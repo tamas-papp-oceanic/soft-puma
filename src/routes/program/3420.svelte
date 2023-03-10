@@ -4,7 +4,7 @@
   import { location, pop } from "svelte-spa-router";
   import ProgramContainer from './partials/ProgramContainer.svelte';
   import { getname } from '../../stores/common.js';
-  import { device } from '../../stores/data.js';
+  import { device, getUpdate } from '../../stores/data.js';
 
   export let params;
 
@@ -55,7 +55,10 @@
       stop('boot');
       running = false;
     });
-    window.pumaAPI.send('boot-start', model);
+    let upd = getUpdate(model);
+    if ((typeof upd['boot'] !== "undefined") && (typeof upd['boot']['location'] !== "undefined")) {
+      window.pumaAPI.send('boot-start', upd['boot']['location']);
+    }
   };
 
   function program(e) {
@@ -80,7 +83,10 @@
         dtype = 0x08;
         break;
     }
-    window.pumaAPI.send('prog-start', [$device, model, dtype, instance]);
+    let upd = getUpdate(model);
+    if ((typeof upd['main'] !== "undefined") && (typeof upd['main']['location'] !== "undefined")) {
+      window.pumaAPI.send('prog-start', [$device, upd['main']['location'], dtype, instance]);
+    }
   };
 
   function cancel(e) {

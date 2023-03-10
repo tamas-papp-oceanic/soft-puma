@@ -1,5 +1,4 @@
 const authURL = 'http://localhost:8080';
-const progURL = 'http://localhost:4000';
 
 const devnames = {
   'senders': {
@@ -28,4 +27,4 @@ function getname(cod) {
   return null;
 };
 
-module.exports = { authURL, progURL, devnames, getname };
+module.exports = { authURL, devnames, getname };
