@@ -2,9 +2,11 @@
   import { createEventDispatcher } from "svelte";
   import { ButtonSet, Button, Tile, Grid, Row, Column, Dropdown } from "carbon-components-svelte";
   import { checkAccess } from "../../../auth/auth.js";
+  import { getUpdate } from "../../../stores/data.js";
   import { loggedIn } from "../../../stores/user.js";
   import Download from "carbon-icons-svelte/lib/Download16";
 
+  export let model;
   export let data;
   export let message;
   export let style;
@@ -12,6 +14,7 @@
 
   const dispatch = createEventDispatcher();
   let access = false;
+  let update = { boot: false, main: false };
   let insts = new Array();
 
   function select(e) {
@@ -35,6 +38,11 @@
 
   // Data getters
   $: access = checkAccess('boot', 'write') && $loggedIn;
+  $: {
+    let upd = getUpdate(model);
+    update.boot = (typeof upd['boot'] !== "undefined");
+    update.main = (typeof upd['main'] !== "undefined");
+  }
   $: {
     let msg = message;
     let con = document.getElementsByClassName('console');
@@ -62,13 +70,13 @@
             </Column>
             <Column sm={1} md={3} lg={5}>
               {#if access}
-                <Button disabled={running} icon={Download} on:click={(e) => loader(e)}>Boot loader</Button>
+                <Button disabled={running || !update.boot} icon={Download} on:click={(e) => loader(e)}>Boot loader</Button>
               {/if}
             </Column>
             <Column sm={1} md={1} lg={1}>
             </Column>
             <Column sm={1} md={3} lg={5}>
-              <Button disabled={running} icon={Download} on:click={(e) => program(e)}>Program Update</Button>
+              <Button disabled={running ||  !update.main} icon={Download} on:click={(e) => program(e)}>Program Update</Button>
             </Column>
           </Row>
         </Grid>
