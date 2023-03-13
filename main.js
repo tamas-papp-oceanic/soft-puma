@@ -19,6 +19,9 @@ const { readFile, writeFile } = require('./src/services/volume.js');
 const EventEmitter = require('node:events');
 const crc32 = require('buffer-crc32');
 
+// Leopard URL
+const authURL = 'http://192.168.16.52:8080';
+
 const pub = new EventEmitter();
 
 // Keep a global reference of the window object, if you don't, the window will
@@ -131,6 +134,9 @@ autoUpdater.on('update-downloaded', (info) => {
 // Some APIs can only be used after this event occurs.
 app.whenReady().then(async () => {
   createWindow();
+  if ((mainWindow != null) && (typeof mainWindow.webContents !== 'undefined')) {
+    mainWindow.webContents.send('auth-url', authURL);
+  }
   autoUpdater.autoDownload = false;
   autoUpdater.checkForUpdates();
 });
@@ -380,7 +386,7 @@ ipcMain.on('bar-code', (e, args) => {
 
 // Download program bin updates
 ipcMain.on('updates', (e, ...args) => {
-  downUpdates().then((res) => {
+  downUpdates(authURL).then((res) => {
     let updates = JSON.parse(JSON.stringify(res));
     if ((mainWindow != null) && (typeof mainWindow.webContents !== 'undefined')) {
       mainWindow.webContents.send('updates', updates);
@@ -426,7 +432,7 @@ ipcMain.on('upd-cancel', (e, ...args) => {
 // Start bootloader programing
 ipcMain.on('boot-start', (e, ...args) => {
   const [file] = args;
-  writeBoot(file, bootMessage).then((res) => {
+  writeBoot(authURL, file, bootMessage).then((res) => {
     if ((mainWindow != null) && (typeof mainWindow.webContents !== 'undefined')) {
       mainWindow.webContents.send('boot-done', res);
     }
@@ -454,7 +460,7 @@ ipcMain.on('prog-start', (e, args) => {
     let byt = 0;
     let dat;
     Promise.resolve()
-    .then(() => downProg(file, progMessage))
+    .then(() => downProg(authURL, file, progMessage))
     .then((res) => {
       byt = res.length;
       dat = Buffer.from(res);

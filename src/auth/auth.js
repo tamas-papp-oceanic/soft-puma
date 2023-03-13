@@ -1,11 +1,16 @@
-import { get } from "svelte/store";
+import { get, writable } from "svelte/store";
 import jwt_decode from "jwt-decode";
-import * as common from '../stores/common.js';
 import { userData, accessToken, refreshToken, loggedIn, permissions } from '../stores/user.js';
+
+const authURL = writable('http://localhost:8080');
+
+window.pumaAPI.recv('auth-url', (e, val) => {
+  authURL.set(val);
+});
 
 async function refreshLogin() {
   let token = get(refreshToken);
-  let res = await fetch(common.authURL + '/refresh', {
+  let res = await fetch(get(authURL) + '/refresh', {
     method: 'POST',
     body: JSON.stringify({
       'refresh_token': token,
@@ -28,7 +33,7 @@ async function refreshLogin() {
 }
 
 async function getPerms() {
-  let res = await afetch(common.authURL + '/roles', {method: 'GET'});
+  let res = await afetch(get(authURL) + '/roles', {method: 'GET'});
   if (res.status == 200) {
     let perms = await res.json();
     let permsObject= {};
@@ -43,7 +48,7 @@ async function getPerms() {
 }
 
 async function login(username, password) {
-  const res = await fetch(common.authURL + '/login', {
+  const res = await fetch(get(authURL) + '/login', {
     method: 'POST',
     body: JSON.stringify({
       username,
@@ -66,7 +71,7 @@ async function login(username, password) {
 }
 
 async function logout() {
-  const res = await afetch(common.authURL + '/logout', {method: 'POST'})
+  const res = await afetch(get(authURL) + '/logout', {method: 'POST'})
   if (res.status == 200) {
     permissions.set({});
     userData.set({});
@@ -121,6 +126,7 @@ async function checkAccess(route, type) {
 }
 
 export {
+  authURL,
   login,
   logout,
   afetch,

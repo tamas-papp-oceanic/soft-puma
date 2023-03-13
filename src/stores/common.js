@@ -1,6 +1,3 @@
-// const authURL = 'http://localhost:8080';
-const authURL = 'http://192.168.16.52:8080';
-
 const devnames = {
   'senders': {
     '3271': 'Volumetric Fuel Sender',
@@ -28,4 +25,4 @@ function getname(cod) {
   return null;
 };
 
-module.exports = { authURL, devnames, getname };
+export { devnames, getname };

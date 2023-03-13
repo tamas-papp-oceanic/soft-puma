@@ -13,7 +13,6 @@ const dwl = require('download');
 const path = require('path');
 const cp = require('child_process');
 const http = require('http');
-const com = require("../stores/common.js");
 
 function erase(func) {
   return new Promise((resolve, reject) => {
@@ -72,10 +71,10 @@ function reboot(func) {
   });
 }
 
-async function writeBoot(file, func) {
+async function writeBoot(url, file, func) {
   return new Promise((resolve, reject) => {
     let dwn = path.join(app.getAppPath(), 'downloads');
-    dwl(com.authURL + '/download?file=' + file, dwn).then((res) => {
+    dwl(url + '/download?file=' + file, dwn).then((res) => {
       log.info('Download successful:', file);
       dwn = path.join(dwn, file);
       erase(func).then((res) => {
@@ -103,9 +102,9 @@ async function writeBoot(file, func) {
   });
 }
 
-async function downUpdates(func) {
+async function downUpdates(url, func) {
   return new Promise((resolve, reject) => {
-    http.get(com.authURL + '/updates', (res) => {
+    http.get(url + '/updates', (res) => {
       if ((res.statusCode >= 200) && (res.statusCode <= 299)) {
         let data = [];
         res.on('data', (chunk) => {
@@ -123,9 +122,9 @@ async function downUpdates(func) {
   });
 }
 
-async function downProg(file, func) {
+async function downProg(url, file, func) {
   return new Promise((resolve, reject) => {
-    dwl(com.authURL + '/download?file=' + file, path.join(app.getAppPath(), 'downloads')).then((res) => {
+    dwl(url + '/download?file=' + file, path.join(app.getAppPath(), 'downloads')).then((res) => {
       let msg = 'Download successful: ' + file;
       log.info(msg);
       func(msg + '\n');
