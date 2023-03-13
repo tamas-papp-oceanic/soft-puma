@@ -73,7 +73,7 @@ function reboot(func) {
 
 async function writeBoot(url, file, func) {
   return new Promise((resolve, reject) => {
-    let dwn = path.join(app.getAppPath(), 'downloads');
+    let dwn = path.join(app.getAppPath(), 'share/downloads');
     dwl(url + '/download?file=' + file, dwn).then((res) => {
       log.info('Download successful:', file);
       dwn = path.join(dwn, file);
@@ -124,7 +124,8 @@ async function downUpdates(url, func) {
 
 async function downProg(url, file, func) {
   return new Promise((resolve, reject) => {
-    dwl(url + '/download?file=' + file, path.join(app.getAppPath(), 'downloads')).then((res) => {
+    let dwn = path.join(app.getAppPath(), 'share/downloads');
+    dwl(url + '/download?file=' + file, dwn).then((res) => {
       let msg = 'Download successful: ' + file;
       log.info(msg);
       func(msg + '\n');
