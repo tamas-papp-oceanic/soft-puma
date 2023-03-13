@@ -89,7 +89,10 @@ function createWindow() {
   // Emitted when the window is ready to be shown
   // This helps in showing the window gracefully.
   mainWindow.once('ready-to-show', () => {
-    mainWindow.show()
+    if ((mainWindow != null) && (typeof mainWindow.webContents !== 'undefined')) {
+      mainWindow.webContents.send('auth-url', authURL);
+    }
+    mainWindow.show();
   });
 }
 
@@ -134,9 +137,6 @@ autoUpdater.on('update-downloaded', (info) => {
 // Some APIs can only be used after this event occurs.
 app.whenReady().then(async () => {
   createWindow();
-  if ((mainWindow != null) && (typeof mainWindow.webContents !== 'undefined')) {
-    mainWindow.webContents.send('auth-url', authURL);
-  }
   autoUpdater.autoDownload = false;
   autoUpdater.checkForUpdates();
 });
