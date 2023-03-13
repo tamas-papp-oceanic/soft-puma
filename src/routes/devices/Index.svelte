@@ -201,7 +201,25 @@
     }
     items = JSON.parse(JSON.stringify(tmp));
   };
-  
+
+  function isNewDevice(old, cur) {
+    let res = false;
+    for (let i in cur) {
+      let fnd = false;
+      for (let j in old) {
+        if (old[j].productCode == cur[i].productCode) {
+          fnd = true;
+          break;
+        }
+      }
+      if (!fnd) {
+        res = true;
+        break;
+      }
+    }
+    return res;
+  }
+
   function getRows() {
     let tmp = new Array();
     if (typeof $name[$device] !== "undefined") {
@@ -219,11 +237,11 @@
         tmp.push(nam);
       }
     }
-    rows = JSON.parse(JSON.stringify(tmp));
-    pagination.totalItems = rows.length;
-    if (rows.length > 0) {
+    if (isNewDevice(rows, tmp)) {
       window.pumaAPI.send('updates');
     }
+    rows = JSON.parse(JSON.stringify(tmp));
+    pagination.totalItems = rows.length;
   };
 
   // Data getters, setters
