@@ -1,4 +1,5 @@
-const authURL = 'http://localhost:8080';
+// const authURL = 'http://localhost:8080';
+const authURL = 'http://192.168.16.52:8080';
 
 const devnames = {
   'senders': {
