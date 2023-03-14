@@ -3,6 +3,8 @@
   "version": "1.0.10",
   "private": true,
   "main": "main.js",
+  "description": "Oceanic System's Device Settings & Diagnostic Application",
+  "author": "Oceanic System's Development Team",
   "build": {
     "icon": "public/favicon.png",
     "productName": "Puma",
@@ -15,6 +17,7 @@
     ],
     "linux": {
       "target": "appImage",
+      "category": "Utility",
       "publish": {
         "provider": "generic",
         "url": "http://localhost:8080/release/x86_64"
