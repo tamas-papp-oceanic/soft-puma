@@ -166,6 +166,7 @@ app.on('activate', function () {
 
 // Discovering interfaces
 async function discover() {
+  let updates = new Array();
   Serial.discover().then((sls) => {
     for (let i in sls) {
       if ((sls[i].vendorId == '0483') && (sls[i].productId == '5740')) {
@@ -175,6 +176,7 @@ async function discover() {
           let dev = new Serial(sls[i].path, 115200);
           let eng = new NMEAEngine(dev);
           devices[sls[i].path] = { type: 'serial', device: dev, engine: eng, process: proc };
+          updates.push(devices[sls[i].path]);
         }
       }
     }
@@ -187,6 +189,7 @@ async function discover() {
             let dev = new Can(cls[i]);
             let eng = new NMEAEngine(dev);
             devices[cls[i]] = { type: 'can', device: dev, engine: eng, process: proc };
+            updates.push(devices[cls[i]]);
           }
         }
       }
@@ -198,11 +201,22 @@ async function discover() {
             log.info('New CAN interface (' + cls[0].path + ')')
             let eng = new NMEAEngine(can);
             devices[cls[0].path] = { type: 'can', device: can, engine: eng, process: proc };
+            updates.push(devices[cls[0].path]);
           }
         }
       }).catch((err) => {
         log.error(err);
       });
+    }
+    for (let upd of updates) {
+      upd.device.start(upd.process);  
+      upd.engine.init();
+      // Send ISO Request for Address Claim
+      upd.engine.send059904(60928, 0xFF);
+    }
+    if ((updates.length > 0) && (mainWindow != null) &&
+      (typeof mainWindow.webContents !== 'undefined')) {
+      mainWindow.webContents.send('n2k-devs', Object.keys(devices));
     }
   }).catch((err) => {
     log.error(err);
@@ -394,23 +408,6 @@ ipcMain.on('updates', (e, ...args) => {
   }).catch((err) => {
     console.log(err);
   });
-});
-
-// Start device processing
-ipcMain.on('dev-start', (e, ...args) => {
-  for (const [key, val] of Object.entries(devices)) {
-    val.device.start(val.process);  
-    val.engine.init();
-    // Send ISO Request for Address Claim
-    val.engine.send059904(60928, 0xFF);
-  }
-});
-
-// Stop device processing
-ipcMain.on('dev-stop', (e, ...args) => {
-  for (const [key, val] of Object.entries(devices)) {
-    val.device.stop();  
-  }
 });
 
 // Start update process
@@ -966,6 +963,13 @@ ipcMain.on('a3478-write', (e, args) => {
 // Cancels 3478 auto tests
 ipcMain.on('a3478-cancel', (e, args) => {
   swcancel = true;
+});
+
+// Stop device processing
+ipcMain.on('dev-stop', (e, ...args) => {
+  for (const [key, val] of Object.entries(devices)) {
+    val.device.stop();  
+  }
 });
 
 // Closes the application

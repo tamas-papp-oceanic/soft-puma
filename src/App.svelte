@@ -131,8 +131,6 @@
     }
   }
 
-  window.pumaAPI.send('dev-start');
-
 	$: prc = $progress && $progress.percent ? $progress.percent : 0;
 	$: max = $progress && $progress.total ? $progress.total / (1024 * 1024) : 100;
 	$: val = $progress && $progress.transferred ? $progress.transferred / (1024 * 1024) : 0;
