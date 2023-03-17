@@ -139,7 +139,21 @@ autoUpdater.on('update-downloaded', (info) => {
 app.whenReady().then(async () => {
   createWindow();
   autoUpdater.autoDownload = false;
+
+console.log("START")
+
   autoUpdater.checkForUpdates();
+
+console.log("FINISH")
+
+  // Start discovery loop
+  log.info('Discovering interfaces...')
+  discover();
+  timer = setInterval(() => {
+    discover();
+  }, 10000);
+
+
 });
 
 // Quit when all windows are closed.
@@ -294,14 +308,7 @@ function proc(dev, frm) {
 }
 
 // Initialize NMEA translator
-com.init();
-
-// Start discovery loop
-log.info('Discovering interfaces...')
-discover();
-timer = setInterval(() => {
-  discover();
-}, 10000);
+// com.init();
 
 // Load configurations
 ipcMain.on('n2k-ready', (e, ...args) => {
