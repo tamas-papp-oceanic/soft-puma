@@ -138,22 +138,10 @@ autoUpdater.on('update-downloaded', (info) => {
 // Some APIs can only be used after this event occurs.
 app.whenReady().then(async () => {
   createWindow();
-  autoUpdater.autoDownload = false;
-
-console.log("START")
-
-  autoUpdater.checkForUpdates();
-
-console.log("FINISH")
-
-  // Start discovery loop
-  log.info('Discovering interfaces...')
-  discover();
-  timer = setInterval(() => {
-    discover();
+  setTimeout(() => {
+    autoUpdater.autoDownload = false;
+    autoUpdater.checkForUpdates();
   }, 10000);
-
-
 });
 
 // Quit when all windows are closed.
@@ -181,60 +169,82 @@ app.on('activate', function () {
 
 // Discovering interfaces
 async function discover() {
-  let updates = new Array();
-  Serial.discover().then((sls) => {
-    for (let i in sls) {
-      if ((sls[i].vendorId == '0483') && (sls[i].productId == '5740')) {
-        // STMicroelectronics Virtual COM port
-        if (typeof devices[sls[i].path] === "undefined") {
-          log.info('New serial interface (' + sls[i].path + ')')
-          let dev = new Serial(sls[i].path, 115200);
-          let eng = new NMEAEngine(dev);
-          devices[sls[i].path] = { type: 'serial', device: dev, engine: eng, process: proc };
-          updates.push(devices[sls[i].path]);
-        }
-      }
-    }
-    if (os.platform() == 'linux') {
-      let cls = Can.discover();
-      for (let i in cls) {
-        if (cls[i].startsWith('can')) {
-          if (typeof devices[cls[i]] === "undefined") {
-            log.info('New CAN interface (' + cls[i] + ')')
-            let dev = new Can(cls[i]);
-            let eng = new NMEAEngine(dev);
-            devices[cls[i]] = { type: 'can', device: dev, engine: eng, process: proc };
-            updates.push(devices[cls[i]]);
+  return new Promise((resolve, reject) => {
+    let updates = new Array();
+    Promise.resolve()
+    .then(() => Serial.discover())
+    .then((sls) => {
+      return new Promise((resolve, reject) => {
+        for (let i in sls) {
+          if ((sls[i].vendorId == '0483') && (sls[i].productId == '5740')) {
+            // STMicroelectronics Virtual COM port
+            if (typeof devices[sls[i].path] === "undefined") {
+              log.info('New serial interface (' + sls[i].path + ')')
+              let dev = new Serial(sls[i].path, 115200);
+              let eng = new NMEAEngine(dev);
+              devices[sls[i].path] = { type: 'serial', device: dev, engine: eng, process: proc };
+              updates.push(devices[sls[i].path]);
+            }
           }
         }
-      }
-    } else if (os.platform() == 'win32') {
-      let can = new Can();
-      can.discover().then((cls) => {
-        if (cls.length > 0) {
-          if (typeof devices[cls[0].path] === "undefined") {
-            log.info('New CAN interface (' + cls[0].path + ')')
-            let eng = new NMEAEngine(can);
-            devices[cls[0].path] = { type: 'can', device: can, engine: eng, process: proc };
-            updates.push(devices[cls[0].path]);
-          }
-        }
-      }).catch((err) => {
-        log.error(err);
+        resolve(true);
       });
-    }
-    for (let upd of updates) {
-      upd.device.start(upd.process);  
-      upd.engine.init();
-      // Send ISO Request for Address Claim
-      upd.engine.send059904(60928, 0xFF);
-    }
-    if ((updates.length > 0) && (mainWindow != null) &&
-      (typeof mainWindow.webContents !== 'undefined')) {
-      mainWindow.webContents.send('n2k-devs', Object.keys(devices));
-    }
-  }).catch((err) => {
-    log.error(err);
+    })
+    .then(() => {
+      return new Promise((resolve, reject) => {
+        if (os.platform() == 'linux') {
+          let cls = Can.discover();
+          for (let i in cls) {
+            if (cls[i].startsWith('can')) {
+              if (typeof devices[cls[i]] === "undefined") {
+                log.info('New CAN interface (' + cls[i] + ')')
+                let dev = new Can(cls[i]);
+                let eng = new NMEAEngine(dev);
+                devices[cls[i]] = { type: 'can', device: dev, engine: eng, process: proc };
+                updates.push(devices[cls[i]]);
+              }
+            }
+          }
+          resolve(true);
+        } else if (os.platform() == 'win32') {
+          let can = new Can();
+          can.discover().then((cls) => {
+            if (cls.length > 0) {
+              if (typeof devices[cls[0].path] === "undefined") {
+                log.info('New CAN interface (' + cls[0].path + ')')
+                let eng = new NMEAEngine(can);
+                devices[cls[0].path] = { type: 'can', device: can, engine: eng, process: proc };
+                updates.push(devices[cls[0].path]);
+              }
+            }
+            resolve(true);
+          }).catch((err) => {
+            reject(err);
+          });
+        }
+      });
+    })
+    .then(() => {
+      return new Promise((resolve) => {
+        for (let upd of updates) {
+          upd.device.start(upd.process);  
+        }
+        setTimeout(() => {
+          for (let upd of updates) {
+            upd.engine.init();
+          }
+          if ((updates.length > 0) && (mainWindow != null) &&
+            (typeof mainWindow.webContents !== 'undefined')) {
+            mainWindow.webContents.send('n2k-devs', Object.keys(devices));
+          }
+          resolve(true);
+        }, 1000);
+      });
+    }).catch((err) => {
+      reject(err);
+      return;
+    });
+    resolve(true);
   });
 }
 
@@ -308,7 +318,14 @@ function proc(dev, frm) {
 }
 
 // Initialize NMEA translator
-// com.init();
+com.init();
+
+// Start discovery loop
+log.info('Discovering interfaces...')
+discover();
+timer = setInterval(() => {
+  discover();
+}, 10000);
 
 // Load configurations
 ipcMain.on('n2k-ready', (e, ...args) => {
