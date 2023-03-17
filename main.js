@@ -32,14 +32,15 @@ let timer = null;
 let Can = null;
 let cancelToken;
 
+log.transports.console.level = 'info';
+log.transports.file.maxSize = 10 * 1024 * 1024;
+log.transports.file.level = 'info';
+
 if (os.platform() == 'linux') {
   Can = require('./src/services/can.js');
 } else if (os.platform() == 'win32') {
   Can = require('./src/services/pcan.js');
 }
-
-log.transports.console.level = 'info';
-log.transports.file.level = 'info';
 
 function createWindow() {
   // Create the browser window.
