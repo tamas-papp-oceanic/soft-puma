@@ -17,6 +17,7 @@ const Address = require('./address.js');
 class NMEAEngine {
   // Static variables
   #device;
+  #active;
   #addrMngr;
   #heartbeat;
   #timer;
@@ -25,6 +26,7 @@ class NMEAEngine {
   constructor(dev) {
     const tranList = [60928, 126993];
     const recvList = [60928];
+    this.#active = false;
     this.#device = dev;
     this.#addrMngr = null;
     this.#heartbeat = {
@@ -55,7 +57,12 @@ class NMEAEngine {
         fun();
       }, 60000, this.#send126993.bind(this));
     }
+    this.#active = true;
   };
+  // Returns with active state
+  active() {
+    return this.#active;
+  }
   // Destroys NMEA engine
   destroy() {
     this.#addrMngr.stop();

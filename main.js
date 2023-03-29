@@ -250,7 +250,7 @@ async function discover() {
 
 // NMEA processing
 function proc(dev, frm) {
-  if ((mainWindow != null) && (typeof mainWindow.webContents !== 'undefined')) {
+  if (devices[dev].engine.active() && (mainWindow != null) && (typeof mainWindow.webContents !== 'undefined')) {
     let msg = devices[dev].engine.process(frm);
     let manu = devices[dev].engine.name[2];
     let indu = devices[dev].engine.name[9];
