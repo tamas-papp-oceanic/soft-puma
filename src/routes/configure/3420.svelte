@@ -65,6 +65,10 @@
   };
 
   function select(e) {
+    kind = null
+    title = null;
+    subttl = null;
+    notify = false;
     running = true;
     rtimer = setTimeout(() => {
       stop('r3420');
@@ -90,6 +94,10 @@
   };
 
   function program(e) {
+    kind = null
+    title = null;
+    subttl = null;
+    notify = false;
     running = true;
     wtimer = setTimeout(() => {
       stop('w3420');

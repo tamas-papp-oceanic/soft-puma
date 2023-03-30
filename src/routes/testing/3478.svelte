@@ -57,6 +57,10 @@
   };
 
   function auto(e) {
+    kind = null
+    title = null;
+    subttl = null;
+    notify = false;
     data.autorun = true;
     // Receives program result
     window.pumaAPI.recv('a3478-done', (e, res) => {
@@ -72,8 +76,12 @@
     window.pumaAPI.send('a3478-write', [$device, parseInt(data.instance)]);
   };
 
-  function toggle(e) {
+  function change(e) {
     if (!data.autorun) {
+      kind = null
+      title = null;
+      subttl = null;
+      notify = false;
       running = true;
       timer = setTimeout(() => {
         kind = 'error'
@@ -114,7 +122,7 @@
   <Row>
     <Column>
       <h2>{model + ' - ' + getname(model) + ' - Test'}</h2>
-      <Container3478 bind:data={data} style="height: 80vh;" on:auto={auto} on:toggle={toggle} on:cancel={cancel} />
+      <Container3478 bind:data={data} style="height: 80vh;" on:auto={auto} on:change={change} on:cancel={cancel} />
       {#if notify}
         <div class="error">
           <ToastNotification
@@ -131,4 +139,15 @@
 </Grid>
 
 <style lang="css">
+.error {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  display: flex;
+  flex-flow: row nowrap;
+  align-items: center;
+  justify-content: center;
+}
 </style>

@@ -28,8 +28,8 @@
     dispatch("auto");
   };
 
-  function toggle(e, idx) {
-    dispatch("toggle", { cell: idx });
+  function change(e, idx) {
+    dispatch("change", { cell: idx });
   };
 
   function cancel(e) {
@@ -83,7 +83,7 @@
                 {#if row.id === "a"}
                   <img src={data.banks[cell.key].status == 0 ? redImage : data.banks[cell.key].status == 1 ? greenImage : data.banks[cell.key].status == 2 ? yellowImage : greyImage} alt style="width: 2rem;" />
                 {:else if row.id === "b"}
-                  <Toggle disabled={data.autorun} labelText={cell.key} hideLabel bind:toggled={data.banks[cell.key].command} on:toggle={(e) => toggle(e, cell.key)}/>
+                  <Toggle disabled={data.autorun} labelText={cell.key} hideLabel bind:toggled={data.banks[cell.key].command} on:change={(e) => change(e, cell.key)} />
                 {/if}
               </svelte:fragment>
               <Row>

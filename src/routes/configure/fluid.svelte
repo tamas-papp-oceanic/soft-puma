@@ -107,6 +107,10 @@
   };
 
   function save(e) {
+    kind = null
+    title = null;
+    subttl = null;
+    notify = false;
     running = true;
     // Receives volume file result
     window.pumaAPI.recv('volfile-done', (e, res) => {
@@ -128,6 +132,10 @@
   };
 
   function getmode(e) {
+    kind = null
+    title = null;
+    subttl = null;
+    notify = false;
     running = true;
     timer = setTimeout(() => {
       kind = 'error'
@@ -152,6 +160,10 @@
   };
 
   function setmode(e) {
+    kind = null
+    title = null;
+    subttl = null;
+    notify = false;
     running = true;
     timer = setTimeout(() => {
       kind = 'error'
@@ -181,6 +193,10 @@
   };
 
   function download(e) {
+    kind = null
+    title = null;
+    subttl = null;
+    notify = false;
     running = true;
     timer = setTimeout(() => {
       kind = 'error'
@@ -205,6 +221,10 @@
   };
 
   function upload(e) {
+    kind = null
+    title = null;
+    subttl = null;
+    notify = false;
     running = true;
     timer = setTimeout(() => {
       kind = 'error'
