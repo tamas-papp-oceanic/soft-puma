@@ -20,7 +20,7 @@ const EventEmitter = require('node:events');
 const crc32 = require('buffer-crc32');
 
 // Leopard URL
-const authURL = 'http://192.168.16.52:8080';
+const authURL = 'http://puma.osukl.com:80';
 
 const pub = new EventEmitter();
 

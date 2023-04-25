@@ -5,6 +5,8 @@ const enc = require('./encode.js');
 const com = require('./common.js');
 let can = null;
 const ser = require('./serial.js');
+const tranList = [59392, 59904, 60160, 60416, 60928, 126208, 126464, 126993, 126996, 126998];
+const recvList = [59392, 59904, 60160, 60416, 60928, 126208];
 
 if (os.platform() == 'linux') {
   can = require('./can.js');
@@ -24,8 +26,6 @@ class NMEAEngine {
   #productInfo;
   // Contructor
   constructor(dev) {
-    const tranList = [60928, 126993];
-    const recvList = [60928];
     this.#active = false;
     this.#device = dev;
     this.#addrMngr = null;
@@ -162,7 +162,9 @@ class NMEAEngine {
       switch (fld.value) {
         case 60928:
           // Send ISO Address Claim message
-          this.#addrMngr.send060928();
+          if (this.#addrMngr.state == 'Valid') {
+            this.#addrMngr.send060928();
+          }
           break;
         case 126464:
           if (msg.header.dst == this.#addrMngr.address) {
@@ -195,7 +197,9 @@ class NMEAEngine {
   };
   // Sends ISO Request message
   send059904(pgn, dst) {
-    this.#addrMngr.send059904(pgn, dst);
+    if (this.#addrMngr.state == 'Valid') {
+      this.#addrMngr.send059904(pgn, dst);
+    }
   };
 
   // Sends Test Control message
@@ -701,7 +705,7 @@ class NMEAEngine {
                         case 8: // Load Equivalency
                           if (flv == pif[fln]) {
                             fer.writeUint8(0x00, i);
-                            ack = true;
+                            ack = false;
                           } else {
                             if (msg.header.dst != 0xFF) {
                               fer.writeUint8(0x03, i);
@@ -757,52 +761,47 @@ class NMEAEngine {
           switch (pgn) {
             case 126996:
               // Process Command Group for Product Info message
-              if (msg.header.dst == this.#addrMngr.address) {
+              if (msg.header.dst == this.#addrMngr.address) {              
                 let ack = false;
                 let per = 0x00;
                 let ter = 0x00;
                 let fer = Buffer.alloc(8).fill(0);
                 if (nop != 0xFF) {
-                  if (pri == 0x08) {
-                    // Loop through the parameters
-                    for (let i = 0; i < nop; i++) {
-                      fld = com.getFld((i * 2) + 6, msg.fields);
-                      if (fld == null) {
-                        fer.writeUint8(0x01, i);
-                        ack = true;
-                        snd = false;
-                        break;
-                      }
-                      let fln = fld.value;
-                      fld = com.getFld((i * 2) + 7, msg.fields);
-                      if (fld == null) {
-                        fer.writeUint8(0x01, i);
-                        ack = true;
-                        snd = false;
-                        break;
-                      }
-                      let flv = fld.value;
-                      switch (fln) {
-                        case 1: // NMEA Network Message Database Version
-                        case 2: // Manufacturer's Product Code
-                        case 3: // Manufacturer's Model ID
-                        case 4: // Manufacturer's Software Version Code
-                        case 5: // Manufacturer's Model Version
-                        case 6: // Manufacturer's Model Serial Code
-                        case 7: // NMEA 2000 Certification Level
-                        case 8: // Load Equivalency
-                          fer.writeUint8(0x01, i);
-                          ack = true;
-                          break;
-                        default:
-                          fer.writeUint8(0x05, i);
-                          ack = true;
-                          break;
-                      }
+                  // Loop through the parameters
+                  for (let i = 0; i < nop; i++) {
+                    fld = com.getFld((i * 2) + 6, msg.fields);
+                    if (fld == null) {
+                      fer.writeUint8(0x01, i);
+                      ack = true;
+                      snd = false;
+                      break;
                     }
-                  } else {
-                    ter = 0x03;
-                    ack = true;                
+                    let fln = fld.value;
+                    fld = com.getFld((i * 2) + 7, msg.fields);
+                    if (fld == null) {
+                      fer.writeUint8(0x01, i);
+                      ack = true;
+                      snd = false;
+                      break;
+                    }
+                    let flv = fld.value;
+                    switch (fln) {
+                      case 1: // NMEA Network Message Database Version
+                      case 2: // Manufacturer's Product Code
+                      case 3: // Manufacturer's Model ID
+                      case 4: // Manufacturer's Software Version Code
+                      case 5: // Manufacturer's Model Version
+                      case 6: // Manufacturer's Model Serial Code
+                      case 7: // NMEA 2000 Certification Level
+                      case 8: // Load Equivalency
+                        fer.writeUint8(0x01, i);
+                        ack = true;
+                        break;
+                      default:
+                        fer.writeUint8(0x05, i);
+                        ack = true;
+                        break;
+                    }
                   }
                 }
                 if (ack) {

@@ -172,9 +172,10 @@ class Address {
   };
   // WaitForDelay6
   #s6Entry(state, context) {
-    setTimeout(() => {
+    let tio = this.rnd();
+    this.#timeout = setTimeout(() => {
       state.trigger('next');
-    }, this.timeout());
+    }, tio);
   };
   // TransmitNew7
   #s7Entry(state, context) {

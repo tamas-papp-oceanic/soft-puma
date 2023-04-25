@@ -2,7 +2,7 @@ import { get, writable } from "svelte/store";
 import jwt_decode from "jwt-decode";
 import { userData, accessToken, refreshToken, loggedIn, permissions } from '../stores/user.js';
 
-const authURL = writable('http://localhost:8080');
+const authURL = writable('http://puma.osukl.com:80');
 
 window.pumaAPI.recv('auth-url', (e, val) => {
   authURL.set(val);
