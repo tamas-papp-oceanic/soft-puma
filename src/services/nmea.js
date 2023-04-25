@@ -39,10 +39,10 @@ class NMEAEngine {
     // Serial number can be loaded from configuration
     this.#productInfo = {
       1: 2101,      // NMEA Network Message Database Version
-      2: 1111,      // NMEA Manufacturer's Product Code
+      2: 9999,      // NMEA Manufacturer's Product Code
       3: 'Puma',    // Manufacturer's Model ID
       4: 'v1.0.0',  // Manufacturer's Software Version Code
-      5: '2222',    // Manufacturer's Model Version
+      5: 'puma',    // Manufacturer's Model Version
       6: '123456',  // Manufacturer's Model Serial Code
       7: 2,         // NMEA 2000 Certification Level
       8: 1,         // Load Equivalency
