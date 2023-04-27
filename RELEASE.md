@@ -33,4 +33,6 @@ The generated files:
 They should be uploaded into the "puma.osukl.com" server's release folder:
 
   /usr/share/leopard/release/win64
+
+Keep all previous files in release folder for windows release!
 ```
