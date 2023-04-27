@@ -9,7 +9,6 @@ npm install
 npm run electron-pack
 ```
 ## Deploying generated files
-<br />
 
 ### Ubuntu linux
 ```
