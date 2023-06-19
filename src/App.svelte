@@ -13,6 +13,7 @@
 	import Content from './routes/devices/Content.svelte';
 	// import Details from './routes/Details.svelte';
 	import Configure from './routes/configure/Index.svelte';
+	import Configure3410 from './routes/configure/3410.svelte';
 	import Configure3420 from './routes/configure/3420.svelte';
 	import ConfigureFluid from './routes/configure/fluid.svelte';
 	import Program from './routes/program/Index.svelte';
@@ -44,6 +45,7 @@
 		"/configure": Configure,
 		"/configure/3271/:instance/:fluid": ConfigureFluid,
 		"/configure/3281/:instance/:fluid": ConfigureFluid,
+		"/configure/3410/:instance": Configure3410,
 		"/configure/3420/:instance": Configure3420,
 		"/configure/3125/:instance/:fluid": ConfigureFluid,
 		"/configure/4291/:instance/:fluid": ConfigureFluid,

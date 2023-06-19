@@ -271,11 +271,17 @@ function proc(dev, frm) {
               break;
             default:
               switch (msg.fields[3].value) {
-                case 8:
+                case 0x08:
+                  // AC data
                   mainWindow.webContents.send('n2k-ac-data', [dev, msg]);
                   pub.emit('conf-ack', msg);
                   break;
-              }
+                case 0x0D:
+                  // DC data
+                  mainWindow.webContents.send('n2k-dc-data', [dev, msg]);
+                  pub.emit('conf-ack', msg);
+                  break;
+                }
               break;
           }
         }
@@ -801,6 +807,127 @@ ipcMain.on('voltable-write', (e, args) => {
     }
   } else {
     progMessage("No device selected!");
+  }
+});
+
+function c3410Read(eng, ins, cmd) {
+  return new Promise((resolve, reject) => {
+    // Reading configuration...
+    let ret = eng.send065445(0x0D, ins, 0xFF, (((0xFF << 8) + cmd) << 8) + 0x00);
+    if (ret) {
+      btimer = setTimeout(() => {
+        btimer = null;
+        reject(new Error('Reading configuration failed!'));
+      }, 5000);
+      pub.once('conf-ack', (res) => {
+        clearTimeout(btimer);
+        btimer = null;
+
+console.log(res)
+
+        if ((typeof res.fields !== 'undefined') && Array.isArray(res.fields) &&
+          (res.fields[3].value == 0x0D) && (res.fields[4].value == ins) &&
+          (res.fields[5].value == cmd)) {
+          let msg = 'Configuration successfuly read.';
+          log.info(msg);
+          resolve(true);
+        } else {
+          reject(new Error('Reading configuration failed!'));
+        }
+      });
+    } else {
+      reject(new Error('Reading configuration failed!'));
+    }
+  });
+}
+
+// Starts 3410 configuration reading
+ipcMain.on('c3410-read', (e, args) => {
+  const [dev, inst] = args;
+  if ((typeof dev === 'string') && (typeof devices[dev] !== 'undefined')) {
+    let eng = devices[dev].engine;
+    Promise.resolve()
+    .then(() => c3410Read(eng, inst, 0))
+    .then(() => c3410Read(eng, inst, 1))
+    .then(() => c3410Read(eng, inst, 2))
+    .then(() => c3410Read(eng, inst, 3))
+    .then(() => c3410Read(eng, inst, 4))
+    .then(() => c3410Read(eng, inst, 5))
+    .then(() => c3410Read(eng, inst, 6))
+    .then(() => c3410Read(eng, inst, 7))
+    .then(() => c3410Read(eng, inst, 8))
+    .then(() => {
+      if ((mainWindow != null) && (typeof mainWindow.webContents !== 'undefined')) {
+        mainWindow.webContents.send('r3410-done', true);
+      }
+    })
+    .catch((err) => {
+      log.error(err);
+      if ((mainWindow != null) && (typeof mainWindow.webContents !== 'undefined')) {
+        mainWindow.webContents.send('r3410-done', false);
+      }
+    });
+  } else {
+    console.log("No device selected!");
+  }
+});
+
+function c3410Write(eng, ins, cmd, dat) {
+  return new Promise((resolve, reject) => {
+    // Writing configuration...
+    let ret = eng.send065445(0x0D, ins, cmd, dat);
+    if (ret) {
+      btimer = setTimeout(() => {
+        btimer = null;
+        reject(new Error('Writing configuration failed!'));
+      }, 5000);
+      pub.once('conf-ack', (res) => {
+        clearTimeout(btimer);
+        btimer = null;
+        if ((typeof res.fields !== 'undefined') && Array.isArray(res.fields) &&
+          (res.fields[3].value == 0x08) && (res.fields[4].value == ins) &&
+          (res.fields[5].value == cmd) && ((res.fields[6].value & 0xFF) == dat)) {
+          let msg = 'Configuration successfuly written.';
+          log.info(msg);
+          resolve(true);
+        } else {
+          reject(new Error('Writing configuration failed!'));
+        }
+      });
+    } else {
+      reject(new Error('Writing configuration failed!'));
+    }
+  });
+}
+
+// Starts 3410 configuration writing
+ipcMain.on('c3410-write', (e, args) => {
+  const [dev, inst, dtyp, btyp, esup, nvol, bche, bcap, tcoe, pexp, ceff] = args;
+  if ((typeof dev === 'string') && (typeof devices[dev] !== 'undefined')) {
+    let eng = devices[dev].engine;
+    Promise.resolve()
+    .then(() => c3410Write(eng, inst, 0, dtyp))
+    .then(() => c3410Write(eng, inst, 1, btyp))
+    .then(() => c3410Write(eng, inst, 2, esup))
+    .then(() => c3410Write(eng, inst, 3, nvol))
+    .then(() => c3410Write(eng, inst, 4, bche))
+    .then(() => c3410Write(eng, inst, 5, bcap))
+    .then(() => c3410Write(eng, inst, 6, tcoe))
+    .then(() => c3410Write(eng, inst, 7, pexp))
+    .then(() => c3410Write(eng, inst, 8, ceff))
+    .then(() => {
+      if ((mainWindow != null) && (typeof mainWindow.webContents !== 'undefined')) {
+        mainWindow.webContents.send('w3410-done', true);
+      }
+    })
+    .catch((err) => {
+      log.error(err);
+      if ((mainWindow != null) && (typeof mainWindow.webContents !== 'undefined')) {
+        mainWindow.webContents.send('w3410-done', false);
+      }
+    });
+  } else {
+    console.log("No device selected!");
   }
 });
 

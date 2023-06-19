@@ -2,6 +2,7 @@ const devnames = {
   'senders': {
     '3271': 'Volumetric Fuel Sender',
     '3281': 'Water Level Sender',
+    '3410': 'DC Monitor',
     '3420': 'AC Monitor',
     '3478': '8 Channel Relay Output Module',
     '4410': '16 Channel Switch Input Module',
