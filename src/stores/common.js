@@ -6,6 +6,8 @@ const devnames = {
     '3420': 'AC Monitor',
     '3478': '8 Channel Relay Output Module',
     '4410': '16 Channel Switch Input Module',
+    '4510': 'Exhaust Gas Temperature Module',
+    '4521': '4 Channel Temperature Module',
   },
   'adaptors': {
     '3125': 'Tank Sender Adaptor',

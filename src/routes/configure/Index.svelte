@@ -7,7 +7,7 @@
   let tab;
   let dev;
   let devs = {
-    'senders': ['3271', '3281', '3410', '3420'],
+    'senders': ['3271', '3281', '3410', '3420', '4510', '4521'],
     'adaptors': ['3125', '4291'],
     'displays': new Array(),
   };
