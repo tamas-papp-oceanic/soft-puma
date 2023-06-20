@@ -16736,6 +16736,147 @@
       }
     ]
   },
+  "nmea2000/131000/-/161/4": {
+    "title": "Proprietary - DC Monitor Setup",
+    "single": false,
+    "priority": 6,
+    "interval": null,
+    "fields": [
+      {
+        "field": 1,
+        "title": "Manufacturer Code",
+        "type": "bit(11)",
+        "unit": null,
+        "multiplier": null,
+        "reserved": null
+      },
+      {
+        "field": 2,
+        "title": "NMEA Reserved",
+        "type": "bit(2)",
+        "unit": null,
+        "multiplier": null,
+        "reserved": "DD001"
+      },
+      {
+        "field": 3,
+        "title": "Industry Group",
+        "type": "bit(3)",
+        "unit": null,
+        "multiplier": null,
+        "reserved": null
+      },
+      {
+        "field": 4,
+        "title": "Message Type",
+        "type": "uint8",
+        "unit": null,
+        "multiplier": null,
+        "reserved": null
+      },
+      {
+        "field": 5,
+        "title": "Source Address",
+        "type": "uint8",
+        "unit": null,
+        "multiplier": null,
+        "reserved": null,
+        "instance": true
+      },
+      {
+        "field": 6,
+        "title": "Device Instance",
+        "type": "uint8",
+        "unit": null,
+        "multiplier": null,
+        "reserved": null
+      },
+      {
+        "field": 7,
+        "title": "DC Type",
+        "type": "uint8",
+        "unit": null,
+        "multiplier": null,
+        "reserved": null
+      },
+      {
+        "field": 8,
+        "title": "Battery Type",
+        "type": "bit(4)",
+        "unit": null,
+        "multiplier": null,
+        "reserved": null,
+        "instance": true
+      },
+      {
+        "field": 9,
+        "title": "Supports Equalization",
+        "type": "bit(2)",
+        "unit": null,
+        "multiplier": null,
+        "reserved": null,
+        "instance": true
+      },
+      {
+        "field": 10,
+        "title": "NMEA Reserved",
+        "type": "bit(2)",
+        "unit": null,
+        "multiplier": null,
+        "reserved": "DD001"
+      },
+      {
+        "field": 11,
+        "title": "Nominal Voltage",
+        "type": "bit(4)",
+        "unit": null,
+        "multiplier": null,
+        "reserved": null,
+        "instance": true
+      },
+      {
+        "field": 12,
+        "title": "Chemistry",
+        "type": "bit(4)",
+        "unit": null,
+        "multiplier": null,
+        "reserved": null,
+        "instance": true
+      },
+      {
+        "field": 13,
+        "title": "Capacity",
+        "type": "uint16",
+        "unit": "Ah",
+        "multiplier": null,
+        "reserved": null
+      },
+      {
+        "field": 14,
+        "title": "Temperature Coefficient",
+        "type": "int8",
+        "unit": "%",
+        "multiplier": null,
+        "reserved": null
+      },
+      {
+        "field": 15,
+        "title": "Peukert Exponent",
+        "type": "uint8",
+        "unit": null,
+        "multiplier": null,
+        "reserved": null
+      },
+      {
+        "field": 16,
+        "title": "Charge Efficiency",
+        "type": "int8",
+        "unit": "%",
+        "multiplier": null,
+        "reserved": null
+      }
+    ]
+  },
   "nmea2000/131010/-/161/4": {
     "title": "Proprietary - DM1",
     "single": false,

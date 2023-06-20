@@ -276,11 +276,6 @@ function proc(dev, frm) {
                   mainWindow.webContents.send('n2k-ac-data', [dev, msg]);
                   pub.emit('conf-ack', msg);
                   break;
-                case 0x0D:
-                  // DC data
-                  mainWindow.webContents.send('n2k-dc-data', [dev, msg]);
-                  pub.emit('conf-ack', msg);
-                  break;
                 }
               break;
           }
@@ -313,6 +308,12 @@ function proc(dev, frm) {
               break;
             }
           break;
+        }
+        break;
+      case 131000:
+        if ((msg.fields[0].value == manu) && (msg.fields[2].value == indu)) {
+          mainWindow.webContents.send('n2k-dc-data', [dev, msg]);
+          pub.emit('conf-ack', msg);
         }
         break;
       default:
@@ -810,10 +811,10 @@ ipcMain.on('voltable-write', (e, args) => {
   }
 });
 
-function c3410Read(eng, ins, cmd) {
+function c3410Read(eng, typ, ins, dst) {
   return new Promise((resolve, reject) => {
     // Reading configuration...
-    let ret = eng.send065445(0x0D, ins, 0xFF, (((0xFF << 8) + cmd) << 8) + 0x00);
+    let ret = eng.send059904(131000, dst);
     if (ret) {
       btimer = setTimeout(() => {
         btimer = null;
@@ -822,12 +823,9 @@ function c3410Read(eng, ins, cmd) {
       pub.once('conf-ack', (res) => {
         clearTimeout(btimer);
         btimer = null;
-
-console.log(res)
-
         if ((typeof res.fields !== 'undefined') && Array.isArray(res.fields) &&
-          (res.fields[3].value == 0x0D) && (res.fields[4].value == ins) &&
-          (res.fields[5].value == cmd)) {
+          (com.getFld(4, res.fields).value == typ) && (com.getFld(5, res.fields).value == dst) &&
+          (com.getFld(6, res.fields).value == ins)) {
           let msg = 'Configuration successfuly read.';
           log.info(msg);
           resolve(true);
@@ -843,19 +841,11 @@ console.log(res)
 
 // Starts 3410 configuration reading
 ipcMain.on('c3410-read', (e, args) => {
-  const [dev, inst] = args;
+  const [dev, typ, ins, src] = args;
   if ((typeof dev === 'string') && (typeof devices[dev] !== 'undefined')) {
     let eng = devices[dev].engine;
     Promise.resolve()
-    .then(() => c3410Read(eng, inst, 0))
-    .then(() => c3410Read(eng, inst, 1))
-    .then(() => c3410Read(eng, inst, 2))
-    .then(() => c3410Read(eng, inst, 3))
-    .then(() => c3410Read(eng, inst, 4))
-    .then(() => c3410Read(eng, inst, 5))
-    .then(() => c3410Read(eng, inst, 6))
-    .then(() => c3410Read(eng, inst, 7))
-    .then(() => c3410Read(eng, inst, 8))
+    .then(() => c3410Read(eng, typ, ins, src))
     .then(() => {
       if ((mainWindow != null) && (typeof mainWindow.webContents !== 'undefined')) {
         mainWindow.webContents.send('r3410-done', true);
@@ -872,10 +862,10 @@ ipcMain.on('c3410-read', (e, args) => {
   }
 });
 
-function c3410Write(eng, ins, cmd, dat) {
+function c3410Write(eng, typ, ins, dst, dat) {
   return new Promise((resolve, reject) => {
     // Writing configuration...
-    let ret = eng.send065445(0x0D, ins, cmd, dat);
+    let ret = eng.send131000(typ, ins, dst, dat);
     if (ret) {
       btimer = setTimeout(() => {
         btimer = null;
@@ -885,8 +875,8 @@ function c3410Write(eng, ins, cmd, dat) {
         clearTimeout(btimer);
         btimer = null;
         if ((typeof res.fields !== 'undefined') && Array.isArray(res.fields) &&
-          (res.fields[3].value == 0x08) && (res.fields[4].value == ins) &&
-          (res.fields[5].value == cmd) && ((res.fields[6].value & 0xFF) == dat)) {
+          (com.getFld(4, res.fields).value == typ) && (com.getFld(5, res.fields).value == dst) &&
+          (com.getFld(6, res.fields).value == ins)) {
           let msg = 'Configuration successfuly written.';
           log.info(msg);
           resolve(true);
@@ -902,19 +892,11 @@ function c3410Write(eng, ins, cmd, dat) {
 
 // Starts 3410 configuration writing
 ipcMain.on('c3410-write', (e, args) => {
-  const [dev, inst, dtyp, btyp, esup, nvol, bche, bcap, tcoe, pexp, ceff] = args;
+  const [dev, typ, ins, dst, dat] = args;
   if ((typeof dev === 'string') && (typeof devices[dev] !== 'undefined')) {
     let eng = devices[dev].engine;
     Promise.resolve()
-    .then(() => c3410Write(eng, inst, 0, dtyp))
-    .then(() => c3410Write(eng, inst, 1, btyp))
-    .then(() => c3410Write(eng, inst, 2, esup))
-    .then(() => c3410Write(eng, inst, 3, nvol))
-    .then(() => c3410Write(eng, inst, 4, bche))
-    .then(() => c3410Write(eng, inst, 5, bcap))
-    .then(() => c3410Write(eng, inst, 6, tcoe))
-    .then(() => c3410Write(eng, inst, 7, pexp))
-    .then(() => c3410Write(eng, inst, 8, ceff))
+    .then(() => c3410Write(eng, typ, ins, dst, dat))
     .then(() => {
       if ((mainWindow != null) && (typeof mainWindow.webContents !== 'undefined')) {
         mainWindow.webContents.send('w3410-done', true);

@@ -1,9 +1,8 @@
 <script>
   import { createEventDispatcher } from "svelte";
   import { ButtonSet, Button, Tile, Grid, Row, Column, Dropdown,
-    TextInput } from "carbon-components-svelte";
+    NumberInput } from "carbon-components-svelte";
   import Download from "carbon-icons-svelte/lib/Download16";
-  import { isAlive } from '../../../stores/data.js';
 
   export let data;
   export let style;
@@ -44,7 +43,6 @@
     { id: '4', text: 'NiMH' },
   );
     
-  let inst = data.instance;
   let insts = new Array();
   let dc_type = '0';
   let batt_type = '0';
@@ -52,17 +50,13 @@
   let nom_voltage = '0';
   let chemistry = '0';
   let capacity = null;
-  let temp_coeff = null;
+  let temp_eff = null;
   let peukert = null;
-  let chg_eff = null;
-  let alive = false;
+  let chrg_eff = null;
+  let isValid = false;
 
   function select(e) {
-    if (alive) {
-      dispatch("select");
-    } else {
-      dispatch("error", { title: 'Device not found' });
-    }
+    dispatch("select");
   };
 
   function program(e) {
@@ -73,9 +67,9 @@
       nom_voltage: nom_voltage,
       chemistry: chemistry,
       capacity: capacity,
-      temp_coeff: temp_coeff,
+      temp_eff: temp_eff,
       peukert: peukert,
-      chg_eff: chg_eff,
+      chrg_eff: chrg_eff,
     });
   };
 
@@ -92,9 +86,18 @@
     return null;
   };
 
-  function setCircuit(val) {
+  function setData(val) {
     if (val != null) {
-      circ = val;
+      dc_type = val.dc_type;
+      batt_type = val.batt_type;
+      equ_support = val.equ_support;
+      nom_voltage = val.nom_voltage;
+      chemistry = val.chemistry;
+      capacity = val.capacity;
+      temp_eff = val.temp_eff;
+      peukert = val.peukert;
+      chrg_eff = val.chrg_eff;
+      isValid = val.isValid;
     }
   };
 
@@ -103,7 +106,7 @@
   }
 
   // Data getters / setters
-  $: alive = isAlive(parseInt(data.source));
+  $: data, setData(data);
 </script>
 
 <div class="container" style={style}>
@@ -115,7 +118,7 @@
           </Column>
           <Column sm={1} md={2} lg={3} padding>
             <Row padding>
-              <Column>Current configuration</Column>
+              <Column>Device selector</Column>
             </Row>
             <Row padding>
               <Column>
@@ -123,11 +126,6 @@
                   disabled={running} on:select={(e) => select(e)} />
               </Column>
             </Row>
-            <!-- <Row padding>
-              <Column>
-                <TextInput disabled={running || !alive} readonly={!running && alive} labelText="Circuit type" value={getCircuit(data.circuit)} />
-              </Column>
-            </Row> -->
           </Column>
           <Column sm={1} md={1} lg={1} padding>
           </Column>
@@ -137,52 +135,75 @@
             </Row>
             <Row padding>
               <Column>
-                <Dropdown disabled={running || !alive} titleText="DC type" size="sm" bind:selectedId={dc_type} items={dc_types} />
+                <Dropdown disabled={running || !isValid} titleText="DC type" size="sm" bind:selectedId={dc_type} items={dc_types} />
               </Column>
             </Row>
             <Row padding>
               <Column>
-                <Dropdown disabled={running || !alive} titleText="Battery type" size="sm" bind:selectedId={batt_type} items={batt_types} />
+                <Dropdown disabled={running || !isValid} titleText="Battery type" size="sm" bind:selectedId={batt_type} items={batt_types} />
               </Column>
             </Row>
             <Row padding>
               <Column>
-                <Dropdown disabled={running || !alive} titleText="Supports equalization" size="sm" bind:selectedId={equ_support} items={equ_supports} />
+                <Dropdown disabled={running || !isValid} titleText="Supports equalization" size="sm" bind:selectedId={equ_support} items={equ_supports} />
               </Column>
             </Row>
             <Row padding>
               <Column>
-                <Dropdown disabled={running || !alive} titleText="Nominal voltage" size="sm" bind:selectedId={nom_voltage} items={nom_voltages} />
+                <Dropdown disabled={running || !isValid} titleText="Nominal voltage" size="sm" bind:selectedId={nom_voltage} items={nom_voltages} />
               </Column>
             </Row>
             <Row padding>
               <Column>
-                <Dropdown disabled={running || !alive} titleText="Battery chemistry" size="sm" bind:selectedId={chemistry} items={chemistries} />
+                <Dropdown disabled={running || !isValid} titleText="Battery chemistry" size="sm" bind:selectedId={chemistry} items={chemistries} />
               </Column>
             </Row>
           </Column>
           <Column sm={1} md={1} lg={1} padding>
           </Column>
-          <Column sm={1} md={2} lg={3} padding>
+          <Column sm={1} md={2} lg={4} padding>
             <Row padding>
               <Column>
-                <TextInput disabled={running || !alive} labelText="Battery capacity" value={capacity} />
+                <NumberInput
+                  disabled={running || !isValid}
+                  min={0} step={1}
+                  label="Battery capacity (Ah)"
+                  bind:value={capacity} />
               </Column>
             </Row>
             <Row padding>
               <Column>
-                <TextInput disabled={running || !alive} labelText="Battery temperature coefficient" value={temp_coeff} />
+                <NumberInput
+                  disabled={running || !isValid}
+                  allowEmpty
+                  min={0} max={100} step={1}
+                  label="Temperature coefficient (%)"
+                  bind:value={temp_eff} />
               </Column>
             </Row>
             <Row padding>
               <Column>
-                <TextInput disabled={running || !alive} labelText="Peukert Exponent" value={peukert} />
+                <NumberInput
+                  disabled={running || !isValid}
+                  min={1.00} max={1.50} step={0.01}
+                  label="Peukert Exponent"
+                  invalidText="Number must be between 1.00 and 1.50."
+                  bind:value={peukert} />
+              </Column>
+            </Row>
+            <Row padding>
+              <Column>
+                <NumberInput
+                  disabled={running || !isValid}
+                  min={1} max={100} step={1}
+                  label="Charging efficiency (%)"
+                  bind:value={chrg_eff} />
               </Column>
             </Row>
             <Row padding>
               <Column style="display: flex; flex-flow: row nowrap; justify-content: center;">
                 <Button tooltipPosition="top" tooltipAlignment="center" iconDescription="Write to sender" icon={Download}
-                  disabled={running || !alive} on:click={(e) => program(e)}>Write to Sensor</Button>
+                  disabled={running || !isValid} on:click={(e) => program(e)}>Write to Sensor</Button>
               </Column>
             </Row>
           </Column>

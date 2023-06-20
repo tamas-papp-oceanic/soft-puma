@@ -198,8 +198,9 @@ class NMEAEngine {
   // Sends ISO Request message
   send059904(pgn, dst) {
     if (this.#addrMngr.state == 'Valid') {
-      this.#addrMngr.send059904(pgn, dst);
+      return this.#addrMngr.send059904(pgn, dst);
     }
+    return false;
   };
 
   // Sends Test Control message
@@ -393,6 +394,36 @@ class NMEAEngine {
           { field: 5,title: 'Instance', state: 'V', value: ins },
           { field: 6,title: 'Data ID', state: 'V', value: dat },
           { field: 7,title: 'Content', state: 'V', value: val },
+        ],
+      };
+      return this.sendMsg(msg);
+    }
+    return false;
+  };
+
+  // Sends Proprietary FP DC Monitor settings
+  send131000(typ, ins, dst, dat) {
+    if (this.#addrMngr.state == 'Valid') {
+      let msg = {
+        key: 'nmea2000/131000/-/161/4/-/-',
+        header: { pgn: 131000, src: this.#addrMngr.address, dst: dst },
+        fields: [
+          { field: 1, title: 'Manufacturer Code', state: 'V', value: this.#addrMngr.name[2] },
+          { field: 2, title: 'Reserved', state: 'V', value: 0b11 },
+          { field: 3, title: 'Industry Group', state: 'V', value: this.#addrMngr.name[9] },
+          { field: 4, title: "Message Type", state: 'V', value: typ },
+          { field: 5, title: "Source Address", state: 'V', value: dst },
+          { field: 6, title: "Device Instance", state: 'V', value: ins },
+          { field: 7, title: "DC Type", state: 'V', value: dat.dc_type },
+          { field: 8, title: "Battery Type", state: 'V', value: dat.batt_type },
+          { field: 9, title: "Supports Equalization", state: 'V', value: dat.equ_support },
+          { field: 10, title: "NMEA Reserved", state: 'V', value: 0b11 },
+          { field: 11, title: "Nominal Voltage", state: 'V', value: dat.nom_voltage },
+          { field: 12, title: "Chemistry", state: 'V', value: dat.chemistry },
+          { field: 13, title: "Capacity", state: 'V', value: dat.capacity },
+          { field: 14, title: "Temperature Coefficient", state: 'V', value: dat.temp_eff != null ? dat.temp_eff : 0x7F },
+          { field: 15, title: "Peukert Exponent", state: 'V', value: dat.peukert },
+          { field: 16, title: "Charge Efficiency", state: 'V', value: dat.chrg_eff },
         ],
       };
       return this.sendMsg(msg);

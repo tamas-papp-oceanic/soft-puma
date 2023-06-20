@@ -3,8 +3,8 @@
   import { Row, Grid, Column, ToastNotification } from "carbon-components-svelte";
   import { location, pop } from "svelte-spa-router";
   import Container3410 from './partials/Container3410.svelte';
-  import { getname } from '../../stores/common.js';
-  import { device } from '../../stores/data';
+  import { getname, getfield } from '../../stores/common.js';
+  import { device, findModel } from '../../stores/data';
 
   export let params;
 
@@ -12,18 +12,20 @@
   const timeout = 2000;
   let rtimer = null;
   let wtimer = null;
+
   let data = {
     instance: params.instance,
     source: null,
     dc_type: null,
-    battery_type: null,
+    batt_type: null,
     equ_support: null,
     nom_voltage: null,
     chemistry: null,
     capacity: null,
-    temp_coeff: null,
+    temp_eff: null,
     peukert: null,
-    chg_eff: null,
+    chrg_eff: null,
+    isValid: false,
   };
   let running = false;
   let notify = false;
@@ -34,55 +36,37 @@
   onMount(() => {
     window.pumaAPI.recv('n2k-dc-data', (e, args) => {
       const [ dev, msg ] = args;
-      if (msg.fields[4].value == data.instance) {
-        let val = msg.fields[6].value & 0xFF;
-        switch (msg.fields[5].value) {
-          case 0:
-            // DC Type (0 = Battery, 1 = Alternator, 2 = Convertor, 3 = Solar Cell, 4 = Wind Generator)
-            data.source = msg.header.src;
-            data.dc_type = val.toString();
-            break;
-          case 1:
-            // Battery Type (0 = Flooded, 1 = GEL, 2 = AGM)
-            data.source = msg.header.src;
-            data.battery_type = val.toString();
-            break;
-          case 2:
-            // Supports Equalization (0 = No, 1 = Yes)
-            data.source = msg.header.src;
-            data.equ_support = val.toString();
-            break;
-          case 3:
-            // Nominal Voltage (0 = 6V, 1 = 12V, 2 = 24V, 3 = 32V, 4 = 36V, 5 = 42V, 6 = 48V)
-            data.source = msg.header.src;
-            data.nom_voltage = val.toString();
-            break;
-          case 4:
-            // Battery Chemistry (0 = Lead Acid, 1 = LiIon, 2 = NiCad, 3 = ZnO, 4 = NiMH)
-            data.source = msg.header.src;
-            data.chemistry = val.toString();
-            break;
-          case 5:
-            // Battery Capacity
-            data.source = msg.header.src;
-            data.capacity = val;
-            break;
-          case 6:
-            // Temperature Coefficient
-            data.source = msg.header.src;
-            data.temp_coeff = val;
-            break;
-          case 7:
-            // Peukert Exponent
-            data.source = msg.header.src;
-            data.peukert = val;
-            break;
-          case 8:
-            // Charge Efficiency Factor
-            data.source = msg.header.src;
-            data.chg_eff = val;
-            break;
-        }
+      if (getfield(6, msg.fields).value == data.instance) {
+        let fld = null;
+        // DC Type (0 = Battery, 1 = Alternator, 2 = Convertor, 3 = Solar Cell, 4 = Wind Generator)
+        fld = getfield(7, msg.fields);
+        data.dc_type = (fld != null ) && (fld.state == 'V') ? fld.value.toString() : null;
+        // Battery Type (0 = Flooded, 1 = GEL, 2 = AGM)
+        fld = getfield(8, msg.fields);
+        data.batt_type = (fld != null ) && (fld.state == 'V') ? fld.value.toString() : null;
+        // Supports Equalization (0 = No, 1 = Yes)
+        fld = getfield(9, msg.fields);
+        data.equ_support = (fld != null ) && (fld.state == 'V') ? fld.value.toString() : null;
+        // Nominal Voltage (0 = 6V, 1 = 12V, 2 = 24V, 3 = 32V, 4 = 36V, 5 = 42V, 6 = 48V)
+        fld = getfield(11, msg.fields);
+        data.nom_voltage = (fld != null ) && (fld.state == 'V') ? fld.value.toString() : null;
+        // Battery Chemistry (0 = Lead Acid, 1 = LiIon, 2 = NiCad, 3 = ZnO, 4 = NiMH)
+        fld = getfield(12, msg.fields);
+        data.chemistry = (fld != null ) && (fld.state == 'V') ? fld.value.toString() : null;
+        // Battery Capacity
+        fld = getfield(13, msg.fields);
+        data.capacity = (fld != null ) && (fld.state == 'V') ? fld.value : null;
+        // Temperature Coefficient
+        fld = getfield(14, msg.fields);
+        data.temp_eff = (fld != null ) && (fld.state == 'V') ? fld.value : null;
+        // Peukert Exponent
+        fld = getfield(15, msg.fields);
+        data.peukert = (fld != null ) && (fld.state == 'V') ? (fld.value * 0.002) + 1 : null;
+        // Charge Efficiency Factor
+        fld = getfield(16, msg.fields);
+        data.chrg_eff = (fld != null ) && (fld.state == 'V') ? fld.value : null;
+        // Validity
+        data.isValid = true;
       }
     });
   });
@@ -118,22 +102,31 @@
       running = false;
       kind = 'error'
       title = 'Error';
-      subttl = 'Error reading circuit type with this instance.';
+      subttl = 'Error reading settings data with this instance.';
       notify = true;
     }, timeout);
-    data.circuit = null;
-    // Receives circuit type result
+    // Receives settings data
+    data.dc_type = null;
+    data.batt_type = null;
+    data.equ_support = null;
+    data.nom_voltage = null;
+    data.chemistry = null;
+    data.capacity = null;
+    data.temp_eff = null;
+    data.peukert = null;
+    data.chrg_eff = null;
+    data.isValid = false;
     window.pumaAPI.recv('r3410-done', (e, res) => {
       stop('r3410');
       running = false;
       if (!res) {
         kind = 'error'
         title = 'Error';
-        subttl = 'Error reading circuit type with this instance.';
+        subttl = 'Error reading settings data with this instance.';
         notify = true;
       }
     });
-    window.pumaAPI.send('c3410-read', [$device, parseInt(data.instance)]);
+    window.pumaAPI.send('c3410-read', [$device, 2, parseInt(data.instance), parseInt(data.source)]);
   };
 
   function program(e) {
@@ -167,17 +160,17 @@
       }
     });
     window.pumaAPI.send('c3410-write', [
-      $device,
-      parseInt(data.instance),
-      parseInt(e.detail.dc_type),
-      parseInt(e.detail.battery_type),
-      parseInt(e.detail.equ_support),
-      parseInt(e.detail.nom_voltage),
-      parseInt(e.detail.chemistry),
-      parseInt(e.detail.capacity),
-      parseInt(e.detail.temp_coeff),
-      parseInt(e.detail.peukert),
-      parseInt(e.detail.chg_eff),
+      $device, 2, parseInt(data.instance), parseInt(data.source), {
+        dc_type: parseInt(e.detail.dc_type),
+        batt_type: parseInt(e.detail.batt_type),
+        equ_support: parseInt(e.detail.equ_support),
+        nom_voltage: parseInt(e.detail.nom_voltage),
+        chemistry: parseInt(e.detail.chemistry),
+        capacity: e.detail.capacity,
+        temp_eff: e.detail.temp_eff,
+        peukert: Math.round((e.detail.peukert - 1) / 0.002),
+        chrg_eff: e.detail.chrg_eff,
+      },
     ]);
   };
 
@@ -195,7 +188,24 @@
     notify = true;
   }
 
-  select();
+  function setData(val) {
+    if (val != null) {
+      data.instance = val.instance;
+      data.source = null;
+      let pro = findModel(model);
+      if ((pro !== null) && (Array.isArray(pro)) && (pro.length > 0)) {
+        for (let i in pro) {
+          if (pro[i].name.deviceInstance == val.instance) {
+            data.source = pro[0].address;
+            break;
+          }
+        }
+      }
+      select();
+    }
+  };
+
+  $: params, setData(params);
 </script>
 
 <Grid>

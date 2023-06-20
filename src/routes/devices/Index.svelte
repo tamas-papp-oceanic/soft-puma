@@ -38,6 +38,7 @@
   }];
   const paths = {
     '3271': '/:instance/:fluid',
+    '3410': '/:instance',
     '3420': '/:instance',
     '3478': '/:instance',
     '4291': '/:instance/:fluid',
