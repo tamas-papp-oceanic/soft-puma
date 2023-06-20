@@ -72,3 +72,29 @@ button:focus {
   white-space: nowrap !important;
   padding: 0.9rem !important;
 }
+
+.bx--tab-content {
+  padding: 1rem 0 !important;
+}
+
+/* width */
+::-webkit-scrollbar {
+  width: 16px;
+}
+
+/* Track */
+::-webkit-scrollbar-track {
+  background: #444444;
+  border-radius: 8px;
+}
+
+/* Handle */
+::-webkit-scrollbar-thumb {
+  background: #222222;
+  border-radius: 8px;
+}
+
+/* Handle on hover */
+::-webkit-scrollbar-thumb:hover {
+  background: #666666;
+}

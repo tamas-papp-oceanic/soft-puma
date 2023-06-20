@@ -57,6 +57,7 @@
     "electron-pack": "electron-builder"
   },
   "devDependencies": {
+    "@electron/rebuild": "^3.2.13",
     "@rollup/plugin-commonjs": "^17.0.0",
     "@rollup/plugin-json": "^4.1.0",
     "@rollup/plugin-node-resolve": "^11.0.0",
