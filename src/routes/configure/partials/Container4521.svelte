@@ -1,7 +1,8 @@
 <script>
   import { createEventDispatcher } from "svelte";
   import { ButtonSet, Button, Tile, Grid, Row, Column, Dropdown,
-    NumberInput } from "carbon-components-svelte";
+    NumberInput, 
+    DropdownSkeleton} from "carbon-components-svelte";
   import Download from "carbon-icons-svelte/lib/Download16";
 
   export let data;
@@ -43,11 +44,16 @@
     
   let inst1 = new Array();
   let inst2 = new Array();
-  let tx_pgn = '0';
-  let temp_ins = '0';
-  let temp_src = '0';
   let conf_type = '0';
-  let enabled = '0';
+  let channels = new Array();
+  for (let i = 0; i < 4; i++) {
+    channels.push({
+      enabled: '0',
+      temp_ins: i.toString(),
+      temp_src: '0',
+      tx_pgn: '0',
+    });
+  }
   let isValid = false;
 
   function select(e) {
@@ -57,9 +63,7 @@
   function program(e) {
     dispatch("program", {
       conf_type: conf_type,
-      temp_ins: temp_ins,
-      temp_src: temp_src,
-      tx_pgn: tx_pgn,
+      channels: channels,
     });
   };
 
@@ -67,12 +71,26 @@
     dispatch("cancel");
   };
 
+  function configure(e) {
+    if (e.selectedId == '0') {
+      for (let i = 0; i < 4; i++) {
+        channels[i].temp_ins = i.toString();
+      }
+    }
+  };
+
   function setData(val) {
     if (val != null) {
-      conf_type = val.conf_type;
-      temp_ins = val.temp_ins;
-      temp_src = val.temp_src;
-      tx_pgn = val.tx_pgn;
+      conf_type = val.conf_type != null ? val.conf_type.toString() : '0';
+      channels = new Array();
+      for (let i = 0; i < 4; i++) {
+        channels.push({
+          enabled: val.channels[i].enabled != null ? val.channels[i].enabled.toString() : '0',
+          temp_ins: val.channels[i].temp_ins != null ? val.channels[i].temp_ins.toString() : i.toString(),
+          temp_src: val.channels[i].temp_src != null ? val.channels[i].temp_src.toString() : '0',
+          tx_pgn: val.channels[i].tx_pgn != null ? val.channels[i].tx_pgn.toString() : '2',
+        });
+      }
       isValid = val.isValid;
     }
   };
@@ -91,9 +109,8 @@
     <div class="tilecont">
       <Grid fullWidth noGutter>
         <Row>
-          <Column sm={1} md={1} lg={1}>
-          </Column>
-          <Column sm={1} md={2} lg={2}>
+          <Column></Column>
+          <Column>
             <Row padding>
               <Column>Device selector</Column>
             </Row>
@@ -103,51 +120,7 @@
                   disabled={running} on:select={(e) => select(e)} />
               </Column>
             </Row>
-          </Column>
-          <Column sm={1} md={1} lg={1}>
-          </Column>
-          <Column>
-            <Row padding>
-              <Column>Parameters for change</Column>
-            </Row>
-            <Row>
-              <Column sm={1} md={2} lg={3}>
-                <Dropdown disabled={running || !isValid} titleText="Configuration type" size="sm" bind:selectedId={conf_type} items={conf_types} />
-              </Column>
-            </Row>
-            <Row>
-              {#each [0, 1, 2, 3] as idx}
-                <Column sm={1} md={2} lg={3} padding>
-                  <Row padding>
-                    <Column>Channel {idx + 1}</Column>
-                  </Row>
-                  <Row>
-                    <Column>
-                      <Dropdown disabled={running || !isValid} titleText="Enabled" size="sm" bind:selectedId={enabled} items={enables} />
-                    </Column>
-                  </Row>
-                  <Row>
-                    <Column>
-                      <Dropdown disabled={running || !isValid} titleText="Temperature instance" size="sm" bind:selectedId={temp_ins} items={inst2} />
-                    </Column>
-                  </Row>
-                  <Row>
-                    <Column>
-                      <Dropdown disabled={running || !isValid} titleText="Temperature source" size="sm" bind:selectedId={temp_src} items={temp_srcs} />
-                    </Column>
-                  </Row>
-                  <Row>
-                    <Column>
-                      <Dropdown disabled={running || !isValid} titleText="Tx PGN type" size="sm" bind:selectedId={tx_pgn} items={tx_pgns} />
-                    </Column>
-                  </Row>
-                </Column>
-                {#if idx < 3}
-                  <Column sm={1} md={1} lg={1} padding>
-                  </Column>
-                {/if}
-              {/each}
-            </Row>
+            <Row padding><Column>&nbsp;</Column></Row>
             <Row padding>
               <Column style="display: flex; flex-flow: row nowrap; justify-content: flex-start;">
                 <Button tooltipPosition="top" tooltipAlignment="center" iconDescription="Write to sender" icon={Download}
@@ -155,6 +128,67 @@
               </Column>
             </Row>
           </Column>
+          <Column></Column>
+          <Column sm={12} md={12} lg={12}>
+            <Row padding>
+              <Column sm={1} md={2} lg={4}>Parameters for change</Column>
+            </Row>
+            <Row>
+              <Column sm={1} md={2} lg={4}>
+                {#if running}
+                  <DropdownSkeleton />
+                {:else}
+                  <Dropdown disabled={!isValid} titleText="Instance configuration" size="sm" bind:selectedId={conf_type} items={conf_types} on:select={(e) => configure(e)} />
+                {/if}
+              </Column>
+            </Row>
+            <Row>
+              {#each channels as channel, idx}
+                <Column sm={1} md={2} lg={4}>
+                  <Row padding>
+                    <Column>Channel {idx + 1}</Column>
+                  </Row>
+                  <Row>
+                    <Column>
+                      {#if running}
+                        <DropdownSkeleton />
+                      {:else}
+                        <Dropdown disabled={!isValid} titleText="Enabled" size="sm" bind:selectedId={channel.enabled} items={enables} />
+                      {/if}
+                    </Column>
+                  </Row>
+                  <Row padding>
+                    <Column>
+                      {#if running}
+                        <DropdownSkeleton />
+                      {:else}
+                        <Dropdown disabled={!isValid || conf_type == '0'} titleText="Temperature instance" size="sm" bind:selectedId={channel.temp_ins} items={inst2} />
+                      {/if}
+                    </Column>
+                  </Row>
+                  <Row>
+                    <Column>
+                      {#if running}
+                        <DropdownSkeleton />
+                      {:else}
+                        <Dropdown disabled={!isValid} titleText="Temperature source" size="sm" bind:selectedId={channel.temp_src} items={temp_srcs} />
+                      {/if}
+                    </Column>
+                  </Row>
+                  <Row padding>
+                    <Column>
+                      {#if running}
+                        <DropdownSkeleton />
+                      {:else}
+                        <Dropdown disabled={!isValid} titleText="Tx PGN type" size="sm" bind:selectedId={channel.tx_pgn} items={tx_pgns} />
+                      {/if}
+                    </Column>
+                  </Row>
+                </Column>
+              {/each}
+            </Row>
+          </Column>
+          <Column></Column>
         </Row>
       </Grid>
     </div>

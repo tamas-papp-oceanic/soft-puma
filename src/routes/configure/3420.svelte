@@ -16,6 +16,7 @@
     instance: params.instance,
     source: null,
     circuit: null,
+    isValid: false,
   };
   let running = false;
   let notify = false;
@@ -26,20 +27,19 @@
   onMount(() => {
     window.pumaAPI.recv('n2k-ac-data', (e, args) => {
       const [ dev, msg ] = args;
-      if (msg.fields[4].value == data.instance) {
-        let val = msg.fields[6].value & 0xFF;
-        switch (msg.fields[5].value) {
+      if (getfield(5, msg.fields).value == data.instance) {
+        let fld = getfield(7, msg.fields);
+        switch (getfield(6, msg.fields).value) {
           case 0:
             // Circuit Type (1 = Single Phase, 2 = Double Phase, 3 = Three Phase, 4 = Split Phase)
-            data.source = msg.header.src;
-            data.circuit = val.toString();
+            data.circuit = (fld != null ) && (fld.state == 'V') ? fld.value.toString() : null;
             break;
           case 1:
             // Device Instance
-            data.source = msg.header.src;
-            data.instance = val.toString();
+            data.instance = (fld != null ) && (fld.state == 'V') ? fld.value.toString() : null;
             break;
         }
+        data.isValid = true;
       }
     });
   });
@@ -79,6 +79,7 @@
       notify = true;
     }, timeout);
     data.circuit = null;
+    data.isValid = false;
     // Receives circuit type result
     window.pumaAPI.recv('r3420-done', (e, res) => {
       stop('r3420');

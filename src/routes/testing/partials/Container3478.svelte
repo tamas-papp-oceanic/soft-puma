@@ -59,24 +59,26 @@
   <Tile style="height: -webkit-fill-available;">
     <div class="tilecont">
       <Grid fullWidth noGutter>
-        <Row padding>
-          <Column sm={1} md={1} lg={1}>
-          </Column>
-          <Column sm={1} md={1} lg={2}>
+        <Row>
+          <Column></Column>
+          <Column>
             <Row padding>
+              <Column>Device selector</Column>
+            </Row>
+            <Row>
               <Column>
                 <Dropdown disabled={data.autorun} titleText="Relay instance" size="lg" bind:selectedId={data.instance} items={insts} on:select={(e) => select(e)}/>
               </Column>
             </Row>
+            <Row padding><Column>&nbsp;</Column></Row>
             <Row padding>
               <Column>
                 <Button disabled={data.autorun} icon={Auto} on:click={(e) => auto(e)}>Auto test</Button>
               </Column>
             </Row>
           </Column>
-          <Column sm={1} md={1} lg={1}>
-          </Column>
-          <Column sm={1} md={4} lg={8}>
+          <Column></Column>
+          <Column sm={12} md={12} lg={12}>
             <Tile>Channels</Tile>
             <DataTable useStaticWidth size="tall" headers={header} rows={rows} class="relay">
               <svelte:fragment slot="cell" let:row let:cell>

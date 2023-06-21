@@ -22,7 +22,7 @@
   };
   for (let i = 0; i < 3; i++) {
     data.channels.push({
-      enabled: false,
+      enabled: null,
       temp_ins: null,
       temp_src: null,
       tx_pgn: null,
@@ -105,9 +105,9 @@
     // Receives settings data
     data.conf_type = null;
     data.channels = new Array();
-    for (let i = 0; i < 3; i++) {
+    for (let i = 0; i < 4; i++) {
       data.channels.push({
-        enabled: false,
+        enabled: null,
         temp_ins: null,
         temp_src: null,
         tx_pgn: null,
@@ -161,7 +161,7 @@
       conf_type: e.detail.conf_type,
       channels: new Array(),
     }
-    for (let i = 0; i < 3; i++) {
+    for (let i = 0; i < 4; i++) {
       out.channels[i].push({
         enabled: parseInt(e.detail.channels[i].enabled),
         temp_ins: parseInt(e.detail.channels[i].temp_ins),

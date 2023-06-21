@@ -1217,6 +1217,128 @@ ipcMain.on('c4510-write', (e, args) => {
   }
 });
 
+function c4521Read(eng, ins, cmd, chn) {
+  return new Promise((resolve, reject) => {
+    // Reading configuration...
+    let ret = eng.send065445(0x06, ins, 0xFF, (((chn << 8) + cmd) << 8) + 0x00);
+    if (ret) {
+      btimer = setTimeout(() => {
+        btimer = null;
+        reject(new Error('Reading configuration failed!'));
+      }, 5000);
+      pub.once('conf-ack', (res) => {
+        clearTimeout(btimer);
+        btimer = null;
+        if ((typeof res.fields !== 'undefined') && Array.isArray(res.fields) &&
+          (getFld(4, res.fields).value == 0x06) && (getFld(5, res.fields).value == ins) &&
+          (getFld(6, res.fields).value == cmd)) {
+          let msg = 'Configuration successfuly read.';
+          log.info(msg);
+          resolve(true);
+        } else {
+          reject(new Error('Reading configuration failed!'));
+        }
+      });
+    } else {
+      reject(new Error('Reading configuration failed!'));
+    }
+  });
+}
+
+// Starts 4521 configuration reading
+ipcMain.on('c4521-read', (e, args) => {
+  const [dev, ins] = args;
+  if ((typeof dev === 'string') && (typeof devices[dev] !== 'undefined')) {
+    let eng = devices[dev].engine;
+    Promise.resolve()
+    .then(() => c4521Read(eng, ins, 0, 0))
+    .then(() => c4521Read(eng, ins, 0, 1))
+    .then(() => c4521Read(eng, ins, 0, 2))
+    .then(() => c4521Read(eng, ins, 0, 3))
+    .then(() => c4521Read(eng, ins, 1, 0))
+    .then(() => c4521Read(eng, ins, 1, 1))
+    .then(() => c4521Read(eng, ins, 1, 2))
+    .then(() => c4521Read(eng, ins, 1, 3))
+    .then(() => c4521Read(eng, ins, 2, 0))
+    .then(() => c4521Read(eng, ins, 2, 1))
+    .then(() => c4521Read(eng, ins, 2, 2))
+    .then(() => c4521Read(eng, ins, 2, 3))
+    .then(() => c4521Read(eng, ins, 3, 0))
+    .then(() => c4521Read(eng, ins, 3, 1))
+    .then(() => c4521Read(eng, ins, 3, 2))
+    .then(() => c4521Read(eng, ins, 3, 3))
+    .then(() => c4521Read(eng, ins, 4, 0xFF))
+    .then(() => {
+      if ((mainWindow != null) && (typeof mainWindow.webContents !== 'undefined')) {
+        mainWindow.webContents.send('r4521-done', true);
+      }
+    })
+    .catch((err) => {
+      log.error(err);
+      if ((mainWindow != null) && (typeof mainWindow.webContents !== 'undefined')) {
+        mainWindow.webContents.send('r4521-done', false);
+      }
+    });
+  } else {
+    console.log("No device selected!");
+  }
+});
+
+function c4521Write(eng, ins, cmd, dat) {
+  return new Promise((resolve, reject) => {
+    // Writing configuration...
+    let ret = eng.send065445(0x06, ins, cmd, dat);
+    if (ret) {
+      btimer = setTimeout(() => {
+        btimer = null;
+        reject(new Error('Writing configuration failed!'));
+      }, 5000);
+      pub.once('conf-ack', (res) => {
+        clearTimeout(btimer);
+        btimer = null;
+        if ((typeof res.fields !== 'undefined') && Array.isArray(res.fields) &&
+          (getFld(4, res.fields).value == 0x06) && (getFld(5, res.fields).value == ins) &&
+          (getFld(6, res.fields).value == cmd) && ((getFld(7, res.fields).value & 0xFF) == dat)) {
+          let msg = 'Configuration successfuly written.';
+          log.info(msg);
+          resolve(true);
+        } else {
+          reject(new Error('Writing configuration failed!'));
+        }
+      });
+    } else {
+      reject(new Error('Writing configuration failed!'));
+    }
+  });
+}
+
+// Starts 4521 configuration writing
+ipcMain.on('c4521-write', (e, args) => {
+  const [dev, ins, dat] = args;
+  if ((typeof dev === 'string') && (typeof devices[dev] !== 'undefined')) {
+    let eng = devices[dev].engine;
+    Promise.resolve()
+    .then(() => c4521Write(eng, ins, 0, dat.tx_pgn))
+    .then(() => c4521Write(eng, ins, 1, dat.temp_src))
+    .then(() => c4521Write(eng, ins, 2, dat.temp_ins))
+    .then(() => c4521Write(eng, ins, 3, dat.temp_ins))
+    .then(() => c4521Write(eng, ins, 4, dat.conf_type))
+    .then(() => {
+      if ((mainWindow != null) && (typeof mainWindow.webContents !== 'undefined')) {
+        mainWindow.webContents.send('w4510-done', true);
+      }
+    })
+    .catch((err) => {
+      log.error(err);
+      if ((mainWindow != null) && (typeof mainWindow.webContents !== 'undefined')) {
+        mainWindow.webContents.send('w4510-done', false);
+      }
+    });
+  } else {
+    console.log("No device selected!");
+  }
+});
+
 // Stop device processing
 ipcMain.on('dev-stop', (e, ...args) => {
   for (const [key, val] of Object.entries(devices)) {

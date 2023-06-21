@@ -1,7 +1,7 @@
 <script>
   import { createEventDispatcher } from "svelte";
   import { ButtonSet, Button, Tile, Grid, Row, Column, Dropdown,
-    NumberInput } from "carbon-components-svelte";
+    DropdownSkeleton, NumberInput, NumberInputSkeleton} from "carbon-components-svelte";
   import Download from "carbon-icons-svelte/lib/Download16";
 
   export let data;
@@ -79,15 +79,15 @@
 
   function setData(val) {
     if (val != null) {
-      dc_type = val.dc_type;
-      batt_type = val.batt_type;
-      equ_support = val.equ_support;
-      nom_voltage = val.nom_voltage;
-      chemistry = val.chemistry;
-      capacity = val.capacity;
+      dc_type = val.dc_type != null ? val.dc_type.toString() : '0';
+      batt_type = val.batt_type != null ? val.batt_type.toString() : '0';
+      equ_support = val.equ_support != null ? val.equ_support.toString() : '0';
+      nom_voltage = val.nom_voltage != null ? val.nom_voltage.toString() : '0';
+      chemistry = val.chemistry != null ? val.chemistry.toString() : '0';
+      capacity = val.capacity != null ? val.capacity : 0;
       temp_eff = val.temp_eff;
-      peukert = val.peukert;
-      chrg_eff = val.chrg_eff;
+      peukert = val.peukert != null ? val.peukert : 1.00;
+      chrg_eff = val.chrg_eff != null ? val.chrg_eff : 1;
       isValid = val.isValid;
     }
   };
@@ -105,9 +105,8 @@
     <div class="tilecont">
       <Grid fullWidth noGutter>
         <Row>
-          <Column sm={1} md={1} lg={1}>
-          </Column>
-          <Column sm={1} md={2} lg={2}>
+          <Column></Column>
+          <Column>
             <Row padding>
               <Column>Device selector</Column>
             </Row>
@@ -117,88 +116,122 @@
                   disabled={running} on:select={(e) => select(e)} />
               </Column>
             </Row>
-          </Column>
-          <Column sm={1} md={1} lg={1}>
-          </Column>
-          <Column>
+            <Row padding><Column>&nbsp;</Column></Row>
             <Row padding>
-              <Column>Parameters for change</Column>
+              <Column style="display: flex; flex-flow: row nowrap; justify-content: flex-start;">
+                <Button tooltipPosition="top" tooltipAlignment="center" iconDescription="Write to sender" icon={Download}
+                  disabled={running || !isValid} on:click={(e) => program(e)}>Write to Sensor</Button>
+              </Column>
+            </Row>
+          </Column>
+          <Column></Column>
+          <Column sm={12} md={12} lg={12}>
+            <Row padding>
+              <Column sm={1} md={2} lg={4}>Parameters for change</Column>
             </Row>
             <Row>
               <Column sm={1} md={2} lg={4}>
                 <Row>
                   <Column>
-                    <Dropdown disabled={running || !isValid} titleText="DC type" size="sm" bind:selectedId={dc_type} items={dc_types} />
+                    {#if running}
+                      <DropdownSkeleton />
+                    {:else}
+                      <Dropdown disabled={running || !isValid} titleText="DC type" size="sm" bind:selectedId={dc_type} items={dc_types} />
+                    {/if}
+                  </Column>
+                </Row>
+                <Row padding>
+                  <Column>
+                    {#if running}
+                      <DropdownSkeleton />
+                    {:else}
+                      <Dropdown disabled={running || !isValid} titleText="Battery type" size="sm" bind:selectedId={batt_type} items={batt_types} />
+                    {/if}
                   </Column>
                 </Row>
                 <Row>
                   <Column>
-                    <Dropdown disabled={running || !isValid} titleText="Battery type" size="sm" bind:selectedId={batt_type} items={batt_types} />
+                    {#if running}
+                      <DropdownSkeleton />
+                    {:else}
+                      <Dropdown disabled={running || !isValid} titleText="Supports equalization" size="sm" bind:selectedId={equ_support} items={equ_supports} />
+                    {/if}
+                  </Column>
+                </Row>
+                <Row padding>
+                  <Column>
+                    {#if running}
+                      <DropdownSkeleton />
+                    {:else}
+                      <Dropdown disabled={running || !isValid} titleText="Nominal voltage" size="sm" bind:selectedId={nom_voltage} items={nom_voltages} />
+                    {/if}
                   </Column>
                 </Row>
                 <Row>
                   <Column>
-                    <Dropdown disabled={running || !isValid} titleText="Supports equalization" size="sm" bind:selectedId={equ_support} items={equ_supports} />
-                  </Column>
-                </Row>
-                <Row>
-                  <Column>
-                    <Dropdown disabled={running || !isValid} titleText="Nominal voltage" size="sm" bind:selectedId={nom_voltage} items={nom_voltages} />
-                  </Column>
-                </Row>
-                <Row>
-                  <Column>
-                    <Dropdown disabled={running || !isValid} titleText="Battery chemistry" size="sm" bind:selectedId={chemistry} items={chemistries} />
+                    {#if running}
+                      <DropdownSkeleton />
+                    {:else}
+                      <Dropdown disabled={running || !isValid} titleText="Battery chemistry" size="sm" bind:selectedId={chemistry} items={chemistries} />
+                    {/if}
                   </Column>
                 </Row>
               </Column>
-              <Column sm={1} md={1} lg={1}>
-              </Column>
-              <Column sm={1} md={2} lg={4}>
+              <Column sm={1} md={3} lg={5}>
                 <Row>
                   <Column>
-                    <NumberInput
-                      disabled={running || !isValid}
-                      min={0} step={1}
-                      label="Battery capacity (Ah)"
-                      bind:value={capacity} />
+                    {#if running}
+                      <NumberInputSkeleton />
+                    {:else}
+                      <NumberInput
+                        disabled={running || !isValid}
+                        min={0} step={1}
+                        label="Battery capacity (Ah)"
+                        bind:value={capacity} />
+                    {/if}
+                  </Column>
+                </Row>
+                <Row padding>
+                  <Column>
+                    {#if running}
+                      <NumberInputSkeleton />
+                    {:else}
+                      <NumberInput
+                        disabled={running || !isValid}
+                        allowEmpty
+                        min={0} max={100} step={1}
+                        label="Temperature coefficient (%)"
+                        bind:value={temp_eff} />
+                    {/if}
                   </Column>
                 </Row>
                 <Row>
                   <Column>
-                    <NumberInput
-                      disabled={running || !isValid}
-                      allowEmpty
-                      min={0} max={100} step={1}
-                      label="Temperature coefficient (%)"
-                      bind:value={temp_eff} />
+                    {#if running}
+                      <NumberInputSkeleton />
+                    {:else}
+                      <NumberInput
+                        disabled={running || !isValid}
+                        min={1.00} max={1.50} step={0.01}
+                        label="Peukert Exponent"
+                        invalidText="Number must be between 1.00 and 1.50."
+                        bind:value={peukert} />
+                    {/if}
                   </Column>
                 </Row>
-                <Row>
+                <Row padding>
                   <Column>
-                    <NumberInput
-                      disabled={running || !isValid}
-                      min={1.00} max={1.50} step={0.01}
-                      label="Peukert Exponent"
-                      invalidText="Number must be between 1.00 and 1.50."
-                      bind:value={peukert} />
+                    {#if running}
+                      <NumberInputSkeleton />
+                    {:else}
+                      <NumberInput
+                        disabled={running || !isValid}
+                        min={1} max={100} step={1}
+                        label="Charging efficiency (%)"
+                        bind:value={chrg_eff} />
+                    {/if}
                   </Column>
                 </Row>
-                <Row>
-                  <Column>
-                    <NumberInput
-                      disabled={running || !isValid}
-                      min={1} max={100} step={1}
-                      label="Charging efficiency (%)"
-                      bind:value={chrg_eff} />
-                  </Column>
-                </Row>
-              </Column>
-            </Row>
-            <Row padding>
-              <Column style="display: flex; flex-flow: row nowrap; justify-content: flex-start;">
-                <Button tooltipPosition="top" tooltipAlignment="center" iconDescription="Write to sender" icon={Download}
-                  disabled={running || !isValid} on:click={(e) => program(e)}>Write to Sensor</Button>
               </Column>
             </Row>
           </Column>

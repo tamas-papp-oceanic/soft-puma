@@ -1,7 +1,7 @@
 <script>
   import { createEventDispatcher } from "svelte";
   import { ButtonSet, Button, Tile, Grid, Row, Column, Dropdown,
-    TextInput } from "carbon-components-svelte";
+    DropdownSkeleton, TextInput } from "carbon-components-svelte";
   import Download from "carbon-icons-svelte/lib/Download16";
   import { isAlive } from '../../../stores/data.js';
 
@@ -22,14 +22,10 @@
   let inst2 = new Array();
   let inst = data.instance;
   let circ = '1';
-  let alive = false;
+  let isValid = false;
     
   function select(e) {
-    if (alive) {
-      dispatch("select");
-    } else {
-      dispatch("error", { title: 'Device not found' });
-    }
+    dispatch("select");
   };
 
   function program(e) {
@@ -40,13 +36,11 @@
     dispatch("cancel");
   };
 
-  function getCircuit(id) {
-    for (let i in circs) {
-      if (circs[i].id == id) {
-        return circs[i].text;
-      }
+  function setData(val) {
+    if (val != null) {
+      circ = val.circuit != null ? val.circuit.toString() : '1';
+      isValid = val.isValid;
     }
-    return null;
   };
 
   for (let i = 0; i < 253; i++) {
@@ -54,15 +48,8 @@
     inst2.push({ id: i.toString(), text: i.toString() })
   }
 
-  function setCircuit(val) {
-    if (val != null) {
-      circ = val;
-    }
-  };
-
   // Data getters / setters
-  $: alive = isAlive(parseInt(data.source));
-  $: data.circuit, setCircuit(data.circuit);
+  $: data, setData(data);
 
 </script>
 
@@ -71,9 +58,8 @@
     <div class="tilecont">
       <Grid fullWidth noGutter>
         <Row>
-          <Column sm={1} md={1} lg={1}>
-          </Column>
-          <Column sm={1} md={2} lg={2}>
+          <Column></Column>
+          <Column>
             <Row padding>
               <Column>Current configuration</Column>
             </Row>
@@ -83,32 +69,39 @@
                   disabled={running} on:select={(e) => select(e)} />
               </Column>
             </Row>
-            <Row>
-              <Column>
-                <TextInput disabled={running || !alive} readonly={!running && alive} labelText="Circuit type" value={getCircuit(data.circuit)} />
-              </Column>
-            </Row>
-          </Column>
-          <Column sm={1} md={1} lg={1}>
-          </Column>
-          <Column sm={1} md={2} lg={3}>
-            <Row padding>
-              <Column>Parameters for change</Column>
-            </Row>
-            <Row>
-              <Column>
-                <Dropdown disabled={running || !alive} titleText="AC instance" size="sm" bind:selectedId={inst} items={inst2} />
-              </Column>
-            </Row>
-            <Row>
-              <Column>
-                <Dropdown disabled={running || !alive} titleText="Circuit type" size="sm" bind:selectedId={circ} items={circs} />
-              </Column>
-            </Row>
+            <Row padding><Column>&nbsp;</Column></Row>
             <Row padding>
               <Column style="display: flex; flex-flow: row nowrap; justify-content: flex-start;">
                 <Button tooltipPosition="top" tooltipAlignment="center" iconDescription="Write to sender" icon={Download}
-                  disabled={running || !alive} on:click={(e) => program(e)}>Write to Sensor</Button>
+                  disabled={running || !isValid} on:click={(e) => program(e)}>Write to Sensor</Button>
+              </Column>
+            </Row>
+          </Column>
+          <Column></Column>
+          <Column sm={12} md={12} lg={12}>
+            <Row>
+              <Column sm={1} md={2} lg={4}>
+                <Row padding>
+                  <Column>Parameters for change</Column>
+                </Row>
+                <Row>
+                  <Column>
+                    {#if running}
+                      <DropdownSkeleton />
+                    {:else}
+                      <Dropdown disabled={!isValid} titleText="AC instance" size="sm" bind:selectedId={inst} items={inst2} />
+                    {/if}
+                  </Column>
+                </Row>
+                <Row padding>
+                  <Column>
+                    {#if running}
+                      <DropdownSkeleton />
+                    {:else}
+                      <Dropdown disabled={!isValid} titleText="Circuit type" size="sm" bind:selectedId={circ} items={circs} />
+                    {/if}
+                  </Column>
+                </Row>
               </Column>
             </Row>
           </Column>
