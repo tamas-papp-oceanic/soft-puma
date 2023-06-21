@@ -77,15 +77,6 @@
     dispatch("cancel");
   };
 
-  function getCircuit(id) {
-    for (let i in circs) {
-      if (circs[i].id == id) {
-        return circs[i].text;
-      }
-    }
-    return null;
-  };
-
   function setData(val) {
     if (val != null) {
       dc_type = val.dc_type;
@@ -114,94 +105,98 @@
     <div class="tilecont">
       <Grid fullWidth noGutter>
         <Row>
-          <Column sm={1} md={1} lg={1} padding>
+          <Column sm={1} md={1} lg={1}>
           </Column>
-          <Column sm={1} md={2} lg={3} padding>
+          <Column sm={1} md={2} lg={2}>
             <Row padding>
               <Column>Device selector</Column>
             </Row>
-            <Row padding>
+            <Row>
               <Column>
                 <Dropdown titleText="DC instance" size="sm" bind:selectedId={data.instance} items={insts}
                   disabled={running} on:select={(e) => select(e)} />
               </Column>
             </Row>
           </Column>
-          <Column sm={1} md={1} lg={1} padding>
+          <Column sm={1} md={1} lg={1}>
           </Column>
-          <Column sm={1} md={2} lg={3} padding>
+          <Column>
             <Row padding>
               <Column>Parameters for change</Column>
             </Row>
-            <Row padding>
-              <Column>
-                <Dropdown disabled={running || !isValid} titleText="DC type" size="sm" bind:selectedId={dc_type} items={dc_types} />
+            <Row>
+              <Column sm={1} md={2} lg={4}>
+                <Row>
+                  <Column>
+                    <Dropdown disabled={running || !isValid} titleText="DC type" size="sm" bind:selectedId={dc_type} items={dc_types} />
+                  </Column>
+                </Row>
+                <Row>
+                  <Column>
+                    <Dropdown disabled={running || !isValid} titleText="Battery type" size="sm" bind:selectedId={batt_type} items={batt_types} />
+                  </Column>
+                </Row>
+                <Row>
+                  <Column>
+                    <Dropdown disabled={running || !isValid} titleText="Supports equalization" size="sm" bind:selectedId={equ_support} items={equ_supports} />
+                  </Column>
+                </Row>
+                <Row>
+                  <Column>
+                    <Dropdown disabled={running || !isValid} titleText="Nominal voltage" size="sm" bind:selectedId={nom_voltage} items={nom_voltages} />
+                  </Column>
+                </Row>
+                <Row>
+                  <Column>
+                    <Dropdown disabled={running || !isValid} titleText="Battery chemistry" size="sm" bind:selectedId={chemistry} items={chemistries} />
+                  </Column>
+                </Row>
+              </Column>
+              <Column sm={1} md={1} lg={1}>
+              </Column>
+              <Column sm={1} md={2} lg={4}>
+                <Row>
+                  <Column>
+                    <NumberInput
+                      disabled={running || !isValid}
+                      min={0} step={1}
+                      label="Battery capacity (Ah)"
+                      bind:value={capacity} />
+                  </Column>
+                </Row>
+                <Row>
+                  <Column>
+                    <NumberInput
+                      disabled={running || !isValid}
+                      allowEmpty
+                      min={0} max={100} step={1}
+                      label="Temperature coefficient (%)"
+                      bind:value={temp_eff} />
+                  </Column>
+                </Row>
+                <Row>
+                  <Column>
+                    <NumberInput
+                      disabled={running || !isValid}
+                      min={1.00} max={1.50} step={0.01}
+                      label="Peukert Exponent"
+                      invalidText="Number must be between 1.00 and 1.50."
+                      bind:value={peukert} />
+                  </Column>
+                </Row>
+                <Row>
+                  <Column>
+                    <NumberInput
+                      disabled={running || !isValid}
+                      min={1} max={100} step={1}
+                      label="Charging efficiency (%)"
+                      bind:value={chrg_eff} />
+                  </Column>
+                </Row>
               </Column>
             </Row>
             <Row padding>
-              <Column>
-                <Dropdown disabled={running || !isValid} titleText="Battery type" size="sm" bind:selectedId={batt_type} items={batt_types} />
-              </Column>
-            </Row>
-            <Row padding>
-              <Column>
-                <Dropdown disabled={running || !isValid} titleText="Supports equalization" size="sm" bind:selectedId={equ_support} items={equ_supports} />
-              </Column>
-            </Row>
-            <Row padding>
-              <Column>
-                <Dropdown disabled={running || !isValid} titleText="Nominal voltage" size="sm" bind:selectedId={nom_voltage} items={nom_voltages} />
-              </Column>
-            </Row>
-            <Row padding>
-              <Column>
-                <Dropdown disabled={running || !isValid} titleText="Battery chemistry" size="sm" bind:selectedId={chemistry} items={chemistries} />
-              </Column>
-            </Row>
-          </Column>
-          <Column sm={1} md={1} lg={1} padding>
-          </Column>
-          <Column sm={1} md={2} lg={4} padding>
-            <Row padding>
-              <Column>
-                <NumberInput
-                  disabled={running || !isValid}
-                  min={0} step={1}
-                  label="Battery capacity (Ah)"
-                  bind:value={capacity} />
-              </Column>
-            </Row>
-            <Row padding>
-              <Column>
-                <NumberInput
-                  disabled={running || !isValid}
-                  allowEmpty
-                  min={0} max={100} step={1}
-                  label="Temperature coefficient (%)"
-                  bind:value={temp_eff} />
-              </Column>
-            </Row>
-            <Row padding>
-              <Column>
-                <NumberInput
-                  disabled={running || !isValid}
-                  min={1.00} max={1.50} step={0.01}
-                  label="Peukert Exponent"
-                  invalidText="Number must be between 1.00 and 1.50."
-                  bind:value={peukert} />
-              </Column>
-            </Row>
-            <Row padding>
-              <Column>
-                <NumberInput
-                  disabled={running || !isValid}
-                  min={1} max={100} step={1}
-                  label="Charging efficiency (%)"
-                  bind:value={chrg_eff} />
-              </Column>
-            </Row>
-            <Row padding>
-              <Column style="display: flex; flex-flow: row nowrap; justify-content: center;">
+              <Column style="display: flex; flex-flow: row nowrap; justify-content: flex-start;">
                 <Button tooltipPosition="top" tooltipAlignment="center" iconDescription="Write to sender" icon={Download}
                   disabled={running || !isValid} on:click={(e) => program(e)}>Write to Sensor</Button>
               </Column>

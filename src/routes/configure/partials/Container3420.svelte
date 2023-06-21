@@ -71,42 +71,42 @@
     <div class="tilecont">
       <Grid fullWidth noGutter>
         <Row>
-          <Column sm={1} md={1} lg={1} padding>
+          <Column sm={1} md={1} lg={1}>
           </Column>
-          <Column sm={1} md={2} lg={3} padding>
+          <Column sm={1} md={2} lg={2}>
             <Row padding>
               <Column>Current configuration</Column>
             </Row>
-            <Row padding>
+            <Row>
               <Column>
                 <Dropdown titleText="AC instance" size="sm" bind:selectedId={data.instance} items={inst1}
                   disabled={running} on:select={(e) => select(e)} />
               </Column>
             </Row>
-            <Row padding>
+            <Row>
               <Column>
                 <TextInput disabled={running || !alive} readonly={!running && alive} labelText="Circuit type" value={getCircuit(data.circuit)} />
               </Column>
             </Row>
           </Column>
-          <Column sm={1} md={1} lg={1} padding>
+          <Column sm={1} md={1} lg={1}>
           </Column>
-          <Column sm={1} md={2} lg={3} padding>
+          <Column sm={1} md={2} lg={3}>
             <Row padding>
               <Column>Parameters for change</Column>
             </Row>
-            <Row padding>
+            <Row>
               <Column>
                 <Dropdown disabled={running || !alive} titleText="AC instance" size="sm" bind:selectedId={inst} items={inst2} />
               </Column>
             </Row>
-            <Row padding>
+            <Row>
               <Column>
                 <Dropdown disabled={running || !alive} titleText="Circuit type" size="sm" bind:selectedId={circ} items={circs} />
               </Column>
             </Row>
             <Row padding>
-              <Column style="display: flex; flex-flow: row nowrap; justify-content: center;">
+              <Column style="display: flex; flex-flow: row nowrap; justify-content: flex-start;">
                 <Button tooltipPosition="top" tooltipAlignment="center" iconDescription="Write to sender" icon={Download}
                   disabled={running || !alive} on:click={(e) => program(e)}>Write to Sensor</Button>
               </Column>

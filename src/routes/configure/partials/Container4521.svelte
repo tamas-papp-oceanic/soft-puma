@@ -36,6 +36,10 @@
     { id: '0', text: 'Auto' },
     { id: '1', text: 'Manual' },
   );
+  const enables = new Array(
+    { id: '0', text: 'No' },
+    { id: '1', text: 'Yes' },
+  );
     
   let inst1 = new Array();
   let inst2 = new Array();
@@ -43,6 +47,7 @@
   let temp_ins = '0';
   let temp_src = '0';
   let conf_type = '0';
+  let enabled = '0';
   let isValid = false;
 
   function select(e) {
@@ -88,7 +93,7 @@
         <Row>
           <Column sm={1} md={1} lg={1}>
           </Column>
-          <Column sm={1} md={2} lg={3}>
+          <Column sm={1} md={2} lg={2}>
             <Row padding>
               <Column>Device selector</Column>
             </Row>
@@ -101,32 +106,50 @@
           </Column>
           <Column sm={1} md={1} lg={1}>
           </Column>
-          <Column sm={1} md={2} lg={3}>
+          <Column>
             <Row padding>
               <Column>Parameters for change</Column>
             </Row>
             <Row>
-              <Column>
+              <Column sm={1} md={2} lg={3}>
                 <Dropdown disabled={running || !isValid} titleText="Configuration type" size="sm" bind:selectedId={conf_type} items={conf_types} />
               </Column>
             </Row>
             <Row>
-              <Column>
-                <Dropdown disabled={running || !isValid} titleText="Temperature instance" size="sm" bind:selectedId={temp_ins} items={inst2} />
-              </Column>
-            </Row>
-            <Row>
-              <Column>
-                <Dropdown disabled={running || !isValid} titleText="Temperature source" size="sm" bind:selectedId={temp_src} items={temp_srcs} />
-              </Column>
-            </Row>
-            <Row>
-              <Column>
-                <Dropdown disabled={running || !isValid} titleText="Tx PGN type" size="sm" bind:selectedId={tx_pgn} items={tx_pgns} />
-              </Column>
+              {#each [0, 1, 2, 3] as idx}
+                <Column sm={1} md={2} lg={3} padding>
+                  <Row padding>
+                    <Column>Channel {idx + 1}</Column>
+                  </Row>
+                  <Row>
+                    <Column>
+                      <Dropdown disabled={running || !isValid} titleText="Enabled" size="sm" bind:selectedId={enabled} items={enables} />
+                    </Column>
+                  </Row>
+                  <Row>
+                    <Column>
+                      <Dropdown disabled={running || !isValid} titleText="Temperature instance" size="sm" bind:selectedId={temp_ins} items={inst2} />
+                    </Column>
+                  </Row>
+                  <Row>
+                    <Column>
+                      <Dropdown disabled={running || !isValid} titleText="Temperature source" size="sm" bind:selectedId={temp_src} items={temp_srcs} />
+                    </Column>
+                  </Row>
+                  <Row>
+                    <Column>
+                      <Dropdown disabled={running || !isValid} titleText="Tx PGN type" size="sm" bind:selectedId={tx_pgn} items={tx_pgns} />
+                    </Column>
+                  </Row>
+                </Column>
+                {#if idx < 3}
+                  <Column sm={1} md={1} lg={1} padding>
+                  </Column>
+                {/if}
+              {/each}
             </Row>
             <Row padding>
-              <Column style="display: flex; flex-flow: row nowrap; justify-content: center;">
+              <Column style="display: flex; flex-flow: row nowrap; justify-content: flex-start;">
                 <Button tooltipPosition="top" tooltipAlignment="center" iconDescription="Write to sender" icon={Download}
                   disabled={running || !isValid} on:click={(e) => program(e)}>Write to Sensor</Button>
               </Column>

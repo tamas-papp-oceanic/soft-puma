@@ -43,6 +43,8 @@
     '3478': '/:instance',
     '4291': '/:instance/:fluid',
     '4410': '/:instance',
+    '4510': '/:instance',
+    '4521': '/:instance',
   };
 
   let items = new Array();

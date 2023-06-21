@@ -264,16 +264,26 @@ function proc(dev, frm) {
         mainWindow.webContents.send('n2k-volume', [dev, msg]);
         break;
       case 65446:
-        if ((msg.fields[0].value == manu) && (msg.fields[2].value == indu)) {
-          switch (msg.fields[5].value) {
+        if ((getFld(1, msg.fields).value == manu) && (getFld(3, msg.fields).value == indu)) {
+          switch (getFld(6, msg.fields).value) {
             case 0xB0:
               pub.emit('reboot-ack', msg);
               break;
             default:
-              switch (msg.fields[3].value) {
+              switch (getFld(4, msg.fields).value) {
+                case 0x04:
+                  // Exhaust gas data
+                  mainWindow.webContents.send('n2k-egt-cfg-data', [dev, msg]);
+                  pub.emit('conf-ack', msg);
+                  break;
+                case 0x06:
+                  // Exhaust gas data
+                  mainWindow.webContents.send('n2k-temp-cfg-data', [dev, msg]);
+                  pub.emit('conf-ack', msg);
+                  break;
                 case 0x08:
                   // AC data
-                  mainWindow.webContents.send('n2k-ac-data', [dev, msg]);
+                  mainWindow.webContents.send('n2k-ac-cfg-data', [dev, msg]);
                   pub.emit('conf-ack', msg);
                   break;
                 }
@@ -292,8 +302,8 @@ function proc(dev, frm) {
         mainWindow.webContents.send('n2k-digi-data', [dev, msg]);
         break;
       case 130982:
-        if ((msg.fields[0].value == manu) && (msg.fields[2].value == indu)) {
-          switch (msg.fields[5].value) {
+        if ((getFld(1, msg.fields).value == manu) && (getFld(3, msg.fields).value == indu)) {
+          switch (getFld(6, msg.fields).value) {
             case 0xC2:
               pub.emit('crc-ack', msg);
               break;
@@ -311,8 +321,8 @@ function proc(dev, frm) {
         }
         break;
       case 131000:
-        if ((msg.fields[0].value == manu) && (msg.fields[2].value == indu)) {
-          mainWindow.webContents.send('n2k-dc-data', [dev, msg]);
+        if ((getFld(1, msg.fields).value == manu) && (getFld(3, msg.fields).value == indu)) {
+          mainWindow.webContents.send('n2k-dc-cfg-data', [dev, msg]);
           pub.emit('conf-ack', msg);
         }
         break;
@@ -1097,6 +1107,114 @@ ipcMain.on('a3478-write', (e, args) => {
 // Cancels 3478 auto tests
 ipcMain.on('a3478-cancel', (e, args) => {
   swcancel = true;
+});
+
+function c4510Read(eng, ins, cmd) {
+  return new Promise((resolve, reject) => {
+    // Reading configuration...
+    let ret = eng.send065445(0x04, ins, 0xFF, (((0xFF << 8) + cmd) << 8) + 0x00);
+    if (ret) {
+      btimer = setTimeout(() => {
+        btimer = null;
+        reject(new Error('Reading configuration failed!'));
+      }, 5000);
+      pub.once('conf-ack', (res) => {
+        clearTimeout(btimer);
+        btimer = null;
+        if ((typeof res.fields !== 'undefined') && Array.isArray(res.fields) &&
+          (getFld(4, res.fields).value == 0x04) && (getFld(5, res.fields).value == ins) &&
+          (getFld(6, res.fields).value == cmd)) {
+          let msg = 'Configuration successfuly read.';
+          log.info(msg);
+          resolve(true);
+        } else {
+          reject(new Error('Reading configuration failed!'));
+        }
+      });
+    } else {
+      reject(new Error('Reading configuration failed!'));
+    }
+  });
+}
+
+// Starts 4510 configuration reading
+ipcMain.on('c4510-read', (e, args) => {
+  const [dev, ins] = args;
+  if ((typeof dev === 'string') && (typeof devices[dev] !== 'undefined')) {
+    let eng = devices[dev].engine;
+    Promise.resolve()
+    .then(() => c4510Read(eng, ins, 0))
+    .then(() => c4510Read(eng, ins, 1))
+    .then(() => c4510Read(eng, ins, 2))
+    .then(() => c4510Read(eng, ins, 4))
+    .then(() => {
+      if ((mainWindow != null) && (typeof mainWindow.webContents !== 'undefined')) {
+        mainWindow.webContents.send('r4510-done', true);
+      }
+    })
+    .catch((err) => {
+      log.error(err);
+      if ((mainWindow != null) && (typeof mainWindow.webContents !== 'undefined')) {
+        mainWindow.webContents.send('r4510-done', false);
+      }
+    });
+  } else {
+    console.log("No device selected!");
+  }
+});
+
+function c4510Write(eng, ins, cmd, dat) {
+  return new Promise((resolve, reject) => {
+    // Writing configuration...
+    let ret = eng.send065445(0x04, ins, cmd, dat);
+    if (ret) {
+      btimer = setTimeout(() => {
+        btimer = null;
+        reject(new Error('Writing configuration failed!'));
+      }, 5000);
+      pub.once('conf-ack', (res) => {
+        clearTimeout(btimer);
+        btimer = null;
+        if ((typeof res.fields !== 'undefined') && Array.isArray(res.fields) &&
+          (getFld(4, res.fields).value == 0x04) && (getFld(5, res.fields).value == ins) &&
+          (getFld(6, res.fields).value == cmd) && ((getFld(7, res.fields).value & 0xFF) == dat)) {
+          let msg = 'Configuration successfuly written.';
+          log.info(msg);
+          resolve(true);
+        } else {
+          reject(new Error('Writing configuration failed!'));
+        }
+      });
+    } else {
+      reject(new Error('Writing configuration failed!'));
+    }
+  });
+}
+
+// Starts 4510 configuration writing
+ipcMain.on('c4510-write', (e, args) => {
+  const [dev, ins, dat] = args;
+  if ((typeof dev === 'string') && (typeof devices[dev] !== 'undefined')) {
+    let eng = devices[dev].engine;
+    Promise.resolve()
+    .then(() => c4510Write(eng, ins, 0, dat.tx_pgn))
+    .then(() => c4510Write(eng, ins, 1, dat.temp_src))
+    .then(() => c4510Write(eng, ins, 2, dat.temp_ins))
+    .then(() => c4510Write(eng, ins, 4, dat.conf_type))
+    .then(() => {
+      if ((mainWindow != null) && (typeof mainWindow.webContents !== 'undefined')) {
+        mainWindow.webContents.send('w4510-done', true);
+      }
+    })
+    .catch((err) => {
+      log.error(err);
+      if ((mainWindow != null) && (typeof mainWindow.webContents !== 'undefined')) {
+        mainWindow.webContents.send('w4510-done', false);
+      }
+    });
+  } else {
+    console.log("No device selected!");
+  }
 });
 
 // Stop device processing

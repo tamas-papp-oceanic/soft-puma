@@ -34,7 +34,7 @@
   let subttl = null;
 
   onMount(() => {
-    window.pumaAPI.recv('n2k-dc-data', (e, args) => {
+    window.pumaAPI.recv('n2k-dc-cfg-data', (e, args) => {
       const [ dev, msg ] = args;
       if (getfield(6, msg.fields).value == data.instance) {
         let fld = null;

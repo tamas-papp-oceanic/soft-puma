@@ -2,7 +2,7 @@
   import { onMount, onDestroy } from "svelte";
   import { Row, Grid, Column, ToastNotification } from "carbon-components-svelte";
   import { location, pop } from "svelte-spa-router";
-  import Container4510 from './partials/Container4510.svelte';
+  import Container4521 from './partials/Container4521.svelte';
   import { getname, getfield } from '../../stores/common.js';
   import { device, findModel } from '../../stores/data';
 
@@ -17,11 +17,18 @@
     instance: params.instance,
     source: null,
     conf_type: null,
-    temp_ins: null,
-    temp_src: null,
-    tx_pgn: null,
+    channels: new Array(),
     isValid: false,
   };
+  for (let i = 0; i < 3; i++) {
+    data.channels.push({
+      enabled: false,
+      temp_ins: null,
+      temp_src: null,
+      tx_pgn: null,
+    });
+  }
+
   let running = false;
   let notify = false;
   let kind = null;
@@ -29,22 +36,27 @@
   let subttl = null;
 
   onMount(() => {
-    window.pumaAPI.recv('n2k-egt-cfg-data', (e, args) => {
+    window.pumaAPI.recv('n2k-temp-cfg-data', (e, args) => {
       const [ dev, msg ] = args;
       if (getfield(5, msg.fields).value == data.instance) {
         let fld = getfield(7, msg.fields);
+        let chn = getfield(8, msg.fields);
         switch (getfield(6, msg.fields).value) {
           case 0:
             // Tx PGN type (0 = PGN130312 (deprecated), 1 = PGN130316, 2 = Both)
-            data.tx_pgn = (fld != null ) && (fld.state == 'V') ? fld.value.toString() : null;
+            data.channels[chn].tx_pgn = (fld != null ) && (fld.state == 'V') ? fld.value.toString() : null;
             break;
           case 1:
             // Temperature source
-            data.temp_src = (fld != null ) && (fld.state == 'V') ? fld.value.toString() : null;
+            data.channels[chn].temp_src = (fld != null ) && (fld.state == 'V') ? fld.value.toString() : null;
             break;
           case 2:
             // Temperature instance
-            data.temp_ins = (fld != null ) && (fld.state == 'V') ? fld.value.toString() : null;
+            data.channels[chn].temp_ins = (fld != null ) && (fld.state == 'V') ? fld.value.toString() : null;
+            break;
+          case 3:
+            // Channel enable
+            data.channels[chn].enabled = (fld != null ) && (fld.state == 'V') ? fld.value.toString() : null;
             break;
           case 4:
             // Instance configuration type
@@ -57,7 +69,7 @@
   });
   
   onDestroy(() => {
-    window.pumaAPI.reml('n2k-egt-cfg-data');
+    window.pumaAPI.reml('n2k-temp-cfg-data');
   });
 
   function stop(lis) {
@@ -92,9 +104,15 @@
     }, timeout);
     // Receives settings data
     data.conf_type = null;
-    data.temp_ins = null;
-    data.temp_src = null;
-    data.tx_pgn = null;
+    data.channels = new Array();
+    for (let i = 0; i < 3; i++) {
+      data.channels.push({
+        enabled: false,
+        temp_ins: null,
+        temp_src: null,
+        tx_pgn: null,
+      });
+    }
     data.isValid = false;
     window.pumaAPI.recv('r4510-done', (e, res) => {
       stop('r4510');
@@ -139,14 +157,19 @@
         notify = true;
       }
     });
-    window.pumaAPI.send('c4510-write', [
-      $device, parseInt(data.instance), {
-        conf_type: parseInt(e.detail.conf_type),
-        temp_ins: parseInt(e.detail.temp_ins),
-        temp_src: parseInt(e.detail.temp_src),
-        tx_pgn: parseInt(e.detail.tx_pgn),
-      },
-    ]);
+    let out = {
+      conf_type: e.detail.conf_type,
+      channels: new Array(),
+    }
+    for (let i = 0; i < 3; i++) {
+      out.channels[i].push({
+        enabled: parseInt(e.detail.channels[i].enabled),
+        temp_ins: parseInt(e.detail.channels[i].temp_ins),
+        temp_src: parseInt(e.detail.channels[i].temp_src),
+        tx_pgn: parseInt(e.detail.channels[i].tx_pgn),
+      });
+    }
+    window.pumaAPI.send('c4510-write', [$device, parseInt(data.instance), out]);
   };
 
   function cancel(e) {
@@ -187,7 +210,7 @@
   <Row>
     <Column>
       <h2>{model + ' - ' + getname(model) + ' - Configuration'}</h2>
-      <Container4510 style="height: 80vh;" bind:data={data} running={running}
+      <Container4521 style="height: 80vh;" bind:data={data} running={running}
         on:select={select} on:program={program} on:cancel={cancel} on:error={error} />
       {#if notify}
         <div class="error">

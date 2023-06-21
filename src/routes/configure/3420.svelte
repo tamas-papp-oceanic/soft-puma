@@ -45,7 +45,7 @@
   });
   
   onDestroy(() => {
-    window.pumaAPI.reml('n2k-ac-data');
+    window.pumaAPI.reml('n2k-ac-cfg-data');
   });
 
   function stop(lis) {
