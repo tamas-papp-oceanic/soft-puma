@@ -1284,10 +1284,10 @@ ipcMain.on('c4521-read', (e, args) => {
   }
 });
 
-function c4521Write(eng, ins, cmd, dat) {
+function c4521Write(eng, ins, cmd, chn, dat) {
   return new Promise((resolve, reject) => {
     // Writing configuration...
-    let ret = eng.send065445(0x06, ins, cmd, dat);
+    let ret = eng.send065445(0x06, ins, cmd, (((chn << 8) + dat) << 8) + 0xFF);
     if (ret) {
       btimer = setTimeout(() => {
         btimer = null;
@@ -1318,11 +1318,23 @@ ipcMain.on('c4521-write', (e, args) => {
   if ((typeof dev === 'string') && (typeof devices[dev] !== 'undefined')) {
     let eng = devices[dev].engine;
     Promise.resolve()
-    .then(() => c4521Write(eng, ins, 0, dat.tx_pgn))
-    .then(() => c4521Write(eng, ins, 1, dat.temp_src))
-    .then(() => c4521Write(eng, ins, 2, dat.temp_ins))
-    .then(() => c4521Write(eng, ins, 3, dat.temp_ins))
-    .then(() => c4521Write(eng, ins, 4, dat.conf_type))
+    .then(() => c4521Write(eng, ins, 0, 0, dat.channels[0].tx_pgn))
+    .then(() => c4521Write(eng, ins, 0, 1, dat.channels[1].tx_pgn))
+    .then(() => c4521Write(eng, ins, 0, 2, dat.channels[2].tx_pgn))
+    .then(() => c4521Write(eng, ins, 0, 3, dat.channels[3].tx_pgn))
+    .then(() => c4521Write(eng, ins, 1, 0, dat.channels[0].temp_src))
+    .then(() => c4521Write(eng, ins, 1, 1, dat.channels[1].temp_src))
+    .then(() => c4521Write(eng, ins, 1, 2, dat.channels[2].temp_src))
+    .then(() => c4521Write(eng, ins, 1, 3, dat.channels[3].temp_src))
+    .then(() => c4521Write(eng, ins, 2, 0, dat.channels[0].temp_ins))
+    .then(() => c4521Write(eng, ins, 2, 1, dat.channels[1].temp_ins))
+    .then(() => c4521Write(eng, ins, 2, 2, dat.channels[2].temp_ins))
+    .then(() => c4521Write(eng, ins, 2, 3, dat.channels[3].temp_ins))
+    .then(() => c4521Write(eng, ins, 3, 0, dat.channels[0].enabled))
+    .then(() => c4521Write(eng, ins, 3, 1, dat.channels[1].enabled))
+    .then(() => c4521Write(eng, ins, 3, 2, dat.channels[2].enabled))
+    .then(() => c4521Write(eng, ins, 3, 3, dat.channels[3].enabled))
+    .then(() => c4521Write(eng, ins, 4, 0xFF, dat.conf_type))
     .then(() => {
       if ((mainWindow != null) && (typeof mainWindow.webContents !== 'undefined')) {
         mainWindow.webContents.send('w4510-done', true);
