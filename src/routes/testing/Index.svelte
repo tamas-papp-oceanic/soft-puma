@@ -49,19 +49,25 @@
       <div slot="content">
         {#each ['senders', 'adaptors', 'modules', 'displays'] as group}
           <TabContent>
-            <Grid padding fullWidth noGutter>
-              <Row>
-                {#each devs[group] as device}
-                  <Column sm={4} md={3} lg={4}>
-                    <div class="product-card" class:selected={dev == device} on:pointerdown={(e) => select(e, group, device)}>
-                      <div class="product-number">{device}</div>
-                      <div class="product-title">{getname(device)}</div>
-                      <div class="product-image"><img src={'images/' + device + '.webp'} alt={device} /></div>
-                    </div>
-                  </Column>
-                {/each}
-              </Row>
-            </Grid>
+            <div class="tecont">
+              <div class="telist">
+                <Grid padding fullWidth noGutter>
+                  <Row>
+                    {#each devs[group] as device}
+                      <Column sm={2} md={3} lg={4}>
+                        <div class="product-card" class:selected={dev == device} on:pointerdown={(e) => select(e, group, device)}>
+                          <div>
+                            <div class="product-number">{device}</div>
+                            <div class="product-title">{getname(device)}</div>
+                          </div>
+                          <div class="product-image"><img src={'images/' + device + '.webp'} alt={device} /></div>
+                        </div>
+                      </Column>
+                    {/each}
+                  </Row>
+                </Grid>
+              </div>
+            </div>
           </TabContent>
         {/each}
       </div>
@@ -71,13 +77,26 @@
 </Grid>
 
 <style>
+  .tecont {
+    width: 100%;
+    height: 77vh;
+    overflow-x: hidden;
+    overflow-y: auto;
+  }
+  .telist {
+    height: 100%;
+  }
   .product-card {
-    padding: 1rem;
+    display: flex;
+    flex-flow: column nowrap;
+    align-items: flex-start;
+    justify-content: space-between;
     width: 100%;
     height: 100%;
     border: 1px solid rgb(75, 75, 75);
     background-color: #222222;
     cursor: pointer;
+    padding: 1rem;
   }
   .product-card:hover, .product-card.selected:hover {
     border: 1px solid white;

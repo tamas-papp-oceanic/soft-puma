@@ -40,15 +40,17 @@
         <div slot="content">
           {#each ['senders', 'adaptors', 'displays'] as group}
             <TabContent>
-              <div class="prwind">
-                <div class="prcont">
+              <div class="cocont">
+                <div class="colist">
                   <Grid padding fullWidth noGutter>
                     <Row>
                       {#each devs[group] as device}
-                        <Column sm={4} md={4} lg={4}>
+                        <Column sm={2} md={3} lg={4}>
                           <div class="product-card" class:selected={dev == device} on:pointerdown={(e) => select(e, group, device)}>
-                            <div class="product-number">{device}</div>
-                            <div class="product-title">{getname(device)}</div>
+                            <div>
+                              <div class="product-number">{device}</div>
+                              <div class="product-title">{getname(device)}</div>
+                            </div>
                             <div class="product-image"><img src={'images/' + device + '.webp'} alt={device} /></div>
                           </div>
                         </Column>
@@ -66,16 +68,20 @@
 </Grid>
 
 <style>
-  .prwind {
+  .cocont {
     width: 100%;
     height: 77vh;
     overflow-x: hidden;
     overflow-y: auto;
   }
-  .prcont {
+  .colist {
     height: 100%;
   }
   .product-card {
+    display: flex;
+    flex-flow: column nowrap;
+    align-items: flex-start;
+    justify-content: space-between;
     width: 100%;
     height: 100%;
     border: 1px solid rgb(75, 75, 75);
