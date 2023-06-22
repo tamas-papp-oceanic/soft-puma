@@ -264,13 +264,13 @@ function proc(dev, frm) {
         mainWindow.webContents.send('n2k-volume', [dev, msg]);
         break;
       case 65446:
-        if ((getFld(1, msg.fields).value == manu) && (getFld(3, msg.fields).value == indu)) {
-          switch (getFld(6, msg.fields).value) {
+        if ((com.getFld(1, msg.fields).value == manu) && (com.getFld(3, msg.fields).value == indu)) {
+          switch (com.getFld(6, msg.fields).value) {
             case 0xB0:
               pub.emit('reboot-ack', msg);
               break;
             default:
-              switch (getFld(4, msg.fields).value) {
+              switch (com.getFld(4, msg.fields).value) {
                 case 0x04:
                   // Exhaust gas data
                   mainWindow.webContents.send('n2k-egt-cfg-data', [dev, msg]);
@@ -302,8 +302,8 @@ function proc(dev, frm) {
         mainWindow.webContents.send('n2k-digi-data', [dev, msg]);
         break;
       case 130982:
-        if ((getFld(1, msg.fields).value == manu) && (getFld(3, msg.fields).value == indu)) {
-          switch (getFld(6, msg.fields).value) {
+        if ((com.getFld(1, msg.fields).value == manu) && (com.getFld(3, msg.fields).value == indu)) {
+          switch (com.getFld(6, msg.fields).value) {
             case 0xC2:
               pub.emit('crc-ack', msg);
               break;
@@ -321,7 +321,7 @@ function proc(dev, frm) {
         }
         break;
       case 131000:
-        if ((getFld(1, msg.fields).value == manu) && (getFld(3, msg.fields).value == indu)) {
+        if ((com.getFld(1, msg.fields).value == manu) && (com.getFld(3, msg.fields).value == indu)) {
           mainWindow.webContents.send('n2k-dc-cfg-data', [dev, msg]);
           pub.emit('conf-ack', msg);
         }
@@ -923,10 +923,10 @@ ipcMain.on('c3410-write', (e, args) => {
   }
 });
 
-function c3420Read(eng, ins, cmd) {
+function c3420Read(eng, ins, did) {
   return new Promise((resolve, reject) => {
     // Reading configuration...
-    let ret = eng.send065445(0x08, ins, 0xFF, (((0xFF << 8) + cmd) << 8) + 0x00);
+    let ret = eng.send065445(0x08, ins, 0xFF, (((0xFF << 8) + did) << 8) + 0x00);
     if (ret) {
       btimer = setTimeout(() => {
         btimer = null;
@@ -937,7 +937,7 @@ function c3420Read(eng, ins, cmd) {
         btimer = null;
         if ((typeof res.fields !== 'undefined') && Array.isArray(res.fields) &&
           (res.fields[3].value == 0x08) && (res.fields[4].value == ins) &&
-          (res.fields[5].value == cmd)) {
+          (res.fields[5].value == did)) {
           let msg = 'Configuration successfuly read.';
           log.info(msg);
           resolve(true);
@@ -975,10 +975,10 @@ ipcMain.on('c3420-read', (e, args) => {
   }
 });
 
-function c3420Write(eng, ins, cmd, dat) {
+function c3420Write(eng, ins, did, dat) {
   return new Promise((resolve, reject) => {
     // Writing configuration...
-    let ret = eng.send065445(0x08, ins, cmd, dat);
+    let ret = eng.send065445(0x08, ins, did, dat);
     if (ret) {
       btimer = setTimeout(() => {
         btimer = null;
@@ -989,7 +989,7 @@ function c3420Write(eng, ins, cmd, dat) {
         btimer = null;
         if ((typeof res.fields !== 'undefined') && Array.isArray(res.fields) &&
           (res.fields[3].value == 0x08) && (res.fields[4].value == ins) &&
-          (res.fields[5].value == cmd) && ((res.fields[6].value & 0xFF) == dat)) {
+          (res.fields[5].value == did) && ((res.fields[6].value & 0xFF) == dat)) {
           let msg = 'Configuration successfuly written.';
           log.info(msg);
           resolve(true);
@@ -1109,10 +1109,10 @@ ipcMain.on('a3478-cancel', (e, args) => {
   swcancel = true;
 });
 
-function c4510Read(eng, ins, cmd) {
+function c4510Read(eng, ins, did) {
   return new Promise((resolve, reject) => {
     // Reading configuration...
-    let ret = eng.send065445(0x04, ins, 0xFF, (((0xFF << 8) + cmd) << 8) + 0x00);
+    let ret = eng.send065445(0x04, ins, 0xFF, (((0xFF << 8) + did) << 8) + 0x00);
     if (ret) {
       btimer = setTimeout(() => {
         btimer = null;
@@ -1122,8 +1122,8 @@ function c4510Read(eng, ins, cmd) {
         clearTimeout(btimer);
         btimer = null;
         if ((typeof res.fields !== 'undefined') && Array.isArray(res.fields) &&
-          (getFld(4, res.fields).value == 0x04) && (getFld(5, res.fields).value == ins) &&
-          (getFld(6, res.fields).value == cmd)) {
+          (com.getFld(4, res.fields).value == 0x04) && (com.getFld(5, res.fields).value == ins) &&
+          (com.getFld(6, res.fields).value == did)) {
           let msg = 'Configuration successfuly read.';
           log.info(msg);
           resolve(true);
@@ -1176,8 +1176,8 @@ function c4510Write(eng, ins, cmd, dat) {
         clearTimeout(btimer);
         btimer = null;
         if ((typeof res.fields !== 'undefined') && Array.isArray(res.fields) &&
-          (getFld(4, res.fields).value == 0x04) && (getFld(5, res.fields).value == ins) &&
-          (getFld(6, res.fields).value == cmd) && ((getFld(7, res.fields).value & 0xFF) == dat)) {
+          (com.getFld(4, res.fields).value == 0x04) && (com.getFld(5, res.fields).value == ins) &&
+          (com.getFld(6, res.fields).value == cmd) && ((com.getFld(7, res.fields).value & 0xFF) == dat)) {
           let msg = 'Configuration successfuly written.';
           log.info(msg);
           resolve(true);
@@ -1217,10 +1217,10 @@ ipcMain.on('c4510-write', (e, args) => {
   }
 });
 
-function c4521Read(eng, ins, cmd, chn) {
+function c4521Read(eng, ins, did, chn) {
   return new Promise((resolve, reject) => {
     // Reading configuration...
-    let ret = eng.send065445(0x06, ins, 0xFF, (((chn << 8) + cmd) << 8) + 0x00);
+    let ret = eng.send065445(0x06, ins, 0xFF, ((chn << 8) | did) << 8);
     if (ret) {
       btimer = setTimeout(() => {
         btimer = null;
@@ -1230,8 +1230,8 @@ function c4521Read(eng, ins, cmd, chn) {
         clearTimeout(btimer);
         btimer = null;
         if ((typeof res.fields !== 'undefined') && Array.isArray(res.fields) &&
-          (getFld(4, res.fields).value == 0x06) && (getFld(5, res.fields).value == ins) &&
-          (getFld(6, res.fields).value == cmd)) {
+          (com.getFld(4, res.fields).value == 0x06) && (com.getFld(5, res.fields).value == ins) &&
+          (com.getFld(6, res.fields).value == did)) {
           let msg = 'Configuration successfuly read.';
           log.info(msg);
           resolve(true);
@@ -1251,10 +1251,7 @@ ipcMain.on('c4521-read', (e, args) => {
   if ((typeof dev === 'string') && (typeof devices[dev] !== 'undefined')) {
     let eng = devices[dev].engine;
     Promise.resolve()
-    .then(() => c4521Read(eng, ins, 0, 0))
-    .then(() => c4521Read(eng, ins, 0, 1))
-    .then(() => c4521Read(eng, ins, 0, 2))
-    .then(() => c4521Read(eng, ins, 0, 3))
+    .then(() => c4521Read(eng, ins, 0, 0xFF))
     .then(() => c4521Read(eng, ins, 1, 0))
     .then(() => c4521Read(eng, ins, 1, 1))
     .then(() => c4521Read(eng, ins, 1, 2))
@@ -1284,10 +1281,10 @@ ipcMain.on('c4521-read', (e, args) => {
   }
 });
 
-function c4521Write(eng, ins, cmd, chn, dat) {
+function c4521Write(eng, ins, did, chn, dat) {
   return new Promise((resolve, reject) => {
     // Writing configuration...
-    let ret = eng.send065445(0x06, ins, cmd, (((chn << 8) + dat) << 8) + 0xFF);
+    let ret = eng.send065445(0x06, ins, did, 0xFF0000 | (chn << 8) | dat);
     if (ret) {
       btimer = setTimeout(() => {
         btimer = null;
@@ -1297,8 +1294,8 @@ function c4521Write(eng, ins, cmd, chn, dat) {
         clearTimeout(btimer);
         btimer = null;
         if ((typeof res.fields !== 'undefined') && Array.isArray(res.fields) &&
-          (getFld(4, res.fields).value == 0x06) && (getFld(5, res.fields).value == ins) &&
-          (getFld(6, res.fields).value == cmd) && ((getFld(7, res.fields).value & 0xFF) == dat)) {
+          (com.getFld(4, res.fields).value == 0x06) && (com.getFld(5, res.fields).value == ins) &&
+          (com.getFld(6, res.fields).value == did) && ((com.getFld(7, res.fields).value & 0xFF) == dat)) {
           let msg = 'Configuration successfuly written.';
           log.info(msg);
           resolve(true);
@@ -1318,10 +1315,7 @@ ipcMain.on('c4521-write', (e, args) => {
   if ((typeof dev === 'string') && (typeof devices[dev] !== 'undefined')) {
     let eng = devices[dev].engine;
     Promise.resolve()
-    .then(() => c4521Write(eng, ins, 0, 0, dat.channels[0].tx_pgn))
-    .then(() => c4521Write(eng, ins, 0, 1, dat.channels[1].tx_pgn))
-    .then(() => c4521Write(eng, ins, 0, 2, dat.channels[2].tx_pgn))
-    .then(() => c4521Write(eng, ins, 0, 3, dat.channels[3].tx_pgn))
+    .then(() => c4521Write(eng, ins, 0, 0xFF, dat.tx_pgn))
     .then(() => c4521Write(eng, ins, 1, 0, dat.channels[0].temp_src))
     .then(() => c4521Write(eng, ins, 1, 1, dat.channels[1].temp_src))
     .then(() => c4521Write(eng, ins, 1, 2, dat.channels[2].temp_src))
@@ -1337,13 +1331,13 @@ ipcMain.on('c4521-write', (e, args) => {
     .then(() => c4521Write(eng, ins, 4, 0xFF, dat.conf_type))
     .then(() => {
       if ((mainWindow != null) && (typeof mainWindow.webContents !== 'undefined')) {
-        mainWindow.webContents.send('w4510-done', true);
+        mainWindow.webContents.send('w4521-done', true);
       }
     })
     .catch((err) => {
       log.error(err);
       if ((mainWindow != null) && (typeof mainWindow.webContents !== 'undefined')) {
-        mainWindow.webContents.send('w4510-done', false);
+        mainWindow.webContents.send('w4521-done', false);
       }
     });
   } else {

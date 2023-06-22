@@ -12,9 +12,9 @@
   const dispatch = createEventDispatcher();
   
   const tx_pgns = new Array(
-    { id: '0', text: 'PGN130312 (deprecated)' },
-    { id: '1', text: 'PGN130316' },
-    { id: '2', text: 'Both' },
+    { id: '1', text: 'PGN130312 (deprecated)' },
+    { id: '2', text: 'PGN130316' },
+    { id: '3', text: 'Both' },
   );
   const temp_srcs = new Array(
     { id: '0', text: 'Sea Temperature' },
@@ -45,13 +45,13 @@
   let inst1 = new Array();
   let inst2 = new Array();
   let conf_type = '0';
+  let tx_pgn = '3';
   let channels = new Array();
   for (let i = 0; i < 4; i++) {
     channels.push({
       enabled: '0',
       temp_ins: i.toString(),
       temp_src: '0',
-      tx_pgn: '0',
     });
   }
   let isValid = false;
@@ -63,6 +63,7 @@
   function program(e) {
     dispatch("program", {
       conf_type: conf_type,
+      tx_pgn: tx_pgn,
       channels: channels,
     });
   };
@@ -82,13 +83,13 @@
   function setData(val) {
     if (val != null) {
       conf_type = val.conf_type != null ? val.conf_type.toString() : '0';
+      tx_pgn = val.tx_pgn != null ? val.tx_pgn.toString() : '3';
       channels = new Array();
       for (let i = 0; i < 4; i++) {
         channels.push({
           enabled: val.channels[i].enabled != null ? val.channels[i].enabled.toString() : '0',
           temp_ins: val.channels[i].temp_ins != null ? val.channels[i].temp_ins.toString() : i.toString(),
           temp_src: val.channels[i].temp_src != null ? val.channels[i].temp_src.toString() : '0',
-          tx_pgn: val.channels[i].tx_pgn != null ? val.channels[i].tx_pgn.toString() : '2',
         });
       }
       isValid = val.isValid;
@@ -142,6 +143,15 @@
                 {/if}
               </Column>
             </Row>
+            <Row padding>
+              <Column sm={1} md={2} lg={4}>
+                {#if running}
+                  <DropdownSkeleton />
+                {:else}
+                  <Dropdown disabled={!isValid} titleText="Tx PGN type" size="sm" bind:selectedId={tx_pgn} items={tx_pgns} />
+                {/if}
+              </Column>
+            </Row>
             <Row>
               {#each channels as channel, idx}
                 <Column sm={1} md={2} lg={4}>
@@ -172,15 +182,6 @@
                         <DropdownSkeleton />
                       {:else}
                         <Dropdown disabled={!isValid} titleText="Temperature source" size="sm" bind:selectedId={channel.temp_src} items={temp_srcs} />
-                      {/if}
-                    </Column>
-                  </Row>
-                  <Row padding>
-                    <Column>
-                      {#if running}
-                        <DropdownSkeleton />
-                      {:else}
-                        <Dropdown disabled={!isValid} titleText="Tx PGN type" size="sm" bind:selectedId={channel.tx_pgn} items={tx_pgns} />
                       {/if}
                     </Column>
                   </Row>

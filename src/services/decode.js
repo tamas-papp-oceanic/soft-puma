@@ -26,7 +26,7 @@ function unpack(frm) {
 };
 
 // Convert can frame to message
-function decode(frm) {
+function decode(frm, din) {
   try {
     let pgn = com.getPgn(frm.id);
     let def = com.findDef(frm);
@@ -191,6 +191,9 @@ function decode(frm) {
         }
         msg.fields.push(fld);
       }
+    }
+    if (din != null) {
+      msg.header.din = din;
     }
     if (ins != null) {
       msg.header.ins = ins;

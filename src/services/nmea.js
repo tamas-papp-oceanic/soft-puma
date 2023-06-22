@@ -84,7 +84,7 @@ class NMEAEngine {
   process(frm) {
     let tmp = dec.unpack(frm);
     if (tmp != null) {
-      let msg = dec.decode(tmp);
+      let msg = dec.decode(tmp, this.#addrMngr.getInstance(tmp.id & 0xFF));
       if (msg != null) {
         switch (msg.header.pgn) {
           case 59904:
@@ -302,7 +302,7 @@ class NMEAEngine {
   };
 
   // Sends Proprietary SF Config Request / Command message
-  send065445(typ, ins, dat, val) {
+  send065445(typ, ins, did, val) {
     if (this.#addrMngr.state == 'Valid') {
       let msg = {
         key: 'nmea2000/065445/-/161/4/-/-',
@@ -313,7 +313,7 @@ class NMEAEngine {
           { field: 3,title: 'Industry Group', state: 'V', value: this.#addrMngr.name[9] },
           { field: 4,title: 'Type ID', state: 'V', value: typ },
           { field: 5,title: 'Instance', state: 'V', value: ins },
-          { field: 6,title: 'Data ID', state: 'V', value: dat },
+          { field: 6,title: 'Data ID', state: 'V', value: did },
           { field: 7,title: 'Content', state: 'V', value: val },
         ],
       };

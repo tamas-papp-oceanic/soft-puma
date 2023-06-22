@@ -70,7 +70,7 @@
         let dat = $data[$devices[selected]];
         for (let i in dat) {
           if (dat[i].header.src == parseInt(row.id)) {
-            if ((dat[i].header.src == parseInt(row.id)) && (dat[i].header.ins == parseInt(row.instance))) {
+            if ((dat[i].header.src == parseInt(row.id)) && (dat[i].header.din == parseInt(row.instance))) {
               pat = pat.replace(':instance', row.instance);
             }
             if (typeof dat[i].header.typ !== 'undefined') {

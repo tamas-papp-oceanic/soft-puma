@@ -2,7 +2,7 @@
   import { onMount, onDestroy } from "svelte";
   import { Row, Grid, Column, ToastNotification } from "carbon-components-svelte";
   import { location, pop } from "svelte-spa-router";
-  import Container4521 from './partials/Container4521.svelte';
+  import Container4601 from './partials/Container4601.svelte';
   import { getname, getfield } from '../../stores/common.js';
   import { device, findModel } from '../../stores/data';
 
@@ -17,18 +17,12 @@
     instance: params.instance,
     source: null,
     conf_type: null,
-    tx_pgn: null,
-    channels: new Array(),
+    press_ins: null,
+    press_src: null,
+    press_rng: null,
+    press_dmp: null,
     isValid: false,
   };
-  for (let i = 0; i < 3; i++) {
-    data.channels.push({
-      enabled: null,
-      temp_ins: null,
-      temp_src: null,
-    });
-  }
-
   let running = false;
   let notify = false;
   let kind = null;
@@ -36,53 +30,48 @@
   let subttl = null;
 
   onMount(() => {
-    window.pumaAPI.recv('n2k-temp-cfg-data', (e, args) => {
+    window.pumaAPI.recv('n2k-egt-cfg-data', (e, args) => {
       const [ dev, msg ] = args;
       if (getfield(5, msg.fields).value == data.instance) {
-        let prm = getfield(6, msg.fields);
         let fld = getfield(7, msg.fields);
-        if ((prm != null) && (typeof prm.value != 'undefined') && (fld != null) && (typeof fld.value != 'undefined')) {
-          let val = fld.value & 0xFF;
-          let chn = (fld.value >> 8) & 0xFF;
-          switch (prm.value) {
-            case 0:
-              // Tx PGN type (1 = PGN130312 (deprecated), 2 = PGN130316, 3 = Both)
-              data.tx_pgn = (fld.state == 'V') ? val.toString() : null;
-              break;
-            case 1:
-              // Temperature source
-              data.channels[chn].temp_src = (fld.state == 'V') ? val.toString() : null;
-              break;
-            case 2:
-              // Temperature instance
-              data.channels[chn].temp_ins = (fld.state == 'V') ? val.toString() : null;
-              break;
-            case 3:
-              // Channel enable
-              data.channels[chn].enabled = (fld.state == 'V') ? val.toString() : null;
-              break;
-            case 4:
-              // Instance configuration type
-              data.conf_type = (fld.state == 'V') ? val.toString() : null;
-              break;
-          }
-          data.isValid = true;
+        switch (getfield(6, msg.fields).value) {
+          case 0:
+            // Instance configuration type
+            data.conf_type = (fld != null ) && (fld.state == 'V') ? fld.value.toString() : null;
+            break;
+          case 1:
+            // Pressure instance
+            data.press_ins = (fld != null ) && (fld.state == 'V') ? fld.value.toString() : null;
+            break;
+          case 2:
+            // Pressure source
+            data.press_src = (fld != null ) && (fld.state == 'V') ? fld.value.toString() : null;
+            break;
+          case 3:
+            // Pressure range
+            data.press_rng = (fld != null ) && (fld.state == 'V') ? fld.value.toString() : null;
+            break;
+          case 4:
+            // Pressure damping
+            data.press_dmp = (fld != null ) && (fld.state == 'V') ? fld.value.toString() : null;
+            break;
         }
+        data.isValid = true;
       }
     });
   });
   
   onDestroy(() => {
-    window.pumaAPI.reml('n2k-temp-cfg-data');
+    window.pumaAPI.reml('n2k-egt-cfg-data');
   });
 
   function stop(lis) {
-    if (lis == 'r4521') {
+    if (lis == 'r4601') {
       if (rtimer != null) {
         clearTimeout(rtimer);
         rtimer = null;
       }
-    } else if (lis == 'w4521') {
+    } else if (lis == 'w4601') {
       if (wtimer != null) {
         clearTimeout(wtimer);
         wtimer = null;
@@ -99,7 +88,7 @@
     notify = false;
     running = true;
     rtimer = setTimeout(() => {
-      stop('r4521');
+      stop('r4601');
       running = false;
       kind = 'error'
       title = 'Error';
@@ -108,18 +97,13 @@
     }, timeout);
     // Receives settings data
     data.conf_type = null;
-    data.tx_pgn = null,
-    data.channels = new Array();
-    for (let i = 0; i < 4; i++) {
-      data.channels.push({
-        enabled: null,
-        temp_ins: null,
-        temp_src: null,
-      });
-    }
+    data.press_ins = null;
+    data.press_src = null;
+    data.press_rng = null;
+    data.press_dmp = null;
     data.isValid = false;
-    window.pumaAPI.recv('r4521-done', (e, res) => {
-      stop('r4521');
+    window.pumaAPI.recv('r4601-done', (e, res) => {
+      stop('r4601');
       running = false;
       if (!res) {
         kind = 'error'
@@ -128,7 +112,7 @@
         notify = true;
       }
     });
-    window.pumaAPI.send('c4521-read', [$device, parseInt(data.instance)]);
+    window.pumaAPI.send('c4601-read', [$device, parseInt(data.instance)]);
   };
 
   function program(e) {
@@ -138,7 +122,7 @@
     notify = false;
     running = true;
     wtimer = setTimeout(() => {
-      stop('w4521');
+      stop('w4601');
       running = false;
       kind = 'error'
       title = 'Error';
@@ -146,8 +130,8 @@
       notify = true;
     }, timeout);
     // Receives program result
-    window.pumaAPI.recv('w4521-done', (e, res) => {
-      stop('w4521');
+    window.pumaAPI.recv('w4601-done', (e, res) => {
+      stop('w4601');
       running = false;
       if (res) {
         kind = 'info'
@@ -161,24 +145,20 @@
         notify = true;
       }
     });
-    let out = {
-      conf_type: parseInt(e.detail.conf_type),
-      tx_pgn: parseInt(e.detail.tx_pgn),
-      channels: new Array(),
-    }
-    for (let i = 0; i < 4; i++) {
-      out.channels.push({
-        enabled: parseInt(e.detail.channels[i].enabled),
-        temp_ins: parseInt(e.detail.channels[i].temp_ins),
-        temp_src: parseInt(e.detail.channels[i].temp_src),
-      });
-    }
-    window.pumaAPI.send('c4521-write', [$device, parseInt(data.instance), out]);
+    window.pumaAPI.send('c4601-write', [
+      $device, parseInt(data.instance), {
+        conf_type: parseInt(e.detail.conf_type),
+        press_ins: parseInt(e.detail.press_ins),
+        press_src: parseInt(e.detail.press_src),
+        press_rng: parseInt(e.detail.press_rng),
+        press_dmp: parseInt(e.detail.press_dmp),
+      },
+    ]);
   };
 
   function cancel(e) {
-    stop('r4521');
-    stop('w4521');
+    stop('r4601');
+    stop('w4601');
     running = false;
     pop();
   };
@@ -214,7 +194,7 @@
   <Row>
     <Column>
       <h2>{model + ' - ' + getname(model) + ' - Configuration'}</h2>
-      <Container4521 style="height: 80vh;" bind:data={data} running={running}
+      <Container4601 style="height: 80vh;" bind:data={data} running={running}
         on:select={select} on:program={program} on:cancel={cancel} on:error={error} />
       {#if notify}
         <div class="error">

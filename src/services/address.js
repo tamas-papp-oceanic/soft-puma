@@ -5,24 +5,25 @@ const { StateMachine } = require('@edium/fsm');
 
 class Address {
   // Private field definitions
-  #namerec; // Name record field / value definition
-  #ourname; // Our name record
-  #address; // Our address
-  #savaddr; // Saved address
-  #timeout; // Random timeout
-  #send;    // Send callback method
-  #timers;  // Product Information timers
-  #asm;     // Address State Machine
-  #s0;      // State 0
-  #s1;      // State 1
-  #s2;      // State 2
-  #s3;      // State 3
-  #s4;      // State 4
-  #s5;      // State 5
-  #s6;      // State 6
-  #s7;      // State 7
-  #s8;      // State 8
-  #s9;      // State 9
+  #namerec;   // Name record field / value definition
+  #ourname;   // Our name record
+  #address;   // Our address
+  #savaddr;   // Saved address
+  #timeout;   // Random timeout
+  #send;      // Send callback method
+  #timers;    // Product Information timers
+  #instances; // Device instances
+  #asm;       // Address State Machine
+  #s0;        // State 0
+  #s1;        // State 1
+  #s2;        // State 2
+  #s3;        // State 3
+  #s4;        // State 4
+  #s5;        // State 5
+  #s6;        // State 6
+  #s7;        // State 7
+  #s8;        // State 8
+  #s9;        // State 9
   // Class contructor
   constructor() {
     const context = {
@@ -46,6 +47,7 @@ class Address {
     this.#timeout = null;
     this.#send = null;
     this.#timers = {};
+    this.#instances = {};
     // Define final state machine
     this.#asm = new StateMachine('ASM', context);
     this.#s0 = this.#asm.createState('Idle', false, this.#s0Entry.bind(this));
@@ -221,6 +223,7 @@ class Address {
   // Processes ISO Address Claim message
   proc060928(msg) {
     let nam = msg.raw.toString('hex', 4);
+    this.#instances[msg.raw[3]] = msg.raw[8];
     if (typeof this.#timers[nam] !== 'undefined') {
       clearTimeout(this.#timers[nam]);
       delete this.#timers[nam];
@@ -288,6 +291,10 @@ class Address {
         }
     }
     return;
+  };
+  // Get device instance
+  getInstance(src) {
+    return this.#instances[src];
   };
   // Random timeout generator
   rnd() {
