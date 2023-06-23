@@ -48,6 +48,14 @@
     });
   };
 
+  function reset_flo(e) {
+    dispatch("reset", "flow");
+  };
+
+  function reset_ret(e) {
+    dispatch("reset", "return");
+  };
+
   function cancel(e) {
     dispatch("cancel");
   };
@@ -116,9 +124,6 @@
                     {/if}
                   </Column>
                 </Row>
-              </Column>
-              <Column sm={1} md={2} lg={4}>
-                <Row padding><Column>&nbsp;</Column></Row>
                 <Row padding>
                   <Column>
                     {#if running}
@@ -129,13 +134,11 @@
                   </Column>
                 </Row>
               </Column>
-            </Row>
-            <Row>
               <Column sm={1} md={2} lg={4}>
                 <Row padding>
                   <Column>Flow</Column>
                 </Row>
-                <Row padding>
+                <Row>
                   <Column>
                     {#if running}
                       <DropdownSkeleton />
@@ -144,7 +147,7 @@
                     {/if}
                   </Column>
                 </Row>
-                <Row>
+                <Row padding>
                   <Column>
                     {#if running}
                       <DropdownSkeleton />
@@ -153,12 +156,13 @@
                     {/if}
                   </Column>
                 </Row>
-                <Row padding>
+                <Row>
                   <Column>
                     {#if running}
                       <NumberInputSkeleton />
                     {:else}
                       <NumberInput
+                        allowEmpty
                         disabled={!isValid}
                         min={0.00} step={0.01}
                         label="K-factor (L)"
@@ -166,12 +170,13 @@
                     {/if}
                   </Column>
                 </Row>
-                <Row>
+                <Row padding>
                   <Column>
                     {#if running}
                       <NumberInputSkeleton />
                     {:else}
                       <NumberInput
+                        allowEmpty
                         disabled={!isValid}
                         min={0.00} step={0.01}
                         label="Total volume (L)"
@@ -179,12 +184,17 @@
                     {/if}
                   </Column>
                 </Row>
+                <Row>
+                  <Column>
+                    <Button kind="primary" disabled={!isValid} on:click={(e) => reset_flo(e)}>Reset total</Button>
+                  </Column>
+                </Row>
               </Column>
               <Column sm={1} md={2} lg={4}>
                 <Row padding>
                   <Column>Return</Column>
                 </Row>
-                <Row padding>
+                <Row>
                   <Column>
                     {#if running}
                       <DropdownSkeleton />
@@ -193,12 +203,26 @@
                     {/if}
                   </Column>
                 </Row>
-                <Row>
+                <Row padding>
                   <Column>
                     {#if running}
                       <DropdownSkeleton />
                     {:else}
                       <Dropdown disabled={!isValid} titleText="Temperature instance" size="sm" bind:selectedId={temp_ret_ins} items={insts} />
+                    {/if}
+                  </Column>
+                </Row>
+                <Row>
+                  <Column>
+                    {#if running}
+                      <NumberInputSkeleton />
+                    {:else}
+                      <NumberInput
+                        allowEmpty
+                        disabled={!isValid}
+                        min={0.00} step={0.01}
+                        label="K-factor (L)"
+                        bind:value={kfact_ret} />
                     {/if}
                   </Column>
                 </Row>
@@ -208,24 +232,17 @@
                       <NumberInputSkeleton />
                     {:else}
                       <NumberInput
-                        disabled={!isValid}
-                        min={0.00} step={0.01}
-                        label="K-factor (L)"
-                        bind:value={kfact_ret} />
-                    {/if}
-                  </Column>
-                </Row>
-                <Row>
-                  <Column>
-                    {#if running}
-                      <NumberInputSkeleton />
-                    {:else}
-                      <NumberInput
+                        allowEmpty
                         disabled={!isValid}
                         min={0.00} step={0.01}
                         label="Total volume (L)"
                         bind:value={total_ret} />
                     {/if}
+                  </Column>
+                </Row>
+                <Row>
+                  <Column>
+                    <Button kind="primary" disabled={!isValid} on:click={(e) => reset_ret(e)}>Reset total</Button>
                   </Column>
                 </Row>
               </Column>

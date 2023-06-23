@@ -291,6 +291,11 @@ function proc(dev, frm) {
                   mainWindow.webContents.send('n2k-press-cfg-data', [dev, msg]);
                   pub.emit('conf-ack', msg);
                   break;
+                case 0x16:
+                  // Flow monitor data
+                  mainWindow.webContents.send('n2k-flow-s-cfg-data', [dev, msg]);
+                  pub.emit('conf-ack', msg);
+                  break;
                 }
               break;
           }
@@ -321,7 +326,15 @@ function proc(dev, frm) {
             case 0xF0:
               pub.emit('prog-ack', msg);
               break;
-            }
+            default:
+              switch (com.getFld(4, msg.fields).value) {
+                case 0x16:
+                  // Flow monitor data
+                  mainWindow.webContents.send('n2k-flow-f-cfg-data', [dev, msg]);
+                  pub.emit('conf-ack', msg);
+                  break;
+              }
+          }
           break;
         }
         break;
@@ -345,6 +358,7 @@ com.init();
 // Start discovery loop
 log.info('Discovering interfaces...')
 discover();
+
 timer = setInterval(() => {
   discover();
 }, 10000);
@@ -1419,10 +1433,10 @@ ipcMain.on('c4601-read', (e, args) => {
   }
 });
 
-function c4601Write(eng, ins, cmd, dat) {
+function c4601Write(eng, ins, did, dat) {
   return new Promise((resolve, reject) => {
     // Writing configuration...
-    let ret = eng.send065445(0x09, ins, cmd, dat);
+    let ret = eng.send065445(0x09, ins, did, dat);
     if (ret) {
       btimer = setTimeout(() => {
         btimer = null;
@@ -1433,7 +1447,7 @@ function c4601Write(eng, ins, cmd, dat) {
         btimer = null;
         if ((typeof res.fields !== 'undefined') && Array.isArray(res.fields) &&
           (com.getFld(4, res.fields).value == 0x09) && (com.getFld(5, res.fields).value == ins) &&
-          (com.getFld(6, res.fields).value == cmd) && ((com.getFld(7, res.fields).value & 0xFF) == dat)) {
+          (com.getFld(6, res.fields).value == did) && ((com.getFld(7, res.fields).value & 0xFF) == dat)) {
           let msg = 'Configuration successfuly written.';
           log.info(msg);
           resolve(true);
@@ -1483,6 +1497,163 @@ ipcMain.on('c4601-write', (e, args) => {
     console.log("No device selected!");
   }
 });
+
+function c5720Read(eng, typ, ins, did) {
+  return new Promise((resolve, reject) => {
+    // Reading configuration...
+    let ret = false;
+    if (typ = 'SF') {
+      ret = eng.send065445(0x16, ins, 0xFF, 0xFF0000 | (did << 8) | 0x00);
+    } else if (typ = 'FP') {
+      let dat = Buffer.alloc(1);
+      dat.writeUInt8(did);
+      ret = eng.send130981(0x16, ins, 0xFF, dat);
+    }
+    if (ret) {
+      btimer = setTimeout(() => {
+        btimer = null;
+        reject(new Error('Reading configuration failed!'));
+      }, 5000);
+      pub.once('conf-ack', (res) => {
+        clearTimeout(btimer);
+        btimer = null;
+        if ((typeof res.fields !== 'undefined') && Array.isArray(res.fields) &&
+          (com.getFld(4, res.fields).value == 0x16) && (com.getFld(5, res.fields).value == ins) &&
+          (com.getFld(6, res.fields).value == did)) {
+          let msg = 'Configuration successfuly read.';
+          log.info(msg);
+          resolve(true);
+        } else {
+          reject(new Error('Reading configuration failed!'));
+        }
+      });
+    } else {
+      reject(new Error('Reading configuration failed!'));
+    }
+  });
+}
+
+// Starts 5720 configuration reading
+ipcMain.on('c5720-read', (e, args) => {
+  const [dev, ins] = args;
+  if ((typeof dev === 'string') && (typeof devices[dev] !== 'undefined')) {
+    let eng = devices[dev].engine;
+    Promise.resolve()
+    .then(() => c5720Read(eng, 'SF', ins, 0))
+    .then(() => c5720Read(eng, 'SF', ins, 1))
+    .then(() => c5720Read(eng, 'SF', ins, 2))
+    .then(() => c5720Read(eng, 'SF', ins, 3))
+    .then(() => c5720Read(eng, 'SF', ins, 4))
+    .then(() => c5720Read(eng, 'SF', ins, 5))
+    .then(() => c5720Read(eng, 'FP', ins, 0))
+    .then(() => c5720Read(eng, 'FP', ins, 1))
+    .then(() => c5720Read(eng, 'FP', ins, 2))
+    .then(() => c5720Read(eng, 'FP', ins, 3))
+    .then(() => c5720Read(eng, 'FP', ins, 4))
+    .then(() => {
+      if ((mainWindow != null) && (typeof mainWindow.webContents !== 'undefined')) {
+        mainWindow.webContents.send('r5720-done', true);
+      }
+    })
+    .catch((err) => {
+      log.error(err);
+      if ((mainWindow != null) && (typeof mainWindow.webContents !== 'undefined')) {
+        mainWindow.webContents.send('r5720-done', false);
+      }
+    });
+  } else {
+    console.log("No device selected!");
+  }
+});
+
+function c5720Write(eng, typ, ins, did, dat) {
+  return new Promise((resolve, reject) => {
+    // Writing configuration...
+    let ret = false;
+    if (typ = 'SF') {
+      ret =eng.send065445(0x09, ins, cmd, dat);
+    } else if (typ = 'FP') {
+      let dat = Buffer.alloc(4);
+      dat.writeUInt32LE(did);
+      ret = eng.send130981(0x16, ins, did, dat);
+    }
+    if (ret) {
+      btimer = setTimeout(() => {
+        btimer = null;
+        reject(new Error('Writing configuration failed!'));
+      }, 5000);
+      pub.once('conf-ack', (res) => {
+        clearTimeout(btimer);
+        btimer = null;
+        if ((typeof res.fields !== 'undefined') && Array.isArray(res.fields) &&
+          (com.getFld(4, res.fields).value == 0x09) && (com.getFld(5, res.fields).value == ins) &&
+          (com.getFld(6, res.fields).value == did) && ((com.getFld(7, res.fields).value & 0xFF) == dat)) {
+          let msg = 'Configuration successfuly written.';
+          log.info(msg);
+          resolve(true);
+        } else {
+          reject(new Error('Writing configuration failed!'));
+        }
+      });
+    } else {
+      reject(new Error('Writing configuration failed!'));
+    }
+  });
+}
+
+// Starts 5720 configuration writing
+ipcMain.on('c5720-write', (e, args) => {
+  const [dev, ins, dat] = args;
+  if ((typeof dev === 'string') && (typeof devices[dev] !== 'undefined')) {
+    let eng = devices[dev].engine;
+    let pro = Promise.resolve();
+    if (typeof dat.mod_ins !== 'undefined') {
+      pro = pro.then(() => { return c5720Write(eng, 'SF', ins, 0, dat.mod_ins) });
+    }
+    if (typeof dat.eng_flo_ins !== 'undefined') {
+      pro = pro.then(() => { return c5720Write(eng, 'SF', ins, 1, dat.eng_flo_ins) });
+    }
+    if (typeof dat.eng_ret_ins !== 'undefined') {
+      pro = pro.then(() => { return c5720Write(eng, 'SF', ins, 2, dat.eng_ret_ins) });
+    }
+    if (typeof dat.temp_flo_ins !== 'undefined') {
+      pro = pro.then(() => { return c5720Write(eng, 'SF', ins, 3, dat.temp_flo_ins) });
+    }
+    if (typeof dat.temp_ret_ins !== 'undefined') {
+      pro = pro.then(() => { return c5720Write(eng, 'SF', ins, 4, dat.temp_ret_ins) });
+    }
+    if (typeof dat.op_mode !== 'undefined') {
+      pro = pro.then(() => { return c5720Write(eng, 'SF', ins, 5, dat.op_mode) });
+    }
+    if (typeof dat.kfact_flo !== 'undefined') {
+      pro = pro.then(() => { return c5720Write(eng, 'FP', ins, 0, dat.kfact_flo) });
+    }
+    if (typeof dat.kfact_ret !== 'undefined') {
+      pro = pro.then(() => { return c5720Write(eng, 'FP', ins, 1, dat.kfact_ret) });
+    }
+    if (typeof dat.total_flo !== 'undefined') {
+      pro = pro.then(() => { return c5720Write(eng, 'FP', ins, 2, dat.total_flo) });
+    }
+    if (typeof dat.total_ret !== 'undefined') {
+      pro = pro.then(() => { return c5720Write(eng, 'FP', ins, 3, dat.total_ret) });
+    }
+    pro.then(() => {
+      if ((mainWindow != null) && (typeof mainWindow.webContents !== 'undefined')) {
+        mainWindow.webContents.send('w5720-done', true);
+      }
+    })
+    .catch((err) => {
+      log.error(err);
+      if ((mainWindow != null) && (typeof mainWindow.webContents !== 'undefined')) {
+        mainWindow.webContents.send('w5720-done', false);
+      }
+    });
+  } else {
+    console.log("No device selected!");
+  }
+});
+
+
 
 // Stop device processing
 ipcMain.on('dev-stop', (e, ...args) => {

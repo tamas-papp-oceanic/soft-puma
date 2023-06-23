@@ -84,10 +84,10 @@
       equ_support = val.equ_support != null ? val.equ_support.toString() : '0';
       nom_voltage = val.nom_voltage != null ? val.nom_voltage.toString() : '0';
       chemistry = val.chemistry != null ? val.chemistry.toString() : '0';
-      capacity = val.capacity != null ? val.capacity : 0;
+      capacity = val.capacity;
       temp_eff = val.temp_eff;
-      peukert = val.peukert != null ? val.peukert : 1.00;
-      chrg_eff = val.chrg_eff != null ? val.chrg_eff : 1;
+      peukert = val.peukert;
+      chrg_eff = val.chrg_eff;
       isValid = val.isValid;
     }
   };
@@ -184,6 +184,7 @@
                       <NumberInputSkeleton />
                     {:else}
                       <NumberInput
+                        allowEmpty
                         disabled={running || !isValid}
                         min={0} step={1}
                         label="Battery capacity (Ah)"
@@ -197,8 +198,8 @@
                       <NumberInputSkeleton />
                     {:else}
                       <NumberInput
-                        disabled={running || !isValid}
                         allowEmpty
+                        disabled={running || !isValid}
                         min={0} max={100} step={1}
                         label="Temperature coefficient (%)"
                         bind:value={temp_eff} />
@@ -211,6 +212,7 @@
                       <NumberInputSkeleton />
                     {:else}
                       <NumberInput
+                        allowEmpty
                         disabled={running || !isValid}
                         min={1.00} max={1.50} step={0.01}
                         label="Peukert Exponent"
@@ -225,6 +227,7 @@
                       <NumberInputSkeleton />
                     {:else}
                       <NumberInput
+                        allowEmpty
                         disabled={running || !isValid}
                         min={1} max={100} step={1}
                         label="Charging efficiency (%)"

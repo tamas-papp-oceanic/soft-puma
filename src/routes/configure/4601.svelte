@@ -155,7 +155,6 @@
       }
     });
 
-
     let out = {};
     let val = parseInt(e.detail.conf_type);
     if (val != save.conf_type) {
