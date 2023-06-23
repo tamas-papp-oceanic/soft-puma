@@ -22,6 +22,7 @@
     tx_pgn: null,
     isValid: false,
   };
+  let save = JSON.parse(JSON.stringify(data));
   let running = false;
   let notify = false;
   let kind = null;
@@ -32,26 +33,34 @@
     window.pumaAPI.recv('n2k-egt-cfg-data', (e, args) => {
       const [ dev, msg ] = args;
       if (getfield(5, msg.fields).value == data.instance) {
+        let prm = getfield(6, msg.fields);
         let fld = getfield(7, msg.fields);
-        switch (getfield(6, msg.fields).value) {
-          case 0:
-            // Tx PGN type (0 = PGN130312 (deprecated), 1 = PGN130316, 2 = Both)
-            data.tx_pgn = (fld != null ) && (fld.state == 'V') ? fld.value.toString() : null;
-            break;
-          case 1:
-            // Temperature source
-            data.temp_src = (fld != null ) && (fld.state == 'V') ? fld.value.toString() : null;
-            break;
-          case 2:
-            // Temperature instance
-            data.temp_ins = (fld != null ) && (fld.state == 'V') ? fld.value.toString() : null;
-            break;
-          case 4:
-            // Instance configuration type
-            data.conf_type = (fld != null ) && (fld.state == 'V') ? fld.value.toString() : null;
-            break;
+        if ((prm != null) && (typeof prm.value != 'undefined') && (fld != null) && (typeof fld.value != 'undefined')) {
+          let val = fld.value & 0xFF;
+          switch (prm.value) {
+            case 0:
+              // Tx PGN type (0 = PGN130312 (deprecated), 1 = PGN130316, 2 = Both)
+              data.tx_pgn = (fld.state == 'V') ? val.toString() : null;
+              save.tx_pgn = data.tx_pgn;
+              break;
+            case 1:
+              // Temperature source
+              data.temp_src = (fld.state == 'V') ? val.toString() : null;
+              save.temp_src = data.temp_src;
+              break;
+            case 2:
+              // Temperature instance
+              data.temp_ins = (fld.state == 'V') ? val.toString() : null;
+              save.temp_ins = data.temp_ins;
+              break;
+            case 4:
+              // Instance configuration type
+              data.conf_type = (fld.state == 'V') ? val.toString() : null;
+              save.conf_type = data.conf_type;
+              break;
+          }
+          data.isValid = true;
         }
-        data.isValid = true;
       }
     });
   });
@@ -91,10 +100,6 @@
       notify = true;
     }, timeout);
     // Receives settings data
-    data.conf_type = null;
-    data.temp_ins = null;
-    data.temp_src = null;
-    data.tx_pgn = null;
     data.isValid = false;
     window.pumaAPI.recv('r4510-done', (e, res) => {
       stop('r4510');
@@ -115,6 +120,7 @@
     subttl = null;
     notify = false;
     running = true;
+    let chg = false;
     wtimer = setTimeout(() => {
       stop('w4510');
       running = false;
@@ -128,6 +134,9 @@
       stop('w4510');
       running = false;
       if (res) {
+        if (chg) {
+          select();
+        }
         kind = 'info'
         title = 'Success';
         subttl = 'Parameter has been sent.';
@@ -139,14 +148,27 @@
         notify = true;
       }
     });
-    window.pumaAPI.send('c4510-write', [
-      $device, parseInt(data.instance), {
-        conf_type: parseInt(e.detail.conf_type),
-        temp_ins: parseInt(e.detail.temp_ins),
-        temp_src: parseInt(e.detail.temp_src),
-        tx_pgn: parseInt(e.detail.tx_pgn),
-      },
-    ]);
+    let out = {};
+    let val = parseInt(e.detail.conf_type);
+    if (val != save.conf_type) {
+      out.conf_type = val;
+      if (val == 0) {
+        chg = true;
+      }
+    }
+    val = parseInt(e.detail.temp_ins);
+    if (val != save.temp_ins) {
+      out.temp_ins = val;
+    }
+    val = parseInt(e.detail.temp_src);
+    if (val != save.temp_src) {
+      out.temp_src = val;
+    }
+    val = parseInt(e.detail.tx_pgn);
+    if (val != save.tx_pgn) {
+      out.tx_pgn = val;
+    }
+    window.pumaAPI.send('c4510-write', [$device, parseInt(data.instance), out]);
   };
 
   function cancel(e) {

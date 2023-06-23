@@ -21,14 +21,14 @@
     channels: new Array(),
     isValid: false,
   };
-  for (let i = 0; i < 3; i++) {
+  for (let i = 0; i < 4; i++) {
     data.channels.push({
       enabled: null,
       temp_ins: null,
       temp_src: null,
     });
   }
-
+  let save = JSON.parse(JSON.stringify(data));
   let running = false;
   let notify = false;
   let kind = null;
@@ -48,22 +48,27 @@
             case 0:
               // Tx PGN type (1 = PGN130312 (deprecated), 2 = PGN130316, 3 = Both)
               data.tx_pgn = (fld.state == 'V') ? val.toString() : null;
+              save.tx_pgn = data.tx_pgn;
               break;
             case 1:
               // Temperature source
               data.channels[chn].temp_src = (fld.state == 'V') ? val.toString() : null;
+              save.channels[chn].temp_src = data.channels[chn].temp_src;
               break;
             case 2:
               // Temperature instance
               data.channels[chn].temp_ins = (fld.state == 'V') ? val.toString() : null;
+              save.channels[chn].temp_ins = data.channels[chn].temp_ins;
               break;
             case 3:
               // Channel enable
               data.channels[chn].enabled = (fld.state == 'V') ? val.toString() : null;
+              save.channels[chn].enabled = data.channels[chn].enabled;
               break;
             case 4:
               // Instance configuration type
               data.conf_type = (fld.state == 'V') ? val.toString() : null;
+              save.conf_type = data.conf_type;
               break;
           }
           data.isValid = true;
@@ -107,16 +112,6 @@
       notify = true;
     }, timeout);
     // Receives settings data
-    data.conf_type = null;
-    data.tx_pgn = null,
-    data.channels = new Array();
-    for (let i = 0; i < 4; i++) {
-      data.channels.push({
-        enabled: null,
-        temp_ins: null,
-        temp_src: null,
-      });
-    }
     data.isValid = false;
     window.pumaAPI.recv('r4521-done', (e, res) => {
       stop('r4521');
@@ -137,6 +132,7 @@
     subttl = null;
     notify = false;
     running = true;
+    let chg = false;
     wtimer = setTimeout(() => {
       stop('w4521');
       running = false;
@@ -150,6 +146,9 @@
       stop('w4521');
       running = false;
       if (res) {
+        if (chg) {
+          select();
+        }
         kind = 'info'
         title = 'Success';
         subttl = 'Parameter has been sent.';
@@ -161,17 +160,32 @@
         notify = true;
       }
     });
-    let out = {
-      conf_type: parseInt(e.detail.conf_type),
-      tx_pgn: parseInt(e.detail.tx_pgn),
-      channels: new Array(),
+    let out = {};
+    let val = parseInt(e.detail.conf_type);
+    if (val != save.conf_type) {
+      out.conf_type = val;
+      if (val == 0) {
+        chg = true;
+      }
     }
+    val = parseInt(e.detail.tx_pgn);
+    if (val != save.tx_pgn) {
+      out.tx_pgn = val;
+    }
+    out.channels = [{}, {}, {}, {}];
     for (let i = 0; i < 4; i++) {
-      out.channels.push({
-        enabled: parseInt(e.detail.channels[i].enabled),
-        temp_ins: parseInt(e.detail.channels[i].temp_ins),
-        temp_src: parseInt(e.detail.channels[i].temp_src),
-      });
+      val = parseInt(e.detail.channels[i].enabled);
+      if (val != save.channels[i].enabled) {
+        out.channels[i].enabled = val;
+      }
+      val = parseInt(e.detail.channels[i].temp_ins);
+      if (val != save.channels[i].temp_ins) {
+        out.channels[i].temp_ins = val;
+      }
+      val = parseInt(e.detail.channels[i].temp_src);
+      if (val != save.channels[i].temp_src) {
+        out.channels[i].temp_src = val;
+      }
     }
     window.pumaAPI.send('c4521-write', [$device, parseInt(data.instance), out]);
   };

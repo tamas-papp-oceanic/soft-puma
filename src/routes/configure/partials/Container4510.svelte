@@ -123,7 +123,7 @@
                     {#if running}
                       <DropdownSkeleton />
                     {:else}
-                      <Dropdown disabled={!isValid} titleText="Configuration type" size="sm" bind:selectedId={conf_type} items={conf_types} on:select={(e) => configure(e)}/>
+                      <Dropdown disabled={!isValid} titleText="Instance configuration" size="sm" bind:selectedId={conf_type} items={conf_types} on:select={(e) => configure(e)}/>
                     {/if}
                   </Column>
                 </Row>

@@ -277,13 +277,18 @@ function proc(dev, frm) {
                   pub.emit('conf-ack', msg);
                   break;
                 case 0x06:
-                  // Exhaust gas data
+                  // Temperature data
                   mainWindow.webContents.send('n2k-temp-cfg-data', [dev, msg]);
                   pub.emit('conf-ack', msg);
                   break;
                 case 0x08:
                   // AC data
                   mainWindow.webContents.send('n2k-ac-cfg-data', [dev, msg]);
+                  pub.emit('conf-ack', msg);
+                  break;
+                case 0x09:
+                  // Pressure data
+                  mainWindow.webContents.send('n2k-press-cfg-data', [dev, msg]);
                   pub.emit('conf-ack', msg);
                   break;
                 }
@@ -1112,7 +1117,7 @@ ipcMain.on('a3478-cancel', (e, args) => {
 function c4510Read(eng, ins, did) {
   return new Promise((resolve, reject) => {
     // Reading configuration...
-    let ret = eng.send065445(0x04, ins, 0xFF, (((0xFF << 8) + did) << 8) + 0x00);
+    let ret = eng.send065445(0x04, ins, 0xFF, 0xFF0000 | (did << 8) | 0x00);
     if (ret) {
       btimer = setTimeout(() => {
         btimer = null;
@@ -1196,12 +1201,20 @@ ipcMain.on('c4510-write', (e, args) => {
   const [dev, ins, dat] = args;
   if ((typeof dev === 'string') && (typeof devices[dev] !== 'undefined')) {
     let eng = devices[dev].engine;
-    Promise.resolve()
-    .then(() => c4510Write(eng, ins, 0, dat.tx_pgn))
-    .then(() => c4510Write(eng, ins, 1, dat.temp_src))
-    .then(() => c4510Write(eng, ins, 2, dat.temp_ins))
-    .then(() => c4510Write(eng, ins, 4, dat.conf_type))
-    .then(() => {
+    let pro = Promise.resolve();
+    if (typeof dat.tx_pgn !== 'undefined') {
+      pro = pro.then(() => { return c4510Write(eng, ins, 0, dat.tx_pgn) });
+    }
+    if (typeof dat.temp_src !== 'undefined') {
+      pro = pro.then(() => { return c4510Write(eng, ins, 1, dat.temp_src) });
+    }
+    if (typeof dat.temp_ins !== 'undefined') {
+      pro = pro.then(() => { return c4510Write(eng, ins, 2, dat.temp_ins) });
+    }
+    if (typeof dat.conf_type !== 'undefined') {
+      pro = pro.then(() => { return c4510Write(eng, ins, 4, dat.conf_type) });
+    }
+    pro.then(() => {
       if ((mainWindow != null) && (typeof mainWindow.webContents !== 'undefined')) {
         mainWindow.webContents.send('w4510-done', true);
       }
@@ -1314,22 +1327,28 @@ ipcMain.on('c4521-write', (e, args) => {
   const [dev, ins, dat] = args;
   if ((typeof dev === 'string') && (typeof devices[dev] !== 'undefined')) {
     let eng = devices[dev].engine;
-    Promise.resolve()
-    .then(() => c4521Write(eng, ins, 0, 0xFF, dat.tx_pgn))
-    .then(() => c4521Write(eng, ins, 1, 0, dat.channels[0].temp_src))
-    .then(() => c4521Write(eng, ins, 1, 1, dat.channels[1].temp_src))
-    .then(() => c4521Write(eng, ins, 1, 2, dat.channels[2].temp_src))
-    .then(() => c4521Write(eng, ins, 1, 3, dat.channels[3].temp_src))
-    .then(() => c4521Write(eng, ins, 2, 0, dat.channels[0].temp_ins))
-    .then(() => c4521Write(eng, ins, 2, 1, dat.channels[1].temp_ins))
-    .then(() => c4521Write(eng, ins, 2, 2, dat.channels[2].temp_ins))
-    .then(() => c4521Write(eng, ins, 2, 3, dat.channels[3].temp_ins))
-    .then(() => c4521Write(eng, ins, 3, 0, dat.channels[0].enabled))
-    .then(() => c4521Write(eng, ins, 3, 1, dat.channels[1].enabled))
-    .then(() => c4521Write(eng, ins, 3, 2, dat.channels[2].enabled))
-    .then(() => c4521Write(eng, ins, 3, 3, dat.channels[3].enabled))
-    .then(() => c4521Write(eng, ins, 4, 0xFF, dat.conf_type))
-    .then(() => {
+    let pro = Promise.resolve();
+    if (typeof dat.tx_pgn !== 'undefined') {
+      pro = pro.then(() => { return c4521Write(eng, ins, 0, 0xFF, dat.tx_pgn) });
+    }
+    if (typeof dat.conf_type !== 'undefined') {
+      pro = pro.then(() => { return c4521Write(eng, ins, 4, 0xFF, dat.conf_type) });
+    }
+    if ((typeof dat.channels !== 'undefined') && Array.isArray(dat.channels)) {
+      for (let i in dat.channels) {
+        let chn = dat.channels[i];
+        if (typeof chn.temp_src !== 'undefined') {
+          pro = pro.then(() => { return c4521Write(eng, ins, 1, i, chn.temp_src) });
+        }
+        if (typeof chn.temp_ins !== 'undefined') {
+          pro = pro.then(() => { return c4521Write(eng, ins, 2, i, chn.temp_ins) });
+        }
+        if (typeof chn.enabled !== 'undefined') {
+          pro = pro.then(() => { return c4521Write(eng, ins, 3, i, chn.enabled) });
+        }
+      }
+    }
+    pro.then(() => {
       if ((mainWindow != null) && (typeof mainWindow.webContents !== 'undefined')) {
         mainWindow.webContents.send('w4521-done', true);
       }
@@ -1338,6 +1357,126 @@ ipcMain.on('c4521-write', (e, args) => {
       log.error(err);
       if ((mainWindow != null) && (typeof mainWindow.webContents !== 'undefined')) {
         mainWindow.webContents.send('w4521-done', false);
+      }
+    });
+  } else {
+    console.log("No device selected!");
+  }
+});
+
+function c4601Read(eng, ins, did) {
+  return new Promise((resolve, reject) => {
+    // Reading configuration...
+    let ret = eng.send065445(0x09, ins, 0xFF, 0xFF0000 | (did << 8) | 0x00);
+    if (ret) {
+      btimer = setTimeout(() => {
+        btimer = null;
+        reject(new Error('Reading configuration failed!'));
+      }, 5000);
+      pub.once('conf-ack', (res) => {
+        clearTimeout(btimer);
+        btimer = null;
+        if ((typeof res.fields !== 'undefined') && Array.isArray(res.fields) &&
+          (com.getFld(4, res.fields).value == 0x09) && (com.getFld(5, res.fields).value == ins) &&
+          (com.getFld(6, res.fields).value == did)) {
+          let msg = 'Configuration successfuly read.';
+          log.info(msg);
+          resolve(true);
+        } else {
+          reject(new Error('Reading configuration failed!'));
+        }
+      });
+    } else {
+      reject(new Error('Reading configuration failed!'));
+    }
+  });
+}
+
+// Starts 4601 configuration reading
+ipcMain.on('c4601-read', (e, args) => {
+  const [dev, ins] = args;
+  if ((typeof dev === 'string') && (typeof devices[dev] !== 'undefined')) {
+    let eng = devices[dev].engine;
+    Promise.resolve()
+    .then(() => c4601Read(eng, ins, 0))
+    .then(() => c4601Read(eng, ins, 1))
+    .then(() => c4601Read(eng, ins, 2))
+    .then(() => c4601Read(eng, ins, 3))
+    .then(() => c4601Read(eng, ins, 4))
+    .then(() => {
+      if ((mainWindow != null) && (typeof mainWindow.webContents !== 'undefined')) {
+        mainWindow.webContents.send('r4601-done', true);
+      }
+    })
+    .catch((err) => {
+      log.error(err);
+      if ((mainWindow != null) && (typeof mainWindow.webContents !== 'undefined')) {
+        mainWindow.webContents.send('r4601-done', false);
+      }
+    });
+  } else {
+    console.log("No device selected!");
+  }
+});
+
+function c4601Write(eng, ins, cmd, dat) {
+  return new Promise((resolve, reject) => {
+    // Writing configuration...
+    let ret = eng.send065445(0x09, ins, cmd, dat);
+    if (ret) {
+      btimer = setTimeout(() => {
+        btimer = null;
+        reject(new Error('Writing configuration failed!'));
+      }, 5000);
+      pub.once('conf-ack', (res) => {
+        clearTimeout(btimer);
+        btimer = null;
+        if ((typeof res.fields !== 'undefined') && Array.isArray(res.fields) &&
+          (com.getFld(4, res.fields).value == 0x09) && (com.getFld(5, res.fields).value == ins) &&
+          (com.getFld(6, res.fields).value == cmd) && ((com.getFld(7, res.fields).value & 0xFF) == dat)) {
+          let msg = 'Configuration successfuly written.';
+          log.info(msg);
+          resolve(true);
+        } else {
+          reject(new Error('Writing configuration failed!'));
+        }
+      });
+    } else {
+      reject(new Error('Writing configuration failed!'));
+    }
+  });
+}
+
+// Starts 4601 configuration writing
+ipcMain.on('c4601-write', (e, args) => {
+  const [dev, ins, dat] = args;
+  if ((typeof dev === 'string') && (typeof devices[dev] !== 'undefined')) {
+    let eng = devices[dev].engine;
+    let pro = Promise.resolve();
+    if (typeof dat.conf_type !== 'undefined') {
+      pro = pro.then(() => { return c4601Write(eng, ins, 0, dat.conf_type) });
+    }
+    if (typeof dat.press_ins !== 'undefined') {
+      pro = pro.then(() => { return c4601Write(eng, ins, 1, dat.press_ins) });
+    }
+    if (typeof dat.press_src !== 'undefined') {
+      pro = pro.then(() => { return c4601Write(eng, ins, 2, dat.press_src) });
+    }
+    if (typeof dat.press_rng !== 'undefined') {
+      pro = pro.then(() => { return c4601Write(eng, ins, 3, dat.press_rng) });
+    }
+    if (typeof dat.press_dmp !== 'undefined') {
+      pro = pro.then(() => { return c4601Write(eng, ins, 4, dat.press_dmp) });
+    }
+    pro.then(() => {
+      if ((mainWindow != null) && (typeof mainWindow.webContents !== 'undefined')) {
+        mainWindow.webContents.send('w4601-done', true);
+      }
+    })
+    .catch((err) => {
+      log.error(err);
+      if ((mainWindow != null) && (typeof mainWindow.webContents !== 'undefined')) {
+        mainWindow.webContents.send('w4601-done', false);
       }
     });
   } else {

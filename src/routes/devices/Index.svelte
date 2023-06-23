@@ -45,6 +45,7 @@
     '4410': '/:instance',
     '4510': '/:instance',
     '4521': '/:instance',
+    '4601': '/:instance',
   };
 
   let items = new Array();
@@ -59,8 +60,8 @@
 
   function conf(e, row) {
     if ((typeof $devices[selected] !== 'undefined') &&
-    (typeof $name[$devices[selected]] !== 'undefined') &&
-    (typeof $name[$devices[selected]][row.id] !== 'undefined')) {
+      (typeof $name[$devices[selected]] !== 'undefined') &&
+      (typeof $name[$devices[selected]][row.id] !== 'undefined')) {
       let nam = $name[$devices[selected]][row.id];
       let pat = '/configure';
       if (typeof paths[nam.modelVersion] !== 'undefined') {

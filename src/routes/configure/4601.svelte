@@ -23,6 +23,7 @@
     press_dmp: null,
     isValid: false,
   };
+  let save = JSON.parse(JSON.stringify(data));
   let running = false;
   let notify = false;
   let kind = null;
@@ -30,33 +31,42 @@
   let subttl = null;
 
   onMount(() => {
-    window.pumaAPI.recv('n2k-egt-cfg-data', (e, args) => {
+    window.pumaAPI.recv('n2k-press-cfg-data', (e, args) => {
       const [ dev, msg ] = args;
       if (getfield(5, msg.fields).value == data.instance) {
+        let prm = getfield(6, msg.fields);
         let fld = getfield(7, msg.fields);
-        switch (getfield(6, msg.fields).value) {
-          case 0:
-            // Instance configuration type
-            data.conf_type = (fld != null ) && (fld.state == 'V') ? fld.value.toString() : null;
-            break;
-          case 1:
-            // Pressure instance
-            data.press_ins = (fld != null ) && (fld.state == 'V') ? fld.value.toString() : null;
-            break;
-          case 2:
-            // Pressure source
-            data.press_src = (fld != null ) && (fld.state == 'V') ? fld.value.toString() : null;
-            break;
-          case 3:
-            // Pressure range
-            data.press_rng = (fld != null ) && (fld.state == 'V') ? fld.value.toString() : null;
-            break;
-          case 4:
-            // Pressure damping
-            data.press_dmp = (fld != null ) && (fld.state == 'V') ? fld.value.toString() : null;
-            break;
+        if ((prm != null) && (typeof prm.value != 'undefined') && (fld != null) && (typeof fld.value != 'undefined')) {
+          let val = fld.value & 0xFF;
+          switch (prm.value) {
+            case 0:
+              // Instance configuration type
+              data.conf_type = (fld.state == 'V') ? val.toString() : null;
+              save.conf_type = data.conf_type;
+              break;
+            case 1:
+              // Pressure instance
+              data.press_ins = (fld.state == 'V') ? val.toString() : null;
+              save.press_ins = data.press_ins;
+              break;
+            case 2:
+              // Pressure source
+              data.press_src = (fld.state == 'V') ? val.toString() : null;
+              save.press_src = data.press_src;
+              break;
+            case 3:
+              // Pressure range
+              data.press_rng = (fld.state == 'V') ? val.toString() : null;
+              save.press_rng = data.press_rng;
+              break;
+            case 4:
+              // Pressure damping
+              data.press_dmp = (fld.state == 'V') ? val.toString() : null;
+              save.press_dmp = data.press_dmp;
+              break;
+          }
+          data.isValid = true;
         }
-        data.isValid = true;
       }
     });
   });
@@ -96,11 +106,6 @@
       notify = true;
     }, timeout);
     // Receives settings data
-    data.conf_type = null;
-    data.press_ins = null;
-    data.press_src = null;
-    data.press_rng = null;
-    data.press_dmp = null;
     data.isValid = false;
     window.pumaAPI.recv('r4601-done', (e, res) => {
       stop('r4601');
@@ -121,6 +126,7 @@
     subttl = null;
     notify = false;
     running = true;
+    let chg = false;
     wtimer = setTimeout(() => {
       stop('w4601');
       running = false;
@@ -134,6 +140,9 @@
       stop('w4601');
       running = false;
       if (res) {
+        if (chg) {
+          select();
+        }
         kind = 'info'
         title = 'Success';
         subttl = 'Parameter has been sent.';
@@ -145,15 +154,33 @@
         notify = true;
       }
     });
-    window.pumaAPI.send('c4601-write', [
-      $device, parseInt(data.instance), {
-        conf_type: parseInt(e.detail.conf_type),
-        press_ins: parseInt(e.detail.press_ins),
-        press_src: parseInt(e.detail.press_src),
-        press_rng: parseInt(e.detail.press_rng),
-        press_dmp: parseInt(e.detail.press_dmp),
-      },
-    ]);
+
+
+    let out = {};
+    let val = parseInt(e.detail.conf_type);
+    if (val != save.conf_type) {
+      out.conf_type = val;
+      if (val == 0) {
+        chg = true;
+      }
+    }
+    val = parseInt(e.detail.press_ins);
+    if (val != save.press_ins) {
+      out.press_ins = val;
+    }
+    val = parseInt(e.detail.press_src);
+    if (val != save.press_src) {
+      out.press_src = val;
+    }
+    val = parseInt(e.detail.press_rng);
+    if (val != save.press_rng) {
+      out.press_rng = val;
+    }
+    val = parseInt(e.detail.press_dmp);
+    if (val != save.press_dmp) {
+      out.press_dmp = val;
+    }
+    window.pumaAPI.send('c4601-write', [$device, parseInt(data.instance), out]);
   };
 
   function cancel(e) {
