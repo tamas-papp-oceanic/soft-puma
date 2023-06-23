@@ -13,6 +13,7 @@ const devnames = {
     '3125': 'Tank Sender Adaptor',
     '4291': 'Tank Level Adaptor',
     '4601': '4-20mA Pressure Adaptor',
+    '5720': 'Flow Adaptor Module',
   },
   'displays': {
     '5185': 'Poseidon 7',

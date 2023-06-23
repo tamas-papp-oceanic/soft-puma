@@ -46,6 +46,7 @@
     '4510': '/:instance',
     '4521': '/:instance',
     '4601': '/:instance',
+    '5720': '/:instance',
   };
 
   let items = new Array();
