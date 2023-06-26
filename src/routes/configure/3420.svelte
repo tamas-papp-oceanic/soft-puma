@@ -3,8 +3,8 @@
   import { Row, Grid, Column, ToastNotification } from "carbon-components-svelte";
   import { location, pop } from "svelte-spa-router";
   import Container3420 from './partials/Container3420.svelte';
-  import { getname } from '../../stores/common.js';
   import { device } from '../../stores/data';
+  import { getname } from '../../config/devices.js';
 
   export let params;
 

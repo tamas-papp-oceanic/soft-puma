@@ -3,7 +3,7 @@
   import { Row, Grid, Column } from "carbon-components-svelte";
   import { location, pop } from "svelte-spa-router";
   import Container4410 from './partials/Container4410.svelte';
-  import { getname } from '../../stores/common.js';
+  import { getname } from '../../config/devices.js';
 
   export let params;
 

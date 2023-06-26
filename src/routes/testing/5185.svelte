@@ -8,7 +8,7 @@
   import { scanDevice, waitDevice, startForm } from './tests/5185.js';
   import { initRun, runStep, nextStep, runScript, setStoreValue, lastStep, stopTests } from "./tests/runner.js"
   import { _steps, _events, _current } from '../../stores/tests.js';
-  import { getname } from '../../stores/common.js';
+  import { getname } from '../../config/devices.js';
 
   const device = $location.split('/')[2];
   const variant = (device == '5185-H' ? 'Honda' : null);
