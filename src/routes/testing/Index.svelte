@@ -3,7 +3,7 @@
   import { findModel, selected } from '../../stores/data.js'
   import { checkAccess } from '../../auth/auth'
   import { loggedIn } from '../../stores/user.js'
-  import { getfunc } from '../../stores/common.js'
+  import { getfunc } from '../../config/devices.js'
   import Selector from '../../components/Selector.svelte'
 
   let devs = getfunc('test');

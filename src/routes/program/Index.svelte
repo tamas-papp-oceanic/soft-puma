@@ -1,7 +1,7 @@
 <script>
   import { push } from 'svelte-spa-router'
   import { findModel, selected } from '../../stores/data.js'
-  import { getfunc } from '../../stores/common.js'
+  import { getfunc } from '../../config/devices.js'
   import Selector from "../../components/Selector.svelte";
 
   const devs = getfunc('prog');
