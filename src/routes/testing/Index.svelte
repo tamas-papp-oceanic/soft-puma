@@ -4,16 +4,11 @@
   import { findModel, selected } from '../../stores/data.js'
   import { checkAccess } from '../../auth/auth'
   import { loggedIn } from '../../stores/user.js'
-  import { getname } from '../../stores/common.js'
+  import { getname, getfunc } from '../../stores/common.js'
 
+  let devs = getfunc('test');
   let tab;
   let dev;
-  let devs = {
-    'senders': new Array(),
-    'adaptors': new Array(),
-    'modules': ['3478', '4410'],
-    'displays': new Array(),
-  };
 
   function change(e) {
     $selected.test = e.detail;
@@ -42,35 +37,38 @@
   <Row>
     <Column>
     <Tabs type="container" bind:selected={tab} on:change={(e) => change(e)}>
-      <Tab label="Sensors" />
-      <Tab label="Adaptors" />
-      <Tab label="Modules" />
-      <Tab label="Displays" />
-      <div slot="content">
-        {#each ['senders', 'adaptors', 'modules', 'displays'] as group}
-          <TabContent>
-            <div class="tecont">
-              <div class="telist">
-                <Grid padding fullWidth noGutter>
-                  <Row>
-                    {#each devs[group] as device}
-                      <Column sm={2} md={3} lg={4}>
-                        <div class="product-card" class:selected={dev == device} on:pointerdown={(e) => select(e, group, device)}>
-                          <div>
-                            <div class="product-number">{device}</div>
-                            <div class="product-title">{getname(device)}</div>
+      {#each Object.entries(devs) as [group, val]}
+        {#if val.length > 0}
+          <Tab label={group.charAt(0).toUpperCase() + group.slice(1).toLowerCase()} />
+        {/if}
+      {/each}
+      <svelte:fragment slot="content">
+        {#each Object.entries(devs) as [group, val]}
+          {#if val.length > 0}
+            <TabContent>
+              <div class="tecont">
+                <div class="telist">
+                  <Grid padding fullWidth noGutter>
+                    <Row>
+                      {#each val as device}
+                        <Column sm={2} md={3} lg={4}>
+                          <div class="product-card" class:selected={dev == device} on:pointerdown={(e) => select(e, group, device)}>
+                            <div>
+                              <div class="product-number">{device}</div>
+                              <div class="product-title">{getname(device)}</div>
+                            </div>
+                            <div class="product-image"><img src={'images/' + device + '.webp'} alt={device} /></div>
                           </div>
-                          <div class="product-image"><img src={'images/' + device + '.webp'} alt={device} /></div>
-                        </div>
-                      </Column>
-                    {/each}
-                  </Row>
-                </Grid>
+                        </Column>
+                      {/each}
+                    </Row>
+                  </Grid>
+                </div>
               </div>
-            </div>
-          </TabContent>
+            </TabContent>
+          {/if}
         {/each}
-      </div>
+      </svelte:fragment>
     </Tabs>
   </Column>
   </Row>

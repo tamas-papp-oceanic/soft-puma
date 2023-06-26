@@ -3,7 +3,7 @@
   import { Row, Grid, Column } from "carbon-components-svelte";
   import { location, pop } from "svelte-spa-router";
   import ProgramContainer from './partials/ProgramContainer.svelte';
-  import { getname } from '../../stores/common.js';
+  import { getid, getname } from '../../stores/common.js';
   import { device, getUpdate } from '../../stores/data.js';
 
   export let params;
@@ -77,12 +77,7 @@
       stop('prog');
       running = false;
     });
-    let dtype = 0x00;
-    switch (model) {
-      case '3420':
-        dtype = 0x08;
-        break;
-    }
+    let dtype =getid(model);
     let upd = getUpdate(model);
     if ((typeof upd['main'] !== "undefined") && (typeof upd['main']['location'] !== "undefined")) {
       window.pumaAPI.send('prog-start', [$device, upd['main']['location'], dtype, instance]);

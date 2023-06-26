@@ -16,12 +16,12 @@
 	import Configure3410 from './routes/configure/3410.svelte';
 	import Configure3420 from './routes/configure/3420.svelte';
 	import ConfigureFluid from './routes/configure/fluid.svelte';
-	import Program from './routes/program/Index.svelte';
 	import Configure4510 from './routes/configure/4510.svelte';
 	import Configure4521 from './routes/configure/4521.svelte';
 	import Configure4601 from './routes/configure/4601.svelte';
 	import Configure5720 from './routes/configure/5720.svelte';
-	import Program3420 from './routes/program/3420.svelte';
+	import Program from './routes/program/Index.svelte';
+	import ProgramDevice from './routes/program/Program.svelte';
 	import Testing from './routes/testing/Index.svelte';
 	import Test3478 from './routes/testing/3478.svelte';
 	import Test4410 from './routes/testing/4410.svelte';
@@ -58,7 +58,7 @@
 		"/configure/4601/:instance": Configure4601,
 		"/configure/5720/:instance": Configure5720,
 		"/program": Program,
-		"/program/3420/:instance": Program3420,
+		"/program/3420/:instance": ProgramDevice,
 		"/testing": Testing,
     "/testing/3478/:instance": Test3478,
 		"/testing/4410/:instance": Test4410,
