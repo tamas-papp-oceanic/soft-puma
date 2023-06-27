@@ -90,8 +90,8 @@
                 </Row>
               </Column>
               <Column></Column>
-              <Column sm={12} md={12} lg={12} style="width: 65%;">
-                <Row padding>
+              <Column sm={11} md={11} lg={11}>
+                  <Row padding>
                   <Column>Console</Column>
                 </Row>
                 <Row style="height: 80%;">
