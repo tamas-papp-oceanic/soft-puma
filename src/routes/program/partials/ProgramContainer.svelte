@@ -1,10 +1,12 @@
 <script>
   import { createEventDispatcher } from "svelte";
-  import { ButtonSet, Button, Tile, Grid, Row, Column, Dropdown } from "carbon-components-svelte";
+  import { ButtonSet, Button, Tile, Grid, Row, Column, Dropdown,
+    TextArea } from "carbon-components-svelte";
   import { checkAccess } from "../../../auth/auth.js";
   import { getUpdate } from "../../../stores/data.js";
   import { loggedIn } from "../../../stores/user.js";
   import Download from "carbon-icons-svelte/lib/Download16";
+    import Container5720 from "../../configure/partials/Container5720.svelte";
 
   export let model;
   export let data;
@@ -57,32 +59,52 @@
 <div class="container" style={style}>
   <Tile style="height: -webkit-fill-available;">
     <div class="tilecont">
-      <div class="title">Connect the device to CAN network and press a button below.</div>
-      <div class="buttons">
-        <Grid fullWidth noGutter>
-          <Row padding>
-            <Column sm={1} md={1} lg={1}></Column>
-            <Column sm={1} md={2} lg={3}>
-              <Dropdown titleText="Device Instance" size="sm" bind:selectedId={data.instance} items={insts} on:select={(e) => select(e)}/>
-            </Column>
-            <Column sm={1} md={1} lg={1}></Column>
-            <Column>
-              {#if access}
-                <Button disabled={running || !update.boot} icon={Download} on:click={(e) => loader(e)}>Boot loader</Button>
-              {/if}
-            </Column>
-            <Column sm={1} md={1} lg={1}></Column>
-            <Column>
-              <Button disabled={running ||  !update.main} icon={Download} on:click={(e) => program(e)}>Program Update</Button>
-            </Column>
-            <Column sm={1} md={1} lg={1}></Column>
-          </Row>
-        </Grid>
-      </div>
-      <h5>Console</h5>
-      <div class="console">
-        <Tile style="height: -webkit-fill-available; white-space: pre !important;">{message}</Tile>
-      </div>
+      <Grid fullWidth noGutter>
+        <Row>
+          <Column><div class="title">Connect the device to CAN network and press a button below.</div></Column>
+        </Row>
+        <Row style="height: inherit;">
+          <Grid fullWidth noGutter>
+            <Row style="height: inherit;">
+              <Column></Column>
+              <Column>
+                <Row padding>
+                  <Column>Device selector</Column>
+                </Row>
+                <Row>
+                  <Column>
+                    <Dropdown titleText="Device Instance" size="sm" bind:selectedId={data.instance} items={insts} on:select={(e) => select(e)}/>
+                  </Column>
+                </Row>
+                {#if access}
+                  <Row padding>
+                    <Column>
+                      <Button disabled={running || !update.boot} icon={Download} on:click={(e) => loader(e)} style="width: inherit;">Boot loader</Button>
+                    </Column>
+                  </Row>
+                {/if}
+                <Row>
+                  <Column>
+                    <Button disabled={running ||  !update.main} icon={Download} on:click={(e) => program(e)}>Program Update</Button>
+                  </Column>
+                </Row>
+              </Column>
+              <Column></Column>
+              <Column sm={12} md={12} lg={12} style="width: 65%;">
+                <Row padding>
+                  <Column>Console</Column>
+                </Row>
+                <Row style="height: 80%;">
+                  <Column>
+                    <Tile style="height: 100%; white-space: pre !important; border: 1px solid gray; overflow-y: auto">{message}</Tile>
+                  </Column>
+                </Row>
+              </Column>
+              <Column></Column>
+            </Row>
+          </Grid>
+        </Row>
+      </Grid>
     </div>
   </Tile>
   <ButtonSet style="justify-content: flex-end;">
@@ -112,14 +134,5 @@
     font-size: 1.25rem;
     text-align: justify;
     margin-bottom: 1rem;
-  }
-  .container .tilecont .buttons {
-    width: 100%;
-  }
-  .container .tilecont .console {
-    width: 100%;
-    flex: 1 auto;
-    border: 1px solid gray;
-    overflow-y: auto;
   }
 </style>

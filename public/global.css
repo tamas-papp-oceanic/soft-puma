@@ -67,6 +67,10 @@ button:focus {
   height: 100% !important;
 }
 
+.bx--grid--full-width {
+  width: 100%;
+}
+
 .bx--tile {
   min-height: 3rem !important;
   white-space: nowrap !important;
