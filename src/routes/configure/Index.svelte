@@ -17,7 +17,7 @@
       (e.detail.group != 'displays') && (
         (e.detail.device.includes('3125') ||
         e.detail.device.includes('3271') ||
-        e.detail.device.includes('3271_SAM') ||
+        e.detail.device.includes('3271-SAM2') ||
         e.detail.device.includes('3281') ||
         e.detail.device.includes('4291')) ?  '/0' : '')
     ));

@@ -1,7 +1,7 @@
 <script>
   import { onMount, onDestroy } from "svelte";
   import { Row, Grid, Column } from "carbon-components-svelte";
-  import { location, pop } from "svelte-spa-router";
+  import { pop } from "svelte-spa-router";
   import ProgramContainer from './partials/ProgramContainer.svelte';
   import { getname } from '../../config/devices.js';
   import { device, getUpdate } from '../../stores/data.js';
@@ -9,7 +9,7 @@
 
   export let params;
 
-  const model = $location.split('/')[2];
+  const model = params.device;
   const instance = params.instance;
   const timeout = 60000;
   let timer = null;

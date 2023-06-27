@@ -61,23 +61,21 @@
       <div class="buttons">
         <Grid fullWidth noGutter>
           <Row padding>
-            <Column sm={1} md={1} lg={1}>
+            <Column sm={1} md={1} lg={1}></Column>
+            <Column sm={1} md={2} lg={3}>
+              <Dropdown titleText="Device Instance" size="sm" bind:selectedId={data.instance} items={insts} on:select={(e) => select(e)}/>
             </Column>
-            <Column sm={1} md={1} lg={2}>
-              <Dropdown titleText="Device Instance" size="lg" bind:selectedId={data.instance} items={insts} on:select={(e) => select(e)}/>
-            </Column>
-            <Column sm={1} md={1} lg={2}>
-            </Column>
-            <Column sm={1} md={3} lg={5}>
+            <Column sm={1} md={1} lg={1}></Column>
+            <Column>
               {#if access}
                 <Button disabled={running || !update.boot} icon={Download} on:click={(e) => loader(e)}>Boot loader</Button>
               {/if}
             </Column>
-            <Column sm={1} md={1} lg={1}>
-            </Column>
-            <Column sm={1} md={3} lg={5}>
+            <Column sm={1} md={1} lg={1}></Column>
+            <Column>
               <Button disabled={running ||  !update.main} icon={Download} on:click={(e) => program(e)}>Program Update</Button>
             </Column>
+            <Column sm={1} md={1} lg={1}></Column>
           </Row>
         </Grid>
       </div>
@@ -113,14 +111,10 @@
     white-space: pre-line;
     font-size: 1.25rem;
     text-align: justify;
-    margin-bottom: 2rem;
+    margin-bottom: 1rem;
   }
   .container .tilecont .buttons {
     width: 100%;
-    /* display: flex;
-    flex-flow: row nowrap;
-    justify-content: space-around;
-    margin-bottom: 1rem; */
   }
   .container .tilecont .console {
     width: 100%;

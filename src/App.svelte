@@ -58,7 +58,7 @@
 		"/configure/4601/:instance": Configure4601,
 		"/configure/5720/:instance": Configure5720,
 		"/program": Program,
-		"/program/3420/:instance": ProgramDevice,
+		"/program/:device/:instance": ProgramDevice,
 		"/testing": Testing,
     "/testing/3478/:instance": Test3478,
 		"/testing/4410/:instance": Test4410,
@@ -141,7 +141,7 @@
     }
   }
 
-	$: prc = $progress && $progress.percent ? $progress.percent : 0;
+  $: prc = $progress && $progress.percent ? $progress.percent : 0;
 	$: max = $progress && $progress.total ? $progress.total / (1024 * 1024) : 100;
 	$: val = $progress && $progress.transferred ? $progress.transferred / (1024 * 1024) : 0;
 	$: txt = val > 0 ? val.toFixed(0) + "MB of " + max.toFixed(0) + "MB" : "Press start";
