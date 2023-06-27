@@ -318,6 +318,9 @@ function proc(dev, frm) {
             case 0xC2:
               pub.emit('crc-ack', msg);
               break;
+            case 0xEA:
+              pub.emit('start-ack', msg);
+              break;
             case 0xEB:
               pub.emit('erase-ack', msg);
               break;
@@ -513,7 +516,7 @@ function sleep(ms) {
 
 // Start device programing
 ipcMain.on('prog-start', (e, args) => {
-  const [dev, file, typ, ins] = args;
+  const [dev, file, typ, ins, add] = args;
   if ((typeof dev === 'string') && (typeof devices[dev] !== 'undefined')) {
     let eng = devices[dev].engine;
     let byt = 0;
@@ -525,6 +528,7 @@ ipcMain.on('prog-start', (e, args) => {
       dat = Buffer.from(res);
     })
     .then(() => bootToLoader(eng, typ, ins, progMessage))
+    .then(() => bootAddress(eng, typ, ins, add, progMessage))
     .then(() => bootErase(eng, typ, ins, byt, progMessage))
     .then(() => bootProgram(eng, typ, ins, dat, progMessage))
     .then(() => bootCRC(eng, typ, ins, dat, progMessage))
@@ -578,6 +582,37 @@ function bootToLoader(eng, typ, ins, func) {
       });
     } else {
       reject(new Error('Re-boot to bootloader failed!'));
+    }
+  });
+}
+
+function bootAddress(eng, typ, ins, add, func) {
+  return new Promise((resolve, reject) => {
+    // Erasing program area...
+    let dat = Buffer.alloc(4);
+    dat.writeUInt32LE(add);
+    let ret = eng.send130981(typ, ins, 0xEA, dat);
+    if (ret) {
+      func('Setting start address...\n');
+      btimer = setTimeout(() => {
+        btimer = null;
+        reject(new Error('Setting start address failed!'));
+      }, 5000);
+      pub.once('start-ack', (res) => {
+        clearTimeout(btimer);
+        btimer = null;
+        if ((typeof res.fields !== 'undefined') && Array.isArray(res.fields) &&
+          (res.fields[3].value == typ)) {
+          let msg = ' Start address successfuly set.';
+          log.info(msg);
+          func(msg + '\n');
+          resolve(true);
+        } else {
+          reject(new Error('Setting start eddress failed!'));
+        }
+      });
+    } else {
+      reject(new Error('Setting start eddress failed!'));
     }
   });
 }
