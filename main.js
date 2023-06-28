@@ -396,6 +396,8 @@ ipcMain.on('bus-scan', (e) => {
     mainWindow.webContents.send('n2k-clear');
   }
   for (const [key, val] of Object.entries(devices)) {
+    // Clear name records
+    val.engine.clearNames();
     // Send ISO Request for Address Claim
     val.engine.send059904(60928, 0xFF);
   }
@@ -528,7 +530,8 @@ ipcMain.on('prog-start', (e, args) => {
       dat = Buffer.from(res);
     })
     .then(() => bootToLoader(eng, typ, ins, progMessage))
-    .then(() => bootAddress(eng, typ, ins, add, progMessage))
+    // BUG in bootloader (not replaying for this message)
+    // .then(() => bootAddress(eng, typ, ins, add, progMessage))
     .then(() => bootErase(eng, typ, ins, byt, progMessage))
     .then(() => bootProgram(eng, typ, ins, dat, progMessage))
     .then(() => bootCRC(eng, typ, ins, dat, progMessage))
@@ -570,15 +573,10 @@ function bootToLoader(eng, typ, ins, func) {
       pub.once('reboot-ack', (res) => {
         clearTimeout(btimer);
         btimer = null;
-        if ((typeof res.fields !== 'undefined') && Array.isArray(res.fields) &&
-          (res.fields[3].value == 0xFF)) {
-          let msg = 'Successfuly re-booted to Bootloader.';
-          log.info(msg);
-          func(msg + '\n');
-          resolve(true);
-        } else {
-          reject(new Error('Re-boot to bootloader failed!'));
-        }
+        let msg = 'Successfuly re-booted to Bootloader.';
+        log.info(msg);
+        func(msg + '\n');
+        resolve(true);
       });
     } else {
       reject(new Error('Re-boot to bootloader failed!'));
@@ -601,15 +599,10 @@ function bootAddress(eng, typ, ins, add, func) {
       pub.once('start-ack', (res) => {
         clearTimeout(btimer);
         btimer = null;
-        if ((typeof res.fields !== 'undefined') && Array.isArray(res.fields) &&
-          (res.fields[3].value == typ)) {
-          let msg = ' Start address successfuly set.';
-          log.info(msg);
-          func(msg + '\n');
-          resolve(true);
-        } else {
-          reject(new Error('Setting start eddress failed!'));
-        }
+        let msg = ' Start address successfuly set.';
+        log.info(msg);
+        func(msg + '\n');
+        resolve(true);
       });
     } else {
       reject(new Error('Setting start eddress failed!'));
@@ -632,15 +625,10 @@ function bootErase(eng, typ, ins, len, func) {
       pub.once('erase-ack', (res) => {
         clearTimeout(btimer);
         btimer = null;
-        if ((typeof res.fields !== 'undefined') && Array.isArray(res.fields) &&
-          (res.fields[3].value == typ)) {
-          let msg = 'Program area successfuly erased.';
-          log.info(msg);
-          func(msg + '\n');
-          resolve(true);
-        } else {
-          reject(new Error('Erasing program area failed!'));
-        }
+        let msg = 'Program area successfuly erased.';
+        log.info(msg);
+        func(msg + '\n');
+        resolve(true);
       });
     } else {
       reject(new Error('Erasing program area failed!'));
@@ -663,12 +651,7 @@ async function blockWrite(eng, typ, ins, out) {
     pub.once('prog-ack', (res) => {
       clearTimeout(btimer);
       btimer = null;
-      if ((typeof res.fields !== 'undefined') && Array.isArray(res.fields) &&
-        (res.fields[3].value == typ)) {
-        resolve(true);
-      } else {
-        reject(new Error('Uploading block failed!'));
-      }
+      resolve(true);
     });
   });
 }
@@ -714,27 +697,22 @@ function bootCRC(eng, typ, ins, dat, func) {
       pub.once('crc-ack', (res) => {
         clearTimeout(btimer);
         btimer = null;
-        if ((typeof res.fields !== 'undefined') && Array.isArray(res.fields) &&
-          (res.fields[3].value == typ)) {
-          let msg = 'CRC successfuly requested.';
+        let msg = 'CRC successfuly requested.';
+        log.info(msg);
+        func(msg + '\n');
+        let dev = Buffer.alloc(4);
+        dev.writeUInt32BE(res.fields[6].value);
+        let crc = crc32(dat);
+        msg = 'Calculating CRC...';
+        log.info(msg);
+        func(msg + '\n');
+        if (dev.compare(crc) == 0) {
+          msg = 'CRC is correct.';
           log.info(msg);
           func(msg + '\n');
-          let dev = Buffer.alloc(4);
-          dev.writeUInt32BE(res.fields[6].value);
-          let crc = crc32(dat);
-          msg = 'Calculating CRC...';
-          log.info(msg);
-          func(msg + '\n');
-          if (dev.compare(crc) == 0) {
-            msg = 'CRC is correct.';
-            log.info(msg);
-            func(msg + '\n');
-            resolve(true);
-          } else {
-            reject(new Error('CRC isn\'t correct !'));
-          }
+          resolve(true);
         } else {
-          reject(new Error('Requesting CRC failed!'));
+          reject(new Error('CRC isn\'t correct !'));
         }
       });
     } else {
@@ -754,18 +732,15 @@ function bootFlag(eng, typ, ins, func) {
         btimer = null;
         reject(new Error('Erasing boot flag failed!'));
       }, 5000);
-      pub.once('flag-ack', (res) => {
+      // BUG in bootloader (wrong replay for this message)
+      // pub.once('flag-ack', (res) => {
+      pub.once('erase-ack', (res) => {
         clearTimeout(btimer);
         btimer = null;
-        if ((typeof res.fields !== 'undefined') && Array.isArray(res.fields) &&
-          (res.fields[3].value == typ)) {
-          let msg = 'Boot flag successfuly erased.';
-          log.info(msg);
-          func(msg + '\n');
-          resolve(true);
-        } else {
-          reject(new Error('Erasing boot flag failed!'));
-        }
+        let msg = 'Boot flag successfuly erased.';
+        log.info(msg);
+        func(msg + '\n');
+        resolve(true);
       });
     } else {
       reject(new Error('Erasing boot flag failed!'));

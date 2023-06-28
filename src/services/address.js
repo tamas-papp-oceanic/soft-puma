@@ -12,7 +12,7 @@ class Address {
   #timeout;   // Random timeout
   #send;      // Send callback method
   #timers;    // Product Information timers
-  #instances; // Device instances
+  #names;     // Name records
   #asm;       // Address State Machine
   #s0;        // State 0
   #s1;        // State 1
@@ -47,7 +47,7 @@ class Address {
     this.#timeout = null;
     this.#send = null;
     this.#timers = {};
-    this.#instances = {};
+    this.#names = {};
     // Define final state machine
     this.#asm = new StateMachine('ASM', context);
     this.#s0 = this.#asm.createState('Idle', false, this.#s0Entry.bind(this));
@@ -223,15 +223,17 @@ class Address {
   // Processes ISO Address Claim message
   proc060928(msg) {
     let nam = msg.raw.toString('hex', 4);
-    this.#instances[msg.raw[3]] = msg.raw[8];
     if (typeof this.#timers[nam] !== 'undefined') {
       clearTimeout(this.#timers[nam]);
       delete this.#timers[nam];
     }
-    this.#timers[nam] = setTimeout((key, src) => {
-      this.send059904(126996, src);
-      delete this.#timers[key];
-    }, 2000, nam, msg.header.src);
+    if (typeof this.#names[nam] === 'undefined') {
+      this.#timers[nam] = setTimeout((key, src) => {
+        this.send059904(126996, src);
+        delete this.#timers[key];
+      }, 2000, nam, msg.header.src);
+    }
+    this.#names[nam] = msg.raw[3];
     switch (this.#asm.currentState.name) {
       case 'WaitForContention':
       case 'Valid':
@@ -294,8 +296,17 @@ class Address {
   };
   // Get device instance
   getInstance(src) {
-    return this.#instances[src];
+    for (const [key, val] of Object.entries(this.#names)) {
+      if (val == src) {
+        return parseInt(key.substring(4, 6));
+      }
+    }
+    return null;
   };
+  // Clear name records
+  clearNames() {
+    this.#names = {};
+  }
   // Random timeout generator
   rnd() {
     return Math.floor(Math.random() * 255 * 0.6)

@@ -1006,6 +1006,10 @@ class NMEAEngine {
     }
     return false;
   };
+  // Clears name records
+  clearNames() {
+    this.#addrMngr.clearNames();
+  }
 };
 
 module.exports = NMEAEngine;
