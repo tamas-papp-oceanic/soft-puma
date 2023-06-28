@@ -7,6 +7,7 @@
   import Warning from "carbon-icons-svelte/lib/WarningAltFilled16";
   import { name, devices, device, data, allRoutes, updates } from "../../stores/data.js";
   import { compareVersions } from 'compare-versions';
+  import { getdev } from '../../config/devices.js';
 
   const headers = [{
     key: "overflow",
@@ -36,18 +37,6 @@
     key: "uniqueNumber",
     value: "Unique Number"
   }];
-  const paths = {
-    '3271': '/:instance/:fluid',
-    '3410': '/:instance',
-    '3420': '/:instance',
-    '3478': '/:instance',
-    '4291': '/:instance/:fluid',
-    '4410': '/:instance',
-    '4510': '/:instance',
-    '4521': '/:instance',
-    '4601': '/:instance',
-    '5720': '/:instance',
-  };
 
   let items = new Array();
   let selected;
@@ -60,78 +49,76 @@
   };
 
   function conf(e, row) {
-    if ((typeof $devices[selected] !== 'undefined') &&
-      (typeof $name[$devices[selected]] !== 'undefined') &&
-      (typeof $name[$devices[selected]][row.id] !== 'undefined')) {
+    try {
       let nam = $name[$devices[selected]][row.id];
-      let pat = '/configure';
-      if (typeof paths[nam.modelVersion] !== 'undefined') {
-        pat += '/' + nam.modelVersion + paths[nam.modelVersion];
+      let dev = getdev(nam.modelVersion);
+      let prf = '/configure/' + nam.modelVersion + '/:instance';
+      if ((dev != null) && dev.fluid) {
+        prf += '/:fluid';
       }
-      if (typeof $data[$devices[selected]] !== 'undefined') {
-        let dat = $data[$devices[selected]];
-        for (let i in dat) {
-          if (dat[i].header.src == parseInt(row.id)) {
-            if ((dat[i].header.src == parseInt(row.id)) && (dat[i].header.din == parseInt(row.instance))) {
-              pat = pat.replace(':instance', row.instance);
-            }
-            if (typeof dat[i].header.typ !== 'undefined') {
-              if (dat[i].header.pgn == 127505) {
-                pat = pat.replace(':fluid', dat[i].header.typ.toString());
-              }
-            }
-            break;
+      let dat = $data[$devices[selected]];
+      for (let i in dat) {
+        if (dat[i].header.src == parseInt(row.id)) {
+          if (dat[i].header.din == parseInt(row.instance)) {
+            prf = prf.replace(':instance', row.instance);
           }
+          if (typeof dat[i].header.typ !== 'undefined') {
+            if (dat[i].header.pgn == 127505) {
+              prf = prf.replace(':fluid', dat[i].header.typ.toString());
+            }
+          }
+          break;
         }
       }
-      pat = pat.replace(':instance', '0').replace(':fluid', '0');
-      push(pat);
+      prf = prf.replace(':instance', '0').replace(':fluid', '0');
+      push(prf);
+    } catch (err) {
+      // console.log(err);
     }
   }
   
   function test(e, row) {
-    if ((typeof $devices[selected] !== 'undefined') &&
-    (typeof $name[$devices[selected]] !== 'undefined') &&
-    (typeof $name[$devices[selected]][row.id] !== 'undefined')) {
+    try {
       let nam = $name[$devices[selected]][row.id];
-      let pat = '/testing';
-      if (typeof paths[nam.modelVersion] !== 'undefined') {
-        pat += '/' + nam.modelVersion + paths[nam.modelVersion];
-      }
-      if (typeof $data[$devices[selected]] !== 'undefined') {
-        let dat = $data[$devices[selected]];
-        for (let i in dat) {
-          if ((dat[i].header.src == parseInt(row.id)) && (dat[i].header.ins == parseInt(row.instance))) {
-            pat = pat.replace(':instance', row.instance);
-            break;
+      let prf = '/testing/' + nam.modelVersion + '/:instance';
+      let dat = $data[$devices[selected]];
+      for (let i in dat) {
+        if (dat[i].header.src == parseInt(row.id)) {
+          if (dat[i].header.din == parseInt(row.instance)) {
+            prf = prf.replace(':instance', row.instance);
           }
+          if (typeof dat[i].header.typ !== 'undefined') {
+            if (dat[i].header.pgn == 127505) {
+              prf = prf.replace(':fluid', dat[i].header.typ.toString());
+            }
+          }
+          break;
         }
       }
-      pat = pat.replace(':instance', '0');
-      push(pat);
+      prf = prf.replace(':instance', '0');
+      push(prf);
+    } catch (err) {
+      // console.log(err);
     }
   }
   
   function update(e, row) {
-    if ((typeof $devices[selected] !== 'undefined') &&
-    (typeof $name[$devices[selected]] !== 'undefined') &&
-    (typeof $name[$devices[selected]][row.id] !== 'undefined')) {
+    try {
       let nam = $name[$devices[selected]][row.id];
-      let pat = '/program';
-      if (typeof paths[nam.modelVersion] !== 'undefined') {
-        pat += '/' + nam.modelVersion + paths[nam.modelVersion];
-      }
-      if (typeof $data[$devices[selected]] !== 'undefined') {
-        let dat = $data[$devices[selected]];
-        for (let i in dat) {
-          if ((dat[i].header.src == parseInt(row.id)) && (dat[i].header.ins == parseInt(row.instance))) {
-            pat = pat.replace(':instance', row.instance);
-            break;
+      let prf = '/program/' + nam.modelVersion + '/:instance';
+      let dat = $data[$devices[selected]];
+      for (let i in dat) {
+        if (dat[i].header.src == parseInt(row.id)) {
+          if (dat[i].header.din == parseInt(row.instance)) {
+            prf = prf.replace(':instance', row.instance);
           }
+          break;
         }
       }
-      pat = pat.replace(':instance', '0');
-      push(pat);
+      prf = prf.replace(':instance', '0');
+      push(prf);
+    } catch (err) {
+      // console.log(err);
     }
   }
   
@@ -145,37 +132,41 @@
   };
   
   function isRoute(prf, add) {
-    if ((typeof $devices[selected] !== 'undefined') &&
-      (typeof $name[$devices[selected]] !== 'undefined') &&
-      (typeof $name[$devices[selected]][add] !== 'undefined')) {
-      let nam = $name[$devices[selected]][add];
-      if (typeof paths[nam.modelVersion] !== 'undefined') {
-        prf += '/' + nam.modelVersion;
-        for (let r of $allRoutes) {
-          if (r.startsWith('/' + prf)) {
-            return true;
-          }
+    try {
+      if (prf == 'program') {
+        prf += '/:device/:instance';
+      } else {
+        let nam = $name[$devices[selected]][add];
+        let dev = getdev(nam.modelVersion);
+        prf += '/' + nam.modelVersion + '/:instance';
+        if ((dev != null) && dev.fluid) {
+          prf += '/:fluid';
         }
       }
+      for (let r of $allRoutes) {
+        if (r.startsWith('/' + prf)) {
+          return true;
+        }
+      }
+    } catch (err) {
+      // console.log(err);
+      return false;
     }
     return false;
   };
   
   function isUpdate(add) {
-    if ((typeof $devices[selected] !== 'undefined') &&
-      (typeof $name[$devices[selected]] !== 'undefined') &&
-      (typeof $name[$devices[selected]][add] !== 'undefined')) {
+    try {
       let nam = $name[$devices[selected]][add];
       let mod = nam.modelVersion;
       let dve = nam.softwareVersion;
       let cve = $updates[mod];
-      if ((typeof cve !== "undefined") && (typeof cve.main !== "undefined") &&
-        Array.isArray(cve.main) && (cve.main.length > 0) &&
-        (typeof cve.main[0].version !== "undefined")) {
-        if (compareVersions(dve, cve.main[0].version) < 0) {
-          return true;
-        }
+      if (compareVersions(dve, cve.main[0].version) < 0) {
+        return true;
       }
+    } catch (err) {
+      // console.log(err);
+      return false;
     }
     return false;
   };

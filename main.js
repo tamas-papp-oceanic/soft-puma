@@ -465,7 +465,7 @@ ipcMain.on('bar-code', (e, args) => {
   });
 });
 
-// Download program bin updates
+// Download device updates
 ipcMain.on('updates', (e, ...args) => {
   downUpdates(authURL).then((res) => {
     let updates = JSON.parse(JSON.stringify(res));
@@ -530,7 +530,7 @@ ipcMain.on('prog-start', (e, args) => {
       dat = Buffer.from(res);
     })
     .then(() => bootToLoader(eng, typ, ins, progMessage))
-    // BUG in bootloader (not replaying for this message)
+    // BUG in bootloader (not replying for this message)
     // .then(() => bootAddress(eng, typ, ins, add, progMessage))
     .then(() => bootErase(eng, typ, ins, byt, progMessage))
     .then(() => bootProgram(eng, typ, ins, dat, progMessage))
@@ -732,7 +732,7 @@ function bootFlag(eng, typ, ins, func) {
         btimer = null;
         reject(new Error('Erasing boot flag failed!'));
       }, 5000);
-      // BUG in bootloader (wrong replay for this message)
+      // BUG in bootloader (wrong reply for this message)
       // pub.once('flag-ack', (res) => {
       pub.once('erase-ack', (res) => {
         clearTimeout(btimer);

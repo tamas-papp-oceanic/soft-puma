@@ -5,7 +5,7 @@
   import ProgramContainer from './partials/ProgramContainer.svelte';
   import { getname } from '../../config/devices.js';
   import { device, getUpdate } from '../../stores/data.js';
-  import { getid, getaddr } from '../../config/devices.js';
+  import { getdev } from '../../config/devices.js';
 
   export let params;
 
@@ -79,8 +79,9 @@
       running = false;
     });
     let upd = getUpdate(model);
-    if ((typeof upd['main'] !== "undefined") && (typeof upd['main']['location'] !== "undefined")) {
-      window.pumaAPI.send('prog-start', [$device, upd['main']['location'], getid(model), instance, getaddr(model)]);
+    let dev = getdev(model);
+    if ((typeof upd['main'] !== 'undefined') && (typeof upd['main']['location'] !== 'undefined') && (dev != null)) {
+      window.pumaAPI.send('prog-start', [$device, upd['main']['location'], dev.id, instance, dev.address]);
     }
   };
 
