@@ -97,7 +97,7 @@
       running = false;
       kind = 'error'
       title = 'Error';
-      subttl = 'Error reading settings data with this instance.';
+      subttl = 'Error reading configuration data with this instance.';
       notify = true;
     }, timeout);
     // Receives settings data
@@ -108,7 +108,7 @@
       if (!res) {
         kind = 'error'
         title = 'Error';
-        subttl = 'Error reading settings data with this instance.';
+        subttl = 'Error reading configuration data with this instance.';
         notify = true;
       }
     });
@@ -127,7 +127,7 @@
       running = false;
       kind = 'error'
       title = 'Error';
-      subttl = 'Error writing parameter with this instance.';
+      subttl = 'Error writing configuration data with this instance.';
       notify = true;
     }, timeout);
     // Receives program result
@@ -140,12 +140,12 @@
         }
         kind = 'info'
         title = 'Success';
-        subttl = 'Parameter has been sent.';
+        subttl = 'Configuration data has been sent.';
         notify = true;
       } else {
         kind = 'error'
         title = 'Error';
-        subttl = 'Error writing parameter with this instance.';
+        subttl = 'Error writing configuration data with this instance.';
         notify = true;
       }
     });
