@@ -22,7 +22,7 @@ const devices = {
   '4900':      { id: 0x14, conf: false, fluid: false, prog: false, address: null,       test: false, group: 'adaptors', title: 'AC Input Module' },
   '5720':      { id: 0x16, conf: true,  fluid: false, prog: true,  address: 0x08004000, test: false, group: 'adaptors', title: 'Fluid Flow Adapter' },
   '5906':      { id: 0x18, conf: false, fluid: false, prog: false, address: null,       test: false, group: 'adaptors', title: '6 Channel Load Controller' },
-  '5985':      { id: 0x1A, conf: false, fluid: false, prog: true,  address: null,       test: false, group: 'adaptors', title: 'CAN to DMX512 Convertor' },
+  '5985':      { id: 0x1A, conf: false, fluid: false, prog: false, address: null,       test: false, group: 'adaptors', title: 'CAN to DMX512 Convertor' },
   '5985-TST':  { id: 0x1B, conf: false, fluid: false, prog: false, address: null,       test: false, group: 'adaptors', title: 'CAN to DMX512 Convertor Testing' },
   '9101':      { id: 0x15, conf: false, fluid: false, prog: false, address: null,       test: false, group: 'adaptors', title: 'Seatek Engine Adapter' },
   'iDac':      { id: 0x13, conf: false, fluid: false, prog: false, address: null,       test: false, group: 'displays', title: 'iDac' },

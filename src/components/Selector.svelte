@@ -31,8 +31,8 @@
         {#each Object.entries(devices) as [group, val]}
           {#if val.length > 0}
             <TabContent>
-              <div class="tecont">
-                <div class="telist">
+              <div class="secont">
+                <div class="selist">
                   <Grid padding fullWidth noGutter>
                     <Row>
                       {#each val as device}
@@ -60,13 +60,13 @@
 </Grid>
 
 <style>
-  .tecont {
+  .secont {
     width: 100%;
     height: 77vh;
     overflow-x: hidden;
     overflow-y: auto;
   }
-  .telist {
+  .selist {
     height: 100%;
   }
   .product-card {

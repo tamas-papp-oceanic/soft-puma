@@ -19,7 +19,7 @@
   };
 
   $: if (checkAccess('test', 'write') && $loggedIn) {
-    devs['displays'] = ['5185',  '5185-H'];
+    devs['displays'] = ['5185', '5185-H'];
   } else {
     devs['displays'] = new Array();
   }
