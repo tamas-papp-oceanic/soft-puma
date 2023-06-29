@@ -5,7 +5,7 @@ const app = new App({
 	target: document.body,
 	props: {
 		appName: pkg.name,
-		version: pkg.version
+		version: pkg.version,
 	}
 });
 
