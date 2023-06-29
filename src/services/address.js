@@ -223,17 +223,19 @@ class Address {
   // Processes ISO Address Claim message
   proc060928(msg) {
     let nam = msg.raw.toString('hex', 4);
-    if (typeof this.#timers[nam] !== 'undefined') {
-      clearTimeout(this.#timers[nam]);
-      delete this.#timers[nam];
+    let key = nam.substring(0, 8) + nam.substring(10);
+    let ins = parseInt(nam.substring(8, 10));
+    if (typeof this.#timers[key] !== 'undefined') {
+      clearTimeout(this.#timers[key]);
+      delete this.#timers[key];
     }
-    if (typeof this.#names[nam] === 'undefined') {
-      this.#timers[nam] = setTimeout((key, src) => {
+    if (typeof this.#names[key] === 'undefined') {
+      this.#timers[key] = setTimeout((key, src) => {
         this.send059904(126996, src);
         delete this.#timers[key];
-      }, 2000, nam, msg.header.src);
+      }, 2000, key, msg.header.src);
     }
-    this.#names[nam] = msg.raw[3];
+    this.#names[key] = { src: msg.header.src, ins: ins };
     switch (this.#asm.currentState.name) {
       case 'WaitForContention':
       case 'Valid':
@@ -297,8 +299,8 @@ class Address {
   // Get device instance
   getInstance(src) {
     for (const [key, val] of Object.entries(this.#names)) {
-      if (val == src) {
-        return parseInt(key.substring(4, 6));
+      if (val.src == src) {
+        return val.ins;
       }
     }
     return null;

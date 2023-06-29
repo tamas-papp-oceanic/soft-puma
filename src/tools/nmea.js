@@ -119,6 +119,7 @@ function create() {
     delete out;
     out = {
       "nmea2000/060416": { function: 0 },
+      "nmea2000/065289": { function: 3 },
       "nmea2000/126208": { function: 0 },
       "nmea2000/126464": { function: 0 },
       "nmea2000/126720": { function: 2 },

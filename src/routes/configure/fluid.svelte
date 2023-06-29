@@ -205,7 +205,9 @@
       notify = true;
       running = false;
     }, timeout);
+    data.capacity = null;
     data.table = new Array();
+    data.mode = null;
     // Receives volume table result
     window.pumaAPI.recv('voltable-done', (e, res) => {
       if (!res) {

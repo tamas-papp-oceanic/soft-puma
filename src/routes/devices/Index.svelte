@@ -52,16 +52,13 @@
     try {
       let nam = $name[$devices[selected]][row.id];
       let dev = getdev(nam.modelVersion);
-      let prf = '/configure/' + nam.modelVersion + '/:instance';
+      let prf = '/configure/' + nam.modelVersion + '/' + row.instance;
       if ((dev != null) && dev.fluid) {
         prf += '/:fluid';
       }
       let dat = $data[$devices[selected]];
       for (let i in dat) {
         if (dat[i].header.src == parseInt(row.id)) {
-          if (dat[i].header.din == parseInt(row.instance)) {
-            prf = prf.replace(':instance', row.instance);
-          }
           if (typeof dat[i].header.typ !== 'undefined') {
             if (dat[i].header.pgn == 127505) {
               prf = prf.replace(':fluid', dat[i].header.typ.toString());

@@ -2,6 +2,9 @@
   "nmea2000/060416": {
     "function": 0
   },
+  "nmea2000/065289": {
+    "function": 3
+  },
   "nmea2000/126208": {
     "function": 0
   },

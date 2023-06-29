@@ -44,29 +44,38 @@ window.pumaAPI.recv('n2k-clear', (e, val) => {
 // NMEA address claim message
 window.pumaAPI.recv('n2k-name', (e, args) => {
   const [ dev, msg ] = args;
-  let nam = {
-    uniqueNumber: null,
-    manufacturer: null,
-    deviceInstance: null,
-    function: null,
-    class: null,
-    systemInstance: null,
-    industry: null,
-    databaseVersion: null,
-    productCode: null,
-    modelID: null,
-    softwareVersion: null,
-    modelVersion: null,
-    serialCode: null,
-    certification: null,
-    loadEquivalency: null,
-    decoded: {
+  let src = msg.header.src;
+  let dat = get(name);
+  let nam = {};
+  let old = null;
+  if ((typeof dat[dev] !== 'undefined') && (typeof dat[dev][src] !== 'undefined')) {
+    nam = JSON.parse(JSON.stringify(dat[dev][src]));
+    old = JSON.parse(JSON.stringify(dat[dev][src]));
+  } else {
+    nam = {
+      uniqueNumber: null,
       manufacturer: null,
+      deviceInstance: null,
       function: null,
       class: null,
+      systemInstance: null,
       industry: null,
-    },
-  };
+      databaseVersion: null,
+      productCode: null,
+      modelID: null,
+      softwareVersion: null,
+      modelVersion: null,
+      serialCode: null,
+      certification: null,
+      loadEquivalency: null,
+      decoded: {
+        manufacturer: null,
+        function: null,
+        class: null,
+        industry: null,
+      },
+    };
+  }
   let acl = get(clas);
   let afu = get(func);
   let ain = get(indu);
@@ -122,23 +131,18 @@ window.pumaAPI.recv('n2k-name', (e, args) => {
         break;
     }
   }
-  let src = msg.raw[3];
-  let dat = get(name);
-  if (typeof dat[dev] === "undefined") {
-    dat[dev] = {};
-  }
-  let tmp = dat[dev][src];
-  let cur = JSON.stringify(nam);
-  let old = JSON.stringify(tmp);
-  if ((typeof tmp !== 'undefined') && (
-    (tmp.uniqueNumber != nam.uniqueNumber) ||
-    (tmp.manufacturer != nam.manufacturer) ||
-    (tmp.function != nam.function) ||
-    (tmp.class != nam.class) ||
-    (tmp.industry != nam.industry))) {
+  if ((old != null) && (
+    (old.uniqueNumber != nam.uniqueNumber) ||
+    (old.manufacturer != nam.manufacturer) ||
+    (old.function != nam.function) ||
+    (old.class != nam.class) ||
+    (old.industry != nam.industry))) {
     delete dat[dev][src];
   }
-  if (cur !== old) {
+  if ((old == null) || (JSON.stringify(nam) !== JSON.stringify(old))) {
+    if (typeof dat[dev] === 'undefined') {
+      dat[dev] = {};
+    }
     dat[dev][src] = nam;
     name.set(dat);
   }
@@ -146,13 +150,12 @@ window.pumaAPI.recv('n2k-name', (e, args) => {
 // NMEA product info message
 window.pumaAPI.recv('n2k-prod', (e, args) => {
   const [ dev, msg ] = args;
-  let src = msg.raw[3];
+  let src = msg.header.src;
   let dat = get(name);
-  if (dat[dev] === "undefined") {
-    dat[dev] = {};
-  }
-  let nam = dat[dev][src];
-  if (typeof nam === 'undefined') {
+  let nam = {};
+  if ((typeof dat[dev] !== 'undefined') && (typeof dat[dev][src] !== 'undefined')) {
+    nam = dat[dev][src];
+  } else {
     nam = {
       uniqueNumber: null,
       manufacturer: null,
