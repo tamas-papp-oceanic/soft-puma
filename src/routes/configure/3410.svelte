@@ -1,11 +1,12 @@
 <script>
   import { onMount, onDestroy } from "svelte";
-  import { Row, Grid, Column, ToastNotification } from "carbon-components-svelte";
+  import { Row, Grid, Column } from "carbon-components-svelte";
   import { location, pop } from "svelte-spa-router";
   import Container3410 from './partials/Container3410.svelte';
   import { getfield } from '../../stores/common.js';
   import { device, findModel } from '../../stores/data';
   import { getname } from '../../config/devices.js';
+  import Notification from "../../components/Notification.svelte";
 
   export let params;
 
@@ -216,26 +217,8 @@
       <Container3410 style="height: 80vh;" bind:data={data} running={running}
         on:select={select} on:program={program} on:cancel={cancel} on:error={error} />
       {#if notify}
-        <div class="error">
-          <ToastNotification kind={kind} title={title} subtitle={subttl} caption={new Date().toLocaleString()}
-            on:close={(e) => (notify = false)}
-          />
-        </div>
+        <Notification kind={kind} title={title} subtitle={subttl} bind:notify={notify} />
       {/if}
     </Column>
   </Row>
 </Grid>
-
-<style lang="css">
-  .error {
-    position: fixed;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
-    display: flex;
-    flex-flow: row nowrap;
-    align-items: center;
-    justify-content: center;
-  }
-</style>

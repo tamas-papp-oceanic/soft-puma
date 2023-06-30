@@ -6,12 +6,13 @@
 
 <div class="notify">
   <ToastNotification
+    lowContrast=false
     kind="error"
     title="Error"
     subtitle="Restricted access."
+    caption="Contact us."
     hideCloseButton
-    timeout="5000"
-    lowContrast = false
+    timeout="2500"
   />
 </div>
 

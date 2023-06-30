@@ -6,13 +6,13 @@
 
 <div class="notify">
   <ToastNotification
+    lowContrast=false
     kind="warning"
     title="Warning"
     subtitle="This function hasn't implemented yet."
     caption="(will soon)"
     hideCloseButton
-    timeout="5000"
-    lowContrast = false
+    timeout="2500"
   />
 </div>
 

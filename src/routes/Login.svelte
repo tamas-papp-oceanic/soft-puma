@@ -1,6 +1,6 @@
 <script>
   import { push } from 'svelte-spa-router'
-  import { Grid, Row, Column, Form, TextInput, PasswordInput, Button } from "carbon-components-svelte";
+  import { Grid, Row, Column, ToastNotification, TextInput, PasswordInput, Button } from "carbon-components-svelte";
   import { login } from '../auth/auth.js'
   
   let redirect = "/welcome"
@@ -28,7 +28,11 @@
     } else {
       push(redirect)
     }
-  }
+  };
+
+  function _cancel() {
+    push("/");
+  };
 </script>
 
 <Grid>
@@ -41,19 +45,20 @@
       <TextInput bind:value={username} labelText="User name" placeholder="Enter user name..." required />
       <PasswordInput bind:value={password} type="password" labelText="Password" placeholder="Enter password..." required />
       <Button on:click={(e) => _submit(e)} type="submit">Submit</Button>
+      <Button kind="secondary" on:click={(e) => _cancel(e)}>Cancel</Button>
     </Column>
     <Column sm={0} md={2} lg={4} />
   </Row>
-  <hr>
-  <Row>
   {#if error}
-    <Column sm={4} md={4} lg={8}><span class="error">{errtext}</span></Column>
+    <Row>
+      <ToastNotification
+        lowContrast=false
+        fullWidth
+        kind="error"
+        title="Error"
+        subtitle={errtext}
+        hideCloseButton
+      />
+    </Row>
   {/if}
-</Row>
 </Grid>
-
-<style>
-  .error {
-    color: red;
-  }
-</style>

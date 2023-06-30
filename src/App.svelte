@@ -128,7 +128,11 @@
 		window.pumaAPI.send('upd-start');
 	}
 
-	function _cancel(e) {
+  function _restrict(e) {
+    push('/restricted');
+  };
+
+  function _cancel(e) {
 		window.pumaAPI.send('upd-cancel');
 		$download = false;
 		$progress = {};
@@ -155,9 +159,7 @@
 
 <Header company="Oceanic" product={appName} version={version} />
 <main class="content">
-	<Router {routes} restoreScrollState={true} on:consitionsFailed={(e) => {
-    push('/restricted');
-  }}/>
+	<Router {routes} restoreScrollState={true} on:conditionsFailed={(e) => _restrict(e)}/>
 	<ComposedModal bind:open={$download} on:submit={(e) => _start(e)}>
 		<ModalHeader label="Download update" title={"Confirm download of Puma v" + $updmsg} />
 		<ModalBody>
