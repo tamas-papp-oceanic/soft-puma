@@ -20,6 +20,7 @@
     mode: null,
   };
   let running = false;
+  let target = null;
   let notify = false;
   let kind = null;
   let title = null;
@@ -86,6 +87,7 @@
 
   function load(e) {
     running = true;
+    target = 'table';
     data.table = new Array();
     // Receives volume file data
     window.pumaAPI.recv('volfile-data', (e, res) => {
@@ -113,6 +115,7 @@
     subttl = null;
     notify = false;
     running = true;
+    target = null;
     // Receives volume file result
     window.pumaAPI.recv('volfile-done', (e, res) => {
       if (res instanceof Error) {
@@ -138,6 +141,7 @@
     subttl = null;
     notify = false;
     running = true;
+    target = 'mode';
     timer = setTimeout(() => {
       kind = 'error'
       title = 'Error';
@@ -166,6 +170,7 @@
     subttl = null;
     notify = false;
     running = true;
+    target = null;
     timer = setTimeout(() => {
       kind = 'error'
       title = 'Error';
@@ -199,6 +204,7 @@
     subttl = null;
     notify = false;
     running = true;
+    target = 'table';
     timer = setTimeout(() => {
       kind = 'error'
       title = 'Error';
@@ -229,6 +235,7 @@
     subttl = null;
     notify = false;
     running = true;
+    target = null;
     timer = setTimeout(() => {
       kind = 'error'
       title = 'Error';
@@ -273,7 +280,7 @@
   <Row>
     <Column>
       <h2>{model + ' - ' + getname(model) + ' - Configuration'}</h2>
-      <VolumeContainer style="height: 80vh;" bind:data={data} running={running}
+      <VolumeContainer style="height: 80vh;" bind:data={data} running={running} target={target}
         on:load={load} on:save={save} on:getmode={getmode} on:setmode={setmode} on:download={download}
         on:upload={upload} on:cancel={cancel} />
       {#if notify}

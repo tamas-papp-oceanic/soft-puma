@@ -1,7 +1,5 @@
 <script>
   import { ToastNotification } from "carbon-components-svelte";
-
-  export let params;
 </script>
 
 <div class="notify">

@@ -1,7 +1,8 @@
 <script>
   import { createEventDispatcher } from "svelte";
   import { ButtonSet, Button, Tile, Grid, Row, Column, DataTable, 
-    Dropdown, TextInput, Pagination } from "carbon-components-svelte";
+    DataTableSkeleton, Dropdown, DropdownSkeleton, TextInput,
+    Pagination, PaginationSkeleton } from "carbon-components-svelte";
   import Open from "carbon-icons-svelte/lib/Document16";
   import Save from "carbon-icons-svelte/lib/Save16";
   import Add from "carbon-icons-svelte/lib/Add16";
@@ -10,6 +11,7 @@
   export let data;
   export let style;
   export let running;
+  export let target;
 
   String.prototype.isNumber = function() {
     return /^\d+$|^\d+\.\d+$/.test(this);
@@ -389,23 +391,28 @@
             </Row>
             <Row>
               <Column style="width: 100%;">
-                <DataTable
-                  size="compact"
-                  selectable
-                  bind:selectedRowIds={selected}
-                  {headers}
-                  {rows}
-                  pageSize={pagination.pageSize}
-                  page={pagination.page}>
-                  <span slot="cell" let:cell let:row>{cell.value}</span>
-                </DataTable>
-                {#if pagination.totalItems > pagination.pageSize}
-                  <Pagination
-                    bind:pageSize={pagination.pageSize}
-                    totalItems={pagination.totalItems}
-                    bind:page={pagination.page}
-                    pageSizeInputDisabled
-                  />
+                {#if running && (target == 'table')}
+                  <DataTableSkeleton showHeader={false} showToolbar={false} {headers} size="compact" rows={pagination.pageSize} />
+                  <PaginationSkeleton />
+                {:else}
+                  <DataTable
+                    size="compact"
+                    selectable
+                    bind:selectedRowIds={selected}
+                    {headers}
+                    {rows}
+                    pageSize={pagination.pageSize}
+                    page={pagination.page}>
+                    <span slot="cell" let:cell let:row>{cell.value}</span>
+                  </DataTable>
+                  {#if pagination.totalItems > pagination.pageSize}
+                    <Pagination
+                      bind:pageSize={pagination.pageSize}
+                      totalItems={pagination.totalItems}
+                      bind:page={pagination.page}
+                      pageSizeInputDisabled
+                    />
+                  {/if}
                 {/if}
               </Column>
             </Row>
@@ -418,8 +425,12 @@
             </Row>
             <Row padding>
               <Column>
-                <Dropdown hideLabel titleText="Select mode" size="xl" bind:selectedId={data.mode} items={modes}
-                  invalid={data.mode == null} />
+                {#if running && (target == 'mode')}
+                  <DropdownSkeleton />
+                {:else}
+                  <Dropdown hideLabel titleText="Select mode" size="xl" bind:selectedId={data.mode} items={modes}
+                    invalid={data.mode == null} />
+                {/if}
               </Column>
             </Row>
             <Row>
