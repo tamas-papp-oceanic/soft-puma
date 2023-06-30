@@ -8,6 +8,7 @@
   import { name, devices, device, data, allRoutes, updates } from "../../stores/data.js";
   import { compareVersions } from 'compare-versions';
   import { getdev } from '../../config/devices.js';
+  import { routeGuard } from '../../helpers/guard.js';
 
   const headers = [{
     key: "overflow",
@@ -93,6 +94,9 @@
         }
       }
       prf = prf.replace(':instance', '0');
+
+      console.log(prf)
+
       push(prf);
     } catch (err) {
       // console.log(err);
@@ -129,25 +133,26 @@
   };
   
   function isRoute(prf, add) {
-    try {
-      if (prf == 'program') {
+    if (routeGuard({ location: prf })) {
+      if (prf == '/program') {
         prf += '/:device/:instance';
       } else {
-        let nam = $name[$devices[selected]][add];
-        let dev = getdev(nam.modelVersion);
-        prf += '/' + nam.modelVersion + '/:instance';
-        if ((dev != null) && dev.fluid) {
-          prf += '/:fluid';
+        try {
+          let nam = $name[$devices[selected]][add];
+          let dev = getdev(nam.modelVersion);
+          prf += '/' + nam.modelVersion + '/:instance';
+          if ((dev != null) && dev.fluid) {
+            prf += '/:fluid';
+          }
+          for (let r of $allRoutes) {
+            if (r.startsWith(prf)) {
+              return true;
+            }
+          }
+        } catch (err) {
+          // console.log(err);
         }
       }
-      for (let r of $allRoutes) {
-        if (r.startsWith('/' + prf)) {
-          return true;
-        }
-      }
-    } catch (err) {
-      // console.log(err);
-      return false;
     }
     return false;
   };
@@ -271,10 +276,10 @@
         <span slot="cell" let:cell let:row>
           {#if cell.key === 'overflow'}
             <OverflowMenu>
-              <OverflowMenuItem text="Configure" disabled={!isRoute('configure', row.id)} on:click={(e) => conf(e, row)} />
+              <OverflowMenuItem text="Configure" disabled={!isRoute('/configure', row.id)} on:click={(e) => conf(e, row)} />
               <OverflowMenuItem text="Monitor" on:click={(e) => push('/monitor/'+row.id)} />
-              <OverflowMenuItem text="Test" disabled={!isRoute('testing', row.id)} on:click={(e) => test(e, row)} />
-              <OverflowMenuItem text="Update" disabled={!isRoute('program', row.id) || !isUpdate(row.id)} on:click={(e) => update(e, row)} />
+              <OverflowMenuItem text="Testing" disabled={!isRoute('/testing', row.id)} on:click={(e) => test(e, row)} />
+              <OverflowMenuItem text="Update" disabled={!isRoute('/program', row.id) || !isUpdate(row.id)} on:click={(e) => update(e, row)} />
             </OverflowMenu>
           {:else}
             {cell.value}

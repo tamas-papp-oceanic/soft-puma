@@ -26,6 +26,7 @@
 	import Test3478 from './routes/testing/3478.svelte';
 	import Test4410 from './routes/testing/4410.svelte';
 	import Test5185 from './routes/testing/5185.svelte';
+  import Restricted from './routes/Restricted.svelte';
 	import { loggedIn } from './stores/user.js';
   import { update, updmsg, download, progress } from './stores/update.js';
 	import { allRoutes, updates } from './stores/data.js';
@@ -36,10 +37,8 @@
 	export let appName;
 
   const routes = {
-    "/": wrap({ component: Devices, conditions: [(detail) => { return routeGuard('/analyse'); }] }),
-		"/login": wrap({
-			component: Login,
-			conditions: [() =>{
+    "/":                                wrap({ component: Devices,        conditions: [(detail) => { return routeGuard({ location: '/analyse' }); }] }),
+		"/login":                           wrap({ component: Login,          conditions: [(detail) => {
 				if ($loggedIn == true) {
 					push("/welcome")
 				} else {
@@ -47,27 +46,28 @@
 				}
 			}],
 		}),
-		"/configure":                       wrap({ component: Configure,      conditions: [(detail) => { return routeGuard(detail.route); }] }),
-		"/configure/3271/:instance/:fluid": wrap({ component: ConfigureFluid, conditions: [(detail) => { return routeGuard(detail.route); }] }),
-		"/configure/3281/:instance/:fluid": wrap({ component: ConfigureFluid, conditions: [(detail) => { return routeGuard(detail.route); }] }),
-		"/configure/3410/:instance":        wrap({ component: Configure3410,  conditions: [(detail) => { return routeGuard(detail.route); }] }),
-		"/configure/3420/:instance":        wrap({ component: Configure3420,  conditions: [(detail) => { return routeGuard(detail.route); }] }),
-		"/configure/3125/:instance/:fluid": wrap({ component: ConfigureFluid, conditions: [(detail) => { return routeGuard(detail.route); }] }),
-		"/configure/4291/:instance/:fluid": wrap({ component: ConfigureFluid, conditions: [(detail) => { return routeGuard(detail.route); }] }),
-		"/configure/4510/:instance":        wrap({ component: Configure4510,  conditions: [(detail) => { return routeGuard(detail.route); }] }),
-		"/configure/4521/:instance":        wrap({ component: Configure4521,  conditions: [(detail) => { return routeGuard(detail.route); }] }),
-		"/configure/4601/:instance":        wrap({ component: Configure4601,  conditions: [(detail) => { return routeGuard(detail.route); }] }),
-		"/configure/5720/:instance":        wrap({ component: Configure5720,  conditions: [(detail) => { return routeGuard(detail.route); }] }),
-		"/program":                         wrap({ component: Program,        conditions: [(detail) => { return routeGuard(detail.route); }] }),
-		"/program/:device/:instance":       wrap({ component: ProgramDevice,  conditions: [(detail) => { return routeGuard(detail.route); }] }),
-		"/testing":                         wrap({ component: Testing,        conditions: [(detail) => { return routeGuard(detail.route); }] }),
-    "/testing/3478/:instance":          wrap({ component: Test3478,       conditions: [(detail) => { return routeGuard(detail.route); }] }),
-		"/testing/4410/:instance":          wrap({ component: Test4410,       conditions: [(detail) => { return routeGuard(detail.route); }] }),
-		"/testing/5185":                    wrap({ component: Test5185,       conditions: [(detail) => { return routeGuard(detail.route); }] }),
-    "/testing/5185-H":                  wrap({ component: Test5185,       conditions: [(detail) => { return routeGuard(detail.route); }] }),
-		"/Welcome": wrap({
-			component: Welcome,
-			conditions: [() =>{
+    "/advanced":                        wrap({ component: NotFound,       conditions: [(detail) => { return true;               }] }),
+		"/configure":                       wrap({ component: Configure,      conditions: [(detail) => { return routeGuard(detail); }] }),
+		"/configure/3271/:instance/:fluid": wrap({ component: ConfigureFluid, conditions: [(detail) => { return routeGuard(detail); }] }),
+		"/configure/3281/:instance/:fluid": wrap({ component: ConfigureFluid, conditions: [(detail) => { return routeGuard(detail); }] }),
+		"/configure/3410/:instance":        wrap({ component: Configure3410,  conditions: [(detail) => { return routeGuard(detail); }] }),
+		"/configure/3420/:instance":        wrap({ component: Configure3420,  conditions: [(detail) => { return routeGuard(detail); }] }),
+		"/configure/3125/:instance/:fluid": wrap({ component: ConfigureFluid, conditions: [(detail) => { return routeGuard(detail); }] }),
+		"/configure/4291/:instance/:fluid": wrap({ component: ConfigureFluid, conditions: [(detail) => { return routeGuard(detail); }] }),
+		"/configure/4510/:instance":        wrap({ component: Configure4510,  conditions: [(detail) => { return routeGuard(detail); }] }),
+		"/configure/4521/:instance":        wrap({ component: Configure4521,  conditions: [(detail) => { return routeGuard(detail); }] }),
+		"/configure/4601/:instance":        wrap({ component: Configure4601,  conditions: [(detail) => { return routeGuard(detail); }] }),
+		"/configure/5720/:instance":        wrap({ component: Configure5720,  conditions: [(detail) => { return routeGuard(detail); }] }),
+		"/program":                         wrap({ component: Program,        conditions: [(detail) => { return routeGuard(detail); }] }),
+		"/program/:device/:instance":       wrap({ component: ProgramDevice,  conditions: [(detail) => { return routeGuard(detail); }] }),
+    "/simulate":                        wrap({ component: NotFound,       conditions: [(detail) => { return true;               }] }),
+		"/testing":                         wrap({ component: Testing,        conditions: [(detail) => { return routeGuard(detail); }] }),
+    "/testing/3478/:instance":          wrap({ component: Test3478,       conditions: [(detail) => { return routeGuard(detail); }] }),
+		"/testing/4410/:instance":          wrap({ component: Test4410,       conditions: [(detail) => { return routeGuard(detail); }] }),
+		"/testing/5185":                    wrap({ component: Test5185,       conditions: [(detail) => { return routeGuard(detail); }] }),
+    "/testing/5185-H":                  wrap({ component: Test5185,       conditions: [(detail) => { return routeGuard(detail); }] }),
+		"/restricted": Restricted,
+		"/Welcome":                         wrap({ component: Welcome,        conditions: [(detail) => {
 				if ($loggedIn == true) {
 					return true
 				} else {
@@ -75,7 +75,7 @@
 				}
 			}],
 		}),
-		"/monitor/:address": wrap({ component: Monitor, conditions: [(detail) => { return routeGuard(detail.route); }] }),
+		"/monitor/:address": Monitor,
 		"/messages/:protocol/:pgn/:function/:manufacturer/:industry/:instance/:type":  Content,
 		// "/details/:protocol/:pgn/:function/:manufacturer/:industry/:instance/:type": Details,
 		"*": NotFound,
@@ -155,7 +155,9 @@
 
 <Header company="Oceanic" product={appName} version={version} />
 <main class="content">
-	<Router {routes} restoreScrollState={true} />
+	<Router {routes} restoreScrollState={true} on:consitionsFailed={(e) => {
+    push('/restricted');
+  }}/>
 	<ComposedModal bind:open={$download} on:submit={(e) => _start(e)}>
 		<ModalHeader label="Download update" title={"Confirm download of Puma v" + $updmsg} />
 		<ModalBody>

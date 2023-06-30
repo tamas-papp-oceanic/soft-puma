@@ -1,4 +1,5 @@
 <script>
+  import { onMount } from 'svelte';
   import { location, push } from 'svelte-spa-router'
   import { Header, HeaderNav, HeaderNavItem, HeaderUtilities, HeaderGlobalAction,
     ComposedModal, ModalHeader, ModalFooter, TooltipDefinition } from "carbon-components-svelte";
@@ -14,11 +15,30 @@
   export let product;
   export let version;
   
+  const menu = [
+    { text: 'Devices', path: '/', selected: false },
+    { text: 'Configure', path: '/configure', selected: false },
+    { text: 'Testing', path: '/testing', selected: false },
+    { text: 'Update', path: '/program', selected: false },
+    { text: 'Simulate', path: '/simulate', selected: false },
+    { text: 'Advanced', path: '/advanced', selected: false },
+  ];
+
   let open = false;
   let platform = product + " v" + version;
-  let routeParsed;
   let re = /(\/[A-z]+)/;
-  
+
+  function _mark(rou) {
+    for (let i in menu) {
+      menu[i].selected = (menu[i].path == rou);
+    }
+  };
+
+  function _select(e, itm) {
+    _mark(itm.path);
+    push(itm.path);
+  };
+
   function _login(e) {
     push("/login");
   };
@@ -48,16 +68,15 @@
   };
 
   $: platform = product + " v" + version
-  $: routeParsed = $location.replace(re, '$1')
+  $: $location, _mark($location.replace(re, '$1'));
 </script>
 
 <div>
   <Header company={company} platformName={platform}>
     <HeaderNav>
-      <HeaderNavItem class="{($location === '/' || routeParsed === '/devices') ? 'active' : ''}" on:click={() => push('/')} text="Devices" />
-      <HeaderNavItem class="{routeParsed === '/program' ? 'active' : ''}" on:click={() => push('/program')} text="Update" />
-      <HeaderNavItem class="{routeParsed === '/configure' ? 'active' : ''}" on:click={() => push('/configure')} text="Configure" />
-      <HeaderNavItem class="{routeParsed === '/testing' ? 'active' : ''}" on:click={() => push('/testing')} text="Tests" />
+      {#each menu as item}
+        <HeaderNavItem bind:isSelected={item.selected} on:click={(e) => { _select(e, item) }} text={item.text} />
+      {/each}
     </HeaderNav>
     <HeaderUtilities>
       {#if $update}

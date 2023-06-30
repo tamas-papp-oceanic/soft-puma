@@ -6,10 +6,9 @@
 
 <div class="notify">
   <ToastNotification
-    kind="warning"
-    title="Warning"
-    subtitle="This function hasn't implemented yet."
-    caption="(will soon)"
+    kind="error"
+    title="Error"
+    subtitle="Restricted access."
     hideCloseButton
     timeout="5000"
     lowContrast = false

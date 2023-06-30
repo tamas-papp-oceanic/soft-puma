@@ -1,34 +1,39 @@
 {
   "Engineering": {
-    "serial": "true",
-    "advanced": "true",
-    "program": "true",
-    "configure": "true",
-    "simulate": "true",
-    "analyse": "true"
+    "serial": true,
+    "advanced": true,
+    "program": true,
+    "configure": true,
+    "simulate": true,
+    "analyse": true,
+    "testing": true
   },
   "Production": {
-    "serial": "true",
-    "advanced": "false",
-    "program": "true",
-    "configure": "true",
-    "simulate": "true",
-    "analyse": "true"
+    "serial": true,
+    "advanced": false,
+    "program": true,
+    "configure": true,
+    "simulate": true,
+    "analyse": true,
+    "testing": true
   },
   "Customer": {
-    "serial": "false",
-    "advanced": "false",
-    "program": "true",
-    "configure": "true",
-    "simulate": "true",
-    "analyse": "true"
+    "serial": false,
+    "advanced": false,
+    "program": true,
+    "configure": true,
+    "simulate": true,
+    "analyse": true,
+    "testing": false
   },
   "Guest": {
-    "serial": "false",
-    "advanced": "false",
-    "program": "false",
-    "configure": "true",
-    "simulate": "false",
-    "analyse": "true"
+    "serial": false,
+    "advanced": false,
+    "program": false,
+    "configure": true,
+    "simulate": false,
+    "analyse": true,
+    "testing": false,
+    "dummy": false
   }
 }

@@ -10,18 +10,24 @@ import guard from '../config/guard.json';
 // function routeGuard
 // accepts detail.route and returns true if authorised or false if unauthorised
 
-function routeGuard(location) {
+function routeGuard(det) {
   let dep = 'Guest';
+  let loc = 'dummy';
   let usr = get(userData);
   try {
-    dep = usr.department;
+    if (typeof usr.department !== 'undefined') {
+      dep = usr.department;
+    }
+    if (typeof det.location !== 'undefined') {
+      let spl = det.location.split('/');
+      if (spl.length > 1) {
+        loc = det.location.split('/')[1];
+      }
+    }
   } catch (err) {
     // console.log(err)
   }
-  if (guard[dep][location.substring(1)]) {
-    return true;
-  }
-  return false;
+  return guard[dep][loc];
 }
 
 export { routeGuard }
