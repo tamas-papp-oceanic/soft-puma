@@ -39,4 +39,24 @@ function isRoute(prf, src) {
   return false;
 };
 
-export { isRoute };
+// key = {protocol}/{pgn}/{function}/{manufacturer}/{industry}/{instance}/{fluidtype}
+function splitKey(key) {
+  let ret = {
+    protocol: null,
+    pgn: null,
+    function: null,
+    manufacturer: null,
+    industry: null,
+    instance: null,
+    fluidtype: null,
+  };
+  let spl = key.split('/');
+  for (let i = 0; i < 7; i++) {
+    if (spl.length > i) {
+      ret[Object.keys(ret)[i]] = spl[i];
+    }
+  }
+  return ret;
+};
+
+export { isRoute, splitKey };

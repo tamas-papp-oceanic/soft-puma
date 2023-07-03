@@ -1,12 +1,10 @@
 <script>
   import { createEventDispatcher } from "svelte";
-  import { ButtonSet, Button, Tile, Grid, Row, Column, Dropdown,
-    TextArea } from "carbon-components-svelte";
+  import { ButtonSet, Button, Tile, Grid, Row, Column, Dropdown } from "carbon-components-svelte";
   import { checkAccess } from "../../../auth/auth.js";
   import { getUpdate } from "../../../stores/data.js";
   import { loggedIn } from "../../../stores/user.js";
   import Download from "carbon-icons-svelte/lib/Download16";
-    import Container5720 from "../../configure/partials/Container5720.svelte";
 
   export let model;
   export let data;
