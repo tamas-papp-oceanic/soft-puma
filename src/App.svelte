@@ -15,13 +15,14 @@
 	import Configure from './routes/configure/Index.svelte';
 	import Configure3410 from './routes/configure/3410.svelte';
 	import Configure3420 from './routes/configure/3420.svelte';
-	import ConfigureFluid from './routes/configure/fluid.svelte';
+	import ConfigureFluid from './routes/configure/Fluid.svelte';
 	import Configure4510 from './routes/configure/4510.svelte';
 	import Configure4521 from './routes/configure/4521.svelte';
 	import Configure4601 from './routes/configure/4601.svelte';
 	import Configure5720 from './routes/configure/5720.svelte';
 	import Program from './routes/program/Index.svelte';
 	import ProgramDevice from './routes/program/Program.svelte';
+	import Simulate from './routes/simulate/Index.svelte';
 	import Testing from './routes/testing/Index.svelte';
 	import Test3478 from './routes/testing/3478.svelte';
 	import Test4410 from './routes/testing/4410.svelte';
@@ -53,7 +54,7 @@
 		"/configure/5720/:instance":        wrap({ component: Configure5720,  conditions: [(detail) => { return routeGuard(detail); }] }),
 		"/program":                         wrap({ component: Program,        conditions: [(detail) => { return routeGuard(detail); }] }),
 		"/program/:device/:instance":       wrap({ component: ProgramDevice,  conditions: [(detail) => { return routeGuard(detail); }] }),
-    "/simulate":                        wrap({ component: NotFound,       conditions: [(detail) => { return true;               }] }),
+    "/simulate":                        wrap({ component: Simulate,       conditions: [(detail) => { return routeGuard(detail); }] }),
 		"/testing":                         wrap({ component: Testing,        conditions: [(detail) => { return routeGuard(detail); }] }),
     "/testing/3478/:instance":          wrap({ component: Test3478,       conditions: [(detail) => { return routeGuard(detail); }] }),
 		"/testing/4410/:instance":          wrap({ component: Test4410,       conditions: [(detail) => { return routeGuard(detail); }] }),

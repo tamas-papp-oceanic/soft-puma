@@ -46,6 +46,7 @@ function routeGuard(det) {
   case 'messages':
   case 'monitor':
   case 'restricted':
+  case 'simulate':
     return true;
   }
   return guard[dep][loc];
