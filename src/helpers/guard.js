@@ -3,8 +3,8 @@
 // Skippng implementation for funtionality first
 
 import { get } from "svelte/store";
-import { userData, accessToken, refreshToken, loggedIn,
-  permissions } from '../stores/user.js';
+import { userData } from '../stores/user.js';
+import { loggedIn } from '../stores/user.js';
 import guard from '../config/guard.json';
   
 // function routeGuard
@@ -19,13 +19,34 @@ function routeGuard(det) {
       dep = usr.department;
     }
     if (typeof det.location !== 'undefined') {
-      let spl = det.location.split('/');
-      if (spl.length > 1) {
-        loc = det.location.split('/')[1];
+      let logged = get(loggedIn);
+      switch (det.location) { 
+      case '/':
+        loc = "analyse";
+        break;
+      case '/details':
+        return false;
+      case '/login':
+        return !logged;
+      case '/welcome':
+        return logged;
+      default:
+        let spl = det.location.split('/');
+        if (spl.length > 1) {
+          loc = det.location.split('/')[1];
+        }
+        break;
       }
     }
   } catch (err) {
     // console.log(err)
+    return false;
+  }
+  switch (loc) { 
+  case 'messages':
+  case 'monitor':
+  case 'restricted':
+    return true;
   }
   return guard[dep][loc];
 }

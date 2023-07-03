@@ -1,11 +1,12 @@
 <script>
   import { onMount, onDestroy } from "svelte";
+  import { push, pop } from 'svelte-spa-router'
   import { Grid, Row, Column, DataTable, Toolbar, ToolbarContent, Tile,
     Button, Pagination, OverflowMenu, OverflowMenuItem } from "carbon-components-svelte";
   import Restart from "carbon-icons-svelte/lib/Restart16";
   import SkipBack from "carbon-icons-svelte/lib/SkipBack16";
-  import { push, pop } from 'svelte-spa-router'
   import { queue, start, stop, restart } from "../../stores/data.js";
+  import { isRoute } from "../../helpers/route.js";
 
   export let params;
 
@@ -49,6 +50,10 @@
     });
     restart();
     first = true;
+  };
+
+  function details(e, row) {
+    push('/details/'+ row.key);
   };
 
   function back(e) {
@@ -186,7 +191,7 @@
               <span slot="cell" let:cell let:row>
                 {#if (cell.key === 'overflow') && (row.id !== 'first')}
                   <OverflowMenu>
-                    <OverflowMenuItem text="Details" disabled on:click={() => push('/details/'+ row.key)} />
+                    <OverflowMenuItem text="Details" disabled={!isRoute('/details')} on:click={(e) => details(e, row)} />
                   </OverflowMenu>
                 {:else}
                   {cell.value}

@@ -5,10 +5,10 @@
     OverflowMenuItem, Pagination, Dropdown } from "carbon-components-svelte";
   import Scan from "carbon-icons-svelte/lib/SearchLocate16";
   import Warning from "carbon-icons-svelte/lib/WarningAltFilled16";
-  import { name, devices, device, data, allRoutes, updates } from "../../stores/data.js";
+  import { name, devices, device, data, updates } from "../../stores/data.js";
   import { compareVersions } from 'compare-versions';
   import { getdev } from '../../config/devices.js';
-  import { routeGuard } from '../../helpers/guard.js';
+  import { isRoute } from '../../helpers/route.js'
 
   const headers = [{
     key: "overflow",
@@ -51,13 +51,13 @@
 
   function conf(e, row) {
     try {
-      let nam = $name[$devices[selected]][row.id];
+      let nam = $name[$device][row.id];
       let dev = getdev(nam.modelVersion);
       let prf = '/configure/' + nam.modelVersion + '/' + row.instance;
       if ((dev != null) && dev.fluid) {
         prf += '/:fluid';
       }
-      let dat = $data[$devices[selected]];
+      let dat = $data[$device];
       for (let i in dat) {
         if (dat[i].header.src == parseInt(row.id)) {
           if (typeof dat[i].header.typ !== 'undefined') {
@@ -75,11 +75,15 @@
     }
   }
   
+  function monitor(e, row) {
+    push('/monitor/' + row.id);
+  }
+
   function test(e, row) {
     try {
-      let nam = $name[$devices[selected]][row.id];
+      let nam = $name[$device][row.id];
       let prf = '/testing/' + nam.modelVersion + '/:instance';
-      let dat = $data[$devices[selected]];
+      let dat = $data[$device];
       for (let i in dat) {
         if (dat[i].header.src == parseInt(row.id)) {
           if (dat[i].header.din == parseInt(row.instance)) {
@@ -94,9 +98,6 @@
         }
       }
       prf = prf.replace(':instance', '0');
-
-      console.log(prf)
-
       push(prf);
     } catch (err) {
       // console.log(err);
@@ -105,9 +106,9 @@
   
   function update(e, row) {
     try {
-      let nam = $name[$devices[selected]][row.id];
+      let nam = $name[$device][row.id];
       let prf = '/program/' + nam.modelVersion + '/:instance';
-      let dat = $data[$devices[selected]];
+      let dat = $data[$device];
       for (let i in dat) {
         if (dat[i].header.src == parseInt(row.id)) {
           if (dat[i].header.din == parseInt(row.instance)) {
@@ -132,34 +133,9 @@
     $device = e.detail.selectedItem.text;
   };
   
-  function isRoute(prf, add) {
-    if (routeGuard({ location: prf })) {
-      if (prf == '/program') {
-        prf += '/:device/:instance';
-      } else {
-        try {
-          let nam = $name[$devices[selected]][add];
-          let dev = getdev(nam.modelVersion);
-          prf += '/' + nam.modelVersion + '/:instance';
-          if ((dev != null) && dev.fluid) {
-            prf += '/:fluid';
-          }
-          for (let r of $allRoutes) {
-            if (r.startsWith(prf)) {
-              return true;
-            }
-          }
-        } catch (err) {
-          // console.log(err);
-        }
-      }
-    }
-    return false;
-  };
-  
-  function isUpdate(add) {
+  function isUpdate(src) {
     try {
-      let nam = $name[$devices[selected]][add];
+      let nam = $name[$device][src];
       let mod = nam.modelVersion;
       let dve = nam.softwareVersion;
       let cve = $updates[mod];
@@ -277,9 +253,9 @@
           {#if cell.key === 'overflow'}
             <OverflowMenu>
               <OverflowMenuItem text="Configure" disabled={!isRoute('/configure', row.id)} on:click={(e) => conf(e, row)} />
-              <OverflowMenuItem text="Monitor" on:click={(e) => push('/monitor/'+row.id)} />
+              <OverflowMenuItem text="Monitor" disabled={!isRoute('/monitor')} on:click={(e) => monitor(e, row)} />
               <OverflowMenuItem text="Testing" disabled={!isRoute('/testing', row.id)} on:click={(e) => test(e, row)} />
-              <OverflowMenuItem text="Update" disabled={!isRoute('/program', row.id) || !isUpdate(row.id)} on:click={(e) => update(e, row)} />
+              <OverflowMenuItem text="Update" disabled={!isRoute('/program') || !isUpdate(row.id)} on:click={(e) => update(e, row)} />
             </OverflowMenu>
           {:else}
             {cell.value}

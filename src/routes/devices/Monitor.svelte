@@ -4,6 +4,7 @@
   import SkipBack from "carbon-icons-svelte/lib/SkipBack16";
   import { push, pop } from 'svelte-spa-router'
   import { device, name, data } from "../../stores/data.js";
+  import { isRoute } from "../../helpers/route.js";
 
   export let params;
 
@@ -46,6 +47,10 @@
       .map((elm, idx) => idx < 20 ? elm.toString(16).padStart(2, '0').toUpperCase() + ' ' : '')
       .join('') + (buffer.length > 20 ? '...' : '');
   } 
+
+  function content(e, row) {
+    push('/messages/' + row.id);
+  };
 
   function back(e) {
     pop();
@@ -119,7 +124,7 @@
         <span slot="cell" let:cell let:row>
           {#if cell.key === 'overflow'}
             <OverflowMenu>
-              <OverflowMenuItem text="Content" on:click={(e) => { push('/messages/'+row.id); }} />
+              <OverflowMenuItem text="Content" disabled={!isRoute('/messages')} on:click={(e) => content(e, row)} />
             </OverflowMenu>
           {:else}
             {cell.value}

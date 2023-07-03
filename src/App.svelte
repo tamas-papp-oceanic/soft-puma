@@ -27,7 +27,7 @@
 	import Test4410 from './routes/testing/4410.svelte';
 	import Test5185 from './routes/testing/5185.svelte';
   import Restricted from './routes/Restricted.svelte';
-	import { loggedIn } from './stores/user.js';
+  import Details from './routes/devices/Details.svelte';
   import { update, updmsg, download, progress } from './stores/update.js';
 	import { allRoutes, updates } from './stores/data.js';
   import { compareVersions } from 'compare-versions';
@@ -37,15 +37,8 @@
 	export let appName;
 
   const routes = {
-    "/":                                wrap({ component: Devices,        conditions: [(detail) => { return routeGuard({ location: '/analyse' }); }] }),
-		"/login":                           wrap({ component: Login,          conditions: [(detail) => {
-				if ($loggedIn == true) {
-					push("/welcome")
-				} else {
-					return true
-				}
-			}],
-		}),
+    "/":                                wrap({ component: Devices,        conditions: [(detail) => { return routeGuard(detail); }] }),
+		"/login":                           wrap({ component: Login,          conditions: [(detail) => { return routeGuard(detail); }] }),
     "/advanced":                        wrap({ component: NotFound,       conditions: [(detail) => { return true;               }] }),
 		"/configure":                       wrap({ component: Configure,      conditions: [(detail) => { return routeGuard(detail); }] }),
 		"/configure/3271/:instance/:fluid": wrap({ component: ConfigureFluid, conditions: [(detail) => { return routeGuard(detail); }] }),
@@ -66,19 +59,14 @@
 		"/testing/4410/:instance":          wrap({ component: Test4410,       conditions: [(detail) => { return routeGuard(detail); }] }),
 		"/testing/5185":                    wrap({ component: Test5185,       conditions: [(detail) => { return routeGuard(detail); }] }),
     "/testing/5185-H":                  wrap({ component: Test5185,       conditions: [(detail) => { return routeGuard(detail); }] }),
-		"/restricted": Restricted,
-		"/Welcome":                         wrap({ component: Welcome,        conditions: [(detail) => {
-				if ($loggedIn == true) {
-					return true
-				} else {
-					push("/login")
-				}
-			}],
-		}),
-		"/monitor/:address": Monitor,
-		"/messages/:protocol/:pgn/:function/:manufacturer/:industry/:instance/:type":  Content,
-		// "/details/:protocol/:pgn/:function/:manufacturer/:industry/:instance/:type": Details,
-		"*": NotFound,
+		"/restricted":                      wrap({ component: Restricted,     conditions: [(detail) => { return routeGuard(detail); }] }),
+		"/welcome":                         wrap({ component: Welcome,        conditions: [(detail) => { return routeGuard(detail); }] }),
+		"/monitor/:address":                wrap({ component: Monitor,        conditions: [(detail) => { return routeGuard(detail); }] }),
+		"/messages/:protocol/:pgn/:function/:manufacturer/:industry/:instance/:type":
+                                        wrap({ component: Content,        conditions: [(detail) => { return routeGuard(detail); }] }),
+		"/details/:protocol/:pgn/:function/:manufacturer/:industry/:instance/:type":
+                                        wrap({ component: Details,        conditions: [(detail) => { return routeGuard(detail); }] }),
+		"*":                                wrap({ component: NotFound,       conditions: [(detail) => { return true;               }] }),
 	};
 
 	let prc;
@@ -126,7 +114,7 @@
   function _start(e) {
 		started = true;
 		window.pumaAPI.send('upd-start');
-	}
+	};
 
   function _restrict(e) {
     push('/restricted');
@@ -137,12 +125,25 @@
 		$download = false;
 		$progress = {};
 		started = false;
-	}
+	};
 
   $allRoutes = new Array();
   for (const [key, val] of Object.entries(routes)) {
-    if (key.startsWith('/configure/') || key.startsWith('/program/') || key.startsWith('/testing/')) {
-      $allRoutes.push(key);
+    let rou = null;
+    switch (key) {
+    case '/':
+      rou = "/analyse";
+      break;
+    case '/login':
+    case '/restricted':
+    case '/welcome':
+    case '*':
+      break;
+    default:
+      rou = key;
+    }
+    if (rou != null) {
+      $allRoutes.push(rou);
     }
   }
 
