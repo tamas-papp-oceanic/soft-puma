@@ -18,5 +18,4 @@
   }
 </script>
 
-<Selector devices={devs} bind:tab={$selected.config} bind:dev={$selected.device} on:select={select}
-/>
+<Selector devices={devs} bind:tab={$selected.config} bind:dev={$selected.device} on:select={select} />

@@ -17,18 +17,10 @@
     { key: 'ins', value: 'Instance', sort: false },
     { key: 'title', value: 'Title', sort: false, width: '60%' },
   );
-  const sims = new Array(
-    { id: 0, text: 'Increasing' },
-    { id: 1, text: 'Decreasing' },
-    { id: 2, text: 'Natural' },
-    { id: 3, text: 'Random' },
-  );
   let insts = new Array();
   let rows = new Array();
   let selectedRowIds = new Array();
   let height;
-  let simulation = 0;
-  let instance = null;
   let pagination = {
     pageSize: 10,
     page: 1,
@@ -36,42 +28,27 @@
   };
   let selection = null;
 
-  function setinst(e) {
+  function setIns(e) {
     if (selection != null) {
       for (let i in data) {
-        if (data[i].key == selection) {
-          data[i].ins = instance;
-          selection = null;
-          instance = null;
+        if (data[i].id == selection.id) {
+          data[i].ins = selection.ins;
           break;
         }
       }
     }
   };  
 
-  function setsim(e) {
-    dispatch("setsim", e.detail);
-  };
-
-  function start(e) {
-    dispatch("start", e.detail);
-  };    
-  
   function select(e) {
-    instance = e.detail.ins;
-    selection = e.detail.id;
-    dispatch("select", e.detail);
+    if (e.detail.selected) {
+      selection = e.detail.row;
+    } else {
+      selection = null;
+    }
   };
 
-  function delRow(e) {
-    console.log(e)
-    // instance = e.detail.ins;
-    // selection = e.detail.id;
-    // dispatch("select", e.detail);
-  };
-
-  function stop(e) {
-    dispatch("stop", e.detail);
+  function addRow(e) {
+    dispatch("addrow", selection);
   };
 
   function cancel(e) {
@@ -81,11 +58,10 @@
   function setData(val) {
     let arr = new Array();
     if (val != null) {
-      simulation = val.simulation != null ? val.simulation : 0;
-      let dat = JSON.parse(JSON.stringify(val.table));
+      let dat = JSON.parse(JSON.stringify(val));
       for (let i in dat) {
         let spl = splitKey(dat[i].id);
-        arr.push({ id: dat[i].id, pgn: spl.pgn, title: dat[i].title, ins: dat[i].ins });
+        arr.push({ id: dat[i].id, pgn: spl.pgn, title: dat[i].val.title, ins: dat[i].ins });
       }
       arr.sort((a, b) => {
         return a.pgn.localeCompare(b.pgn) || a.title.localeCompare(b.title);
@@ -110,13 +86,13 @@
       <Grid fullWidth noGutter>
         <Row style="height: inherit;">
           <Column></Column>
-          <Column sm={12} md={12} lg={12}>
+          <Column sm={13} md={13} lg={13}>
             {#if loading}
               <DataTableSkeleton showHeader={true} showToolbar={false} {headers} size="compact" rows={pagination.pageSize} />
               <PaginationSkeleton />
             {:else}
               <DataTable
-                class="simtab"
+                class="msgtab"
                 size="compact"
                 radio
                 bind:selectedRowIds
@@ -125,8 +101,8 @@
                 pageSize={pagination.pageSize}
                 page={pagination.page}
                 on:click:row--select={(e) => select(e)}>
-                <span slot="title">Message(s) part of simulation.</span>
-                <span slot="description">(select row for remove from simulaton)</span>
+                <span slot="title">Select message(s) for simulation from below.</span>
+                <span slot="description">(select row for change of parameter(s) or add to simulaton)</span>
                 <svelte:fragment slot="cell" let:cell>{cell.value != null ? cell.value : ''}</svelte:fragment>
               </DataTable>
               {#if pagination.totalItems > pagination.pageSize}
@@ -140,31 +116,24 @@
             {/if}
           </Column>
           <Column></Column>
-          <Column sm={3} md={3} lg={3} style="display: flex; flex-flow: column nowrap; justify-content: space-between;">
+          <Column sm={2} md={2} lg={2} style="display: flex; flex-flow: column nowrap; justify-content: space-between;">
             <Row>
               <Column>
-                <!-- <Row>
-                  <Column>Parameters</Column>
+                <Row>
+                  <Column>Parameter(s)</Column>
                 </Row>
-                {#if (selection != null) && (instance != null)}
+                {#if (selection != null) && (selection.ins != null)}
                   <Row padding>
                     <Column>
                       {#if running}
                         <DropdownSkeleton />
                       {:else}
-                        <Dropdown titleText="Data instance" size="sm" bind:selectedId={instance} items={insts}
-                          disabled={running} />
+                        <Dropdown titleText="Data instance" size="sm" bind:selectedId={selection.ins} items={insts}
+                          disabled={running} on:select={setIns} />
                       {/if}
                     </Column>
                   </Row>
-                  <Row>
-                    <Column>
-                      <ButtonSet stacked style="padding: 0.2rem;">
-                        <Button style="margin: 0.2rem 0" on:click={(e) => setinst(e)}>Set</Button>
-                      </ButtonSet>
-                    </Column>
-                  </Row>
-                {/if} -->
+                {/if}
               </Column>
             </Row>
             <Row>
@@ -175,26 +144,10 @@
                 <Row padding>
                   <Column>
                     <ButtonSet stacked style="padding: 0.2rem;">
-                      <Button disabled={selectedRowIds.length == 0} style="margin: 0.2rem 0" on:click={(e) => delRow(e)}>Delete row</Button>
-                    </ButtonSet>
-                    {#if loading}
-                      <DropdownSkeleton />
-                    {:else}
-                      <Dropdown titleText="Simulation mode" size="sm" bind:selectedId={simulation} items={sims} on:select={(e) => setsim(e)} />
-                    {/if}
-                  </Column>
-                </Row>
-              <!-- </Column>
-              <Column sm={1} md={1} lg={1}></Column>
-              <Column> -->
-                <Row>
-                  <Column>
-                    <ButtonSet stacked style="padding: 0.2rem;">
-                      <Button style="margin: 0.2rem 0" disabled={(selectedRowIds.length == 0) || running} on:click={(e) => start(e)}>Start</Button>
-                      <Button style="margin: 0.2rem 0" disabled={!running} on:click={(e) => stop(e)}>Stop</Button>
+                      <Button disabled={selectedRowIds.length == 0} style="margin: 0.2rem 0" on:click={addRow}>Add row</Button>
                     </ButtonSet>
                   </Column>
-                </Row>
+                    </Row>
               </Column>
             </Row>
           </Column>
@@ -231,21 +184,18 @@
     text-align: justify;
     margin-bottom: 1rem;
   }
-  .simtab td:last-child {
+  .msgtab td:last-child {
     white-space: nowrap;
     overflow: hidden;
     text-overflow: ellipsis;
   }
-  .simtab .bx--data-table-header {
+  .msgtab .bx--data-table-header {
     padding: 0 0 1em 0;
   }
-  .simtab .bx--data-table-header__title {
+  .msgtab .bx--data-table-header__title {
     font-size: 1.25rem;
   }
-  .simtab .bx--data-table-header__description {
+  .msgtab .bx--data-table-header__description {
     font-size: 0.85rem;
-  }
-  .simtab .bx--data-table tbody tr.selected {
-    background-color: #666666;
   }
 </style>
