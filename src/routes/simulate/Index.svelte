@@ -5,6 +5,7 @@
   import MessageContainer from "./partials/MessageContainer.svelte";
   import SimulateContainer from "./partials/SimulateContainer.svelte";
   import nmeadefs from "../../config/nmeadefs.json";
+  import Notification from "../../components/Notification.svelte";
   import { nextIncremetal, nextDecremetal, nextNatural,
     nextRandom } from '../../helpers/simulate.js';
 
@@ -16,6 +17,10 @@
   let loading = true;
   let running = false;
   let tab = 0;
+  let notify = false;
+  let kind = null;
+  let title = null;
+  let subttl = null;
 
   onMount((e) => {
     for (const [key, val] of Object.entries(nmeadefs)) {
@@ -45,9 +50,23 @@
   };
 
   function addrow(e) {
-    simulator.table.push(e.detail);
-    simulator = simulator;
-    tab = 1;
+    let fnd = false;
+    for (let i in simulator.table) {
+      if (JSON.stringify(simulator.table[i]) === JSON.stringify(e.detail)) {
+        fnd = true;
+        break;
+      }
+    }
+    if (fnd) {
+      kind = 'error'
+      title = 'Error';
+      subttl = 'Already part of the simulation.';
+      notify = true;
+    } else {
+      simulator.table.push(e.detail);
+      simulator = simulator;
+      tab = 1;
+    }
   };
 
   function stop(e) {
@@ -75,6 +94,9 @@
           </TabContent>
         </svelte:fragment>
       </Tabs>
+      {#if notify}
+        <Notification kind={kind} title={title} subtitle={subttl} bind:notify={notify} />
+      {/if}
     </Column>
   </Row>
 </Grid>
