@@ -134,6 +134,7 @@ class NMEAEngine {
   };
   // NMEA message sending function
   sendMsg(msg) {
+    msg.header.src = this.#addrMngr.address;
     let frs = this.#createMsg(msg);
     for (let i in frs) {
       try {
@@ -210,7 +211,7 @@ class NMEAEngine {
     }
     if (this.#addrMngr.state == 'Valid') {
       let msg = {
-      key: 'nmea2000/065477/-/161/4/-/-',
+        key: 'nmea2000/065477/-/161/4/-/-',
         header: { pgn: 65477, src: this.#addrMngr.address, dst: 0xFF },
         fields: [
           { field: 1,title: 'Manufacturer Code', state: 'V', value: this.#addrMngr.name[2] },

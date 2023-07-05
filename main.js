@@ -1664,7 +1664,14 @@ ipcMain.on('c5720-write', (e, args) => {
   }
 });
 
-
+ipcMain.on('sim-data', (e, args) => {
+  const [dev, msg] = args;
+  if ((typeof dev === 'string') && (typeof devices[dev] !== 'undefined')) {
+    let eng = devices[dev].engine;
+    // Send simulation message
+    eng.sendMsg(msg);
+  }
+});
 
 // Stop device processing
 ipcMain.on('dev-stop', (e, ...args) => {

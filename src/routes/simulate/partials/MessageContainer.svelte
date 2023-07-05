@@ -15,18 +15,18 @@
   const headers = new Array(
     { key: 'pgn', value: 'PGN', sort: false },
     { key: 'ins', value: 'Instance', sort: false },
-    { key: 'title', value: 'Title', sort: false, width: '60%' },
+    { key: 'title', value: 'Title', sort: false, width: '70%' },
   );
   let insts = new Array();
   let rows = new Array();
   let selectedRowIds = new Array();
+  let selection = null;
   let height;
   let pagination = {
     pageSize: 10,
     page: 1,
     totalItems: 0,
   };
-  let selection = null;
 
   function setIns(e) {
     if (selection != null) {
@@ -39,16 +39,21 @@
     }
   };  
 
-  function select(e) {
-    if (e.detail.selected) {
-      selection = e.detail.row;
-    } else {
+  function selRow(e) {
+    if (JSON.stringify(selection) === JSON.stringify(e.detail)) {
+      selectedRowIds = new Array();
       selection = null;
     }
   };
 
+  function rowSel(e) {
+    selection = e.detail.row;
+  };
+
   function addRow(e) {
     dispatch("addrow", selection);
+    selectedRowIds = new Array();
+    selection = null;
   };
 
   function cancel(e) {
@@ -85,7 +90,6 @@
     <div class="tilecont">
       <Grid fullWidth noGutter>
         <Row style="height: inherit;">
-          <Column></Column>
           <Column sm={13} md={13} lg={13}>
             {#if loading}
               <DataTableSkeleton showHeader={true} showToolbar={false} {headers} size="compact" rows={pagination.pageSize} />
@@ -100,7 +104,8 @@
                 {rows}
                 pageSize={pagination.pageSize}
                 page={pagination.page}
-                on:click:row--select={(e) => select(e)}>
+                on:click:row={selRow}
+                on:click:row--select={rowSel}>
                 <span slot="title">Select message(s) for simulation from below.</span>
                 <span slot="description">(select row for change of parameter(s) or add to simulaton)</span>
                 <svelte:fragment slot="cell" let:cell>{cell.value != null ? cell.value : ''}</svelte:fragment>
@@ -115,8 +120,7 @@
               {/if}
             {/if}
           </Column>
-          <Column></Column>
-          <Column sm={2} md={2} lg={2} style="display: flex; flex-flow: column nowrap; justify-content: space-between;">
+          <Column sm={3} md={3} lg={3} style="display: flex; flex-flow: column nowrap; justify-content: space-between;">
             <Row>
               <Column>
                 <Row>
@@ -139,25 +143,24 @@
             <Row>
               <Column>
                 <Row>
-                  <Column>Operation</Column>
+                  <Column>Operation(s)</Column>
                 </Row>
                 <Row padding>
                   <Column>
                     <ButtonSet stacked style="padding: 0.2rem;">
-                      <Button disabled={selectedRowIds.length == 0} style="margin: 0.2rem 0" on:click={addRow}>Add row</Button>
+                      <Button disabled={selectedRowIds.length == 0} style="margin: 0.2rem 0" on:click={addRow}>Add message</Button>
                     </ButtonSet>
                   </Column>
                     </Row>
               </Column>
             </Row>
           </Column>
-          <Column></Column>
         </Row>
       </Grid>
     </div>
   </Tile>
   <ButtonSet style="justify-content: flex-end;">
-    <Button kind="secondary" on:click={(e) => cancel(e)}>Close</Button>
+    <Button kind="secondary" on:click={cancel}>Close</Button>
   </ButtonSet>
 </div>
 

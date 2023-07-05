@@ -15,67 +15,66 @@
   const headers = new Array(
     { key: 'pgn', value: 'PGN', sort: false },
     { key: 'ins', value: 'Instance', sort: false },
-    { key: 'title', value: 'Title', sort: false, width: '60%' },
+    { key: 'title', value: 'Title', sort: false, width: '70%' },
   );
   const sims = new Array(
-    { id: 0, text: 'Increasing' },
-    { id: 1, text: 'Decreasing' },
+    { id: 0, text: 'Incremental' },
+    { id: 1, text: 'Decremental' },
     { id: 2, text: 'Natural' },
     { id: 3, text: 'Random' },
   );
   let insts = new Array();
   let rows = new Array();
   let selectedRowIds = new Array();
-  let height;
+  let selection = null;
   let simulation = 0;
-  let instance = null;
+  let height;
   let pagination = {
     pageSize: 10,
     page: 1,
     totalItems: 0,
   };
-  let selection = null;
 
-  function setinst(e) {
-    if (selection != null) {
-      for (let i in data) {
-        if (data[i].key == selection) {
-          data[i].ins = instance;
-          selection = null;
-          instance = null;
-          break;
-        }
-      }
-    }
-  };  
-
-  function setsim(e) {
+  function setSim(e) {
     dispatch("setsim", e.detail);
   };
 
   function start(e) {
-    dispatch("start", e.detail);
+    dispatch("start");
   };    
   
-  function select(e) {
-    instance = e.detail.ins;
-    selection = e.detail.id;
-    dispatch("select", e.detail);
+  function selRow(e) {
+    if (JSON.stringify(selection) === JSON.stringify(e.detail)) {
+      selectedRowIds = new Array();
+      selection = null;
+    }
+  };
+
+  function rowSel(e) {
+    selection = e.detail.row;
   };
 
   function delRow(e) {
-    console.log(e)
-    // instance = e.detail.ins;
-    // selection = e.detail.id;
-    // dispatch("select", e.detail);
-  };
+    dispatch("delrow", selection);
+    selectedRowIds = new Array();
+    selection = null;
+};
+
+  function clrTab(e) {
+    dispatch("clrtab");
+    selectedRowIds = new Array();
+    selection = null;
+};
 
   function stop(e) {
-    dispatch("stop", e.detail);
+    dispatch("stop");
   };
 
+  function send(e) {
+    dispatch("send", selection);
+  };
   function cancel(e) {
-    dispatch("cancel", e.detail);
+    dispatch("cancel");
   };
 
   function setData(val) {
@@ -85,7 +84,7 @@
       let dat = JSON.parse(JSON.stringify(val.table));
       for (let i in dat) {
         let spl = splitKey(dat[i].id);
-        arr.push({ id: dat[i].id, pgn: spl.pgn, title: dat[i].title, ins: dat[i].ins });
+        arr.push({ id: dat[i].id, pgn: spl.pgn, title: dat[i].title, ins: dat[i].ins, def: dat[i].def });
       }
       arr.sort((a, b) => {
         return a.pgn.localeCompare(b.pgn) || a.title.localeCompare(b.title);
@@ -109,8 +108,7 @@
     <div class="tilecont">
       <Grid fullWidth noGutter>
         <Row style="height: inherit;">
-          <Column></Column>
-          <Column sm={12} md={12} lg={12}>
+          <Column sm={13} md={13} lg={13}>
             {#if loading}
               <DataTableSkeleton showHeader={true} showToolbar={false} {headers} size="compact" rows={pagination.pageSize} />
               <PaginationSkeleton />
@@ -124,7 +122,8 @@
                 {rows}
                 pageSize={pagination.pageSize}
                 page={pagination.page}
-                on:click:row--select={(e) => select(e)}>
+                on:click:row={selRow}
+                on:click:row--select={rowSel}>
                 <span slot="title">Message(s) part of simulation.</span>
                 <span slot="description">(select row for remove from simulaton)</span>
                 <svelte:fragment slot="cell" let:cell>{cell.value != null ? cell.value : ''}</svelte:fragment>
@@ -139,72 +138,60 @@
               {/if}
             {/if}
           </Column>
-          <Column></Column>
           <Column sm={3} md={3} lg={3} style="display: flex; flex-flow: column nowrap; justify-content: space-between;">
             <Row>
               <Column>
-                <!-- <Row>
-                  <Column>Parameters</Column>
+                <Row>
+                  <Column>Operation(s)</Column>
                 </Row>
-                {#if (selection != null) && (instance != null)}
-                  <Row padding>
-                    <Column>
-                      {#if running}
-                        <DropdownSkeleton />
-                      {:else}
-                        <Dropdown titleText="Data instance" size="sm" bind:selectedId={instance} items={insts}
-                          disabled={running} />
-                      {/if}
-                    </Column>
-                  </Row>
-                  <Row>
-                    <Column>
-                      <ButtonSet stacked style="padding: 0.2rem;">
-                        <Button style="margin: 0.2rem 0" on:click={(e) => setinst(e)}>Set</Button>
-                      </ButtonSet>
-                    </Column>
-                  </Row>
-                {/if} -->
+                <Row padding>
+                  <Column>
+                    <ButtonSet stacked style="padding: 0.2rem;">
+                      <Button disabled={(selectedRowIds.length == 0) || running} style="margin: 0.2rem 0" on:click={delRow}>Delete message</Button>
+                      <Button disabled={(rows.length == 0) || running} style="margin: 0.2rem 0" on:click={clrTab}>Clear table</Button>
+                    </ButtonSet>
+                  </Column>
+                </Row>
               </Column>
             </Row>
             <Row>
               <Column>
                 <Row>
-                  <Column>Operation</Column>
+                  <Column>Simulation</Column>
+                </Row>
+                <Row style="padding: 1rem 0 0 0;">
+                  <Column>
+                    <ButtonSet stacked style="padding: 0.2rem;">
+                      <Button style="margin: 0.2rem 0" disabled={(selectedRowIds.length == 0) || running} on:click={send}>Send message</Button>
+                    </ButtonSet>
+                  </Column>
                 </Row>
                 <Row padding>
                   <Column>
-                    <ButtonSet stacked style="padding: 0.2rem;">
-                      <Button disabled={selectedRowIds.length == 0} style="margin: 0.2rem 0" on:click={(e) => delRow(e)}>Delete row</Button>
-                    </ButtonSet>
                     {#if loading}
                       <DropdownSkeleton />
                     {:else}
-                      <Dropdown titleText="Simulation mode" size="sm" bind:selectedId={simulation} items={sims} on:select={(e) => setsim(e)} />
+                      <Dropdown disabled={running} titleText="Simulation mode" size="sm" bind:selectedId={simulation} items={sims} on:select={setSim} />
                     {/if}
                   </Column>
                 </Row>
-              <!-- </Column>
-              <Column sm={1} md={1} lg={1}></Column>
-              <Column> -->
                 <Row>
                   <Column>
                     <ButtonSet stacked style="padding: 0.2rem;">
-                      <Button style="margin: 0.2rem 0" disabled={(selectedRowIds.length == 0) || running} on:click={(e) => start(e)}>Start</Button>
-                      <Button style="margin: 0.2rem 0" disabled={!running} on:click={(e) => stop(e)}>Stop</Button>
+                      <Button style="margin: 0.2rem 0" disabled={(rows.length == 0) || running} on:click={start}>Start simulation</Button>
+                      <Button style="margin: 0.2rem 0" disabled={!running} on:click={stop}>Stop simulation</Button>
                     </ButtonSet>
                   </Column>
                 </Row>
               </Column>
             </Row>
           </Column>
-          <Column></Column>
         </Row>
       </Grid>
     </div>
   </Tile>
   <ButtonSet style="justify-content: flex-end;">
-    <Button kind="secondary" on:click={(e) => cancel(e)}>Close</Button>
+    <Button kind="secondary" on:click={cancel}>Close</Button>
   </ButtonSet>
 </div>
 
@@ -221,8 +208,6 @@
     flex-flow: column nowrap;
     justify-content: flex-start;
     align-items: flex-start;
-    width: 100%;
-    height: 100%;
   }
   .container .tilecont .title {
     max-width: 90%;
