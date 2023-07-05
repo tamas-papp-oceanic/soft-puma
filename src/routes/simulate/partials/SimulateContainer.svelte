@@ -84,7 +84,7 @@
       let dat = JSON.parse(JSON.stringify(val.table));
       for (let i in dat) {
         let spl = splitKey(dat[i].id);
-        arr.push({ id: dat[i].id, pgn: spl.pgn, title: dat[i].title, ins: dat[i].ins, def: dat[i].def });
+        arr.push({ id: dat[i].id, pgn: spl.pgn, title: dat[i].title, ins: dat[i].ins });
       }
       arr.sort((a, b) => {
         return a.pgn.localeCompare(b.pgn) || a.title.localeCompare(b.title);

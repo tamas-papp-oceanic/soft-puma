@@ -8,12 +8,12 @@ function minmax(def) {
   } else if (def['type'].startsWith('bit(')) {
     let num = parseInt(def['type'].replace('bit(', '').replace(')', ''));
     if (Number.isInteger(num)) {
-      return { min: -Math.pow(10, num), max: Math.pow(10, num) };
+      return { min: 0, max: Math.pow(2, num) };
     }
   } else if (def['type'].startsWith('int') || def['type'].startsWith('uint')) {
     let num = parseInt(def['type'].replace('uint', '').replace('int', ''));
     if (Number.isInteger(num)) {
-      return { min: def['type'].startsWith('uint') ? 0 : -Math.pow(10, num), max: Math.pow(10, num) };
+      return { min: def['type'].startsWith('uint') ? 0 : -Math.pow(2, num - 1), max: def['type'].startsWith('uint') ? Math.pow(2, num) : Math.pow(2, num - 1) - 1 };
     }
   }
   return null;
@@ -22,7 +22,13 @@ function minmax(def) {
 function nextIncremetal(def) {
   let res = def.value != null ? def.value : 0;
   let lim = minmax(def);
-  res += 0.5;
+  if (def.multiplier != null) {
+    res /= def.multiplier;
+  }
+  res++;
+  if (def.multiplier != null) {
+    res *= def.multiplier;
+  }
   if (lim != null) {
     if (res > lim.max) {
       res = lim.min;
@@ -34,7 +40,13 @@ function nextIncremetal(def) {
 function nextDecremetal(def) {
   let res = def.value != null ? def.value : 0;
   let lim = minmax(def);
-  res -= 0.5;
+  if (def.multiplier != null) {
+    res /= def.multiplier;
+  }
+  res--;
+  if (def.multiplier != null) {
+    res *= def.multiplier;
+  }
   if (lim != null) {
     if (res < lim.min) {
       res = lim.max;
@@ -47,10 +59,16 @@ function nextNatural(def) {
   let res = def.value != null ? def.value : 0;
   let lim = minmax(def);
   let rnd = Math.random();
+  if (def.multiplier != null) {
+    res /= def.multiplier;
+  }
   if (rnd < 0.5) {
-    res -= 0.1;
+    res--;
   } else {
-    res += 0.1;
+    res++;
+  }
+  if (def.multiplier != null) {
+    res *= def.multiplier;
   }
   if (res < lim.min) {
     res = lim.min;
@@ -64,7 +82,7 @@ function nextRandom(def) {
   let res = def.value != null ? def.value : 0;
   let lim = minmax(def);
   let rnd = Math.random();
-  res = Math.round(((rnd * (lim.max - lim.min)) + lim.min) * 100) / 100;
+  res = Math.round((rnd * (lim.max - lim.min)) + lim.min);
   if (res < lim.min) {
     res = lim.min;
   } else if (res > lim.max) {

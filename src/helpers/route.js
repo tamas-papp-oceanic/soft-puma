@@ -53,10 +53,24 @@ function splitKey(key) {
   let spl = key.split('/');
   for (let i = 0; i < 7; i++) {
     if (spl.length > i) {
-      ret[Object.keys(ret)[i]] = spl[i];
+      if (spl[i] != '-') {
+        ret[Object.keys(ret)[i]] = spl[i];
+      }
     }
   }
   return ret;
 };
 
-export { isRoute, splitKey };
+function joinKey(spl) {
+  let ret = '';
+  ret += (spl.protocol != null ? spl.protocol : '-');
+  ret += '/' + (spl.pgn != null ? spl.pgn : '-');
+  ret += '/' + (spl.function != null ? spl.function : '-');
+  ret += '/' + (spl.manufacturer != null ? spl.manufacturer : '-');
+  ret += '/' + (spl.industry != null ? spl.industry : '-');
+  ret += '/' + (spl.instance != null ? spl.instance : '-');
+  ret += '/' + (spl.fluidtype != null ? spl.fluidtype : '-');
+  return ret;
+};
+
+export { isRoute, splitKey, joinKey };

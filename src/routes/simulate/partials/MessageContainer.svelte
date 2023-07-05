@@ -51,7 +51,7 @@
   };
 
   function addRow(e) {
-    dispatch("addrow", selection);
+    dispatch("addrow", JSON.parse(JSON.stringify(selection)));
     selectedRowIds = new Array();
     selection = null;
   };

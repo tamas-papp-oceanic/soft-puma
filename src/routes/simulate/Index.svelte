@@ -9,7 +9,7 @@
   import { nextIncremetal, nextDecremetal, nextNatural,
     nextRandom } from '../../helpers/simulate.js';
   import { device } from '../../stores/data.js';
-    import { splitKey } from "../../helpers/route";
+  import { splitKey, joinKey } from "../../helpers/route";
     
   let selector = new Array();
   let simulator = {
@@ -45,6 +45,10 @@
   };
 
   function addRow(e) {
+    let oid = e.detail.id;
+    let spl = splitKey(e.detail.id);
+    spl.instance = e.detail.ins != null ? e.detail.ins.toString() : null;
+    e.detail.id = joinKey(spl);
     let fnd = false;
     for (let i in simulator.table) {
       if (JSON.stringify(simulator.table[i]) === JSON.stringify(e.detail)) {
@@ -60,7 +64,7 @@
     } else {
       simulator.table.push(e.detail);
       simulator = simulator;
-      values.push({ id: e.detail.id, ins: e.detail.ins, def: nmeadefs[e.detail.id], tim: null })
+      values.push({ id: e.detail.id, ins: e.detail.ins, def: nmeadefs[oid], tim: null })
       tab = 1;
     }
   };
@@ -86,24 +90,11 @@
   function send(e) {
     for (let i in simulator.table) {
       if (JSON.stringify(simulator.table[i]) === JSON.stringify(e.detail)) {
-console.log(values[i])
-        break;
-      }
-    }
-  };
-
-  function setSim(e) {
-    simulator.simulation = e.detail.selectedId;
-  };
-
-  function start(e) {
-    running = true;
-    for (let i in values) {
-      if ((typeof values[i].def.interval !== 'undefined') && (values[i].def.interval != null)) {
-        values[i].tim = setInterval((i) => {
-          for (let j in values[i].def.fields) {
-            let fld = values[i].def.fields[j];
-            let val = null;
+        let key = values[i].id;
+        for (let j in values[i].def.fields) {
+          let fld = values[i].def.fields[j];
+          let val = 0;
+          if (fld['type'].startsWith('int') || fld['type'].startsWith('uint')) {
             switch (simulator.simulation) {
             case 0:
               val = nextIncremetal(fld);
@@ -118,15 +109,77 @@ console.log(values[i])
               val = nextRandom(fld);
               break;
             }
-            values[i].def.fields[j].value = val;
-            let key = values[i].id;
-            let msg = {
-              key: key,
-              header: { pgn: splitKey(key).pgn, src: null, dst: 0xFF },
-              fields: values[i].def.fields,
-            }
-            window.pumaAPI.send('sim-data', [$device, msg]);
+          } else if (fld['type'].startsWith('chr(') || (fld['type'] == 'str')) {
+            val = '';
+          } else if (fld['type'].startsWith('bit(')) {
+            val = 0;
           }
+          values[i].def.fields[j].value = val;
+        }
+        let msg = {
+          key: key,
+          header: { pgn: parseInt(splitKey(key).pgn), src: null, dst: 0xFF },
+          fields: values[i].def.fields,
+        }
+        for (let j in msg.fields) {
+          if (typeof msg.fields[j].instance !== 'undefined') {
+            msg.fields[j].value = values[i].ins;
+            break;
+          }
+        }
+        window.pumaAPI.send('sim-data', [$device, msg]);
+        break;
+      }
+    }
+  };
+
+  function setSim(e) {
+    simulator.simulation = e.detail.selectedId;
+  };
+
+  function start(e) {
+    running = true;
+    for (let i in values) {
+      if ((typeof values[i].def.interval !== 'undefined') && (values[i].def.interval != null)) {
+        values[i].tim = setInterval((i) => {
+          let key = values[i].id;
+          for (let j in values[i].def.fields) {
+            let fld = values[i].def.fields[j];
+            let val = 0;
+            if (fld['type'].startsWith('int') || fld['type'].startsWith('uint')) {
+              switch (simulator.simulation) {
+              case 0:
+                val = nextIncremetal(fld);
+                break;
+              case 1:
+                val = nextDecremetal(fld);
+                break;
+              case 2:
+                val = nextNatural(fld);
+                break;
+              case 3:
+                val = nextRandom(fld);
+                break;
+              }
+            } else if (fld['type'].startsWith('chr(') || (fld['type'] == 'str')) {
+              val = '';
+            } else if (fld['type'].startsWith('bit(')) {
+              val = 0;
+            }
+            values[i].def.fields[j].value = val;
+          }
+          let msg = {
+            key: key,
+            header: { pgn: parseInt(splitKey(key).pgn), src: null, dst: 0xFF },
+            fields: values[i].def.fields,
+          }
+          for (let j in msg.fields) {
+            if (typeof msg.fields[j].instance !== 'undefined') {
+              msg.fields[j].value = values[i].ins;
+              break;
+            }
+          }
+          window.pumaAPI.send('sim-data', [$device, msg]);
         }, values[i].def.interval, i);
       }
     }
@@ -146,10 +199,6 @@ console.log(values[i])
     running = false;
     pop();
   };
-
-  function sndMsg(def) {
-
-  }
 </script>
 
 <Grid>
