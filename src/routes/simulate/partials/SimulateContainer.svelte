@@ -123,7 +123,7 @@
 </script>
 
 <svelte:window bind:innerHeight={height} />
-<div class="container" style={style}>
+<div class="simcont" style={style}>
   <Tile style="height: -webkit-fill-available;">
     <div class="tilecont">
       <Grid fullWidth noGutter>
@@ -209,20 +209,20 @@
 </div>
 
 <style type="css" global>
-  .container {
+  .simcont {
     display: flex;
     flex-flow: column nowrap;
     justify-content: stretch;
     border: 1px solid gray;
     width: 100%;
   }
-  .container .tilecont {
+  .simcont .tilecont {
     display: flex;
     flex-flow: column nowrap;
     justify-content: flex-start;
     align-items: flex-start;
   }
-  .container .tilecont .title {
+  .simcont .tilecont .title {
     max-width: 90%;
     white-space: pre-line;
     font-size: 1.25rem;

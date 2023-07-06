@@ -28,21 +28,34 @@
 
   onMount((e) => {
     for (const [key, val] of Object.entries(nmeadefs)) {
-      let ins = null;
-      let flu = null;
-      for (let i in val.fields) {
-        if (typeof val.fields[i].instance !== 'undefined') {
-          ins = 0;
-          break;
+      let rec = Object.assign({ id: key }, val);
+      for (let i in rec.fields) {
+        let fld = rec.fields[i];
+        if (fld.type != null) {
+          if (typeof fld.instance !== 'undefined') {
+            rec.fields[i].value = 0;
+          }
+          if (typeof fld.fluid !== 'undefined') {
+            rec.fields[i].value = 0;
+          }
+          if (fld.type.startsWith('int') || fld.type.startsWith('uint')) {
+            rec.fields[i].value = 0;
+          } else if (fld.type.startsWith('float')) {
+            rec.fields[i].value = 0.0;
+          } else if (fld.type.startsWith('bit(')) {
+            rec.fields[i].value = 0;
+            if (fld.dictionary == 'DD001') {
+              let num = parseInt(fld.type.replace('bit(', '').replace(')', ''));
+              if (Number.isInteger(num)) {
+                rec.fields[i].value = Math.pow(2, num) - 1;
+              }
+            }
+          } else if (fld.type.startsWith('chr(') || (fld.type == 'str')) {
+            rec.fields[i].value = '';
+          }
         }
       }
-      for (let i in val.fields) {
-        if (typeof val.fields[i].fluid !== 'undefined') {
-          flu = 0;
-          break;
-        }
-      }
-      selector.push({ id: key, val: val, ins: ins, flu: flu });
+      selector.push(rec);
     }
     simulator.simulation = 0;
     loading = false;
@@ -56,15 +69,19 @@
     tab = e.detail;
   };
 
+  function getValue(rec, pro) {
+    for (let i in rec.fields) {
+      if (typeof rec.fields[i][pro] !== 'undefined') {
+        return rec.fields[i].value;
+      }
+    }
+    return null;
+  }
+
   function addRow(e) {
-    let oid = e.detail.id;
-    let spl = splitKey(e.detail.id);
-    spl.instance = e.detail.ins != null ? e.detail.ins.toString() : null;
-    spl.fluidtype = e.detail.flu != null ? e.detail.flu.toString() : null;
-    e.detail.id = joinKey(spl);
     let fnd = false;
     for (let i in simulator.table) {
-      if (JSON.stringify(simulator.table[i]) === JSON.stringify(e.detail)) {
+      if (simulator.table[i].id === e.detail.id) {
         fnd = true;
         break;
       }
@@ -75,9 +92,13 @@
       subttl = 'Already part of the simulation.';
       notify = true;
     } else {
-      simulator.table.push(e.detail);
+      let spl = splitKey(e.detail.id);
+      spl.instance = getValue(e.detail, 'instance');
+      spl.fluidtype = getValue(e.detail, 'fluid');
+      e.detail.id = joinKey(spl);
+      let rec = Object.assign(e.detail, { tim: null });
+      simulator.table.push(rec);
       simulator = simulator;
-      values.push({ id: e.detail.id, ins: e.detail.ins, flu: e.detail.flu, def: nmeadefs[oid], tim: null })
       tab = 1;
     }
   };

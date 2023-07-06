@@ -27,6 +27,7 @@
     { id: 6, text: 'Fuel (Gasoline)' },
   ];
   let rows = new Array();
+  let filteredRowIds = new Array();
   let selectedRowIds = new Array();
   let selection = null;
   let height;
@@ -35,28 +36,6 @@
     page: 1,
     totalItems: 0,
   };
-
-  function setIns(e) {
-    if (selection != null) {
-      for (let i in data) {
-        if (data[i].id == selection.id) {
-          data[i].ins = selection.ins;
-          break;
-        }
-      }
-    }
-  };  
-
-  function setFlu(e) {
-    if (selection != null) {
-      for (let i in data) {
-        if (data[i].id == selection.id) {
-          data[i].flu = selection.flu;
-          break;
-        }
-      }
-    }
-  };  
 
   function selRow(e) {
     if (JSON.stringify(selection) === JSON.stringify(e.detail)) {
@@ -79,17 +58,36 @@
     dispatch("cancel", e.detail);
   };
 
+  function getValue(rec, pro) {
+    if (rec != null) {
+      for (let i in rec.fields) {
+        if (typeof rec.fields[i][pro] !== 'undefined') {
+          return rec.fields[i].value;
+        }
+      }
+    }
+    return null;
+  };
+
+  function setValue(e, rec, pro) {
+    if (rec != null) {
+      for (let i in rec.fields) {
+        if (typeof rec.fields[i][pro] !== 'undefined') {
+          rec.fields[i].value = e.detail.selectedId;
+        }
+      }
+    }
+  };  
+
   function setData(val) {
     let arr = new Array();
     if (val != null) {
       let dat = JSON.parse(JSON.stringify(val));
       for (let i in dat) {
         let spl = splitKey(dat[i].id);
-        arr.push({ id: dat[i].id, pgn: spl.pgn, title: dat[i].val.title, ins: dat[i].ins, flu: dat[i].flu });
+        dat[i].pgn = spl.pgn;
+        arr.push(dat[i]);
       }
-      arr.sort((a, b) => {
-        return a.pgn.localeCompare(b.pgn) || a.title.localeCompare(b.title);
-      });
     }
     rows = JSON.parse(JSON.stringify(arr));
   };
@@ -99,32 +97,21 @@
   }
 
   $: data, setData(data);
-  $: pagination.totalItems = rows.length;
+  $: pagination.totalItems = filteredRowIds.length;
   $: pagination.pageSize = Math.round((height / getComputedStyle(document.documentElement).fontSize.replace('px', '')) / 2) - 7;
 </script>
 
 <svelte:window bind:innerHeight={height} />
-<div class="container" style={style}>
+<div class="msgcont" style={style}>
   <Tile style="height: -webkit-fill-available;">
     <div class="tilecont">
       <Grid fullWidth noGutter>
         <Row style="height: inherit;">
           <Column sm={13} md={13} lg={13}>
-            <Toolbar>
-              <ToolbarContent>
-                <Tile style="display: flex; flex-flow: column nowrap; width: 70%;">
-                  <span class="title">NMEA2000 message(s) for simulation.</span>
-                  <span class="desrc">(select message for change of parameter(s) or add to simulaton)</span>
-                </Tile>
-                <ToolbarSearch />
-              </ToolbarContent>
-            </Toolbar>
             {#if loading}
               <DataTableSkeleton showHeader={true} showToolbar={false} {headers} size="compact" rows={pagination.pageSize} />
               <PaginationSkeleton />
             {:else}
-            <!-- title="NMEA2000 message(s) for simulation." -->
-            <!-- description="(select message for change of parameter(s) or add to simulaton)" -->
               <DataTable
                 class="msgtab"
                 size="compact"
@@ -136,6 +123,22 @@
                 page={pagination.page}
                 on:click:row={selRow}
                 on:click:row--select={rowSel}>
+                <Toolbar>
+                  <ToolbarContent>
+                    <Tile class="head">
+                      <h4 class="title">NMEA2000 message(s) for simulation.</h4>
+                      <p class="descr">(select message for change of parameter(s) or add to simulaton)</p>
+                    </Tile>
+                    <ToolbarSearch
+                      bind:filteredRowIds
+                      shouldFilterRows={(row, value) => {
+                        return (
+                          row.pgn.toLowerCase().includes(value.toLowerCase()) ||
+                          row.title.toLowerCase().includes(value.toLowerCase())
+                        );
+                      }} />
+                  </ToolbarContent>
+                </Toolbar>
               </DataTable>
               {#if pagination.totalItems > pagination.pageSize}
                 <Pagination
@@ -154,26 +157,26 @@
                   <Column>Parameter(s)</Column>
                 </Row>
                 {#if selection != null} 
-                  {#if selection.ins != null}
+                  {#if getValue(selection, 'instance') != null}
                     <Row padding>
                       <Column>
                         {#if running}
                           <DropdownSkeleton />
                         {:else}
-                          <Dropdown titleText="Data instance" size="sm" bind:selectedId={selection.ins} items={insts}
-                            disabled={running} on:select={setIns} />
+                          <Dropdown titleText="Data instance" size="sm" selectedId={getValue(selection, 'instance')} items={insts}
+                            disabled={running} on:select={(e) => setValue(e, selection, 'instance')} />
                         {/if}
                       </Column>
                     </Row>
                   {/if}
-                  {#if selection.flu != null}
+                  {#if getValue(selection, 'fluid') != null}
                     <Row padding>
                       <Column>
                         {#if running}
                           <DropdownSkeleton />
                         {:else}
-                          <Dropdown titleText="Fluid type" size="sm" bind:selectedId={selection.flu} items={fluts}
-                            disabled={running} on:select={setFlu} />
+                          <Dropdown titleText="Fluid type" size="sm" selectedId={getValue(selection, 'fluid')} items={fluts}
+                            disabled={running} on:select={(e) => setValue(e, selection, 'fluid')} />
                         {/if}
                       </Column>
                     </Row>
@@ -206,14 +209,14 @@
 </div>
 
 <style type="css" global>
-  .container {
+  .msgcont {
     display: flex;
     flex-flow: column nowrap;
     justify-content: stretch;
     border: 1px solid gray;
     width: 100%;
   }
-  .container .tilecont {
+  .msgcont .tilecont {
     display: flex;
     flex-flow: column nowrap;
     justify-content: flex-start;
@@ -221,13 +224,23 @@
     width: 100%;
     height: 100%;
   }
-  .container .tilecont .title {
-    font-size: 1.25rem;
-    height: 0.25rem;
+  .msgcont .bx--toolbar-content {
+    justify-content: space-between;
+    height: 3.75rem;
   }
-  .container .tilecont .descr {
+  .msgcont .tilecont .head {
+    padding: 0.125rem 0 1em 0 !important;
+    width: 60%;
+  }
+  .msgcont .tilecont .title {
+    font-size: 1.25rem;
+  }
+  .msgcont .tilecont .descr {
     font-size: 0.8rem;
-    height: 1rem;
+    color: #c6c6c6;
+  }
+  .msgcont .bx--toolbar-search-container-active.bx--search {
+    max-width: 40%;
   }
   .msgtab td:last-child {
     white-space: nowrap;
