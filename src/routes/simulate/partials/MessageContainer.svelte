@@ -2,7 +2,7 @@
   import { createEventDispatcher } from "svelte";
   import { ButtonSet, Button, Tile, Grid, Row, Column, DataTableSkeleton,
     PaginationSkeleton, DataTable, Pagination, Dropdown,
-    DropdownSkeleton } from "carbon-components-svelte";
+    DropdownSkeleton, ToolbarContent, ToolbarSearch, Toolbar } from "carbon-components-svelte";
   import { splitKey } from "../../../helpers/route";
 
   export let data;
@@ -14,10 +14,18 @@
 
   const headers = new Array(
     { key: 'pgn', value: 'PGN', sort: false },
-    { key: 'ins', value: 'Instance', sort: false },
-    { key: 'title', value: 'Title', sort: false, width: '70%' },
+    { key: 'title', value: 'Title', sort: false, width: '80%' },
   );
   let insts = new Array();
+  let fluts = [
+    { id: 0, text: 'Fuel' },
+    { id: 1, text: 'Fresh Water' },
+    { id: 2, text: 'Waste Water' },
+    { id: 3, text: 'Live Well' },
+    { id: 4, text: 'Oil' },
+    { id: 5, text: 'Black Water (Sewage)' },
+    { id: 6, text: 'Fuel (Gasoline)' },
+  ];
   let rows = new Array();
   let selectedRowIds = new Array();
   let selection = null;
@@ -33,6 +41,17 @@
       for (let i in data) {
         if (data[i].id == selection.id) {
           data[i].ins = selection.ins;
+          break;
+        }
+      }
+    }
+  };  
+
+  function setFlu(e) {
+    if (selection != null) {
+      for (let i in data) {
+        if (data[i].id == selection.id) {
+          data[i].flu = selection.flu;
           break;
         }
       }
@@ -66,7 +85,7 @@
       let dat = JSON.parse(JSON.stringify(val));
       for (let i in dat) {
         let spl = splitKey(dat[i].id);
-        arr.push({ id: dat[i].id, pgn: spl.pgn, title: dat[i].val.title, ins: dat[i].ins });
+        arr.push({ id: dat[i].id, pgn: spl.pgn, title: dat[i].val.title, ins: dat[i].ins, flu: dat[i].flu });
       }
       arr.sort((a, b) => {
         return a.pgn.localeCompare(b.pgn) || a.title.localeCompare(b.title);
@@ -91,10 +110,21 @@
       <Grid fullWidth noGutter>
         <Row style="height: inherit;">
           <Column sm={13} md={13} lg={13}>
+            <Toolbar>
+              <ToolbarContent>
+                <Tile style="display: flex; flex-flow: column nowrap; width: 70%;">
+                  <span class="title">NMEA2000 message(s) for simulation.</span>
+                  <span class="desrc">(select message for change of parameter(s) or add to simulaton)</span>
+                </Tile>
+                <ToolbarSearch />
+              </ToolbarContent>
+            </Toolbar>
             {#if loading}
               <DataTableSkeleton showHeader={true} showToolbar={false} {headers} size="compact" rows={pagination.pageSize} />
               <PaginationSkeleton />
             {:else}
+            <!-- title="NMEA2000 message(s) for simulation." -->
+            <!-- description="(select message for change of parameter(s) or add to simulaton)" -->
               <DataTable
                 class="msgtab"
                 size="compact"
@@ -106,9 +136,6 @@
                 page={pagination.page}
                 on:click:row={selRow}
                 on:click:row--select={rowSel}>
-                <span slot="title">Select message(s) for simulation from below.</span>
-                <span slot="description">(select row for change of parameter(s) or add to simulaton)</span>
-                <svelte:fragment slot="cell" let:cell>{cell.value != null ? cell.value : ''}</svelte:fragment>
               </DataTable>
               {#if pagination.totalItems > pagination.pageSize}
                 <Pagination
@@ -126,24 +153,38 @@
                 <Row>
                   <Column>Parameter(s)</Column>
                 </Row>
-                {#if (selection != null) && (selection.ins != null)}
-                  <Row padding>
-                    <Column>
-                      {#if running}
-                        <DropdownSkeleton />
-                      {:else}
-                        <Dropdown titleText="Data instance" size="sm" bind:selectedId={selection.ins} items={insts}
-                          disabled={running} on:select={setIns} />
-                      {/if}
-                    </Column>
-                  </Row>
+                {#if selection != null} 
+                  {#if selection.ins != null}
+                    <Row padding>
+                      <Column>
+                        {#if running}
+                          <DropdownSkeleton />
+                        {:else}
+                          <Dropdown titleText="Data instance" size="sm" bind:selectedId={selection.ins} items={insts}
+                            disabled={running} on:select={setIns} />
+                        {/if}
+                      </Column>
+                    </Row>
+                  {/if}
+                  {#if selection.flu != null}
+                    <Row padding>
+                      <Column>
+                        {#if running}
+                          <DropdownSkeleton />
+                        {:else}
+                          <Dropdown titleText="Fluid type" size="sm" bind:selectedId={selection.flu} items={fluts}
+                            disabled={running} on:select={setFlu} />
+                        {/if}
+                      </Column>
+                    </Row>
+                  {/if}
                 {/if}
               </Column>
             </Row>
             <Row>
               <Column>
                 <Row>
-                  <Column>Operation(s)</Column>
+                  <Column>Operation</Column>
                 </Row>
                 <Row padding>
                   <Column>
@@ -181,11 +222,12 @@
     height: 100%;
   }
   .container .tilecont .title {
-    max-width: 90%;
-    white-space: pre-line;
     font-size: 1.25rem;
-    text-align: justify;
-    margin-bottom: 1rem;
+    height: 0.25rem;
+  }
+  .container .tilecont .descr {
+    font-size: 0.8rem;
+    height: 1rem;
   }
   .msgtab td:last-child {
     white-space: nowrap;

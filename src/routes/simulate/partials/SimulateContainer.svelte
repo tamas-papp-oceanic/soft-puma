@@ -15,15 +15,26 @@
   const headers = new Array(
     { key: 'pgn', value: 'PGN', sort: false },
     { key: 'ins', value: 'Instance', sort: false },
-    { key: 'title', value: 'Title', sort: false, width: '70%' },
+    { key: 'flu', value: 'Fluid', display: (item) => item == null ? null : getFlu(item), sort: false },
+    { key: 'title', value: 'Title', sort: false, width: '65%' },
   );
   const sims = new Array(
-    { id: 0, text: 'Incremental' },
-    { id: 1, text: 'Decremental' },
-    { id: 2, text: 'Natural' },
-    { id: 3, text: 'Random' },
+    { id: 0, text: 'Static' },
+    { id: 1, text: 'Incremental' },
+    { id: 2, text: 'Decremental' },
+    { id: 3, text: 'Natural' },
+    { id: 4, text: 'Random' },
   );
   let insts = new Array();
+  const fluts = [
+    { id: 0, text: 'Fuel' },
+    { id: 1, text: 'Fresh Water' },
+    { id: 2, text: 'Waste Water' },
+    { id: 3, text: 'Live Well' },
+    { id: 4, text: 'Oil' },
+    { id: 5, text: 'Black Water (Sewage)' },
+    { id: 6, text: 'Fuel (Gasoline)' },
+  ];
   let rows = new Array();
   let selectedRowIds = new Array();
   let selection = null;
@@ -33,6 +44,15 @@
     pageSize: 10,
     page: 1,
     totalItems: 0,
+  };
+
+  function getFlu(id) {
+    for (let i in fluts) {
+      if (fluts[i].id == id) {
+        return fluts[i].text;
+      }
+    }
+    return null;
   };
 
   function setSim(e) {
@@ -84,7 +104,7 @@
       let dat = JSON.parse(JSON.stringify(val.table));
       for (let i in dat) {
         let spl = splitKey(dat[i].id);
-        arr.push({ id: dat[i].id, pgn: spl.pgn, title: dat[i].title, ins: dat[i].ins });
+        arr.push({ id: dat[i].id, pgn: spl.pgn, title: dat[i].title, ins: dat[i].ins, flu: dat[i].flu });
       }
       arr.sort((a, b) => {
         return a.pgn.localeCompare(b.pgn) || a.title.localeCompare(b.title);
@@ -117,16 +137,15 @@
                 class="simtab"
                 size="compact"
                 radio
-                bind:selectedRowIds
+                title="NMEA2000 message(s) as part of simulation."
+                description="(select message for individual operation)"
                 {headers}
                 {rows}
+                bind:selectedRowIds
                 pageSize={pagination.pageSize}
                 page={pagination.page}
                 on:click:row={selRow}
                 on:click:row--select={rowSel}>
-                <span slot="title">Message(s) part of simulation.</span>
-                <span slot="description">(select row for remove from simulaton)</span>
-                <svelte:fragment slot="cell" let:cell>{cell.value != null ? cell.value : ''}</svelte:fragment>
               </DataTable>
               {#if pagination.totalItems > pagination.pageSize}
                 <Pagination
@@ -142,7 +161,7 @@
             <Row>
               <Column>
                 <Row>
-                  <Column>Operation(s)</Column>
+                  <Column>Operation</Column>
                 </Row>
                 <Row padding>
                   <Column>
@@ -159,13 +178,6 @@
                 <Row>
                   <Column>Simulation</Column>
                 </Row>
-                <Row style="padding: 1rem 0 0 0;">
-                  <Column>
-                    <ButtonSet stacked style="padding: 0.2rem;">
-                      <Button style="margin: 0.2rem 0" disabled={(selectedRowIds.length == 0) || running} on:click={send}>Send message</Button>
-                    </ButtonSet>
-                  </Column>
-                </Row>
                 <Row padding>
                   <Column>
                     {#if loading}
@@ -178,6 +190,7 @@
                 <Row>
                   <Column>
                     <ButtonSet stacked style="padding: 0.2rem;">
+                      <Button style="margin: 0.2rem 0" disabled={(selectedRowIds.length == 0) || running} on:click={send}>Send message</Button>
                       <Button style="margin: 0.2rem 0" disabled={(rows.length == 0) || running} on:click={start}>Start simulation</Button>
                       <Button style="margin: 0.2rem 0" disabled={!running} on:click={stop}>Stop simulation</Button>
                     </ButtonSet>

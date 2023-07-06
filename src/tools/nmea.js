@@ -85,9 +85,12 @@ function create() {
         if (fld.divider != null) {
           mul = (mul != null ? mul : 1) / fld.divider;
         }
-        let res = null;
-        if ((fld.dictionary != null) && (fld.dictionary == 'DD001')) {
-          res = fld.dictionary;
+        let dic = null;
+        switch (fld.dictionary) {
+        case "DD001":
+        case "DD002":
+        case "DD003":
+          dic = fld.dictionary;
         }
         let tmp = {
           field: fld.field,
@@ -95,10 +98,13 @@ function create() {
           type: typ,
           unit: fld.unit,
           multiplier: mul,
-          reserved: res,
+          dictionary: dic,
         };
         if (typeof fld.instance !== 'undefined') {
           tmp.instance = true;
+        }
+        if (typeof fld.group !== 'undefined') {
+          tmp.fluid = true;
         }
         obj.fields.push(tmp);
       }

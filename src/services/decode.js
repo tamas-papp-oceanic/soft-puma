@@ -83,8 +83,8 @@ function decode(frm, din) {
           let msk = (BigInt(1) << BigInt(len)) - BigInt(1);
           let off = BigInt(ptr) - BigInt(byt * 8);
           val = parseInt(((dat >> off) & msk).toString());
-          if (fld.reserved != null) {
-            switch (fld.reserved) {
+          if (fld.dictionary != null) {
+            switch (fld.dictionary) {
               case 'DD001':
               case 'DD003':
                 fld.state = '-';

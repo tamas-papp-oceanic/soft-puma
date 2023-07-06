@@ -18,4 +18,13 @@ function setfield(fld, fls) {
   }
 };
 
-export { getfield, setfield };
+// Returns true if proprietary PGN
+function isproprietary(pgn) {
+  if ((pgn == 61184) || ((pgn >= 65280) && (pgn <= 65535)) || 
+    (pgn == 126720) || ((pgn >= 130816) && (pgn <= 131071))) {
+    return true;
+  }
+  return false;
+}
+
+export { getfield, setfield, isproprietary };

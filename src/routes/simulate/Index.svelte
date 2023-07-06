@@ -1,5 +1,5 @@
 <script>
-  import { onMount } from "svelte";
+  import { onDestroy, onMount } from "svelte";
   import { Grid, Row, Column, Tabs, Tab, TabContent } from "carbon-components-svelte";
   import { pop } from "svelte-spa-router";
   import MessageContainer from "./partials/MessageContainer.svelte";
@@ -9,7 +9,8 @@
   import { nextIncremetal, nextDecremetal, nextNatural,
     nextRandom } from '../../helpers/simulate.js';
   import { device } from '../../stores/data.js';
-  import { splitKey, joinKey } from "../../helpers/route";
+  import { splitKey, joinKey } from "../../helpers/route.js";
+  import { isproprietary } from "../../stores/common.js";
     
   let selector = new Array();
   let simulator = {
@@ -28,16 +29,27 @@
   onMount((e) => {
     for (const [key, val] of Object.entries(nmeadefs)) {
       let ins = null;
+      let flu = null;
       for (let i in val.fields) {
         if (typeof val.fields[i].instance !== 'undefined') {
           ins = 0;
           break;
         }
       }
-      selector.push({ id: key, val: val, ins: ins });
+      for (let i in val.fields) {
+        if (typeof val.fields[i].fluid !== 'undefined') {
+          flu = 0;
+          break;
+        }
+      }
+      selector.push({ id: key, val: val, ins: ins, flu: flu });
     }
     simulator.simulation = 0;
     loading = false;
+  });
+
+  onDestroy((e) => {
+    stop(e);
   });
 
   function tabChg(e) {
@@ -48,6 +60,7 @@
     let oid = e.detail.id;
     let spl = splitKey(e.detail.id);
     spl.instance = e.detail.ins != null ? e.detail.ins.toString() : null;
+    spl.fluidtype = e.detail.flu != null ? e.detail.flu.toString() : null;
     e.detail.id = joinKey(spl);
     let fnd = false;
     for (let i in simulator.table) {
@@ -64,7 +77,7 @@
     } else {
       simulator.table.push(e.detail);
       simulator = simulator;
-      values.push({ id: e.detail.id, ins: e.detail.ins, def: nmeadefs[oid], tim: null })
+      values.push({ id: e.detail.id, ins: e.detail.ins, flu: e.detail.flu, def: nmeadefs[oid], tim: null })
       tab = 1;
     }
   };
@@ -87,47 +100,70 @@
     tab = 0;
   };
 
+  function simMsg(idx) {
+    let key = values[idx].id;
+    let spl = splitKey(key);
+    let pgn = parseInt(spl.pgn);
+    if (isproprietary(pgn)) {
+      values[idx].def.fields[0].value = parseInt(spl.manufacturer);
+      values[idx].def.fields[2].value = parseInt(spl.industry);
+    }
+    for (let i in values[idx].def.fields) {
+      let fld = values[idx].def.fields[i];
+      let val = (typeof fld.value === 'undefined') ? null : fld.value;
+      if (fld['type'].startsWith('int') || fld['type'].startsWith('uint')) {
+        val = (val == null) ? 0 : val;
+        switch (simulator.simulation) {
+        case 1:
+          val = nextIncremetal(fld);
+          break;
+        case 2:
+          val = nextDecremetal(fld);
+          break;
+        case 3:
+          val = nextNatural(fld);
+          break;
+        case 4:
+          val = nextRandom(fld);
+          break;
+        }
+      } else if (fld['type'].startsWith('bit(')) {
+        val = (val == null) ? 0 : val;
+        if (fld.dictionary == 'DD001') {
+          let num = parseInt(fld['type'].replace('bit(', '').replace(')', ''));
+          if (Number.isInteger(num)) {
+            val = Math.pow(2, num) - 1;
+          }
+        }
+      } else if (fld['type'].startsWith('chr(') || (fld['type'] == 'str')) {
+        val = (val == null) ? '' : val;
+      }
+      values[idx].def.fields[i].value = val;
+    }
+    let msg = {
+      key: key,
+      header: { pgn: pgn, src: null, dst: 0xFF },
+      fields: values[idx].def.fields,
+    }
+    for (let i in msg.fields) {
+      if (typeof msg.fields[i].instance !== 'undefined') {
+        msg.fields[i].value = values[idx].ins;
+        break;
+      }
+    }
+    for (let i in msg.fields) {
+      if (typeof msg.fields[i].fluid !== 'undefined') {
+        msg.fields[i].value = values[idx].flu;
+        break;
+      }
+    }
+    window.pumaAPI.send('sim-data', [$device, msg]);
+  };
+    
   function send(e) {
     for (let i in simulator.table) {
       if (JSON.stringify(simulator.table[i]) === JSON.stringify(e.detail)) {
-        let key = values[i].id;
-        for (let j in values[i].def.fields) {
-          let fld = values[i].def.fields[j];
-          let val = 0;
-          if (fld['type'].startsWith('int') || fld['type'].startsWith('uint')) {
-            switch (simulator.simulation) {
-            case 0:
-              val = nextIncremetal(fld);
-              break;
-            case 1:
-              val = nextDecremetal(fld);
-              break;
-            case 2:
-              val = nextNatural(fld);
-              break;
-            case 3:
-              val = nextRandom(fld);
-              break;
-            }
-          } else if (fld['type'].startsWith('chr(') || (fld['type'] == 'str')) {
-            val = '';
-          } else if (fld['type'].startsWith('bit(')) {
-            val = 0;
-          }
-          values[i].def.fields[j].value = val;
-        }
-        let msg = {
-          key: key,
-          header: { pgn: parseInt(splitKey(key).pgn), src: null, dst: 0xFF },
-          fields: values[i].def.fields,
-        }
-        for (let j in msg.fields) {
-          if (typeof msg.fields[j].instance !== 'undefined') {
-            msg.fields[j].value = values[i].ins;
-            break;
-          }
-        }
-        window.pumaAPI.send('sim-data', [$device, msg]);
+        simMsg(i);
         break;
       }
     }
@@ -141,46 +177,7 @@
     running = true;
     for (let i in values) {
       if ((typeof values[i].def.interval !== 'undefined') && (values[i].def.interval != null)) {
-        values[i].tim = setInterval((i) => {
-          let key = values[i].id;
-          for (let j in values[i].def.fields) {
-            let fld = values[i].def.fields[j];
-            let val = 0;
-            if (fld['type'].startsWith('int') || fld['type'].startsWith('uint')) {
-              switch (simulator.simulation) {
-              case 0:
-                val = nextIncremetal(fld);
-                break;
-              case 1:
-                val = nextDecremetal(fld);
-                break;
-              case 2:
-                val = nextNatural(fld);
-                break;
-              case 3:
-                val = nextRandom(fld);
-                break;
-              }
-            } else if (fld['type'].startsWith('chr(') || (fld['type'] == 'str')) {
-              val = '';
-            } else if (fld['type'].startsWith('bit(')) {
-              val = 0;
-            }
-            values[i].def.fields[j].value = val;
-          }
-          let msg = {
-            key: key,
-            header: { pgn: parseInt(splitKey(key).pgn), src: null, dst: 0xFF },
-            fields: values[i].def.fields,
-          }
-          for (let j in msg.fields) {
-            if (typeof msg.fields[j].instance !== 'undefined') {
-              msg.fields[j].value = values[i].ins;
-              break;
-            }
-          }
-          window.pumaAPI.send('sim-data', [$device, msg]);
-        }, values[i].def.interval, i);
+        values[i].tim = setInterval((i) => { simMsg(i); }, values[i].def.interval, i);
       }
     }
   };

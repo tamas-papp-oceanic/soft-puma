@@ -8,7 +8,7 @@ function minmax(def) {
   } else if (def['type'].startsWith('bit(')) {
     let num = parseInt(def['type'].replace('bit(', '').replace(')', ''));
     if (Number.isInteger(num)) {
-      return { min: 0, max: Math.pow(2, num) };
+      return { min: 0, max: Math.pow(2, num) - 1 };
     }
   } else if (def['type'].startsWith('int') || def['type'].startsWith('uint')) {
     let num = parseInt(def['type'].replace('uint', '').replace('int', ''));
@@ -26,13 +26,13 @@ function nextIncremetal(def) {
     res /= def.multiplier;
   }
   res++;
-  if (def.multiplier != null) {
-    res *= def.multiplier;
-  }
   if (lim != null) {
     if (res > lim.max) {
       res = lim.min;
     }
+  }
+  if (def.multiplier != null) {
+    res *= def.multiplier;
   }
   return res;
 };
@@ -44,13 +44,13 @@ function nextDecremetal(def) {
     res /= def.multiplier;
   }
   res--;
-  if (def.multiplier != null) {
-    res *= def.multiplier;
-  }
   if (lim != null) {
     if (res < lim.min) {
       res = lim.max;
     }
+  }
+  if (def.multiplier != null) {
+    res *= def.multiplier;
   }
   return res;
 };
@@ -67,13 +67,15 @@ function nextNatural(def) {
   } else {
     res++;
   }
+  if (lim != null) {
+    if (res < lim.min) {
+      res = lim.min;
+    } else if (res > lim.max) {
+      res = lim.max;
+    }
+  }
   if (def.multiplier != null) {
     res *= def.multiplier;
-  }
-  if (res < lim.min) {
-    res = lim.min;
-  } else if (res > lim.max) {
-    res = lim.max;
   }
   return res;
 };
@@ -83,10 +85,15 @@ function nextRandom(def) {
   let lim = minmax(def);
   let rnd = Math.random();
   res = Math.round((rnd * (lim.max - lim.min)) + lim.min);
-  if (res < lim.min) {
-    res = lim.min;
-  } else if (res > lim.max) {
-    res = lim.max;
+  if (lim != null) {
+    if (res < lim.min) {
+      res = lim.min;
+    } else if (res > lim.max) {
+      res = lim.max;
+    }
+  }
+  if (def.multiplier != null) {
+    res *= def.multiplier;
   }
   return res;
 };

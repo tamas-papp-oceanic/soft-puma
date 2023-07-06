@@ -77,7 +77,7 @@
         });
         for (let i in dat.fields) {
           let fld = dat.fields[i];
-          if (fld.reserved == null) {
+          if (fld.dictionary != "DD001") {
             tmp.push({
               key: 'fld' + fld.field,
               value: fld.title,

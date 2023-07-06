@@ -66,6 +66,8 @@ function createWindow() {
 
   mainWindow.setMenuBarVisibility(false)
 
+console.log(isDev)
+
   if (isDev) {
     // This block of code is intended for development purpose only.
     // Delete this entire block of code when you are ready to package the application.
@@ -165,8 +167,8 @@ app.on('activate', function () {
 // code. You can also put them in separate files and require them here.
 // Data processing
 // FOR INIT ONLY
-// let tool = require('./src/tools/nmea.js');
-// tool.create();
+let tool = require('./src/tools/nmea.js');
+tool.create();
 
 // Discovering interfaces
 async function discover() {
