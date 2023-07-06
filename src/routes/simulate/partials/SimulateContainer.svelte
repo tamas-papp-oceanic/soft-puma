@@ -3,7 +3,6 @@
   import { ButtonSet, Button, Tile, Grid, Row, Column, DataTableSkeleton,
     PaginationSkeleton, DataTable, Pagination, Dropdown,
     DropdownSkeleton } from "carbon-components-svelte";
-  import { splitKey } from "../../../helpers/route";
 
   export let data;
   export let style;
@@ -14,9 +13,9 @@
 
   const headers = new Array(
     { key: 'pgn', value: 'PGN', sort: false },
-    { key: 'ins', value: 'Instance', sort: false },
-    { key: 'flu', value: 'Fluid', display: (item) => item == null ? null : getFlu(item), sort: false },
-    { key: 'title', value: 'Title', sort: false, width: '65%' },
+    { key: 'instance', value: 'Instance', sort: false },
+    { key: 'fluidtype', value: 'Fluid', display: (item) => item == null ? null : getFlu(item), sort: false },
+    { key: 'title', value: 'Title', sort: false, width: '55%' },
   );
   const sims = new Array(
     { id: 0, text: 'Static' },
@@ -103,12 +102,8 @@
       simulation = val.simulation != null ? val.simulation : 0;
       let dat = JSON.parse(JSON.stringify(val.table));
       for (let i in dat) {
-        let spl = splitKey(dat[i].id);
-        arr.push({ id: dat[i].id, pgn: spl.pgn, title: dat[i].title, ins: dat[i].ins, flu: dat[i].flu });
+        arr.push(dat[i]);
       }
-      arr.sort((a, b) => {
-        return a.pgn.localeCompare(b.pgn) || a.title.localeCompare(b.title);
-      });
     }
     rows = JSON.parse(JSON.stringify(arr));
   };
@@ -233,6 +228,9 @@
     white-space: nowrap;
     overflow: hidden;
     text-overflow: ellipsis;
+  }
+  .simtab td:first-child {
+    width: 2rem;
   }
   .simtab .bx--data-table-header {
     padding: 0 0 1em 0;

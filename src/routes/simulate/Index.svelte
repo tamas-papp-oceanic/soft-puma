@@ -17,7 +17,6 @@
     table: new Array(),
     simulation: null,
   };
-  let values = new Array();
   let loading = true;
   let running = false;
   let tab = 0;
@@ -27,11 +26,15 @@
   let subttl = null;
 
   onMount((e) => {
+    let arr = new Array();
     for (const [key, val] of Object.entries(nmeadefs)) {
       let rec = Object.assign({ id: key }, val);
+      let spl = splitKey(key);
+      let pgn = parseInt(spl.pgn);
       for (let i in rec.fields) {
         let fld = rec.fields[i];
         if (fld.type != null) {
+          rec.fields[i].id = i;
           if (typeof fld.instance !== 'undefined') {
             rec.fields[i].value = 0;
           }
@@ -55,8 +58,14 @@
           }
         }
       }
-      selector.push(rec);
+      if (isproprietary(pgn)) {
+        rec.fields[0].value = parseInt(spl.manufacturer);
+        rec.fields[2].value = parseInt(spl.industry);
+      }
+      arr.push(rec);
     }
+    arr.sort((a, b) => { return a.id.localeCompare(b.id); });
+    selector = JSON.parse(JSON.stringify(arr));
     simulator.simulation = 0;
     loading = false;
   });
@@ -93,10 +102,12 @@
       notify = true;
     } else {
       let spl = splitKey(e.detail.id);
-      spl.instance = getValue(e.detail, 'instance');
-      spl.fluidtype = getValue(e.detail, 'fluid');
+      let ins = getValue(e.detail, 'instance');
+      let flu = getValue(e.detail, 'fluid');
+      spl.instance = ins;
+      spl.fluidtype = flu;
       e.detail.id = joinKey(spl);
-      let rec = Object.assign(e.detail, { tim: null });
+      let rec = Object.assign(e.detail, { instance: ins, fluidtype: flu, timer: null });
       simulator.table.push(rec);
       simulator = simulator;
       tab = 1;
@@ -108,7 +119,6 @@
       if (JSON.stringify(simulator.table[i]) === JSON.stringify(e.detail)) {
         simulator.table.splice(i, 1);
         simulator = simulator;
-        values.splice(i, 1);
         break;
       }
     }
@@ -117,20 +127,15 @@
   function clrTab(e) {
     simulator.table = new Array();
     simulator = simulator;
-    values = new Array();
     tab = 0;
   };
 
   function simMsg(idx) {
-    let key = values[idx].id;
+    let key = simulator.table[idx].id;
     let spl = splitKey(key);
     let pgn = parseInt(spl.pgn);
-    if (isproprietary(pgn)) {
-      values[idx].def.fields[0].value = parseInt(spl.manufacturer);
-      values[idx].def.fields[2].value = parseInt(spl.industry);
-    }
-    for (let i in values[idx].def.fields) {
-      let fld = values[idx].def.fields[i];
+    for (let i in simulator.table[idx].fields) {
+      let fld = simulator.table[idx].fields[i];
       let val = (typeof fld.value === 'undefined') ? null : fld.value;
       if (fld['type'].startsWith('int') || fld['type'].startsWith('uint')) {
         val = (val == null) ? 0 : val;
@@ -159,22 +164,22 @@
       } else if (fld['type'].startsWith('chr(') || (fld['type'] == 'str')) {
         val = (val == null) ? '' : val;
       }
-      values[idx].def.fields[i].value = val;
+      simulator.table[idx].fields[i].value = val;
     }
     let msg = {
       key: key,
       header: { pgn: pgn, src: null, dst: 0xFF },
-      fields: values[idx].def.fields,
+      fields: simulator.table[idx].fields,
     }
     for (let i in msg.fields) {
       if (typeof msg.fields[i].instance !== 'undefined') {
-        msg.fields[i].value = values[idx].ins;
+        msg.fields[i].value = simulator.table[idx].instance;
         break;
       }
     }
     for (let i in msg.fields) {
       if (typeof msg.fields[i].fluid !== 'undefined') {
-        msg.fields[i].value = values[idx].flu;
+        msg.fields[i].value = simulator.table[idx].fluidtype;
         break;
       }
     }
@@ -196,18 +201,18 @@
 
   function start(e) {
     running = true;
-    for (let i in values) {
-      if ((typeof values[i].def.interval !== 'undefined') && (values[i].def.interval != null)) {
-        values[i].tim = setInterval((i) => { simMsg(i); }, values[i].def.interval, i);
+    for (let i in simulator.table) {
+      if ((typeof simulator.table[i].interval !== 'undefined') && (simulator.table[i].interval != null)) {
+        simulator.table[i].timer = setInterval((i) => { simMsg(i); }, simulator.table[i].interval, i);
       }
     }
   };
 
   function stop(e) {
-    for (let i in values) {
-      if ((typeof values[i].tim !== 'undefined') && (values[i].tim != null)) {
-        clearInterval(values[i].tim);
-        values[i].tim = null;
+    for (let i in simulator.table) {
+      if ((typeof simulator.table[i].timer !== 'undefined') && (simulator.table[i].timer != null)) {
+        clearInterval(simulator.table[i].timer);
+        simulator.table[i].timer = null;
       }
     }
     running = false;

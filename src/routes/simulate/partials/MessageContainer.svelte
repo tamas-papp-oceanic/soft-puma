@@ -2,8 +2,10 @@
   import { createEventDispatcher } from "svelte";
   import { ButtonSet, Button, Tile, Grid, Row, Column, DataTableSkeleton,
     PaginationSkeleton, DataTable, Pagination, Dropdown,
-    DropdownSkeleton, ToolbarContent, ToolbarSearch, Toolbar } from "carbon-components-svelte";
+    DropdownSkeleton, ToolbarContent, ToolbarSearch, Toolbar,
+    NumberInput } from "carbon-components-svelte";
   import { splitKey } from "../../../helpers/route";
+    import { each } from "svelte/internal";
 
   export let data;
   export let style;
@@ -12,9 +14,14 @@
 
   const dispatch = createEventDispatcher();
 
-  const headers = new Array(
+  const header1 = new Array(
     { key: 'pgn', value: 'PGN', sort: false },
-    { key: 'title', value: 'Title', sort: false, width: '80%' },
+    { key: 'title', value: 'Title', sort: false, width: '70%' },
+  );
+  const header2 = new Array(
+    { key: 'field', value: 'Field', sort: false },
+    { key: 'title', value: 'Title', width: '50%', sort: false },
+    { key: 'value', value: 'Value', width: '30%', sort: false },
   );
   let insts = new Array();
   let fluts = [
@@ -28,8 +35,10 @@
   ];
   let rows = new Array();
   let filteredRowIds = new Array();
-  let selectedRowIds = new Array();
-  let selection = null;
+  let selectedIds1 = new Array();
+  let selectedIds2 = new Array();
+  let selection1 = null;
+  let selection2 = null;
   let height;
   let pagination = {
     pageSize: 10,
@@ -37,21 +46,32 @@
     totalItems: 0,
   };
 
-  function selRow(e) {
-    if (JSON.stringify(selection) === JSON.stringify(e.detail)) {
-      selectedRowIds = new Array();
-      selection = null;
+  function selRow1(e) {
+    if (JSON.stringify(selection1) === JSON.stringify(e.detail)) {
+      selectedIds1 = new Array();
+      selection1 = null;
     }
   };
 
-  function rowSel(e) {
-    selection = e.detail.row;
+  function rowSel1(e) {
+    selection1 = e.detail.row;
   };
 
-  function addRow(e) {
-    dispatch("addrow", JSON.parse(JSON.stringify(selection)));
-    selectedRowIds = new Array();
-    selection = null;
+  function selRow2(e) {
+    if (JSON.stringify(selection2) === JSON.stringify(e.detail)) {
+      selectedIds2 = new Array();
+      selection2 = null;
+    }
+  };
+
+  function rowSel2(e) {
+    selection2 = e.detail.row;
+  };
+
+  function addRow1(e) {
+    dispatch("addrow", JSON.parse(JSON.stringify(selection1)));
+    selectedIds1 = new Array();
+    selection1 = null;
   };
 
   function cancel(e) {
@@ -107,22 +127,22 @@
     <div class="tilecont">
       <Grid fullWidth noGutter>
         <Row style="height: inherit;">
-          <Column sm={13} md={13} lg={13}>
+          <Column sm={9} md={9} lg={9}>
             {#if loading}
-              <DataTableSkeleton showHeader={true} showToolbar={false} {headers} size="compact" rows={pagination.pageSize} />
+              <DataTableSkeleton showHeader={true} showToolbar={false} headers={header1} size="compact" rows={pagination.pageSize} />
               <PaginationSkeleton />
             {:else}
               <DataTable
                 class="msgtab"
                 size="compact"
                 radio
-                bind:selectedRowIds
-                {headers}
+                bind:selectedRowIds={selectedIds1}
+                headers={header1}
                 {rows}
                 pageSize={pagination.pageSize}
                 page={pagination.page}
-                on:click:row={selRow}
-                on:click:row--select={rowSel}>
+                on:click:row={selRow1}
+                on:click:row--select={rowSel1}>
                 <Toolbar>
                   <ToolbarContent>
                     <Tile class="head">
@@ -150,37 +170,43 @@
               {/if}
             {/if}
           </Column>
-          <Column sm={3} md={3} lg={3} style="display: flex; flex-flow: column nowrap; justify-content: space-between;">
+          <Column sm={7} md={7} lg={7} style="display: flex; flex-flow: column nowrap; justify-content: space-between;">
             <Row>
               <Column>
                 <Row>
-                  <Column>Parameter(s)</Column>
+                  <Column>Fields</Column>
                 </Row>
-                {#if selection != null} 
-                  {#if getValue(selection, 'instance') != null}
-                    <Row padding>
-                      <Column>
-                        {#if running}
-                          <DropdownSkeleton />
-                        {:else}
-                          <Dropdown titleText="Data instance" size="sm" selectedId={getValue(selection, 'instance')} items={insts}
-                            disabled={running} on:select={(e) => setValue(e, selection, 'instance')} />
-                        {/if}
-                      </Column>
-                    </Row>
-                  {/if}
-                  {#if getValue(selection, 'fluid') != null}
-                    <Row padding>
-                      <Column>
-                        {#if running}
-                          <DropdownSkeleton />
-                        {:else}
-                          <Dropdown titleText="Fluid type" size="sm" selectedId={getValue(selection, 'fluid')} items={fluts}
-                            disabled={running} on:select={(e) => setValue(e, selection, 'fluid')} />
-                        {/if}
-                      </Column>
-                    </Row>
-                  {/if}
+                {#if selection1 != null}
+                  <Row padding>
+                    <Column>
+                      <DataTable
+                        class="fldtab"
+                        size="compact"
+                        radio
+                        bind:selectedRowIds={selectedIds2}
+                        headers={header2}
+                        rows={selection1.fields}
+                        on:click:row={selRow2}
+                        on:click:row--select={rowSel2}
+                      ></DataTable>
+                    </Column>
+                  </Row>
+                {/if}
+              </Column>
+            </Row>
+            <Row style="display: flex; flex-flow: column nowrap; align-items: center; justify-content: center">
+              <Column sm={5} md={5} lg={5}>
+                {#if selection2 != null}
+                  <Row>
+                    <Column>
+                      <NumberInput
+                        allowEmpty
+                        hideSteppers
+                        disabled={running}
+                        label={selection2.title}
+                        bind:value={selection2.value} />
+                    </Column>
+                  </Row>
                 {/if}
               </Column>
             </Row>
@@ -192,7 +218,7 @@
                 <Row padding>
                   <Column>
                     <ButtonSet stacked style="padding: 0.2rem;">
-                      <Button disabled={selectedRowIds.length == 0} style="margin: 0.2rem 0" on:click={addRow}>Add message</Button>
+                      <Button disabled={selectedIds1.length == 0} style="margin: 0.2rem 0" on:click={addRow1}>Add message</Button>
                     </ButtonSet>
                   </Column>
                     </Row>
@@ -239,10 +265,7 @@
     font-size: 0.8rem;
     color: #c6c6c6;
   }
-  .msgcont .bx--toolbar-search-container-active.bx--search {
-    max-width: 40%;
-  }
-  .msgtab td:last-child {
+  .msgtab tbody td:last-child {
     white-space: nowrap;
     overflow: hidden;
     text-overflow: ellipsis;
@@ -255,5 +278,17 @@
   }
   .msgtab .bx--data-table-header__description {
     font-size: 0.85rem;
+  }
+  .fldtab tbody td:nth-child(3) {
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+  .fldtab {
+    max-height: 30vh;
+    overflow-y: auto;
+  }
+  .msgcont input[type="number"] {
+    font-size: 1rem;
   }
 </style>
