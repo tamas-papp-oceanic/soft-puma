@@ -5,7 +5,7 @@
     Pagination, NumberInput, TextInput, Dropdown,
     DropdownSkeleton } from "carbon-components-svelte";
 
-  export let simulator;
+  export let data;
   export let style;
   export let running;
   export let loading;
@@ -47,12 +47,6 @@
   let selection1 = null;
   let selection2 = null;
   let simulation = 0;
-  let height;
-  let pagination = {
-    pageSize: 10,
-    page: 1,
-    totalItems: 0,
-  };
 
   function getFlu(id) {
     for (let i in fluts) {
@@ -87,8 +81,8 @@
 
   function input1(e) {
     if (e.detail != null) {
-      for (let i in simulator) {
-        if (simulator[i].id == selection1.id) {
+      for (let i in data) {
+        if (data[i].id == selection1.id) {
           selection1.fields[selection2.id].value = parseFloat(e.detail);
           break;
         }
@@ -98,8 +92,8 @@
 
   function input2(e) {
     if (e.detail != null) {
-      for (let i in simulator) {
-        if (simulator[i].id == selection1.id) {
+      for (let i in data) {
+        if (data[i].id == selection1.id) {
           selection1.fields[selection2.id].value = e.detail;
           break;
         }
@@ -155,77 +149,63 @@
     insts.push({ id: i, text: i.toString() });
   }
 
-$: console.log(simulator)
-  $: simulator, setData(simulator);
-  $: pagination.totalItems = rows.length;
-  $: pagination.pageSize = Math.round((height / getComputedStyle(document.documentElement).fontSize.replace('px', '')) / 2) - 7;
+  $: data, setData(data);
 </script>
 
-<svelte:window bind:innerHeight={height} />
-<div class="msgcont" style={style}>
+<div class="simcont" style={style}>
   <Tile style="height: -webkit-fill-available;">
     <div class="tilecont">
       <Grid fullWidth noGutter>
         <Row style="height: inherit;">
-          <Column sm={9} md={9} lg={9}>
-            {#if loading}
-              <DataTableSkeleton showHeader={true} showToolbar={false} headers={header1} size="compact" rows={pagination.pageSize} />
-              <PaginationSkeleton />
-            {:else}
-              <DataTable
-                class="msgtab"
-                size="compact"
-                radio
-                title="NMEA2000 message(s) as part of simulation."
-                description="(select message for individual operation)"
-                bind:selectedRowIds={selectedIds1}
-                headers={header1}
-                {rows}
-                pageSize={pagination.pageSize}
-                page={pagination.page}
-                on:click:row={selRow1}
-                on:click:row--select={rowSel1}>
-              </DataTable>
-              {#if pagination.totalItems > pagination.pageSize}
-                <Pagination
-                  bind:pageSize={pagination.pageSize}
-                  totalItems={pagination.totalItems}
-                  bind:page={pagination.page}
-                  pageSizeInputDisabled
-                />
-              {/if}
-            {/if}
-          </Column>
-          <Column sm={7} md={7} lg={7} style="display: flex; flex-flow: column nowrap; justify-content: space-between;">
-            <Row>
-              <Column>
-                <Row>
-                  <Column>Fields</Column>
-                </Row>
-                {#if selection1 != null}
-                  <Row padding>
-                    <Column>
-                      <DataTable
-                        class="fldtab"
-                        size="compact"
-                        radio
-                        nonSelectableRowIds={selection1.disabledIds}
-                        bind:selectedRowIds={selectedIds2}
-                        headers={header2}
-                        rows={selection1.fields}
-                        on:click:row--select={rowSel2}>
-                        <svelte:fragment slot="cell" let:row let:cell let:cellIndex>
-                          {((row.dictionary == 'DD001') && (cellIndex == 2)) || ((cellIndex == 3) && (cell.value == null)) ? '-' : cell.value}
-                        </svelte:fragment>
-                      </DataTable>
-                    </Column>
-                  </Row>
+          <Column sm={13} md={13} lg={13} class="left">
+            <Row style="height: 48%;">
+              <Column style="height: 100%;">
+                {#if loading}
+                  <DataTableSkeleton showHeader={true} showToolbar={false} headers={header1} size="compact" rows={20} />
+                {:else}
+                  <DataTable
+                    class="simtab"
+                    size="compact"
+                    radio
+                    title="NMEA2000 message(s) as part of simulation."
+                    description="(select message for setting field values)"
+                    bind:selectedRowIds={selectedIds1}
+                    headers={header1}
+                    {rows}
+                    on:click:row={selRow1}
+                    on:click:row--select={rowSel1}>
+                  </DataTable>
                 {/if}
               </Column>
             </Row>
-            <Row>
-              <Column>
-                {#if selection2 != null}
+            {#if selection1 != null}
+              <Row style="height: 48%;">
+                <Column style="height: 100%;">
+                  {#if loading}
+                    <DataTableSkeleton showHeader={true} showToolbar={false} headers={header2} size="compact" rows={20} />
+                  {:else}
+                    <DataTable
+                      class="fldtab"
+                      size="compact"
+                      radio
+                      title="Message fields."
+                      description="(select field for setting values)"
+                      nonSelectableRowIds={selection1.disabledIds}
+                      bind:selectedRowIds={selectedIds2}
+                      headers={header2}
+                      rows={selection1.fields}
+                      on:click:row--select={rowSel2}>
+                      <svelte:fragment slot="cell" let:row let:cell let:cellIndex>
+                        {((row.dictionary == 'DD001') && (cellIndex == 2)) || ((cellIndex == 3) && (cell.value == null)) ? '-' : cell.value}
+                      </svelte:fragment>
+                    </DataTable>
+                  {/if}
+                </Column>
+              </Row>
+            {/if}
+            {#if selection2 != null}
+              <Row>
+                <Column>
                   <Row>
                     {#if selection2['type'].startsWith('int') || selection2['type'].startsWith('uint') ||
                       selection2['type'].startsWith('float') || selection2['type'].startsWith('bit(')}
@@ -252,9 +232,11 @@ $: console.log(simulator)
                       </Column>
                     {/if}
                   </Row>
-                {/if}
-              </Column>
-            </Row>
+                </Column>
+              </Row>
+            {/if}
+          </Column>
+          <Column sm={3} md={3} lg={3} style="display: flex; flex-flow: column nowrap; justify-content: space-between;">
             <Row>
               <Column>
                 <Row>
@@ -306,51 +288,66 @@ $: console.log(simulator)
 </div>
 
 <style type="css" global>
-  .msgcont {
+  .simcont {
     display: flex;
     flex-flow: column nowrap;
     justify-content: stretch;
     border: 1px solid gray;
     width: 100%;
   }
-  .msgcont .tilecont {
+  .simcont .tilecont {
     display: flex;
     flex-flow: column nowrap;
     justify-content: flex-start;
     align-items: flex-start;
-    width: 100%;
-    height: 100%;
+    height: -webkit-fill-available
   }
-  .msgcont .bx--toolbar-content {
-    justify-content: space-between;
-    height: 3.75rem;
-  }
-  .msgcont .tilecont .head {
-    padding: 0.125rem 0 1em 0 !important;
-    width: 60%;
-  }
-  .msgcont .tilecont .title {
+  .simcont .tilecont .title {
+    max-width: 90%;
+    white-space: pre-line;
     font-size: 1.25rem;
+    text-align: justify;
+    margin-bottom: 1rem;
   }
-  .msgcont .tilecont .descr {
-    font-size: 0.8rem;
-    color: #c6c6c6;
+  .simcont .tilecont .left {
+    display: flex;
+    flex-flow: column nowrap;
+    justify-content: space-between;
+    align-items: center;
+    height: -webkit-fill-available
   }
-  .msgcont .bx--toolbar-search-container-active.bx--search {
-    width: 30%;
+  .simtab {
+    max-height: 100%;
+    overflow-x: hidden;
+    overflow-y: auto;
   }
-  .msgtab tbody td:last-child {
+  .simtab td:last-child {
     white-space: nowrap;
     overflow: hidden;
     text-overflow: ellipsis;
   }
-  .msgtab .bx--simulator-table-header {
+  .simtab td:first-child {
+    width: 2rem;
+  }
+  .simtab .bx--data-table-header {
     padding: 0 0 1em 0;
   }
-  .msgtab .bx--simulator-table-header__title {
+  .simtab .bx--data-table-header__title {
     font-size: 1.25rem;
   }
-  .msgtab .bx--simulator-table-header__description {
+  .simtab .bx--data-table-header__description {
+    font-size: 0.85rem;
+  }
+  .simtab .bx--data-table tbody tr.selected {
+    background-color: #666666;
+  }
+  .fldtab .bx--data-table-header {
+    padding: 0 0 1em 0;
+  }
+  .fldtab .bx--data-table-header__title {
+    font-size: 1.25rem;
+  }
+  .fldtab .bx--data-table-header__description {
     font-size: 0.85rem;
   }
   .fldtab tbody td:nth-child(3) {
@@ -359,7 +356,7 @@ $: console.log(simulator)
     text-overflow: ellipsis;
   }
   .fldtab {
-    max-height: 30vh;
+    max-height: 100%;
     overflow-x: hidden;
     overflow-y: auto;
   }

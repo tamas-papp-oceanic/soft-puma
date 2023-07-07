@@ -559,7 +559,7 @@
       {
         "field": 8,
         "title": "Variable Number of fields, Field number 6 repeated",
-        "type": null,
+        "type": "uint8",
         "unit": null,
         "multiplier": null,
         "dictionary": null

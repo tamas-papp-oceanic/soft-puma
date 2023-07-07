@@ -6,7 +6,7 @@
     Toolbar } from "carbon-components-svelte";
   import { splitKey } from "../../../helpers/route";
 
-  export let selector;
+  export let data;
   export let style;
   // export let running;
   export let loading;
@@ -30,7 +30,6 @@
   let rows = new Array();
   let selectedRowIds = new Array();
   let filteredRowIds = new Array();
-  let selection = null;
   let height;
   let pagination = {
     pageSize: 10,
@@ -42,21 +41,16 @@
     pagination.page = 1;
   };
 
-  function selRow(e) {
-    if (JSON.stringify(selection) === JSON.stringify(e.detail)) {
-      selectedRowIds = new Array();
-      selection = null;
-    }
-  };
-
-  function rowSel(e) {
-    selection = e.detail.row;
-  };
-
   function addRow(e) {
-    dispatch("addrow", JSON.parse(JSON.stringify(selection)));
+    for (let i in selectedRowIds) {
+      for (let j in rows) {
+        if (rows[j].id == selectedRowIds[i]) {
+          dispatch("addrow", JSON.parse(JSON.stringify(rows[j])));
+          break;
+        }
+      }
+    }
     selectedRowIds = new Array();
-    selection = null;
   };
 
   function cancel(e) {
@@ -68,7 +62,7 @@
     if (val != null) {
       let dat = JSON.parse(JSON.stringify(val));
       for (let i in dat) {
-        let spl = splitKey(dat[i].id);
+        let spl = splitKey(dat[i].key);
         dat[i].pgn = spl.pgn;
         arr.push(dat[i]);
       }
@@ -80,13 +74,13 @@
     insts.push({ id: i, text: i.toString() });
   }
 
-  $: selector, setData(selector);
+  $: data, setData(data);
   $: pagination.totalItems = filteredRowIds.length;
   $: pagination.pageSize = Math.round((height / getComputedStyle(document.documentElement).fontSize.replace('px', '')) / 2) - 7;
 </script>
 
 <svelte:window bind:innerHeight={height} />
-<div class="simcont" style={style}>
+<div class="msgcont" style={style}>
   <Tile style="height: -webkit-fill-available;">
     <div class="tilecont">
       <Grid fullWidth noGutter>
@@ -97,16 +91,14 @@
               <PaginationSkeleton />
             {:else}
               <DataTable
-                class="simtab"
+                class="msgtab"
                 size="compact"
-                radio
+                selectable
                 {headers}
                 {rows}
                 bind:selectedRowIds
                 pageSize={pagination.pageSize}
-                page={pagination.page}
-                on:click:row={selRow}
-                on:click:row--select={rowSel}>
+                page={pagination.page}>
                 <Toolbar>
                   <ToolbarContent>
                     <Tile class="head">
@@ -145,7 +137,7 @@
                 <Row padding>
                   <Column>
                     <ButtonSet stacked style="padding: 0.2rem;">
-                      <Button disabled={selectedRowIds.length == 0} style="margin: 0.2rem 0" on:click={addRow}>Add message</Button>
+                      <Button disabled={selectedRowIds.length == 0} style="margin: 0.2rem 0" on:click={addRow}>Add message(s)</Button>
                     </ButtonSet>
                   </Column>
                 </Row>
@@ -162,44 +154,51 @@
 </div>
 
 <style type="css" global>
-  .simcont {
+  .msgcont {
     display: flex;
     flex-flow: column nowrap;
     justify-content: stretch;
     border: 1px solid gray;
     width: 100%;
   }
-  .simcont .tilecont {
+  .msgcont .tilecont {
     display: flex;
     flex-flow: column nowrap;
     justify-content: flex-start;
     align-items: flex-start;
+    width: 100%;
+    height: 100%;
   }
-  .simcont .tilecont .title {
-    max-width: 90%;
-    white-space: pre-line;
+  .msgcont .bx--toolbar-content {
+    justify-content: space-between;
+    height: 3.75rem;
+  }
+  .msgcont .tilecont .head {
+    padding: 0.125rem 0 1em 0 !important;
+    width: 60%;
+  }
+  .msgcont .tilecont .title {
     font-size: 1.25rem;
-    text-align: justify;
-    margin-bottom: 1rem;
   }
-  .simtab td:last-child {
+  .msgcont .tilecont .descr {
+    font-size: 0.8rem;
+    color: #c6c6c6;
+  }
+  .msgcont .bx--toolbar-search-container-active.bx--search {
+    width: 30%;
+  }
+  .msgtab tbody td:last-child {
     white-space: nowrap;
     overflow: hidden;
     text-overflow: ellipsis;
   }
-  .simtab td:first-child {
-    width: 2rem;
-  }
-  .simtab .bx--selector-table-header {
+  .msgtab .bx--data-table-header {
     padding: 0 0 1em 0;
   }
-  .simtab .bx--selector-table-header__title {
+  .msgtab .bx--data-table-header__title {
     font-size: 1.25rem;
   }
-  .simtab .bx--selector-table-header__description {
+  .msgtab .bx--data-table-header__description {
     font-size: 0.85rem;
-  }
-  .simtab .bx--selector-table tbody tr.selected {
-    background-color: #666666;
   }
 </style>

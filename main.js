@@ -66,8 +66,6 @@ function createWindow() {
 
   mainWindow.setMenuBarVisibility(false)
 
-console.log(isDev)
-
   if (isDev) {
     // This block of code is intended for development purpose only.
     // Delete this entire block of code when you are ready to package the application.

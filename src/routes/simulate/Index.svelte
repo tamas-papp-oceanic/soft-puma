@@ -2,8 +2,9 @@
   import { onDestroy, onMount } from "svelte";
   import { Grid, Row, Column, Tabs, Tab, TabContent } from "carbon-components-svelte";
   import { pop } from "svelte-spa-router";
-  import MessageContainer from "./partials/SimulateContainer.svelte";
-  import SimulateContainer from "./partials/MessageContainer.svelte";
+  import { v4 as uuidv4 } from "uuid";
+  import MessageContainer from "./partials/MessageContainer.svelte";
+  import SimulateContainer from "./partials/SimulateContainer.svelte";
   import nmeaconv from "../../config/nmeaconv.json";
   import nmeadefs from "../../config/nmeadefs.json";
   import Notification from "../../components/Notification.svelte";
@@ -29,7 +30,7 @@
   onMount((e) => {
     let arr = new Array();
     for (const [key, val] of Object.entries(nmeadefs)) {
-      let rec = Object.assign({ id: key }, val, { disabledIds: new Array() });
+      let rec = Object.assign({ id: uuidv4(), key: key }, val, { disabledIds: new Array() });
       let spl = splitKey(key);
       let pgn = parseInt(spl.pgn);
       for (let i in rec.fields) {
@@ -85,7 +86,7 @@
       }
       arr.push(rec);
     }
-    arr.sort((a, b) => { return a.id.localeCompare(b.id); });
+    arr.sort((a, b) => { return a.key.localeCompare(b.key); });
     selector = JSON.parse(JSON.stringify(arr));
     simulator.simulation = 0;
     loading = false;
@@ -110,35 +111,22 @@
   }
 
   function addRow(e) {
-    let fnd = false;
-    for (let i in simulator.table) {
-      if (simulator.table[i].id === e.detail.id) {
-        fnd = true;
-        break;
-      }
-    }
-    if (fnd) {
-      kind = 'error'
-      title = 'Error';
-      subttl = 'Already part of the simulation.';
-      notify = true;
-    } else {
-      let spl = splitKey(e.detail.id);
-      let ins = getValue(e.detail, 'instance');
-      let flu = getValue(e.detail, 'fluid');
-      spl.instance = ins;
-      spl.fluidtype = flu;
-      e.detail.id = joinKey(spl);
-      let rec = Object.assign(e.detail, { instance: ins, fluidtype: flu, timer: null });
-      simulator.table.push(rec);
-      simulator = simulator;
-      tab = 1;
-    }
+    let spl = splitKey(e.detail.key);
+    let ins = getValue(e.detail, 'instance');
+    let flu = getValue(e.detail, 'fluid');
+    spl.instance = ins;
+    spl.fluidtype = flu;
+    e.detail.id = uuidv4();    
+    e.detail.key = joinKey(spl);
+    let rec = Object.assign(e.detail, { instance: ins, fluidtype: flu, timer: null });
+    simulator.table.push(rec);
+    simulator = simulator;
+    tab = 1;
   };
 
   function delRow(e) {
     for (let i in simulator.table) {
-      if (JSON.stringify(simulator.table[i]) === JSON.stringify(e.detail)) {
+      if (JSON.stringify(simulator.table[i].id) === JSON.stringify(e.detail.id)) {
         simulator.table.splice(i, 1);
         simulator = simulator;
         break;
@@ -153,7 +141,7 @@
   };
 
   function simMsg(idx) {
-    let key = simulator.table[idx].id;
+    let key = simulator.table[idx].key;
     let spl = splitKey(key);
     let pgn = parseInt(spl.pgn);
     for (let i in simulator.table[idx].fields) {
@@ -250,9 +238,6 @@
     running = false;
     pop();
   };
-
-$: console.log(simulator);
-
 </script>
 
 <Grid>
@@ -264,7 +249,7 @@ $: console.log(simulator);
         <svelte:fragment slot="content">
           <TabContent>
             <MessageContainer
-              bind:selector={selector}
+              bind:data={selector}
               loading={loading}
               running={running}
               on:addrow={addRow}
@@ -273,7 +258,7 @@ $: console.log(simulator);
           </TabContent>
           <TabContent>
             <SimulateContainer
-              bind:simulator={simulator}
+              bind:data={simulator}
               loading={loading}
               running={running}
               on:delrow={delRow}
