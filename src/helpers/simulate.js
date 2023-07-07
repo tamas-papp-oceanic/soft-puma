@@ -98,4 +98,4 @@ function nextRandom(def) {
   return res;
 };
 
-export { nextIncremetal, nextDecremetal, nextNatural, nextRandom };
+export { minmax, nextIncremetal, nextDecremetal, nextNatural, nextRandom };

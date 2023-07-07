@@ -1,8 +1,8 @@
 <script>
   import { createEventDispatcher } from "svelte";
-  import { ButtonSet, Button, Tile, Grid, Row, Column, DataTableSkeleton,
-    PaginationSkeleton, DataTable, Pagination, Dropdown,
-    DropdownSkeleton } from "carbon-components-svelte";
+  import { ButtonSet, Button, Tile, Grid, Row, Column,
+    DataTableSkeleton, PaginationSkeleton, DataTable,
+    Pagination, Dropdown, DropdownSkeleton } from "carbon-components-svelte";
 
   export let data;
   export let style;
@@ -13,8 +13,8 @@
 
   const headers = new Array(
     { key: 'pgn', value: 'PGN', sort: false },
-    { key: 'instance', value: 'Instance', sort: false },
-    { key: 'fluidtype', value: 'Fluid', display: (item) => item == null ? null : getFlu(item), sort: false },
+    { key: 'instance', value: 'Instance', display: (item) => item != null ? item : '-', sort: false },
+    { key: 'fluidtype', value: 'Fluid', display: (item) => item != null ? getFlu(item) : '-', sort: false },
     { key: 'title', value: 'Title', sort: false, width: '55%' },
   );
   const sims = new Array(

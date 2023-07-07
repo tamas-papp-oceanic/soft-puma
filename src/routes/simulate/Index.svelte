@@ -4,9 +4,10 @@
   import { pop } from "svelte-spa-router";
   import MessageContainer from "./partials/MessageContainer.svelte";
   import SimulateContainer from "./partials/SimulateContainer.svelte";
+  import nmeaconv from "../../config/nmeaconv.json";
   import nmeadefs from "../../config/nmeadefs.json";
   import Notification from "../../components/Notification.svelte";
-  import { nextIncremetal, nextDecremetal, nextNatural,
+  import { minmax, nextIncremetal, nextDecremetal, nextNatural,
     nextRandom } from '../../helpers/simulate.js';
   import { device } from '../../stores/data.js';
   import { splitKey, joinKey } from "../../helpers/route.js";
@@ -28,39 +29,59 @@
   onMount((e) => {
     let arr = new Array();
     for (const [key, val] of Object.entries(nmeadefs)) {
-      let rec = Object.assign({ id: key }, val);
+      let rec = Object.assign({ id: key }, val, { disabledIds: new Array() });
       let spl = splitKey(key);
       let pgn = parseInt(spl.pgn);
       for (let i in rec.fields) {
+        rec.fields[i] = Object.assign(
+          { id: parseInt(i) }, rec.fields[i],
+          { limits: rec.fields[i]['type'] != null ? minmax(rec.fields[i]) : null, character: null }
+        );
         let fld = rec.fields[i];
-        if (fld.type != null) {
-          rec.fields[i].id = i;
-          if (typeof fld.instance !== 'undefined') {
-            rec.fields[i].value = 0;
-          }
-          if (typeof fld.fluid !== 'undefined') {
-            rec.fields[i].value = 0;
-          }
-          if (fld.type.startsWith('int') || fld.type.startsWith('uint')) {
-            rec.fields[i].value = 0;
-          } else if (fld.type.startsWith('float')) {
-            rec.fields[i].value = 0.0;
-          } else if (fld.type.startsWith('bit(')) {
-            rec.fields[i].value = 0;
-            if (fld.dictionary == 'DD001') {
-              let num = parseInt(fld.type.replace('bit(', '').replace(')', ''));
-              if (Number.isInteger(num)) {
-                rec.fields[i].value = Math.pow(2, num) - 1;
-              }
+        if (fld.dictionary == "DD056") {
+          rec.fields[i].value = 0;
+          rec.disabledIds.push(parseInt(i));
+        } else {
+          if (fld['type'] != null) {
+            if (typeof fld.instance !== 'undefined') {
+              rec.fields[i].value = 0;
             }
-          } else if (fld.type.startsWith('chr(') || (fld.type == 'str')) {
-            rec.fields[i].value = '';
+            if (typeof fld.fluid !== 'undefined') {
+              rec.fields[i].value = 0;
+            }
+            if (fld['type'].startsWith('int') || fld['type'].startsWith('uint')) {
+              rec.fields[i].value = 0;
+            } else if (fld['type'].startsWith('float')) {
+              rec.fields[i].value = 0.0;
+            } else if (fld['type'].startsWith('bit(')) {
+              rec.fields[i].value = 0;
+              if (fld.dictionary == 'DD001') {
+                rec.fields[i].value = fld.limits.max;
+                rec.disabledIds.push(parseInt(i))
+              }
+            } else if (fld['type'].startsWith('chr(')) {
+              rec.fields[i].value = '';
+              let num = parseInt(fld['type'].replace('chr(', '').replace(')', ''));
+              rec.fields[i].character = num;
+            } else if (fld['type'] == 'str') {
+              rec.fields[i].value = '';
+              rec.fields[i].character = 250;
+            }
+          } else {
+            rec.fields[i].value = null;
           }
         }
       }
       if (isproprietary(pgn)) {
         rec.fields[0].value = parseInt(spl.manufacturer);
+        rec.disabledIds.push(0);
         rec.fields[2].value = parseInt(spl.industry);
+        rec.disabledIds.push(2);
+      }
+      let cnv = spl.protocol + '/' + spl.pgn;
+      if (typeof nmeaconv[cnv] !== 'undefined') {
+        rec.fields[nmeaconv[cnv].function].value = parseInt(spl.function);
+        rec.disabledIds.push(nmeaconv[cnv].function);
       }
       arr.push(rec);
     }
@@ -75,6 +96,7 @@
   });
 
   function tabChg(e) {
+    stop(e);
     tab = e.detail;
   };
 
@@ -137,32 +159,38 @@
     for (let i in simulator.table[idx].fields) {
       let fld = simulator.table[idx].fields[i];
       let val = (typeof fld.value === 'undefined') ? null : fld.value;
-      if (fld['type'].startsWith('int') || fld['type'].startsWith('uint')) {
-        val = (val == null) ? 0 : val;
-        switch (simulator.simulation) {
-        case 1:
-          val = nextIncremetal(fld);
-          break;
-        case 2:
-          val = nextDecremetal(fld);
-          break;
-        case 3:
-          val = nextNatural(fld);
-          break;
-        case 4:
-          val = nextRandom(fld);
-          break;
-        }
-      } else if (fld['type'].startsWith('bit(')) {
-        val = (val == null) ? 0 : val;
-        if (fld.dictionary == 'DD001') {
-          let num = parseInt(fld['type'].replace('bit(', '').replace(')', ''));
-          if (Number.isInteger(num)) {
-            val = Math.pow(2, num) - 1;
+      if (fld.dictionary == 'DD056') {
+        val++;
+      } else {
+        if (fld['type'] != null) {
+          if (fld['type'].startsWith('int') || fld['type'].startsWith('uint')) {
+            val = (val == null) ? 0 : val;
+            switch (simulator.simulation) {
+            case 1:
+              val = nextIncremetal(fld);
+              break;
+            case 2:
+              val = nextDecremetal(fld);
+              break;
+            case 3:
+              val = nextNatural(fld);
+              break;
+            case 4:
+              val = nextRandom(fld);
+              break;
+            }
+          } else if (fld['type'].startsWith('bit(')) {
+            val = (val == null) ? 0 : val;
+            if (fld.dictionary == 'DD001') {
+              let num = parseInt(fld['type'].replace('bit(', '').replace(')', ''));
+              if (Number.isInteger(num)) {
+                val = Math.pow(2, num) - 1;
+              }
+            }
+          } else if (fld['type'].startsWith('chr(') || (fld['type'] == 'str')) {
+            val = (val == null) ? '' : val;
           }
         }
-      } else if (fld['type'].startsWith('chr(') || (fld['type'] == 'str')) {
-        val = (val == null) ? '' : val;
       }
       simulator.table[idx].fields[i].value = val;
     }

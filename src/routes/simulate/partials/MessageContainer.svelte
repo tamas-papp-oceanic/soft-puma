@@ -1,11 +1,10 @@
 <script>
   import { createEventDispatcher } from "svelte";
-  import { ButtonSet, Button, Tile, Grid, Row, Column, DataTableSkeleton,
-    PaginationSkeleton, DataTable, Pagination, Dropdown,
-    DropdownSkeleton, ToolbarContent, ToolbarSearch, Toolbar,
-    NumberInput } from "carbon-components-svelte";
+  import { ButtonSet, Button, Tile, Grid, Row, Column,
+    DataTableSkeleton, PaginationSkeleton, DataTable,
+    Pagination, ToolbarContent, ToolbarSearch, Toolbar,
+    NumberInput, TextInput } from "carbon-components-svelte";
   import { splitKey } from "../../../helpers/route";
-    import { each } from "svelte/internal";
 
   export let data;
   export let style;
@@ -20,8 +19,9 @@
   );
   const header2 = new Array(
     { key: 'field', value: 'Field', sort: false },
-    { key: 'title', value: 'Title', width: '50%', sort: false },
-    { key: 'value', value: 'Value', width: '30%', sort: false },
+    { key: 'title', value: 'Title', width: '45%', sort: false },
+    { key: 'value', value: 'Value', width: '20%', sort: false },
+    { key: 'unit', value: 'Unit', sort: false },
   );
   let insts = new Array();
   let fluts = [
@@ -46,58 +46,65 @@
     totalItems: 0,
   };
 
+  function search(e) {
+    pagination.page = 1;
+  };
+
   function selRow1(e) {
     if (JSON.stringify(selection1) === JSON.stringify(e.detail)) {
       selectedIds1 = new Array();
+      selectedIds2 = new Array();
       selection1 = null;
+      selection2 = null;
     }
   };
 
   function rowSel1(e) {
     selection1 = e.detail.row;
-  };
-
-  function selRow2(e) {
-    if (JSON.stringify(selection2) === JSON.stringify(e.detail)) {
-      selectedIds2 = new Array();
-      selection2 = null;
-    }
+    selectedIds2 = new Array();
+    selection2 = null;
   };
 
   function rowSel2(e) {
     selection2 = e.detail.row;
+    setTimeout(() => {
+      document.getElementById('input').focus();
+    }, 100);
+  };
+
+  function input1(e) {
+    if (e.detail != null) {
+      for (let i in data) {
+        if (data[i].id == selection1.id) {
+          selection1.fields[selection2.id].value = parseFloat(e.detail);
+          break;
+        }
+      }
+    }
+  };
+
+  function input2(e) {
+    if (e.detail != null) {
+      for (let i in data) {
+        if (data[i].id == selection1.id) {
+          selection1.fields[selection2.id].value = e.detail;
+          break;
+        }
+      }
+    }
   };
 
   function addRow1(e) {
     dispatch("addrow", JSON.parse(JSON.stringify(selection1)));
     selectedIds1 = new Array();
+    selectedIds2 = new Array();
     selection1 = null;
+    selection2 = null;
   };
 
   function cancel(e) {
     dispatch("cancel", e.detail);
   };
-
-  function getValue(rec, pro) {
-    if (rec != null) {
-      for (let i in rec.fields) {
-        if (typeof rec.fields[i][pro] !== 'undefined') {
-          return rec.fields[i].value;
-        }
-      }
-    }
-    return null;
-  };
-
-  function setValue(e, rec, pro) {
-    if (rec != null) {
-      for (let i in rec.fields) {
-        if (typeof rec.fields[i][pro] !== 'undefined') {
-          rec.fields[i].value = e.detail.selectedId;
-        }
-      }
-    }
-  };  
 
   function setData(val) {
     let arr = new Array();
@@ -156,7 +163,8 @@
                           row.pgn.toLowerCase().includes(value.toLowerCase()) ||
                           row.title.toLowerCase().includes(value.toLowerCase())
                         );
-                      }} />
+                      }}
+                      on:focus={search} />
                   </ToolbarContent>
                 </Toolbar>
               </DataTable>
@@ -183,29 +191,48 @@
                         class="fldtab"
                         size="compact"
                         radio
+                        nonSelectableRowIds={selection1.disabledIds}
                         bind:selectedRowIds={selectedIds2}
                         headers={header2}
                         rows={selection1.fields}
-                        on:click:row={selRow2}
-                        on:click:row--select={rowSel2}
-                      ></DataTable>
+                        on:click:row--select={rowSel2}>
+                        <svelte:fragment slot="cell" let:row let:cell let:cellIndex>
+                          {((row.dictionary == 'DD001') && (cellIndex == 2)) || ((cellIndex == 3) && (cell.value == null)) ? '-' : cell.value}
+                        </svelte:fragment>
+                      </DataTable>
                     </Column>
                   </Row>
                 {/if}
               </Column>
             </Row>
-            <Row style="display: flex; flex-flow: column nowrap; align-items: center; justify-content: center">
-              <Column sm={5} md={5} lg={5}>
+            <Row>
+              <Column>
                 {#if selection2 != null}
                   <Row>
-                    <Column>
-                      <NumberInput
-                        allowEmpty
-                        hideSteppers
-                        disabled={running}
-                        label={selection2.title}
-                        bind:value={selection2.value} />
-                    </Column>
+                    {#if selection2['type'].startsWith('int') || selection2['type'].startsWith('uint') ||
+                      selection2['type'].startsWith('float') || selection2['type'].startsWith('bit(')}
+                      <Column sm={8} md={8} lg={8}>
+                        <NumberInput
+                          id="input"
+                          min={selection2.limits.min}
+                          max={selection2.limits.max}
+                          disabled={running}
+                          label={selection2.title}
+                          invalidText={"Number must be between " + selection2.limits.min + " and " + selection2.limits.max}
+                          value={selection2.value}
+                          on:input={input1} />
+                      </Column>
+                    {:else if selection2['type'].startsWith('chr(') || selection2['type'].startsWith('str')}
+                      <Column>
+                        <TextInput
+                          id="input"
+                          disabled={running}
+                          labelText={selection2.title}
+                          invalidText={"Text length must be between 0 and " + selection2.character}
+                          value={selection2.value}
+                          on:input={input2} />
+                      </Column>
+                    {/if}
                   </Row>
                 {/if}
               </Column>
@@ -265,6 +292,9 @@
     font-size: 0.8rem;
     color: #c6c6c6;
   }
+  .msgcont .bx--toolbar-search-container-active.bx--search {
+    width: 30%;
+  }
   .msgtab tbody td:last-child {
     white-space: nowrap;
     overflow: hidden;
@@ -286,9 +316,11 @@
   }
   .fldtab {
     max-height: 30vh;
+    overflow-x: hidden;
     overflow-y: auto;
   }
-  .msgcont input[type="number"] {
+  .msgcont input[type="number"],
+  .msgcont input[type="text"] {
     font-size: 1rem;
   }
 </style>

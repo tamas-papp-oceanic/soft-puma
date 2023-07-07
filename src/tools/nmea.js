@@ -90,6 +90,7 @@ function create() {
         case "DD001":
         case "DD002":
         case "DD003":
+        case "DD056":
           dic = fld.dictionary;
         }
         let tmp = {

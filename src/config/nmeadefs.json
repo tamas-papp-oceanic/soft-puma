@@ -559,7 +559,7 @@
       {
         "field": 8,
         "title": "Variable Number of fields, Field number 6 repeated",
-        "type": "uint8",
+        "type": null,
         "unit": null,
         "multiplier": null,
         "dictionary": null
@@ -2158,7 +2158,7 @@
         "type": "uint8",
         "unit": null,
         "multiplier": null,
-        "dictionary": null
+        "dictionary": "DD056"
       },
       {
         "field": 2,
@@ -2366,7 +2366,7 @@
         "type": "uint8",
         "unit": null,
         "multiplier": null,
-        "dictionary": null
+        "dictionary": "DD056"
       },
       {
         "field": 2,
@@ -2727,7 +2727,7 @@
         "type": "uint8",
         "unit": null,
         "multiplier": null,
-        "dictionary": null
+        "dictionary": "DD056"
       },
       {
         "field": 2,
@@ -2783,7 +2783,7 @@
         "type": "uint8",
         "unit": null,
         "multiplier": null,
-        "dictionary": null
+        "dictionary": "DD056"
       },
       {
         "field": 2,
@@ -2815,7 +2815,7 @@
         "type": "uint8",
         "unit": null,
         "multiplier": null,
-        "dictionary": null
+        "dictionary": "DD056"
       },
       {
         "field": 2,
@@ -2863,7 +2863,7 @@
         "type": "uint8",
         "unit": null,
         "multiplier": null,
-        "dictionary": null
+        "dictionary": "DD056"
       },
       {
         "field": 2,
@@ -2911,7 +2911,7 @@
         "type": "uint8",
         "unit": null,
         "multiplier": null,
-        "dictionary": null
+        "dictionary": "DD056"
       },
       {
         "field": 2,
@@ -3332,7 +3332,7 @@
         "type": "uint8",
         "unit": null,
         "multiplier": null,
-        "dictionary": null
+        "dictionary": "DD056"
       },
       {
         "field": 2,
@@ -4147,7 +4147,7 @@
         "type": "uint8",
         "unit": null,
         "multiplier": null,
-        "dictionary": null
+        "dictionary": "DD056"
       },
       {
         "field": 2,
@@ -4326,7 +4326,7 @@
         "type": "uint8",
         "unit": null,
         "multiplier": null,
-        "dictionary": null
+        "dictionary": "DD056"
       }
     ]
   },
@@ -4756,7 +4756,7 @@
         "type": "uint8",
         "unit": null,
         "multiplier": null,
-        "dictionary": null
+        "dictionary": "DD056"
       },
       {
         "field": 2,
@@ -4797,7 +4797,7 @@
         "type": "uint8",
         "unit": null,
         "multiplier": null,
-        "dictionary": null
+        "dictionary": "DD056"
       },
       {
         "field": 2,
@@ -4838,7 +4838,7 @@
         "type": "uint8",
         "unit": null,
         "multiplier": null,
-        "dictionary": null
+        "dictionary": "DD056"
       },
       {
         "field": 2,
@@ -4879,7 +4879,7 @@
         "type": "uint8",
         "unit": null,
         "multiplier": null,
-        "dictionary": null
+        "dictionary": "DD056"
       },
       {
         "field": 2,
@@ -4928,7 +4928,7 @@
         "type": "uint8",
         "unit": null,
         "multiplier": null,
-        "dictionary": null
+        "dictionary": "DD056"
       },
       {
         "field": 2,
@@ -4977,7 +4977,7 @@
         "type": "uint8",
         "unit": null,
         "multiplier": null,
-        "dictionary": null
+        "dictionary": "DD056"
       },
       {
         "field": 2,
@@ -5026,7 +5026,7 @@
         "type": "uint8",
         "unit": null,
         "multiplier": null,
-        "dictionary": null
+        "dictionary": "DD056"
       },
       {
         "field": 2,
@@ -5099,7 +5099,7 @@
         "type": "uint8",
         "unit": null,
         "multiplier": null,
-        "dictionary": null
+        "dictionary": "DD056"
       },
       {
         "field": 2,
@@ -5148,7 +5148,7 @@
         "type": "uint8",
         "unit": null,
         "multiplier": null,
-        "dictionary": null
+        "dictionary": "DD056"
       },
       {
         "field": 2,
@@ -5204,7 +5204,7 @@
         "type": "uint8",
         "unit": null,
         "multiplier": null,
-        "dictionary": null
+        "dictionary": "DD056"
       },
       {
         "field": 2,
@@ -5284,7 +5284,7 @@
         "type": "uint8",
         "unit": null,
         "multiplier": null,
-        "dictionary": null
+        "dictionary": "DD056"
       },
       {
         "field": 2,
@@ -5428,7 +5428,7 @@
         "type": "uint8",
         "unit": null,
         "multiplier": null,
-        "dictionary": null
+        "dictionary": "DD056"
       },
       {
         "field": 2,
@@ -5484,7 +5484,7 @@
         "type": "uint8",
         "unit": null,
         "multiplier": null,
-        "dictionary": null
+        "dictionary": "DD056"
       },
       {
         "field": 2,
@@ -5524,7 +5524,7 @@
         "type": "uint8",
         "unit": null,
         "multiplier": null,
-        "dictionary": null
+        "dictionary": "DD056"
       },
       {
         "field": 2,
@@ -5595,7 +5595,7 @@
         "type": "uint8",
         "unit": null,
         "multiplier": null,
-        "dictionary": null
+        "dictionary": "DD056"
       },
       {
         "field": 2,
@@ -5955,7 +5955,7 @@
         "type": "uint8",
         "unit": null,
         "multiplier": null,
-        "dictionary": null
+        "dictionary": "DD056"
       }
     ]
   },
@@ -6155,7 +6155,7 @@
         "type": "uint8",
         "unit": null,
         "multiplier": null,
-        "dictionary": null
+        "dictionary": "DD056"
       }
     ]
   },
@@ -6387,7 +6387,7 @@
         "type": "uint8",
         "unit": null,
         "multiplier": null,
-        "dictionary": null
+        "dictionary": "DD056"
       }
     ]
   },
@@ -6731,7 +6731,7 @@
         "type": "uint8",
         "unit": null,
         "multiplier": null,
-        "dictionary": null
+        "dictionary": "DD056"
       },
       {
         "field": 2,
@@ -6787,7 +6787,7 @@
         "type": "uint8",
         "unit": null,
         "multiplier": null,
-        "dictionary": null
+        "dictionary": "DD056"
       },
       {
         "field": 2,
@@ -7042,7 +7042,7 @@
         "type": "uint8",
         "unit": null,
         "multiplier": null,
-        "dictionary": null
+        "dictionary": "DD056"
       },
       {
         "field": 2,
@@ -7098,7 +7098,7 @@
         "type": "uint8",
         "unit": null,
         "multiplier": null,
-        "dictionary": null
+        "dictionary": "DD056"
       },
       {
         "field": 2,
@@ -7146,7 +7146,7 @@
         "type": "uint8",
         "unit": null,
         "multiplier": null,
-        "dictionary": null
+        "dictionary": "DD056"
       },
       {
         "field": 2,
@@ -7330,7 +7330,7 @@
         "type": "uint8",
         "unit": null,
         "multiplier": null,
-        "dictionary": null
+        "dictionary": "DD056"
       },
       {
         "field": 2,
@@ -7394,7 +7394,7 @@
         "type": "uint8",
         "unit": null,
         "multiplier": null,
-        "dictionary": null
+        "dictionary": "DD056"
       },
       {
         "field": 2,
@@ -7666,7 +7666,7 @@
         "type": "uint8",
         "unit": null,
         "multiplier": null,
-        "dictionary": null
+        "dictionary": "DD056"
       },
       {
         "field": 2,
@@ -7738,7 +7738,7 @@
         "type": "uint8",
         "unit": null,
         "multiplier": null,
-        "dictionary": null
+        "dictionary": "DD056"
       },
       {
         "field": 2,
@@ -7874,7 +7874,7 @@
         "type": "uint8",
         "unit": null,
         "multiplier": null,
-        "dictionary": null
+        "dictionary": "DD056"
       },
       {
         "field": 2,
@@ -7946,7 +7946,7 @@
         "type": "uint8",
         "unit": null,
         "multiplier": null,
-        "dictionary": null
+        "dictionary": "DD056"
       },
       {
         "field": 2,
@@ -8106,7 +8106,7 @@
         "type": "uint8",
         "unit": null,
         "multiplier": null,
-        "dictionary": null
+        "dictionary": "DD056"
       },
       {
         "field": 2,
@@ -8578,7 +8578,7 @@
         "type": "uint8",
         "unit": null,
         "multiplier": null,
-        "dictionary": null
+        "dictionary": "DD056"
       }
     ]
   },
@@ -8762,7 +8762,7 @@
         "type": "uint8",
         "unit": null,
         "multiplier": null,
-        "dictionary": null
+        "dictionary": "DD056"
       }
     ]
   },
@@ -8978,7 +8978,7 @@
         "type": "uint8",
         "unit": null,
         "multiplier": null,
-        "dictionary": null
+        "dictionary": "DD056"
       }
     ]
   },
@@ -9202,7 +9202,7 @@
         "type": "uint8",
         "unit": null,
         "multiplier": null,
-        "dictionary": null
+        "dictionary": "DD056"
       }
     ]
   },
@@ -9346,7 +9346,7 @@
         "type": "uint8",
         "unit": null,
         "multiplier": null,
-        "dictionary": null
+        "dictionary": "DD056"
       }
     ]
   },
@@ -9450,7 +9450,7 @@
         "type": "uint8",
         "unit": null,
         "multiplier": null,
-        "dictionary": null
+        "dictionary": "DD056"
       }
     ]
   },
@@ -9522,7 +9522,7 @@
         "type": "uint8",
         "unit": null,
         "multiplier": null,
-        "dictionary": null
+        "dictionary": "DD056"
       }
     ]
   },
@@ -9706,7 +9706,7 @@
         "type": "uint8",
         "unit": null,
         "multiplier": null,
-        "dictionary": null
+        "dictionary": "DD056"
       }
     ]
   },
@@ -9834,7 +9834,7 @@
         "type": "uint8",
         "unit": null,
         "multiplier": null,
-        "dictionary": null
+        "dictionary": "DD056"
       }
     ]
   },
@@ -10042,7 +10042,7 @@
         "type": "uint8",
         "unit": null,
         "multiplier": null,
-        "dictionary": null
+        "dictionary": "DD056"
       }
     ]
   },
@@ -10266,7 +10266,7 @@
         "type": "uint8",
         "unit": null,
         "multiplier": null,
-        "dictionary": null
+        "dictionary": "DD056"
       }
     ]
   },
@@ -10450,7 +10450,7 @@
         "type": "uint8",
         "unit": null,
         "multiplier": null,
-        "dictionary": null
+        "dictionary": "DD056"
       }
     ]
   },
@@ -10738,7 +10738,7 @@
         "type": "uint8",
         "unit": null,
         "multiplier": null,
-        "dictionary": null
+        "dictionary": "DD056"
       }
     ]
   },
@@ -10874,7 +10874,7 @@
         "type": "uint8",
         "unit": null,
         "multiplier": null,
-        "dictionary": null
+        "dictionary": "DD056"
       }
     ]
   },
@@ -10890,7 +10890,7 @@
         "type": "uint8",
         "unit": null,
         "multiplier": null,
-        "dictionary": null
+        "dictionary": "DD056"
       },
       {
         "field": 2,
@@ -10986,7 +10986,7 @@
         "type": "uint8",
         "unit": null,
         "multiplier": null,
-        "dictionary": null
+        "dictionary": "DD056"
       },
       {
         "field": 2,
@@ -11178,7 +11178,7 @@
         "type": "uint8",
         "unit": null,
         "multiplier": null,
-        "dictionary": null
+        "dictionary": "DD056"
       },
       {
         "field": 2,
@@ -12744,7 +12744,7 @@
         "type": "uint8",
         "unit": null,
         "multiplier": null,
-        "dictionary": null
+        "dictionary": "DD056"
       },
       {
         "field": 2,
@@ -12792,7 +12792,7 @@
         "type": "uint8",
         "unit": null,
         "multiplier": null,
-        "dictionary": null
+        "dictionary": "DD056"
       },
       {
         "field": 2,
@@ -12840,7 +12840,7 @@
         "type": "uint8",
         "unit": null,
         "multiplier": null,
-        "dictionary": null
+        "dictionary": "DD056"
       },
       {
         "field": 2,
@@ -12896,7 +12896,7 @@
         "type": "uint8",
         "unit": null,
         "multiplier": null,
-        "dictionary": null
+        "dictionary": "DD056"
       },
       {
         "field": 2,
@@ -12953,7 +12953,7 @@
         "type": "uint8",
         "unit": null,
         "multiplier": null,
-        "dictionary": null
+        "dictionary": "DD056"
       },
       {
         "field": 2,
@@ -13010,7 +13010,7 @@
         "type": "uint8",
         "unit": null,
         "multiplier": null,
-        "dictionary": null
+        "dictionary": "DD056"
       },
       {
         "field": 2,
@@ -13059,7 +13059,7 @@
         "type": "uint8",
         "unit": null,
         "multiplier": null,
-        "dictionary": null
+        "dictionary": "DD056"
       },
       {
         "field": 2,
@@ -13108,7 +13108,7 @@
         "type": "uint8",
         "unit": null,
         "multiplier": null,
-        "dictionary": null
+        "dictionary": "DD056"
       },
       {
         "field": 2,
@@ -13733,7 +13733,7 @@
         "type": "uint8",
         "unit": null,
         "multiplier": null,
-        "dictionary": null
+        "dictionary": "DD056"
       },
       {
         "field": 2,
@@ -14658,7 +14658,7 @@
         "type": "uint8",
         "unit": null,
         "multiplier": null,
-        "dictionary": null
+        "dictionary": "DD056"
       },
       {
         "field": 5,
