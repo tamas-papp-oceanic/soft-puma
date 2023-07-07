@@ -2,8 +2,8 @@
   import { onDestroy, onMount } from "svelte";
   import { Grid, Row, Column, Tabs, Tab, TabContent } from "carbon-components-svelte";
   import { pop } from "svelte-spa-router";
-  import MessageContainer from "./partials/MessageContainer.svelte";
-  import SimulateContainer from "./partials/SimulateContainer.svelte";
+  import MessageContainer from "./partials/SimulateContainer.svelte";
+  import SimulateContainer from "./partials/MessageContainer.svelte";
   import nmeaconv from "../../config/nmeaconv.json";
   import nmeadefs from "../../config/nmeadefs.json";
   import Notification from "../../components/Notification.svelte";
@@ -250,6 +250,9 @@
     running = false;
     pop();
   };
+
+$: console.log(simulator);
+
 </script>
 
 <Grid>
@@ -261,7 +264,7 @@
         <svelte:fragment slot="content">
           <TabContent>
             <MessageContainer
-              bind:data={selector}
+              bind:selector={selector}
               loading={loading}
               running={running}
               on:addrow={addRow}
@@ -270,7 +273,7 @@
           </TabContent>
           <TabContent>
             <SimulateContainer
-              bind:data={simulator}
+              bind:simulator={simulator}
               loading={loading}
               running={running}
               on:delrow={delRow}
