@@ -1,9 +1,8 @@
 <script>
   import { createEventDispatcher } from "svelte";
   import { ButtonSet, Button, Tile, Grid, Row, Column,
-    DataTableSkeleton, PaginationSkeleton, DataTable,
-    Pagination, NumberInput, TextInput, Dropdown,
-    DropdownSkeleton } from "carbon-components-svelte";
+    DataTableSkeleton, DataTable, NumberInput, TextInput, Dropdown,
+    DropdownSkeleton, Checkbox } from "carbon-components-svelte";
 
   export let data;
   export let style;
@@ -20,9 +19,11 @@
   );
   const header2 = new Array(
     { key: 'field', value: 'Field', sort: false },
-    { key: 'title', value: 'Title', width: '45%', sort: false },
-    { key: 'value', value: 'Value', width: '20%', sort: false },
+    { key: 'title', value: 'Title', width: '35%', sort: false },
+    { key: 'value', value: 'Value', sort: false },
     { key: 'unit', value: 'Unit', sort: false },
+    { key: 'range', value: 'Range', sort: false },
+    { key: 'static', value: 'Static', sort: false },
   );
   let insts = new Array();
   let fluts = [
@@ -35,11 +36,10 @@
     { id: 6, text: 'Fuel (Gasoline)' },
   ];
   const sims = new Array(
-    { id: 0, text: 'Static' },
-    { id: 1, text: 'Incremental' },
-    { id: 2, text: 'Decremental' },
-    { id: 3, text: 'Natural' },
-    { id: 4, text: 'Random' },
+    { id: 0, text: 'Incremental' },
+    { id: 1, text: 'Decremental' },
+    { id: 2, text: 'Natural' },
+    { id: 3, text: 'Random' },
   );
   let rows = new Array();
   let selectedIds1 = new Array();
@@ -77,6 +77,17 @@
     setTimeout(() => {
       document.getElementById('input').focus();
     }, 100);
+  };
+
+  function setSta(e, row) {
+    if (e.detail != null) {
+      for (let i in data.table) {
+        if (data.table[i].id == selection1.id) {
+          data.table[i].fields[row].static = e.detail;
+          break;
+        }
+      }
+    }
   };
 
   function input1(e) {
@@ -160,15 +171,19 @@
           <Column sm={13} md={13} lg={13} class="left">
             <Row style="height: 48%;">
               <Column style="height: 100%;">
-                {#if loading}
-                  <DataTableSkeleton showHeader={true} showToolbar={false} headers={header1} size="compact" rows={20} />
+                <Tile class="head">
+                  <h4 class="title">NMEA2000 message(s) as part of simulation.</h4>
+                  <p class="descr">(select message for setting field values)</p>
+                </Tile>
+              {#if loading}
+                  <DataTableSkeleton showHeader={false} showToolbar={false} headers={header1} size="compact" rows={20} />
                 {:else}
+                <!-- title="NMEA2000 message(s) as part of simulation."
+                description="(select message for setting field values)" -->
                   <DataTable
                     class="simtab"
                     size="compact"
                     radio
-                    title="NMEA2000 message(s) as part of simulation."
-                    description="(select message for setting field values)"
                     bind:selectedRowIds={selectedIds1}
                     headers={header1}
                     {rows}
@@ -181,22 +196,52 @@
             {#if selection1 != null}
               <Row style="height: 48%;">
                 <Column style="height: 100%;">
+                  <Tile class="head">
+                    <h4 class="title">Message fields.</h4>
+                    <p class="descr">(select field for setting values)</p>
+                  </Tile>
                   {#if loading}
-                    <DataTableSkeleton showHeader={true} showToolbar={false} headers={header2} size="compact" rows={20} />
+                    <DataTableSkeleton showHeader={false} showToolbar={false} headers={header2} size="compact" rows={20} />
                   {:else}
+                  <!-- title="Message fields."
+                  description="(select field for setting values)" -->
                     <DataTable
                       class="fldtab"
                       size="compact"
                       radio
-                      title="Message fields."
-                      description="(select field for setting values)"
                       nonSelectableRowIds={selection1.disabledIds}
                       bind:selectedRowIds={selectedIds2}
                       headers={header2}
                       rows={selection1.fields}
                       on:click:row--select={rowSel2}>
-                      <svelte:fragment slot="cell" let:row let:cell let:cellIndex>
-                        {((row.dictionary == 'DD001') && (cellIndex == 2)) || ((cellIndex == 3) && (cell.value == null)) ? '-' : cell.value}
+                      <svelte:fragment slot="cell" let:row let:rowIndex let:cell let:cellIndex>
+                        {#if (row.dictionary === 'DD001')}
+                          {#if (cell.key === "value") || (cell.key === "unit")}
+                            {"-"}
+                          {:else if cell.key === "range"}
+                            {"-"}
+                          {:else if cell.key === "static"}
+                            {""}
+                          {:else}
+                            {cell.value}
+                          {/if}
+                        {:else if ((cell.key === "unit") && (cell.value === null))}
+                          {"-"}
+                        {:else if cell.key === "range"}
+                          {#if (row.range.min !== null) || (row.range.max !== null)}
+                            {(row.range.min !== null ? row.range.min + " " : "")  + "-" + (row.range.max !== null ? " " + row.range.max : "")}
+                          {:else}
+                            {"-"}
+                          {/if}
+                        {:else if cell.key === "static"}
+                          {#if selection1.disabledIds.indexOf(rowIndex) === -1}
+                            <Checkbox labelText="Static" hideLabel checked={row.static} on:check={(e) => setSta(e, rowIndex)} />
+                          {:else}
+                            {""}
+                          {/if}
+                        {:else}
+                          {cell.value}
+                        {/if}
                       </svelte:fragment>
                     </DataTable>
                   {/if}
@@ -209,7 +254,7 @@
                   <Row>
                     {#if selection2['type'].startsWith('int') || selection2['type'].startsWith('uint') ||
                       selection2['type'].startsWith('float') || selection2['type'].startsWith('bit(')}
-                      <Column sm={8} md={8} lg={8}>
+                      <Column sm={3} md={3} lg={3}>
                         <NumberInput
                           id="input"
                           min={selection2.limits.min}
@@ -231,6 +276,30 @@
                           on:input={input2} />
                       </Column>
                     {/if}
+                    <Column></Column>
+                    <Column sm={3} md={3} lg={3}>
+                      <NumberInput
+                        id="min"
+                        min={selection2.limits.min}
+                        max={selection2.limits.max}
+                        disabled={running}
+                        label="Minimum"
+                        invalidText={"Number must be between " + selection2.limits.min + " and " + selection2.limits.max}
+                        value={selection2.range.min}
+                        on:input={input1} />
+                    </Column>
+                    <Column></Column>
+                    <Column sm={3} md={3} lg={3}>
+                      <NumberInput
+                        id="max"
+                        min={selection2.range.min}
+                        max={selection2.limits.max}
+                        disabled={running}
+                        label="Maximum"
+                        invalidText={"Number must be between " + selection2.range.min + " and " + selection2.limits.max}
+                        value={selection2.range.max}
+                        on:input={input1} />
+                    </Column>
                   </Row>
                 </Column>
               </Row>
@@ -302,13 +371,6 @@
     align-items: flex-start;
     height: -webkit-fill-available
   }
-  .simcont .tilecont .title {
-    max-width: 90%;
-    white-space: pre-line;
-    font-size: 1.25rem;
-    text-align: justify;
-    margin-bottom: 1rem;
-  }
   .simcont .tilecont .left {
     display: flex;
     flex-flow: column nowrap;
@@ -316,49 +378,64 @@
     align-items: center;
     height: -webkit-fill-available
   }
+  .simcont .tilecont .head {
+    padding: 0 !important;
+    width: 100%;
+    height: 3.25rem;
+  }
+  .simcont .tilecont .title {
+    font-size: 1.25rem;
+  }
+  .simcont .tilecont .descr {
+    font-size: 0.8rem;
+    color: #c6c6c6;
+  }
   .simtab {
-    max-height: 100%;
+    max-height: 84%;
     overflow-x: hidden;
     overflow-y: auto;
+  }
+  .simtab th:first-child,
+  .simtab td:first-child {
+    width: 3rem;
+  }
+  .simtab th:nth-child(3),
+  .simtab td:nth-child(3) {
+    text-align: center;
   }
   .simtab td:last-child {
     white-space: nowrap;
     overflow: hidden;
     text-overflow: ellipsis;
   }
-  .simtab td:first-child {
-    width: 2rem;
+  .simtab .bx--form-item.bx--checkbox-wrapper {
+    align-items: center;
   }
-  .simtab .bx--data-table-header {
-    padding: 0 0 1em 0;
+  .fldtab {
+    max-height: calc(100% - 3.5rem);;
+    overflow-x: hidden;
+    overflow-y: auto;
   }
-  .simtab .bx--data-table-header__title {
-    font-size: 1.25rem;
+  .fldtab th:first-child,
+  .fldtab td:first-child {
+    width: 3rem;
   }
-  .simtab .bx--data-table-header__description {
-    font-size: 0.85rem;
+  .fldtab th:nth-child(2),
+  .fldtab th:nth-child(4),
+  .fldtab th:nth-child(6),
+  .fldtab th:last-child,
+  .fldtab td:nth-child(2),
+  .fldtab td:nth-child(4),
+  .fldtab td:nth-child(6) {
+    text-align: center;
   }
-  .simtab .bx--data-table tbody tr.selected {
-    background-color: #666666;
-  }
-  .fldtab .bx--data-table-header {
-    padding: 0 0 1em 0;
-  }
-  .fldtab .bx--data-table-header__title {
-    font-size: 1.25rem;
-  }
-  .fldtab .bx--data-table-header__description {
-    font-size: 0.85rem;
-  }
-  .fldtab tbody td:nth-child(3) {
+  .fldtab td:nth-child(3) {
     white-space: nowrap;
     overflow: hidden;
     text-overflow: ellipsis;
   }
-  .fldtab {
-    max-height: 100%;
-    overflow-x: hidden;
-    overflow-y: auto;
+  .fldtab .bx--form-item.bx--checkbox-wrapper {
+    align-items: center;
   }
   .msgcont input[type="number"],
   .msgcont input[type="text"] {

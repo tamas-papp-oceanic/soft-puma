@@ -128,7 +128,6 @@
             {/if}
           </Column>
           <Column sm={3} md={3} lg={3} style="display: flex; flex-flow: column nowrap; justify-content: space-between;">
-
             <Row>
               <Column>
                 <Row>
@@ -187,7 +186,11 @@
   .msgcont .bx--toolbar-search-container-active.bx--search {
     width: 30%;
   }
-  .msgtab tbody td:last-child {
+  .msgtab th:first-child,
+  .msgtab td:first-child {
+    width: 3rem;
+  }
+  .msgtab td:last-child {
     white-space: nowrap;
     overflow: hidden;
     text-overflow: ellipsis;

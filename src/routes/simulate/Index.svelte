@@ -35,8 +35,14 @@
       let pgn = parseInt(spl.pgn);
       for (let i in rec.fields) {
         rec.fields[i] = Object.assign(
-          { id: parseInt(i) }, rec.fields[i],
-          { limits: rec.fields[i]['type'] != null ? minmax(rec.fields[i]) : null, character: null }
+          { id: parseInt(i) },
+          rec.fields[i],
+          {
+            static: false,
+            limits: rec.fields[i]['type'] != null ? minmax(rec.fields[i]) : null,
+            range: { min: null, max: null },
+            character: null
+          },
         );
         let fld = rec.fields[i];
         if (fld.dictionary == "DD056") {
