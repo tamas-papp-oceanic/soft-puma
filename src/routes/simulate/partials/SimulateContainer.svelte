@@ -62,15 +62,6 @@
     return null;
   };
 
-  function selRow1(e) {
-    if (JSON.stringify(selection1) === JSON.stringify(e.detail)) {
-      selectedIds1 = new Array();
-      selectedIds2 = new Array();
-      selection1 = null;
-      selection2 = null;
-    }
-  };
-
   function rowSel1(e) {
     selection1 = e.detail.row;
     selectedIds2 = new Array();
@@ -176,17 +167,28 @@
   }
 
   function hgtSet(val) {
-    if (val === null) {
-      fldhgt = 100;
-    } else {
-      fldhgt = 85;
+    let div = jq('.flddiv');
+    let elh = 0;
+    if (div.length > 0) {
+      if (val === null) {
+        div.css("height", "100%");
+      } else {
+        div.css("height", "80%");
+      }
     }
-    let pos = jq('.fldtab tr:last').position();
-  
-    // console.log(jq('#fldtab tbody tr:last-child').html())
-    console.log(jq('#fldtab'))
+    let tab = jq('.fldtab');
+    if (tab.length > 0) {
+      elh = tab.height();
+    }
+//     let row = jq('.fldtab tbody tr:last-child');
+//     if (row.length > 0) {
+//       let top = row.position().top;
 
-    jq('.fldtab').scrollTop(pos.top);
+
+// console.log(elh, top)
+
+//       tab.scrollTop(elh);
+//     }
   }
 
   for (let i = 0; i < 253; i++) {
@@ -221,7 +223,6 @@
                       bind:selectedRowIds={selectedIds1}
                       headers={header1}
                       rows={rows1}
-                      on:click:row={selRow1}
                       on:click:row--select={rowSel1}>
                     </DataTable>
                   {/if}
@@ -231,7 +232,7 @@
             {#if selection1 != null}
               <Row style="height: 49%;">
                 <Column style="height: 100%; display: flex; flex-flow: column nowrap; justify-content: space-between;">
-                  <div class="flddiv" style="height: {fldhgt}%;">
+                  <div class="flddiv">
                     <Tile class="head">
                       <h4 class="title">Message fields.</h4>
                       <p class="descr">(select field for setting values)</p>
@@ -240,7 +241,6 @@
                       <DataTableSkeleton showHeader={false} showToolbar={false} headers={header2} size="compact" rows={10} />
                     {:else}
                       <DataTable
-                        id="fldtab"
                         class="fldtab"
                         size="compact"
                         radio
@@ -458,6 +458,9 @@
   }
   .simtab .bx--form-item.bx--checkbox-wrapper {
     align-items: center;
+  }
+  .flddiv {
+    height: 100%;
   }
   .fldtab {
     max-height: calc(100% - 3.5rem);;
