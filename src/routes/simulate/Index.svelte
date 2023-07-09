@@ -87,8 +87,10 @@
       }
       let cnv = spl.protocol + '/' + spl.pgn;
       if (typeof nmeaconv[cnv] !== 'undefined') {
-        rec.fields[nmeaconv[cnv].function].value = parseInt(spl.function);
-        rec.disabledIds.push(nmeaconv[cnv].function);
+        if ((spl.pgn !== '065289') && (spl.pgn !== '130825')) {
+          rec.fields[nmeaconv[cnv].function].value = parseInt(spl.function);
+          rec.disabledIds.push(nmeaconv[cnv].function);
+        }
       }
       arr.push(rec);
     }

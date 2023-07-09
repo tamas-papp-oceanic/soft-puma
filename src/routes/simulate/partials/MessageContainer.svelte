@@ -2,7 +2,7 @@
   import { createEventDispatcher } from "svelte";
   import { ButtonSet, Button, Tile, Grid, Row, Column,
     DataTableSkeleton, PaginationSkeleton, DataTable,
-    Pagination,ToolbarContent, ToolbarSearch,
+    Pagination, ToolbarContent, ToolbarSearch,
     Toolbar } from "carbon-components-svelte";
   import { splitKey } from "../../../helpers/route";
 

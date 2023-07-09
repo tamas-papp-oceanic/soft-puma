@@ -3,6 +3,7 @@
   import { ButtonSet, Button, Tile, Grid, Row, Column,
     DataTableSkeleton, DataTable, NumberInput, TextInput, Dropdown,
     DropdownSkeleton, Checkbox } from "carbon-components-svelte";
+  import jq from "jquery";
 
   export let data;
   export let style;
@@ -41,11 +42,15 @@
     { id: 2, text: 'Natural' },
     { id: 3, text: 'Random' },
   );
-  let rows = new Array();
+  let rows1 = new Array();
+  let rows2 = new Array();
   let selectedIds1 = new Array();
   let selectedIds2 = new Array();
+  let filteredIds2 = new Array();
   let selection1 = null;
   let selection2 = null;
+  let range2 = false;
+  let fldhgt = 100;
   let simulation = 0;
 
   function getFlu(id) {
@@ -74,6 +79,12 @@
 
   function rowSel2(e) {
     selection2 = e.detail.row;
+    for (let i in selection1.fields) {
+      let fid = selection1.fields[i].id;
+      if (fid !== selection2.id) {
+        filteredIds2.push(fid);
+      }
+    }
     setTimeout(() => {
       document.getElementById('input').focus();
     }, 100);
@@ -153,14 +164,38 @@
         arr.push(dat[i]);
       }
     }
-    rows = JSON.parse(JSON.stringify(arr));
+    rows1 = JSON.parse(JSON.stringify(arr));
   };
+
+  function filter(val) {
+    let arr = new Array();
+    if (selection1 !== null) {
+      arr = JSON.parse(JSON.stringify(selection1.fields));
+    }
+    rows2 = JSON.parse(JSON.stringify(arr));
+  }
+
+  function hgtSet(val) {
+    if (val === null) {
+      fldhgt = 100;
+    } else {
+      fldhgt = 85;
+    }
+    let pos = jq('.fldtab tr:last').position();
+  
+    // console.log(jq('#fldtab tbody tr:last-child').html())
+    console.log(jq('#fldtab'))
+
+    jq('.fldtab').scrollTop(pos.top);
+  }
 
   for (let i = 0; i < 253; i++) {
     insts.push({ id: i, text: i.toString() });
   }
 
   $: data, setData(data);
+  $: selection1, filter(selection2);
+  $: selection2, hgtSet(selection2);
 </script>
 
 <div class="simcont" style={style}>
@@ -169,138 +204,151 @@
       <Grid fullWidth noGutter>
         <Row style="height: inherit;">
           <Column sm={13} md={13} lg={13} class="left">
-            <Row style="height: 48%;">
+            <Row style="height: 49%;">
               <Column style="height: 100%;">
-                <Tile class="head">
-                  <h4 class="title">NMEA2000 message(s) as part of simulation.</h4>
-                  <p class="descr">(select message for setting field values)</p>
-                </Tile>
-              {#if loading}
-                  <DataTableSkeleton showHeader={false} showToolbar={false} headers={header1} size="compact" rows={20} />
-                {:else}
-                <!-- title="NMEA2000 message(s) as part of simulation."
-                description="(select message for setting field values)" -->
-                  <DataTable
-                    class="simtab"
-                    size="compact"
-                    radio
-                    bind:selectedRowIds={selectedIds1}
-                    headers={header1}
-                    {rows}
-                    on:click:row={selRow1}
-                    on:click:row--select={rowSel1}>
-                  </DataTable>
-                {/if}
+                <div>
+                  <Tile class="head">
+                    <h4 class="title">NMEA2000 message(s) as part of simulation.</h4>
+                    <p class="descr">(select message for setting field values)</p>
+                  </Tile>
+                  {#if loading}
+                    <DataTableSkeleton showHeader={false} showToolbar={false} headers={header1} size="compact" rows={20} />
+                  {:else}
+                    <DataTable
+                      class="simtab"
+                      size="compact"
+                      radio
+                      bind:selectedRowIds={selectedIds1}
+                      headers={header1}
+                      rows={rows1}
+                      on:click:row={selRow1}
+                      on:click:row--select={rowSel1}>
+                    </DataTable>
+                  {/if}
+                </div>
               </Column>
             </Row>
             {#if selection1 != null}
-              <Row style="height: 48%;">
-                <Column style="height: 100%;">
-                  <Tile class="head">
-                    <h4 class="title">Message fields.</h4>
-                    <p class="descr">(select field for setting values)</p>
-                  </Tile>
-                  {#if loading}
-                    <DataTableSkeleton showHeader={false} showToolbar={false} headers={header2} size="compact" rows={20} />
-                  {:else}
-                  <!-- title="Message fields."
-                  description="(select field for setting values)" -->
-                    <DataTable
-                      class="fldtab"
-                      size="compact"
-                      radio
-                      nonSelectableRowIds={selection1.disabledIds}
-                      bind:selectedRowIds={selectedIds2}
-                      headers={header2}
-                      rows={selection1.fields}
-                      on:click:row--select={rowSel2}>
-                      <svelte:fragment slot="cell" let:row let:rowIndex let:cell let:cellIndex>
-                        {#if (row.dictionary === 'DD001')}
-                          {#if (cell.key === "value") || (cell.key === "unit")}
+              <Row style="height: 49%;">
+                <Column style="height: 100%; display: flex; flex-flow: column nowrap; justify-content: space-between;">
+                  <div class="flddiv" style="height: {fldhgt}%;">
+                    <Tile class="head">
+                      <h4 class="title">Message fields.</h4>
+                      <p class="descr">(select field for setting values)</p>
+                    </Tile>
+                    {#if loading}
+                      <DataTableSkeleton showHeader={false} showToolbar={false} headers={header2} size="compact" rows={10} />
+                    {:else}
+                      <DataTable
+                        id="fldtab"
+                        class="fldtab"
+                        size="compact"
+                        radio
+                        nonSelectableRowIds={selection1.disabledIds}
+                        bind:selectedRowIds={selectedIds2}
+                        headers={header2}
+                        rows={rows2}
+                        on:click:row--select={rowSel2}>
+                        <svelte:fragment slot="cell" let:row let:rowIndex let:cell let:cellIndex>
+                          {#if (row.dictionary === 'DD001')}
+                            {#if (cell.key === "value") || (cell.key === "unit")}
+                              {"-"}
+                            {:else if cell.key === "range"}
+                              {"-"}
+                            {:else if cell.key === "static"}
+                              {""}
+                            {:else}
+                              {cell.value}
+                            {/if}
+                          {:else if ((cell.key === "unit") && (cell.value === null))}
                             {"-"}
                           {:else if cell.key === "range"}
-                            {"-"}
+                            {#if (row.range.min !== null) || (row.range.max !== null)}
+                              {(row.range.min !== null ? row.range.min + " " : "")  + "-" + (row.range.max !== null ? " " + row.range.max : "")}
+                            {:else}
+                              {"-"}
+                            {/if}
                           {:else if cell.key === "static"}
-                            {""}
+                            {#if selection1.disabledIds.indexOf(rowIndex) === -1}
+                              <Checkbox labelText="Static" hideLabel checked={row.static} on:check={(e) => setSta(e, rowIndex)} />
+                            {:else}
+                              {""}
+                            {/if}
                           {:else}
                             {cell.value}
                           {/if}
-                        {:else if ((cell.key === "unit") && (cell.value === null))}
-                          {"-"}
-                        {:else if cell.key === "range"}
-                          {#if (row.range.min !== null) || (row.range.max !== null)}
-                            {(row.range.min !== null ? row.range.min + " " : "")  + "-" + (row.range.max !== null ? " " + row.range.max : "")}
-                          {:else}
-                            {"-"}
-                          {/if}
-                        {:else if cell.key === "static"}
-                          {#if selection1.disabledIds.indexOf(rowIndex) === -1}
-                            <Checkbox labelText="Static" hideLabel checked={row.static} on:check={(e) => setSta(e, rowIndex)} />
-                          {:else}
-                            {""}
-                          {/if}
-                        {:else}
-                          {cell.value}
-                        {/if}
-                      </svelte:fragment>
-                    </DataTable>
-                  {/if}
-                </Column>
-              </Row>
-            {/if}
-            {#if selection2 != null}
-              <Row>
-                <Column>
-                  <Row>
-                    {#if selection2['type'].startsWith('int') || selection2['type'].startsWith('uint') ||
-                      selection2['type'].startsWith('float') || selection2['type'].startsWith('bit(')}
-                      <Column sm={3} md={3} lg={3}>
-                        <NumberInput
-                          id="input"
-                          min={selection2.limits.min}
-                          max={selection2.limits.max}
-                          disabled={running}
-                          label={selection2.title}
-                          invalidText={"Number must be between " + selection2.limits.min + " and " + selection2.limits.max}
-                          value={selection2.value}
-                          on:input={input1} />
-                      </Column>
-                    {:else if selection2['type'].startsWith('chr(') || selection2['type'].startsWith('str')}
-                      <Column>
-                        <TextInput
-                          id="input"
-                          disabled={running}
-                          labelText={selection2.title}
-                          invalidText={"Text length must be between 0 and " + selection2.character}
-                          value={selection2.value}
-                          on:input={input2} />
-                      </Column>
+                        </svelte:fragment>
+                      </DataTable>
                     {/if}
-                    <Column></Column>
-                    <Column sm={3} md={3} lg={3}>
-                      <NumberInput
-                        id="min"
-                        min={selection2.limits.min}
-                        max={selection2.limits.max}
-                        disabled={running}
-                        label="Minimum"
-                        invalidText={"Number must be between " + selection2.limits.min + " and " + selection2.limits.max}
-                        value={selection2.range.min}
-                        on:input={input1} />
-                    </Column>
-                    <Column></Column>
-                    <Column sm={3} md={3} lg={3}>
-                      <NumberInput
-                        id="max"
-                        min={selection2.range.min}
-                        max={selection2.limits.max}
-                        disabled={running}
-                        label="Maximum"
-                        invalidText={"Number must be between " + selection2.range.min + " and " + selection2.limits.max}
-                        value={selection2.range.max}
-                        on:input={input1} />
-                    </Column>
-                  </Row>
+                  </div>
+                  {#if selection2 != null}
+                    <div class="detdiv">
+                      <Grid fullWidth noGutter>
+                        <Row>
+                          <Column>
+                            <Row style="display:flex; flex-flow: row nowrap; align-items: center;">
+                              <Column style="display:flex; flex-flow: row nowrap; align-items: center;">
+                                <span>{selection2.title}:&nbsp;</span>
+                                {#if selection2['type'].startsWith('int') || selection2['type'].startsWith('uint') ||
+                                  selection2['type'].startsWith('float') || selection2['type'].startsWith('bit(')}
+                                  <NumberInput
+                                    id="input"
+                                    min={selection2.limits.min}
+                                    max={selection2.limits.max}
+                                    disabled={running}
+                                    label={selection2.title}
+                                    hideLabel
+                                    invalidText={"Number must be between " + selection2.limits.min + " and " + selection2.limits.max}
+                                    value={selection2.value}
+                                    on:input={input1} />
+                                {:else if selection2['type'].startsWith('chr(') || selection2['type'].startsWith('str')}
+                                  <TextInput
+                                    id="input"
+                                    disabled={running}
+                                    labelText={selection2.title}
+                                    hideLabel
+                                    invalidText={"Text length must be between 0 and " + selection2.character}
+                                    value={selection2.value}
+                                    on:input={input2} />
+                                {/if}
+                              </Column>
+                              <Column sm={2} md={2} lg={2}>
+                                <Checkbox labelText="Custom range" bind:checked={range2} />
+                              </Column>
+                              <Column sm={4} md={4} lg={4} style="display:flex; flex-flow: row nowrap; align-items: center;">
+                                <span>Minimum:&nbsp;</span>
+                                <NumberInput
+                                  id="min"
+                                  allowEmpty
+                                  min={selection2.limits.min}
+                                  max={selection2.limits.max}
+                                  disabled={running || !range2}
+                                  label="Minimum"
+                                  hideLabel
+                                  invalidText={"Number must be between " + selection2.limits.min + " and " + selection2.limits.max}
+                                  value={selection2.range.min}
+                                  on:input={input1} />
+                              </Column>
+                              <Column sm={4} md={4} lg={4} style="display:flex; flex-flow: row nowrap; align-items: center;">
+                                <span>Maximum:&nbsp;</span>
+                                <NumberInput
+                                  id="max"
+                                  allowEmpty
+                                  min={selection2.range.min}
+                                  max={selection2.limits.max}
+                                  disabled={running || !range2}
+                                  label="Maximum"
+                                  hideLabel
+                                  invalidText={"Number must be between " + selection2.range.min + " and " + selection2.limits.max}
+                                  value={selection2.range.max}
+                                  on:input={input1} />
+                              </Column>
+                            </Row>
+                          </Column>
+                        </Row>
+                      </Grid>
+                    </div>
+                  {/if}
                 </Column>
               </Row>
             {/if}
@@ -315,7 +363,7 @@
                   <Column>
                     <ButtonSet stacked style="padding: 0.2rem;">
                       <Button disabled={(selectedIds1.length == 0) || running} style="margin: 0.2rem 0" on:click={delRow}>Delete message</Button>
-                      <Button disabled={(rows.length == 0) || running} style="margin: 0.2rem 0" on:click={clrTab}>Clear table</Button>
+                      <Button disabled={(rows1.length == 0) || running} style="margin: 0.2rem 0" on:click={clrTab}>Clear table</Button>
                     </ButtonSet>
                   </Column>
                 </Row>
@@ -339,7 +387,7 @@
                   <Column>
                     <ButtonSet stacked style="padding: 0.2rem;">
                       <Button style="margin: 0.2rem 0" disabled={(selectedIds1.length == 0) || running} on:click={send}>Send message</Button>
-                      <Button style="margin: 0.2rem 0" disabled={(rows.length == 0) || running} on:click={start}>Start simulation</Button>
+                      <Button style="margin: 0.2rem 0" disabled={(rows1.length == 0) || running} on:click={start}>Start simulation</Button>
                       <Button style="margin: 0.2rem 0" disabled={!running} on:click={stop}>Stop simulation</Button>
                     </ButtonSet>
                   </Column>
@@ -440,5 +488,8 @@
   .msgcont input[type="number"],
   .msgcont input[type="text"] {
     font-size: 1rem;
+  }
+  .simtab .detdiv {
+    padding-top: 1rem;
   }
 </style>

@@ -94,6 +94,7 @@
     "electron-log": "^4.4.8",
     "electron-serve": "^1.1.0",
     "electron-updater": "^5.2.1",
+    "jquery": "^3.7.0",
     "jwt-decode": "^3.1.2",
     "node-fetch": "^2.6.7",
     "pdfkit": "^0.13.0",
