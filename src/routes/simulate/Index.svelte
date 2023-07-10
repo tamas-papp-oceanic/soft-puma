@@ -40,7 +40,7 @@
           {
             static: false,
             limits: rec.fields[i]['type'] != null ? minmax(rec.fields[i]) : null,
-            range: { min: null, max: null },
+            ranges: { min: null, max: null },
             character: null
           },
         );

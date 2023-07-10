@@ -23,7 +23,7 @@
     { key: 'title', value: 'Title', width: '35%', sort: false },
     { key: 'value', value: 'Value', sort: false },
     { key: 'unit', value: 'Unit', sort: false },
-    { key: 'range', value: 'Range', sort: false },
+    { key: 'ranges', value: 'Ranges', sort: false },
     { key: 'static', value: 'Static', sort: false },
   );
   let insts = new Array();
@@ -46,11 +46,9 @@
   let rows2 = new Array();
   let selectedIds1 = new Array();
   let selectedIds2 = new Array();
-  let filteredIds2 = new Array();
   let selection1 = null;
   let selection2 = null;
-  let range2 = false;
-  let fldhgt = 100;
+  let ranges = false;
   let simulation = 0;
 
   function getFlu(id) {
@@ -70,16 +68,23 @@
 
   function rowSel2(e) {
     selection2 = e.detail.row;
-    for (let i in selection1.fields) {
-      let fid = selection1.fields[i].id;
-      if (fid !== selection2.id) {
-        filteredIds2.push(fid);
-      }
-    }
+    ranges = ((selection2.ranges.min !== null) && (selection2.ranges.max !== null));
     setTimeout(() => {
       document.getElementById('input').focus();
     }, 100);
   };
+
+  function check2(e) {
+    if (e.detail) {
+      if (selection2.limits !== null) {
+        selection2.ranges.min = selection2.limits.min;
+        selection2.ranges.max = selection2.limits.max;
+      }
+    } else {
+      selection2.ranges.min = null;
+      selection2.ranges.max = null;
+    }
+  }
 
   function setSta(e, row) {
     if (e.detail != null) {
@@ -166,29 +171,36 @@
     rows2 = JSON.parse(JSON.stringify(arr));
   }
 
-  function hgtSet(val) {
-    let div = jq('.flddiv');
-    let elh = 0;
+  function divSet(val) {
+    let div = jq('.tabdiv');
     if (div.length > 0) {
       if (val === null) {
         div.css("height", "100%");
       } else {
-        div.css("height", "80%");
+        div.css("height", "75%");
+      }
+      if (selection2 !== null) {
+        let len = jq('.tabfld tbody tr:last-child');
+        if (len.length > 0) {
+          let row = jq('.tabfld tbody tr:nth-child(' + (selection2.id + 1) + ')');
+          if (row.length > 0) {
+
+
+// console.log(div.offset().top, div.height(), jq('.tabfld').height())
+
+            // div.animate({ scrollTop: div.height() * row.position().top / len.position().top }, 100);
+            // div.animate({ scrollTop: div.offset().top + div.height() }, 100);
+            // jq('.tabfld').animate({ scrollTop: div.height() * row.position().top / len.position().top }, 100);
+            // jq('.tabfld').animate({ scrollTop: 260 }, 100);
+
+            setTimeout(() => {
+              let elm = document.querySelectorAll('.tabfld tr');
+              elm[selection2.id + 1].scrollIntoView({ behavior: "smooth", block: "center", inline: "nearest" });
+            }, 150);
+          }
+        }
       }
     }
-    let tab = jq('.fldtab');
-    if (tab.length > 0) {
-      elh = tab.height();
-    }
-//     let row = jq('.fldtab tbody tr:last-child');
-//     if (row.length > 0) {
-//       let top = row.position().top;
-
-
-// console.log(elh, top)
-
-//       tab.scrollTop(elh);
-//     }
   }
 
   for (let i = 0; i < 253; i++) {
@@ -197,7 +209,7 @@
 
   $: data, setData(data);
   $: selection1, filter(selection2);
-  $: selection2, hgtSet(selection2);
+  $: selection2, divSet(selection2);
 </script>
 
 <div class="simcont" style={style}>
@@ -206,7 +218,7 @@
       <Grid fullWidth noGutter>
         <Row style="height: inherit;">
           <Column sm={13} md={13} lg={13} class="left">
-            <Row style="height: 49%;">
+            <Row style="height: 39vh;">
               <Column style="height: 100%;">
                 <div>
                   <Tile class="head">
@@ -230,125 +242,120 @@
               </Column>
             </Row>
             {#if selection1 != null}
-              <Row style="height: 49%;">
-                <Column style="height: 100%; display: flex; flex-flow: column nowrap; justify-content: space-between;">
+              <Row style="height: 39vh;">
+                <Column style="height: 100%;">
                   <div class="flddiv">
-                    <Tile class="head">
-                      <h4 class="title">Message fields.</h4>
-                      <p class="descr">(select field for setting values)</p>
-                    </Tile>
-                    {#if loading}
-                      <DataTableSkeleton showHeader={false} showToolbar={false} headers={header2} size="compact" rows={10} />
-                    {:else}
-                      <DataTable
-                        class="fldtab"
-                        size="compact"
-                        radio
-                        nonSelectableRowIds={selection1.disabledIds}
-                        bind:selectedRowIds={selectedIds2}
-                        headers={header2}
-                        rows={rows2}
-                        on:click:row--select={rowSel2}>
-                        <svelte:fragment slot="cell" let:row let:rowIndex let:cell let:cellIndex>
-                          {#if (row.dictionary === 'DD001')}
-                            {#if (cell.key === "value") || (cell.key === "unit")}
+                    <div class="tabdiv">
+                      <Tile class="head">
+                        <h4 class="title">Message fields.</h4>
+                        <p class="descr">(select field for setting values)</p>
+                      </Tile>
+                      {#if loading}
+                        <DataTableSkeleton showHeader={false} showToolbar={false} headers={header2} size="compact" rows={10} />
+                      {:else}
+                        <DataTable
+                          class="tabfld"
+                          size="compact"
+                          radio
+                          nonSelectableRowIds={selection1.disabledIds}
+                          bind:selectedRowIds={selectedIds2}
+                          headers={header2}
+                          rows={rows2}
+                          on:click:row--select={rowSel2}>
+                          <svelte:fragment slot="cell" let:row let:rowIndex let:cell let:cellIndex>
+                            {#if (row.dictionary === 'DD001')}
+                              {#if (cell.key === "value") || (cell.key === "unit")}
+                                {"-"}
+                              {:else if cell.key === "ranges"}
+                                {"-"}
+                              {:else if cell.key === "static"}
+                                {""}
+                              {:else}
+                                {cell.value}
+                              {/if}
+                            {:else if ((cell.key === "unit") && (cell.value === null))}
                               {"-"}
-                            {:else if cell.key === "range"}
-                              {"-"}
+                            {:else if cell.key === "ranges"}
+                              {#if (row.ranges.min !== null) || (row.ranges.max !== null)}
+                                {(row.ranges.min !== null ? row.ranges.min + " " : "")  + "-" + (row.ranges.max !== null ? " " + row.ranges.max : "")}
+                              {:else}
+                                {"-"}
+                              {/if}
                             {:else if cell.key === "static"}
-                              {""}
+                              {#if selection1.disabledIds.indexOf(rowIndex) === -1}
+                                <Checkbox labelText="Static" hideLabel checked={row.static} on:check={(e) => setSta(e, rowIndex)} />
+                              {:else}
+                                {""}
+                              {/if}
                             {:else}
                               {cell.value}
                             {/if}
-                          {:else if ((cell.key === "unit") && (cell.value === null))}
-                            {"-"}
-                          {:else if cell.key === "range"}
-                            {#if (row.range.min !== null) || (row.range.max !== null)}
-                              {(row.range.min !== null ? row.range.min + " " : "")  + "-" + (row.range.max !== null ? " " + row.range.max : "")}
-                            {:else}
-                              {"-"}
-                            {/if}
-                          {:else if cell.key === "static"}
-                            {#if selection1.disabledIds.indexOf(rowIndex) === -1}
-                              <Checkbox labelText="Static" hideLabel checked={row.static} on:check={(e) => setSta(e, rowIndex)} />
-                            {:else}
-                              {""}
-                            {/if}
-                          {:else}
-                            {cell.value}
-                          {/if}
-                        </svelte:fragment>
-                      </DataTable>
-                    {/if}
-                  </div>
-                  {#if selection2 != null}
-                    <div class="detdiv">
-                      <Grid fullWidth noGutter>
-                        <Row>
-                          <Column>
-                            <Row style="display:flex; flex-flow: row nowrap; align-items: center;">
-                              <Column style="display:flex; flex-flow: row nowrap; align-items: center;">
-                                <span>{selection2.title}:&nbsp;</span>
-                                {#if selection2['type'].startsWith('int') || selection2['type'].startsWith('uint') ||
-                                  selection2['type'].startsWith('float') || selection2['type'].startsWith('bit(')}
+                          </svelte:fragment>
+                        </DataTable>
+                      {/if}
+                    </div>
+                    {#if selection2 != null}
+                      <div class="detdiv">
+                        <Grid fullWidth noGutter>
+                          <Row>
+                            <Column>
+                              <Row style="display:flex; flex-flow: row nowrap; align-items: center;">
+                                <Column style="display:flex; flex-flow: row nowrap; align-items: center;">
+                                  {#if selection2['type'].startsWith('int') || selection2['type'].startsWith('uint') ||
+                                    selection2['type'].startsWith('float') || selection2['type'].startsWith('bit(')}
+                                    <NumberInput
+                                      id="input"
+                                      min={selection2.limits.min}
+                                      max={selection2.limits.max}
+                                      disabled={running}
+                                      label={selection2.title}
+                                      invalidText={"Number must be between " + selection2.limits.min + " and " + selection2.limits.max}
+                                      value={selection2.value}
+                                      on:input={input1} />
+                                  {:else if selection2['type'].startsWith('chr(') || selection2['type'].startsWith('str')}
+                                    <TextInput
+                                      id="input"
+                                      disabled={running}
+                                      labelText={selection2.title}
+                                      invalidText={"Text length must be between 0 and " + selection2.character}
+                                      value={selection2.value}
+                                      on:input={input2} />
+                                  {/if}
+                                </Column>
+                                <Column sm={3} md={3} lg={3}>
+                                  <Checkbox labelText="Custom ranges" bind:checked={ranges} on:check={check2} />
+                                </Column>
+                                <Column sm={4} md={4} lg={4} style="display:flex; flex-flow: row nowrap; align-items: center;">
                                   <NumberInput
-                                    id="input"
+                                    id="min"
+                                    allowEmpty
                                     min={selection2.limits.min}
                                     max={selection2.limits.max}
-                                    disabled={running}
-                                    label={selection2.title}
-                                    hideLabel
+                                    disabled={running || !ranges}
+                                    label="Minimum"
                                     invalidText={"Number must be between " + selection2.limits.min + " and " + selection2.limits.max}
-                                    value={selection2.value}
+                                    value={selection2.ranges.min}
                                     on:input={input1} />
-                                {:else if selection2['type'].startsWith('chr(') || selection2['type'].startsWith('str')}
-                                  <TextInput
-                                    id="input"
-                                    disabled={running}
-                                    labelText={selection2.title}
-                                    hideLabel
-                                    invalidText={"Text length must be between 0 and " + selection2.character}
-                                    value={selection2.value}
-                                    on:input={input2} />
-                                {/if}
-                              </Column>
-                              <Column sm={2} md={2} lg={2}>
-                                <Checkbox labelText="Custom range" bind:checked={range2} />
-                              </Column>
-                              <Column sm={4} md={4} lg={4} style="display:flex; flex-flow: row nowrap; align-items: center;">
-                                <span>Minimum:&nbsp;</span>
-                                <NumberInput
-                                  id="min"
-                                  allowEmpty
-                                  min={selection2.limits.min}
-                                  max={selection2.limits.max}
-                                  disabled={running || !range2}
-                                  label="Minimum"
-                                  hideLabel
-                                  invalidText={"Number must be between " + selection2.limits.min + " and " + selection2.limits.max}
-                                  value={selection2.range.min}
-                                  on:input={input1} />
-                              </Column>
-                              <Column sm={4} md={4} lg={4} style="display:flex; flex-flow: row nowrap; align-items: center;">
-                                <span>Maximum:&nbsp;</span>
-                                <NumberInput
-                                  id="max"
-                                  allowEmpty
-                                  min={selection2.range.min}
-                                  max={selection2.limits.max}
-                                  disabled={running || !range2}
-                                  label="Maximum"
-                                  hideLabel
-                                  invalidText={"Number must be between " + selection2.range.min + " and " + selection2.limits.max}
-                                  value={selection2.range.max}
-                                  on:input={input1} />
-                              </Column>
-                            </Row>
-                          </Column>
-                        </Row>
-                      </Grid>
-                    </div>
-                  {/if}
+                                </Column>
+                                <Column sm={4} md={4} lg={4} style="display:flex; flex-flow: row nowrap; align-items: center;">
+                                  <NumberInput
+                                    id="max"
+                                    allowEmpty
+                                    min={selection2.ranges.min}
+                                    max={selection2.limits.max}
+                                    disabled={running || !ranges}
+                                    label="Maximum"
+                                    invalidText={"Number must be between " + selection2.ranges.min + " and " + selection2.limits.max}
+                                    value={selection2.ranges.max}
+                                    on:input={input1} />
+                                </Column>
+                              </Row>
+                            </Column>
+                          </Row>
+                        </Grid>
+                      </div>
+                    {/if}
+                  </div>
                 </Column>
               </Row>
             {/if}
@@ -460,39 +467,46 @@
     align-items: center;
   }
   .flddiv {
+    height: 100%; display: flex; flex-flow: column nowrap; justify-content: space-between;
+  }
+  .tabdiv {
     height: 100%;
   }
-  .fldtab {
-    max-height: calc(100% - 3.5rem);;
+  .tabfld {
+    max-height: calc(100% - 3.5rem);
     overflow-x: hidden;
     overflow-y: auto;
   }
-  .fldtab th:first-child,
-  .fldtab td:first-child {
+  .tabfld th:first-child,
+  .tabfld td:first-child {
     width: 3rem;
   }
-  .fldtab th:nth-child(2),
-  .fldtab th:nth-child(4),
-  .fldtab th:nth-child(6),
-  .fldtab th:last-child,
-  .fldtab td:nth-child(2),
-  .fldtab td:nth-child(4),
-  .fldtab td:nth-child(6) {
+  .tabfld th:nth-child(2),
+  .tabfld th:nth-child(4),
+  .tabfld th:nth-child(6),
+  .tabfld th:last-child,
+  .tabfld td:nth-child(2),
+  .tabfld td:nth-child(4),
+  .tabfld td:nth-child(6) {
     text-align: center;
   }
-  .fldtab td:nth-child(3) {
+  .tabfld td:nth-child(3) {
     white-space: nowrap;
     overflow: hidden;
     text-overflow: ellipsis;
   }
-  .fldtab .bx--form-item.bx--checkbox-wrapper {
+  .tabfld .bx--form-item.bx--checkbox-wrapper {
     align-items: center;
   }
-  .msgcont input[type="number"],
-  .msgcont input[type="text"] {
+  .simcont input[type="number"],
+  .simcont input[type="text"] {
     font-size: 1rem;
   }
-  .simtab .detdiv {
-    padding-top: 1rem;
+  .simcont .detdiv .field {
+    padding-right: 1rem;
   }
+  .simcont .detdiv .field.disabled {
+    color: #525252;
+  }
+
 </style>
