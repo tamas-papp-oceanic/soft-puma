@@ -179,7 +179,7 @@
 <style lang="scss" global>
 	@import "~carbon-components-svelte/css/g100.css";
 	.content {
-		margin-top: 10vh;
+		margin-top: 4rem;
 	}
 	@media (min-width: 48rem) {
 		.bx--header__nav {

@@ -262,7 +262,7 @@
               running={running}
               on:addrow={addRow}
               on:cancel={cancel}
-              style="height: 80vh;" />
+              style="height: calc(100vh - 10rem);" />
           </TabContent>
           <TabContent>
             <SimulateContainer
@@ -276,7 +276,7 @@
               on:start={start}
               on:stop={stop}
               on:cancel={cancel}
-              style="height: 80vh;" />
+              style="height: calc(100vh - 10rem);" />
           </TabContent>
         </svelte:fragment>
       </Tabs>

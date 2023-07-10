@@ -76,7 +76,7 @@
 
   $: data, setData(data);
   $: pagination.totalItems = filteredRowIds.length;
-  $: pagination.pageSize = Math.round((height / getComputedStyle(document.documentElement).fontSize.replace('px', '')) / 2) - 7;
+  $: pagination.pageSize = Math.round(((height - 350) / 24));
 </script>
 
 <svelte:window bind:innerHeight={height} />

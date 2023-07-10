@@ -75,14 +75,24 @@
   };
 
   function check2(e) {
-    if (e.detail) {
-      if (selection2.limits !== null) {
-        selection2.ranges.min = selection2.limits.min;
-        selection2.ranges.max = selection2.limits.max;
+    for (let i in  data.table) {
+      if (data.table[i].id == selection1.id) {
+        if (e.detail) {
+          if (selection2.limits !== null) {
+            selection2.ranges.min = selection2.limits.min;
+            selection2.ranges.max = selection2.limits.max;
+            data.table[i].fields[selection2.id].ranges.min = selection2.limits.min;
+            data.table[i].fields[selection2.id].ranges.max = selection2.limits.max;
+          }
+        } else {
+          selection2.ranges.min = null;
+          selection2.ranges.max = null;
+          data.table[i].fields[selection2.id].ranges.min = null;
+          data.table[i].fields[selection2.id].ranges.max = null;
+        }
+        data = data;
+        break;
       }
-    } else {
-      selection2.ranges.min = null;
-      selection2.ranges.max = null;
     }
   }
 
@@ -99,9 +109,9 @@
 
   function input1(e) {
     if (e.detail != null) {
-      for (let i in data) {
-        if (data[i].id == selection1.id) {
-          selection1.fields[selection2.id].value = parseFloat(e.detail);
+      for (let i in data.table) {
+        if (data.table[i].id == selection1.id) {
+          data.table[i].fields[selection2.id].value = parseFloat(e.detail);
           break;
         }
       }
@@ -110,9 +120,31 @@
 
   function input2(e) {
     if (e.detail != null) {
-      for (let i in data) {
-        if (data[i].id == selection1.id) {
-          selection1.fields[selection2.id].value = e.detail;
+      for (let i in  data.table) {
+        if (data.table[i].id == selection1.id) {
+          data.table[i].fields[selection2.id].value = e.detail;
+          break;
+        }
+      }
+    }
+  };
+
+  function input3(e) {
+    if (e.detail != null) {
+      for (let i in  data.table) {
+        if (data.table[i].id == selection1.id) {
+          data.table[i].fields[selection2.id].ranges.min = e.detail;
+          break;
+        }
+      }
+    }
+  };
+
+  function input4(e) {
+    if (e.detail != null) {
+      for (let i in  data.table) {
+        if (data.table[i].id == selection1.id) {
+          data.table[i].fields[selection2.id].ranges.max = e.detail;
           break;
         }
       }
@@ -163,12 +195,26 @@
     rows1 = JSON.parse(JSON.stringify(arr));
   };
 
-  function filter(val) {
+  function filter() {
     let arr = new Array();
     if (selection1 !== null) {
+      for (let i in data.table) {
+        if (data.table[i].id == selection1.id) {
+          selection1 = data.table[i];
+          break;
+        }
+      }
       arr = JSON.parse(JSON.stringify(selection1.fields));
     }
     rows2 = JSON.parse(JSON.stringify(arr));
+    if (selection2 !== null) {
+      for (let i in rows2) {
+        if (rows2[i].id == selection2.id) {
+          selection2 = rows2[i];
+          break;
+        }
+      }
+    }
   }
 
   function divSet(val) {
@@ -180,25 +226,10 @@
         div.css("height", "75%");
       }
       if (selection2 !== null) {
-        let len = jq('.tabfld tbody tr:last-child');
-        if (len.length > 0) {
-          let row = jq('.tabfld tbody tr:nth-child(' + (selection2.id + 1) + ')');
-          if (row.length > 0) {
-
-
-// console.log(div.offset().top, div.height(), jq('.tabfld').height())
-
-            // div.animate({ scrollTop: div.height() * row.position().top / len.position().top }, 100);
-            // div.animate({ scrollTop: div.offset().top + div.height() }, 100);
-            // jq('.tabfld').animate({ scrollTop: div.height() * row.position().top / len.position().top }, 100);
-            // jq('.tabfld').animate({ scrollTop: 260 }, 100);
-
-            setTimeout(() => {
-              let elm = document.querySelectorAll('.tabfld tr');
-              elm[selection2.id + 1].scrollIntoView({ behavior: "smooth", block: "center", inline: "nearest" });
-            }, 150);
-          }
-        }
+        setTimeout(() => {
+          let elm = document.querySelectorAll('.tabfld tr');
+          elm[selection2.id + 1].scrollIntoView({ behavior: "smooth", block: "nearest" });
+        }, 150);
       }
     }
   }
@@ -208,7 +239,8 @@
   }
 
   $: data, setData(data);
-  $: selection1, filter(selection2);
+  $: data, filter();
+  $: selection1, filter();
   $: selection2, divSet(selection2);
 </script>
 
@@ -218,9 +250,9 @@
       <Grid fullWidth noGutter>
         <Row style="height: inherit;">
           <Column sm={13} md={13} lg={13} class="left">
-            <Row style="height: 39vh;">
+            <Row style="height: 49%;">
               <Column style="height: 100%;">
-                <div>
+                <div class="seldiv">
                   <Tile class="head">
                     <h4 class="title">NMEA2000 message(s) as part of simulation.</h4>
                     <p class="descr">(select message for setting field values)</p>
@@ -242,7 +274,7 @@
               </Column>
             </Row>
             {#if selection1 != null}
-              <Row style="height: 39vh;">
+              <Row style="height: 49%;">
                 <Column style="height: 100%;">
                   <div class="flddiv">
                     <div class="tabdiv">
@@ -335,7 +367,7 @@
                                     label="Minimum"
                                     invalidText={"Number must be between " + selection2.limits.min + " and " + selection2.limits.max}
                                     value={selection2.ranges.min}
-                                    on:input={input1} />
+                                    on:input={input3} />
                                 </Column>
                                 <Column sm={4} md={4} lg={4} style="display:flex; flex-flow: row nowrap; align-items: center;">
                                   <NumberInput
@@ -347,7 +379,7 @@
                                     label="Maximum"
                                     invalidText={"Number must be between " + selection2.ranges.min + " and " + selection2.limits.max}
                                     value={selection2.ranges.max}
-                                    on:input={input1} />
+                                    on:input={input4} />
                                 </Column>
                               </Row>
                             </Column>
@@ -418,6 +450,7 @@
     justify-content: stretch;
     border: 1px solid gray;
     width: 100%;
+    height: calc(100vh - 10rem);
   }
   .simcont .tilecont {
     display: flex;
@@ -446,7 +479,7 @@
     color: #c6c6c6;
   }
   .simtab {
-    max-height: 84%;
+    max-height: calc(100% - 3.5rem);
     overflow-x: hidden;
     overflow-y: auto;
   }
@@ -469,7 +502,7 @@
   .flddiv {
     height: 100%; display: flex; flex-flow: column nowrap; justify-content: space-between;
   }
-  .tabdiv {
+  .seldiv, .tabdiv {
     height: 100%;
   }
   .tabfld {
@@ -501,6 +534,9 @@
   .simcont input[type="number"],
   .simcont input[type="text"] {
     font-size: 1rem;
+  }
+  .simcont input[type="number"] {
+    padding-right: 5.5rem;
   }
   .simcont .detdiv .field {
     padding-right: 1rem;
