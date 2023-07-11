@@ -14,8 +14,9 @@ const NMEAEngine = require('./src/services/nmea.js');
 const bwipjs = require('bwip-js');
 const PDFDocument = require('pdfkit');
 const prt = 'HP-LaserJet-Pro-M404-M405';
-const { writeBoot, downProg, downUpdates } = require('./src/services/program.js')
+const { writeBoot, downFile, downUpdates, upFile } = require('./src/services/program.js')
 const { readFile, writeFile } = require('./src/services/volume.js');
+const { readSim, writeSim } = require('./src/services/simulator.js');
 const EventEmitter = require('node:events');
 const crc32 = require('buffer-crc32');
 
@@ -524,7 +525,7 @@ ipcMain.on('prog-start', (e, args) => {
     let byt = 0;
     let dat;
     Promise.resolve()
-    .then(() => downProg(authURL, file, progMessage))
+    .then(() => downFile(authURL, file, progMessage))
     .then((res) => {
       byt = res.length;
       dat = Buffer.from(res);
@@ -1671,6 +1672,33 @@ ipcMain.on('sim-data', (e, args) => {
     // Send simulation message
     eng.sendMsg(msg);
   }
+});
+
+// Reads file content
+ipcMain.on('open-file', (e, args) => {
+  readSim().then((res) => {
+    if ((mainWindow != null) && (typeof mainWindow.webContents !== 'undefined')) {
+      mainWindow.webContents.send('open-done', res);
+    }
+  }).catch((err) => {
+    if ((mainWindow != null) && (typeof mainWindow.webContents !== 'undefined')) {
+      mainWindow.webContents.send('open-done', err);
+    }
+  });
+});
+
+// Saves file content
+ipcMain.on('save-file', (e, args) => {
+  const [fil] = args;
+  writeSim(fil).then((res) => {
+    if ((mainWindow != null) && (typeof mainWindow.webContents !== 'undefined')) {
+      mainWindow.webContents.send('save-done', res);
+    }
+  }).catch((err) => {
+    if ((mainWindow != null) && (typeof mainWindow.webContents !== 'undefined')) {
+      mainWindow.webContents.send('save-done', err);
+    }
+  });
 });
 
 // Stop device processing

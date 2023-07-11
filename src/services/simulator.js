@@ -2,16 +2,15 @@ const { dialog } = require('electron');
 const fs = require('fs');
 const path = require('path');
 
-async function readFile() {
+async function readSim() {
   return new Promise((resolve, reject) => {
-    let fp = dialog.showOpenDialogSync({ title: 'Open volume table', defaultPath: path.join(process.env.HOME, 'puma', 'save', 'voltab.json'),
+    let fp = dialog.showOpenDialogSync({ title: 'Open simulator file', defaultPath: path.join(process.env.HOME, 'puma', 'save', 'simulator.json'),
       filters: [{ name: 'JSON file', extensions: ['json'] }]});
     if (typeof fp !== 'undefined') {
       let cnt = fs.readFileSync(fp[0], { encoding: 'UTF8'} );
       try {
         let dat = JSON.parse(cnt);
-        if ((typeof dat.fluid !== 'undefined') && (typeof dat.instance !== 'undefined') &&
-          (typeof dat.table !== 'undefined') && (typeof dat.mode !== 'undefined')) {
+        if ((typeof dat.simulation !== 'undefined') && (typeof dat.table !== 'undefined')) {
           resolve(dat);
         } else {
           reject(new Error('Invalid data structure'));
@@ -25,9 +24,9 @@ async function readFile() {
   });
 };
 
-async function writeFile(data) {
+async function writeSim(data) {
   return new Promise((resolve, reject) => {
-    let fp = dialog.showSaveDialogSync({ title: 'Save volume table', defaultPath: path.join(process.env.HOME, 'puma', 'save', 'voltab.json'),
+    let fp = dialog.showSaveDialogSync({ title: 'Save simulator table', defaultPath: path.join(process.env.HOME, 'puma', 'save', 'simulator.json'),
       filters: [{ name: 'JSON file', extensions: ['json'] }]});
     if (typeof fp !== 'undefined') {
       try {
@@ -44,6 +43,6 @@ async function writeFile(data) {
 };
 
 module.exports = {
-  readFile,
-  writeFile,
+  readSim,
+  writeSim,
 };

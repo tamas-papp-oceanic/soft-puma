@@ -14,6 +14,8 @@
   import { splitKey, joinKey } from "../../helpers/route.js";
   import { isproprietary } from "../../stores/common.js";
     
+  const timeout = 60000;
+  let timer = null;
   let selector = new Array();
   let simulator = {
     table: new Array(),
@@ -21,6 +23,7 @@
   };
   let loading = true;
   let running = false;
+  let success = false;
   let tab = 0;
   let notify = false;
   let kind = null;
@@ -110,8 +113,22 @@
   });
 
   onDestroy((e) => {
+    if (timer != null) {
+      clearTimeout(timer);
+      timer = null
+    }
     stop(e);
   });
+
+  function reml(lis) {
+    if (timer != null) {
+      clearTimeout(timer);
+      timer = null;
+    }
+    // Remove listeners
+    window.pumaAPI.reml(lis + '-file');
+    window.pumaAPI.reml(lis + '-done');
+  }
 
   function setDisabled(val) {
     for (let i in simulator.table) {
@@ -180,6 +197,36 @@
         break;
       }
     }
+  };
+
+  function opeTab(e) {
+    running = true;
+    timer = setTimeout(() => {
+      reml('open');
+      running = false;
+    }, timeout);
+    // Receives opening result
+    window.pumaAPI.recv('open-done', (e, res) => {
+      reml('open');
+      running = false;
+      simulator = JSON.parse(JSON.stringify(res));
+      simulator = simulator;
+    });
+    window.pumaAPI.send('open-file');
+  };
+
+  function savTab(e) {
+    running = true;
+    timer = setTimeout(() => {
+      reml('save');
+      running = false;
+    }, timeout);
+    // Receives saving result
+    window.pumaAPI.recv('save-done', (e, res) => {
+      reml('save');
+      running = false;
+    });
+    window.pumaAPI.send('save-file', [simulator]);
   };
 
   function clrTab(e) {
@@ -321,10 +368,13 @@
               bind:data={simulator}
               loading={loading}
               running={running}
+              success={success}
               on:delrow={delRow}
-              on:clrtab={clrTab} 
-              on:send={send}
+              on:opetab={opeTab}
+              on:savtab={savTab}
+              on:clrtab={clrTab}
               on:setsim={setSim}
+              on:send={send}
               on:start={start}
               on:stop={stop}
               on:cancel={cancel}

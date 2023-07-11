@@ -121,7 +121,7 @@ async function downUpdates(url, func) {
   });
 }
 
-async function downProg(url, file, func) {
+async function downFile(url, file, func) {
   return new Promise((resolve, reject) => {
     let dwn = app.getPath("downloads");
     console.log(dwn);
@@ -139,5 +139,5 @@ async function downProg(url, file, func) {
 module.exports = {
   writeBoot,
   downUpdates,
-  downProg,
+  downFile,
 };

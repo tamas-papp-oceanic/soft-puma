@@ -3,11 +3,16 @@
   import { ButtonSet, Button, Tile, Grid, Row, Column,
     DataTableSkeleton, DataTable, NumberInput, TextInput, Dropdown,
     DropdownSkeleton, Checkbox } from "carbon-components-svelte";
+  import Delete from "carbon-icons-svelte/lib/RowDelete16";
+  import Open from "carbon-icons-svelte/lib/Folder16";
+  import Save from "carbon-icons-svelte/lib/Save16";
+  import Empty from "carbon-icons-svelte/lib/TrashCan16";
 
   export let data;
   export let style;
-  export let running;
   export let loading;
+  export let running;
+  export let success;
 
   const dispatch = createEventDispatcher();
 
@@ -49,6 +54,7 @@
   let selection2 = null;
   let ranges = false;
   let simulation = 0;
+  let files;
 
   function getFlu(id) {
     for (let i in fluts) {
@@ -156,14 +162,18 @@
     }
   };
 
-  function setSim(e) {
-    dispatch("setsim", e.detail);
-  };
-
   function delRow(e) {
     dispatch("delrow", selection1);
     selectedIds1 = new Array();
     selection1 = null;
+  };
+
+  function opeTab() {
+    dispatch("opetab");
+  };
+
+  function savTab(e) {
+    dispatch("savtab");
   };
 
   function clrTab(e) {
@@ -172,19 +182,23 @@
     selection1 = null;
   };
 
-  function start(e) {
-    selectedIds2 = new Array();
-    selection2 = null;
-    dispatch("start");
-  };    
-  
-  function stop(e) {
-    dispatch("stop");
+  function setSim(e) {
+    dispatch("setsim", e.detail);
   };
 
   function send(e) {
     dispatch("send", selection1);
   };
+
+  function start(e) {
+    selectedIds2 = new Array();
+    selection2 = null;
+    dispatch("start");
+  };      
+  
+  function stop(e) {
+    dispatch("stop");
+  };  
 
   function cancel(e) {
     dispatch("cancel", e.detail);
@@ -255,6 +269,13 @@
     }
   }
 
+  function clrSel1(val) {
+    if (val) {
+      selectedIds1 = new Array();
+      selection1 = null;
+    }
+  }
+
   for (let i = 0; i < 253; i++) {
     insts.push({ id: i, text: i.toString() });
   }
@@ -264,6 +285,8 @@
   $: selection1, filter();
   $: selection2, divSet(selection2);
   $: running, divSet(running ? null : selection2);
+  $: success, clrSel1(success);
+  $: files, opeTab(files);
 </script>
 
 <div class="simcont" style={style}>
@@ -425,10 +448,16 @@
                 </Row>
                 <Row padding>
                   <Column>
-                    <ButtonSet stacked style="padding: 0.2rem;">
-                      <Button disabled={(selectedIds1.length == 0) || running} style="margin: 0.2rem 0" on:click={delRow}>Delete message</Button>
-                      <Button disabled={(rows1.length == 0) || running} style="margin: 0.2rem 0" on:click={clrTab}>Clear table</Button>
-                    </ButtonSet>
+                    <div class="buttons">
+                      <div>
+                        <Button disabled={(selectedIds1.length == 0) || running} iconDescription="Delete message" icon={Delete} on:click={delRow} />
+                        <Button disabled={(rows1.length == 0) || running} iconDescription="Clear table" icon={Empty} on:click={clrTab} />
+                      </div>
+                      <div>
+                        <Button disabled={running} iconDescription="Open table" icon={Open} on:click={opeTab} />
+                        <Button disabled={(rows1.length == 0) || running} iconDescription="Save table" icon={Save} on:click={savTab} />
+                      </div>
+                    </div>
                   </Column>
                 </Row>
               </Column>
@@ -503,6 +532,21 @@
     font-size: 0.8rem;
     color: #c6c6c6;
   }
+  .simcont .tilecont .bx--btn--icon-only {
+    width: auto;
+    margin: 0.25rem;
+    padding: 0 0.75rem;
+  }
+  .simcont .tilecont .bx--btn--icon-only .bx--btn__icon {
+    width: 1.25rem;
+    height: 1.25rem;
+  }
+  .simcont .tilecont .buttons {
+    display: flex;
+    flex-flow: row wrap;
+    align-items: center;
+    justify-content: flex-start;
+  }
   .simtab {
     max-height: calc(100% - 3.5rem);
     overflow-x: hidden;
@@ -561,6 +605,9 @@
   .simcont input[type="number"],
   .simcont input[type="text"] {
     font-size: 1rem;
+  }
+  .simcont input[type="file"] {
+    display: none;
   }
   .simcont input[type="number"] {
     padding-right: 5.5rem;
