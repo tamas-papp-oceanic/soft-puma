@@ -8,7 +8,7 @@
   import nmeaconv from "../../config/nmeaconv.json";
   import nmeadefs from "../../config/nmeadefs.json";
   import Notification from "../../components/Notification.svelte";
-  import { minmax, nextIncremetal, nextDecremetal, nextNatural,
+  import { minmax, ranges, nextIncremetal, nextDecremetal, nextNatural,
     nextRandom } from '../../helpers/simulate.js';
   import { device } from '../../stores/data.js';
   import { splitKey, joinKey } from "../../helpers/route.js";
@@ -39,22 +39,25 @@
           rec.fields[i],
           {
             static: false,
-            limits: rec.fields[i]['type'] != null ? minmax(rec.fields[i]) : null,
-            ranges: { min: null, max: null },
-            character: null
+            limits: minmax(rec.fields[i]),
+            ranges: ranges(rec.fields[i]),
+            chrnum: null,
           },
         );
         let fld = rec.fields[i];
         if (fld.dictionary == "DD056") {
           rec.fields[i].value = 0;
           rec.disabledIds.push(parseInt(i));
+          rec.fields[i].static = null;
         } else {
           if (fld['type'] != null) {
             if (typeof fld.instance !== 'undefined') {
               rec.fields[i].value = 0;
+              rec.fields[i].static = null;
             }
             if (typeof fld.fluid !== 'undefined') {
               rec.fields[i].value = 0;
+              rec.fields[i].static = null;
             }
             if (fld['type'].startsWith('int') || fld['type'].startsWith('uint')) {
               rec.fields[i].value = 0;
@@ -66,13 +69,16 @@
                 rec.fields[i].value = fld.limits.max;
                 rec.disabledIds.push(parseInt(i))
               }
+              rec.fields[i].static = null;
             } else if (fld['type'].startsWith('chr(')) {
               rec.fields[i].value = '';
               let num = parseInt(fld['type'].replace('chr(', '').replace(')', ''));
-              rec.fields[i].character = num;
+              rec.fields[i].chrnum = num;
+              rec.fields[i].static = null;
             } else if (fld['type'] == 'str') {
               rec.fields[i].value = '';
-              rec.fields[i].character = 250;
+              rec.fields[i].chrnum = 250;
+              rec.fields[i].static = null;
             }
           } else {
             rec.fields[i].value = null;
@@ -82,14 +88,17 @@
       if (isproprietary(pgn)) {
         rec.fields[0].value = parseInt(spl.manufacturer);
         rec.disabledIds.push(0);
+        rec.fields[0].static = null;
         rec.fields[2].value = parseInt(spl.industry);
         rec.disabledIds.push(2);
+        rec.fields[2].static = null;
       }
       let cnv = spl.protocol + '/' + spl.pgn;
       if (typeof nmeaconv[cnv] !== 'undefined') {
         if ((spl.pgn !== '065289') && (spl.pgn !== '130825')) {
           rec.fields[nmeaconv[cnv].function].value = parseInt(spl.function);
           rec.disabledIds.push(nmeaconv[cnv].function);
+          rec.fields[nmeaconv[cnv].function].static = null;
         }
       }
       arr.push(rec);
@@ -103,6 +112,37 @@
   onDestroy((e) => {
     stop(e);
   });
+
+  function setDisabled(val) {
+    for (let i in simulator.table) {
+      simulator.table[i].disabledIds = new Array();
+      let msg = simulator.table[i];
+      let spl = splitKey(msg.key);
+      let pgn = parseInt(spl.pgn);
+      for (let j in msg.fields) {
+        if (val) {
+          simulator.table[i].disabledIds.push(parseInt(j));
+        } else {
+          let fld = msg.fields[j];
+          if ((fld.dictionary == "DD001") || (fld.dictionary == "DD056")) {
+            simulator.table[i].disabledIds.push(parseInt(j));
+          }
+        }
+      }
+      if (!val) {
+        if (isproprietary(pgn)) {
+          simulator.table[i].disabledIds.push(0);
+          simulator.table[i].disabledIds.push(2);
+        }
+        let cnv = spl.protocol + '/' + spl.pgn;
+        if (typeof nmeaconv[cnv] !== 'undefined') {
+          if ((spl.pgn !== '065289') && (spl.pgn !== '130825')) {
+            simulator.table[i].disabledIds.push(nmeaconv[cnv].function);
+          }
+        }
+      }
+    }
+  }
 
   function tabChg(e) {
     stop(e);
@@ -160,23 +200,33 @@
       } else {
         if (fld['type'] != null) {
           if (fld['type'].startsWith('int') || fld['type'].startsWith('uint')) {
-            val = (val == null) ? 0 : val;
-            switch (simulator.simulation) {
-            case 1:
-              val = nextIncremetal(fld);
-              break;
-            case 2:
-              val = nextDecremetal(fld);
-              break;
-            case 3:
-              val = nextNatural(fld);
-              break;
-            case 4:
-              val = nextRandom(fld);
-              break;
+            val = (val === null) ? 0 : val;
+            if (!fld.static) {
+              let dif = 0;
+              if (simulator.table[idx].interval !== null) {
+                if (fld.multiplier !== null) {
+                  dif = Math.round(simulator.table[idx].interval / 100);
+                } else {
+                  dif = 1;
+                }
+              }
+              switch (simulator.simulation) {
+              case 0:
+                val = nextIncremetal(fld, dif);
+                break;
+              case 1:
+                val = nextDecremetal(fld, dif);
+                break;
+              case 2:
+                val = nextNatural(fld, dif);
+                break;
+              case 3:
+                val = nextRandom(fld);
+                break;
+              }
             }
           } else if (fld['type'].startsWith('bit(')) {
-            val = (val == null) ? 0 : val;
+            val = (val === null) ? 0 : val;
             if (fld.dictionary == 'DD001') {
               let num = parseInt(fld['type'].replace('bit(', '').replace(')', ''));
               if (Number.isInteger(num)) {
@@ -184,7 +234,7 @@
               }
             }
           } else if (fld['type'].startsWith('chr(') || (fld['type'] == 'str')) {
-            val = (val == null) ? '' : val;
+            val = (val === null) ? '' : val;
           }
         }
       }
@@ -210,21 +260,22 @@
     window.pumaAPI.send('sim-data', [$device, msg]);
   };
     
+  function setSim(e) {
+    simulator.simulation = e.detail.selectedId;
+  };
+
   function send(e) {
     for (let i in simulator.table) {
       if (JSON.stringify(simulator.table[i]) === JSON.stringify(e.detail)) {
         simMsg(i);
         break;
-      }
-    }
-  };
-
-  function setSim(e) {
-    simulator.simulation = e.detail.selectedId;
-  };
+      }  
+    }  
+  };  
 
   function start(e) {
     running = true;
+    setDisabled(true);
     for (let i in simulator.table) {
       if ((typeof simulator.table[i].interval !== 'undefined') && (simulator.table[i].interval != null)) {
         simulator.table[i].timer = setInterval((i) => { simMsg(i); }, simulator.table[i].interval, i);
@@ -233,6 +284,7 @@
   };
 
   function stop(e) {
+    setDisabled(false);
     for (let i in simulator.table) {
       if ((typeof simulator.table[i].timer !== 'undefined') && (simulator.table[i].timer != null)) {
         clearInterval(simulator.table[i].timer);

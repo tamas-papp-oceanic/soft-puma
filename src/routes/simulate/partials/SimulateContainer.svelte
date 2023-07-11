@@ -3,7 +3,6 @@
   import { ButtonSet, Button, Tile, Grid, Row, Column,
     DataTableSkeleton, DataTable, NumberInput, TextInput, Dropdown,
     DropdownSkeleton, Checkbox } from "carbon-components-svelte";
-  import jq from "jquery";
 
   export let data;
   export let style;
@@ -68,7 +67,7 @@
 
   function rowSel2(e) {
     selection2 = e.detail.row;
-    ranges = ((selection2.ranges.min !== null) && (selection2.ranges.max !== null));
+    ranges = selection2.ranges !== null;
     setTimeout(() => {
       document.getElementById('input').focus();
     }, 100);
@@ -79,16 +78,16 @@
       if (data.table[i].id == selection1.id) {
         if (e.detail) {
           if (selection2.limits !== null) {
-            selection2.ranges.min = selection2.limits.min;
-            selection2.ranges.max = selection2.limits.max;
-            data.table[i].fields[selection2.id].ranges.min = selection2.limits.min;
-            data.table[i].fields[selection2.id].ranges.max = selection2.limits.max;
+            let rgs = { min: selection2.limits.min, max: selection2.limits.max };
+            selection2.ranges = rgs;
+            data.table[i].fields[selection2.id].ranges = rgs;
+            setTimeout(() => {
+              document.getElementById('min').focus();
+            }, 100);
           }
         } else {
-          selection2.ranges.min = null;
-          selection2.ranges.max = null;
-          data.table[i].fields[selection2.id].ranges.min = null;
-          data.table[i].fields[selection2.id].ranges.max = null;
+          selection2.ranges = null;
+          data.table[i].fields[selection2.id].ranges = null;
         }
         data = data;
         break;
@@ -133,6 +132,9 @@
     if (e.detail != null) {
       for (let i in  data.table) {
         if (data.table[i].id == selection1.id) {
+          if (data.table[i].fields[selection2.id].ranges === null) {
+            data.table[i].fields[selection2.id].ranges = { min: null, max: null };
+          }
           data.table[i].fields[selection2.id].ranges.min = e.detail;
           break;
         }
@@ -144,6 +146,9 @@
     if (e.detail != null) {
       for (let i in  data.table) {
         if (data.table[i].id == selection1.id) {
+          if (data.table[i].fields[selection2.id].ranges === null) {
+            data.table[i].fields[selection2.id].ranges = { min: null, max: null };
+          }
           data.table[i].fields[selection2.id].ranges.max = e.detail;
           break;
         }
@@ -168,6 +173,8 @@
   };
 
   function start(e) {
+    selectedIds2 = new Array();
+    selection2 = null;
     dispatch("start");
   };    
   
@@ -181,6 +188,20 @@
 
   function cancel(e) {
     dispatch("cancel", e.detail);
+  };
+
+  function getlim(fld, key) {
+    if ((fld.limits !== null) && (typeof fld.limits[key] !== 'undefined')) {
+      return fld.limits[key];
+    }
+    return null;
+  };
+
+  function getrng(fld, key) {
+    if ((fld.ranges !== null) && (typeof fld.ranges[key] !== 'undefined')) {
+      return fld.ranges[key];
+    }
+    return null;
   };
 
   function setData(val) {
@@ -218,17 +239,17 @@
   }
 
   function divSet(val) {
-    let div = jq('.tabdiv');
-    if (div.length > 0) {
+    let div = document.querySelector('.tabdiv');
+    if (div !== null) {
       if (val === null) {
-        div.css("height", "100%");
+        div.style.height = "100%";
       } else {
-        div.css("height", "75%");
+        div.style.height = "75%"
       }
-      if (selection2 !== null) {
+      if (val !== null) {
         setTimeout(() => {
           let elm = document.querySelectorAll('.tabfld tr');
-          elm[selection2.id + 1].scrollIntoView({ behavior: "smooth", block: "nearest" });
+          elm[val.id + 1].scrollIntoView({ behavior: "smooth", block: "nearest" });
         }, 150);
       }
     }
@@ -242,6 +263,7 @@
   $: data, filter();
   $: selection1, filter();
   $: selection2, divSet(selection2);
+  $: running, divSet(running ? null : selection2);
 </script>
 
 <div class="simcont" style={style}>
@@ -308,13 +330,13 @@
                             {:else if ((cell.key === "unit") && (cell.value === null))}
                               {"-"}
                             {:else if cell.key === "ranges"}
-                              {#if (row.ranges.min !== null) || (row.ranges.max !== null)}
+                              {#if row.ranges !== null}
                                 {(row.ranges.min !== null ? row.ranges.min + " " : "")  + "-" + (row.ranges.max !== null ? " " + row.ranges.max : "")}
                               {:else}
                                 {"-"}
                               {/if}
                             {:else if cell.key === "static"}
-                              {#if selection1.disabledIds.indexOf(rowIndex) === -1}
+                              {#if row.static != null}
                                 <Checkbox labelText="Static" hideLabel checked={row.static} on:check={(e) => setSta(e, rowIndex)} />
                               {:else}
                                 {""}
@@ -326,7 +348,7 @@
                         </DataTable>
                       {/if}
                     </div>
-                    {#if selection2 != null}
+                    {#if !running && (selection2 != null)}
                       <div class="detdiv">
                         <Grid fullWidth noGutter>
                           <Row>
@@ -337,11 +359,10 @@
                                     selection2['type'].startsWith('float') || selection2['type'].startsWith('bit(')}
                                     <NumberInput
                                       id="input"
-                                      min={selection2.limits.min}
-                                      max={selection2.limits.max}
-                                      disabled={running}
+                                      min={getlim(selection2, 'min')}
+                                      max={getlim(selection2, 'max')}
                                       label={selection2.title}
-                                      invalidText={"Number must be between " + selection2.limits.min + " and " + selection2.limits.max}
+                                      invalidText={"Number must be between " + getlim(selection2, 'min') + " and " + getlim(selection2, 'max')}
                                       value={selection2.value}
                                       on:input={input1} />
                                   {:else if selection2['type'].startsWith('chr(') || selection2['type'].startsWith('str')}
@@ -349,36 +370,40 @@
                                       id="input"
                                       disabled={running}
                                       labelText={selection2.title}
-                                      invalidText={"Text length must be between 0 and " + selection2.character}
+                                      invalidText={"Text length must be between 0 and " + selection2.chrnum}
                                       value={selection2.value}
                                       on:input={input2} />
                                   {/if}
                                 </Column>
                                 <Column sm={3} md={3} lg={3}>
-                                  <Checkbox labelText="Custom ranges" bind:checked={ranges} on:check={check2} />
+                                  <Checkbox disabled={running} labelText="Custom ranges" bind:checked={ranges} on:check={check2} />
                                 </Column>
                                 <Column sm={4} md={4} lg={4} style="display:flex; flex-flow: row nowrap; align-items: center;">
                                   <NumberInput
                                     id="min"
                                     allowEmpty
-                                    min={selection2.limits.min}
-                                    max={selection2.limits.max}
-                                    disabled={running || !ranges}
+                                    min={getlim(selection2, 'min')}
+                                    max={getlim(selection2, 'max')}
+                                    disabled={!ranges}
                                     label="Minimum"
-                                    invalidText={"Number must be between " + selection2.limits.min + " and " + selection2.limits.max}
-                                    value={selection2.ranges.min}
+                                    invalidText={"Number must be between " + getlim(selection2, 'min') + " and " + getlim(selection2, 'max')}
+                                    value={getrng(selection2, 'min')}
                                     on:input={input3} />
                                 </Column>
                                 <Column sm={4} md={4} lg={4} style="display:flex; flex-flow: row nowrap; align-items: center;">
                                   <NumberInput
                                     id="max"
                                     allowEmpty
-                                    min={selection2.ranges.min}
-                                    max={selection2.limits.max}
-                                    disabled={running || !ranges}
+                                    min={getrng(selection2, 'min') !== null ? getrng(selection2, 'min') : getlim(selection2, 'min')}
+                                    max={getlim(selection2, 'max')}
+                                    disabled={!ranges}
                                     label="Maximum"
-                                    invalidText={"Number must be between " + selection2.ranges.min + " and " + selection2.limits.max}
-                                    value={selection2.ranges.max}
+                                    invalidText={
+                                      "Number must be between " +
+                                      getrng(selection2, 'min') !== null ? getrng(selection2, 'min') : getlim(selection2, 'min') +
+                                      " and " +
+                                      getlim(selection2, 'max')}
+                                    value={getrng(selection2, 'max')}
                                     on:input={input4} />
                                 </Column>
                               </Row>
@@ -511,7 +536,9 @@
     overflow-y: auto;
   }
   .tabfld th:first-child,
-  .tabfld td:first-child {
+  .tabfld td:first-child,
+  .tabfld th:nth-child(2),
+  .tabfld td:nth-child(2) {
     width: 3rem;
   }
   .tabfld th:nth-child(2),
