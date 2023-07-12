@@ -18,6 +18,7 @@
   let simulator = {
     table: new Array(),
     simulation: null,
+    rate: null,
   };
   let loading = true;
   let running = false;
@@ -105,6 +106,7 @@
     arr.sort((a, b) => { return a.key.localeCompare(b.key); });
     selector = JSON.parse(JSON.stringify(arr));
     simulator.simulation = 0;
+    simulator.rate = 0.5;
     loading = false;
   });
 
@@ -266,13 +268,13 @@
               }
               switch (simulator.simulation) {
               case 0:
-                val = nextIncremetal(fld, dif);
+                val = nextIncremetal(fld, simulator.rate);
                 break;
               case 1:
-                val = nextDecremetal(fld, dif);
+                val = nextDecremetal(fld, simulator.rate);
                 break;
               case 2:
-                val = nextNatural(fld, dif);
+                val = nextNatural(fld, simulator.rate);
                 break;
               case 3:
                 val = nextRandom(fld);

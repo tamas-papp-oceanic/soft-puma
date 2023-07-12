@@ -1,8 +1,8 @@
 <script>
   import { createEventDispatcher } from "svelte";
   import { ButtonSet, Button, Tile, Grid, Row, Column,
-    DataTableSkeleton, DataTable, NumberInput, TextInput, Dropdown,
-    DropdownSkeleton, Checkbox } from "carbon-components-svelte";
+    DataTableSkeleton, DataTable, NumberInput, NumberInputSkeleton,
+    TextInput, Dropdown, DropdownSkeleton, Checkbox } from "carbon-components-svelte";
   import Delete from "carbon-icons-svelte/lib/RowDelete16";
   import Open from "carbon-icons-svelte/lib/Document16";
   import Save from "carbon-icons-svelte/lib/Save16";
@@ -178,6 +178,12 @@
           break;
         }
       }
+    }
+  };
+
+  function input5(e) {
+    if (e.detail != null) {
+      data.rate = e.detail;
     }
   };
 
@@ -495,11 +501,24 @@
                   <Column>Simulation</Column>
                 </Row>
                 <Row padding>
-                  <Column>
+                  <Column style="display: flex; flex-flow: column nowrap; justify-content: flex-start;">
                     {#if loading}
+                      <NumberInputSkeleton />
+                      <div style="height: 1rem;"></div>
                       <DropdownSkeleton />
                     {:else}
-                      <Dropdown disabled={running} titleText="Simulation mode" size="sm" bind:selectedId={simulation} items={sims} on:select={setSim} />
+                      <NumberInput
+                        id="rate"
+                        allowEmpty
+                        min={0.1}
+                        max={5.0}
+                        step={0.1}
+                        label="Rate of change (%)"
+                        invalidText={"Number must be between 0.1% and 50%"}
+                        value={data.rate}
+                        on:input={input5} />
+                      <div style="height: 1rem;"></div>
+                      <Dropdown titleText="Simulation mode" size="sm" bind:selectedId={simulation} items={sims} on:select={setSim} />
                     {/if}
                   </Column>
                 </Row>

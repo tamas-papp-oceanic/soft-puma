@@ -15,7 +15,7 @@ function minmax(def) {
       if (num === 32) {
         return { min: -3.40282347e+38, max: 3.40282347e+38 };
       } else if (num === 64) {
-        return { min: Number.MIN_VALUE, max: Number.MIN_VALUE };
+        return { min: Number.MIN_VALUE, max: Number.MAX_VALUE };
       }
     }
   }
@@ -40,126 +40,89 @@ function ranges(def) {
   return typeof def.ranges !== 'undefined' ? def.ranges : null;
 };
 
-function nextIncremetal(def, dif) {
+function limits(def) {
+  let lim = minmax(def);
+  let rng = ranges(def);
+  if (rng != null) {
+    lim = { min: rng.min, max: rng.max };
+    if ((def.multiplier != null) && (def.multiplier < 1)) {
+      lim.min = Math.round(lim.min / def.multiplier);
+      lim.max = Math.round(lim.max / def.multiplier);
+    }
+  }
+  return lim;
+};
+
+function decode(def, lim) {
   let res = def.value !== null ? def.value : 0;
-  let lim = minmax(def);
-  let rng = ranges(def);
-  if (rng != null) {
-    if ((res < rng.min) || (res > rng.max)) {
-      res = rng.min;
-    }
-  }
   if ((def.multiplier != null) && (def.multiplier < 1)) {
     res = Math.round(res / def.multiplier);
   }
+  if (res < lim.min) {
+    res = lim.min;
+  } else if (res > lim.max) {
+    res = lim.max;
+  }
+return res;
+};
+
+function encode(def, lim, typ, val) {
   if (lim != null) {
-    if ((res < lim.min) || (res > lim.max)) {
-      res = lim.min;
+    if (typ === 1) {
+      if (val > lim.max) {
+        val = lim.min;
+      }
+    } else if (typ === 2) {
+      if (val < lim.min) {
+        val = lim.max;
+      }
+    } else if (typ === 3) {
+      if (val < lim.min) {
+        val = lim.min;
+      } else if (val > lim.max) {
+        val = lim.max;
+      }
     }
   }
+  if ((def.multiplier != null) && (def.multiplier < 1)) {
+    let dec = Math.floor(def.multiplier) !== def.multiplier ? def.multiplier.toString().split('.')[1].length || 0 : 0;
+    val = parseFloat((val * def.multiplier).toFixed(dec));
+  }
+  return val;
+};
+
+function nextIncremetal(def, rat) {
+  let lim = limits(def);
+  let res = decode(def, lim);
+  let dif = Math.round((lim.max - lim.min) * rat / 100);
   res += dif;
-  if (lim != null) {
-    if (res > lim.max) {
-      res = lim.min;
-    }
-  }
-  if ((def.multiplier != null) && (def.multiplier < 1)) {
-    let dec = Math.floor(def.multiplier) !== def.multiplier ? def.multiplier.toString().split('.')[1].length || 0 : 0;
-    res = parseFloat((res * def.multiplier).toFixed(dec));
-  }
-  return res;
+  return encode(def, lim, 1, res);
 };
 
-function nextDecremetal(def, dif) {
-  let res = def.value != null ? def.value : 0;
-  let lim = minmax(def);
-  let rng = ranges(def);
-  if (rng != null) {
-    if ((res < rng.min) || (res > rng.max)) {
-      res = rng.max;
-    }
-  }
-  if ((def.multiplier != null) && (def.multiplier < 1)) {
-    res = Math.round(res / def.multiplier);
-  }
-  if (lim != null) {
-    if ((res < lim.min) || (res > lim.max)) {
-      res = lim.max;
-    }
-  }
+function nextDecremetal(def, rat) {
+  let lim = limits(def);
+  let res = decode(def, lim);
+  let dif = Math.round((lim.max - lim.min) * rat / 100);
   res -= dif;
-  if (lim != null) {
-    if (res < lim.min) {
-      res = lim.max;
-    }
-  }
-  if ((def.multiplier != null) && (def.multiplier < 1)) {
-    let dec = Math.floor(def.multiplier) !== def.multiplier ? def.multiplier.toString().split('.')[1].length || 0 : 0;
-    res = parseFloat((res * def.multiplier).toFixed(dec));
-  }
-  return res;
+  return encode(def, lim, 2, res);
 };
 
-function nextNatural(def, dif) {
-  let res = def.value != null ? def.value : 0;
-  let lim = minmax(def);
-  let rng = ranges(def);
-  if (rng != null) {
-    if ((res < rng.min) || (res > rng.max)) {
-      res = rng.min;
-    }
-  }
-  if ((def.multiplier != null) && (def.multiplier < 1)) {
-    res = Math.round(res / def.multiplier);
-  }
-  if (lim != null) {
-    if ((res < lim.min) || (res > lim.max)) {
-      res = lim.min;
-    }
-  }
+function nextNatural(def, rat) {
+  let lim = limits(def);
+  let res = decode(def, lim);
+  let dif = Math.round((lim.max - lim.min) * rat / 100);
   if (Math.random() < 0.5) {
     res -= dif;
   } else {
     res += dif;
   }
-  if (lim != null) {
-    if (res < lim.min) {
-      res = lim.min;
-    } else if (res > lim.max) {
-      res = lim.max;
-    }
-  }
-  if ((def.multiplier != null) && (def.multiplier < 1)) {
-    let dec = Math.floor(def.multiplier) !== def.multiplier ? def.multiplier.toString().split('.')[1].length || 0 : 0;
-    res = parseFloat((res * def.multiplier).toFixed(dec));
-  }
-  return res;
+  return encode(def, lim, 3, res);
 };
 
 function nextRandom(def) {
-  let lim = minmax(def);
-  let rng = ranges(def);
-  let res = 0;
-  if (rng != null) {
-    res = (Math.random() * (rng.max - rng.min)) + rng.min;
-    if ((def.multiplier != null) && (def.multiplier < 1)) {
-      res = res / def.multiplier;
-    }
-    if (lim != null) {
-      if ((res < lim.min) || (res > lim.max)) {
-        res = lim.min;
-      }
-    }
-  } else {
-    res = (Math.random() * (lim.max - lim.min)) + lim.min;
-  }
-  if ((def.multiplier != null) && (def.multiplier < 1)) {
-    let dec = Math.floor(def.multiplier) !== def.multiplier ? def.multiplier.toString().split('.')[1].length || 0 : 0;
-    res = parseFloat((Math.round(res) * def.multiplier).toFixed(dec));
-  } else {
-    res = Math.round(res);
-  }
-  return res;
+  let lim = limits(def);
+  let res = Math.round((Math.random() * (lim.max - lim.min)) + lim.min);
+  return encode(def, lim, 3, res);
 };
 
 export { minmax, ranges, nextIncremetal, nextDecremetal, nextNatural, nextRandom };
