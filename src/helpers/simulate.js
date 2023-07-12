@@ -29,12 +29,21 @@ function ranges(def) {
     } else if (def['unit'] == 'deg') {
       return { min: -180, max: 180 };
     } else if (def['unit'] == 'rad') {
-      let max = 2 * Math.PI;
-      if ((def.multiplier != null) && (def.multiplier < 1)) {
-        let dec = Math.floor(def.multiplier) !== def.multiplier ? def.multiplier.toString().split('.')[1].length || 0 : 0;
-        max = max.toFixed(dec);
+      if (def['type'].startsWith('int')) {
+        let num = Math.PI;
+        if ((def.multiplier != null) && (def.multiplier < 1)) {
+          let dec = Math.floor(def.multiplier) !== def.multiplier ? def.multiplier.toString().split('.')[1].length || 0 : 0;
+          num = num.toFixed(dec);
+        }
+        return { min: -num, max: num };
+      } else if (def['type'].startsWith('uint')) {
+        let num = 2 * Math.PI;
+        if ((def.multiplier != null) && (def.multiplier < 1)) {
+          let dec = Math.floor(def.multiplier) !== def.multiplier ? def.multiplier.toString().split('.')[1].length || 0 : 0;
+          num = num.toFixed(dec);
+        }
+        return { min: 0, max: num };
       }
-      return { min: 0, max: max };
     }
   }
   return typeof def.ranges !== 'undefined' ? def.ranges : null;
