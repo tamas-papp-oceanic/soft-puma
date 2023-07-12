@@ -4,6 +4,7 @@
     DataTableSkeleton, PaginationSkeleton, DataTable,
     Pagination, ToolbarContent, ToolbarSearch,
     Toolbar } from "carbon-components-svelte";
+  import Add from "carbon-icons-svelte/lib/Add16";
   import { splitKey } from "../../../helpers/route";
 
   export let data;
@@ -135,9 +136,9 @@
                 </Row>
                 <Row padding>
                   <Column>
-                    <ButtonSet stacked style="padding: 0.2rem;">
-                      <Button disabled={selectedRowIds.length == 0} style="margin: 0.2rem 0" on:click={addRow}>Add message(s)</Button>
-                    </ButtonSet>
+                    <div class="buttons">
+                      <Button disabled={selectedRowIds.length == 0}  iconDescription="Add message(s)" icon={Add} on:click={addRow} />
+                    </div>
                   </Column>
                 </Row>
               </Column>
@@ -185,6 +186,15 @@
   }
   .msgcont .bx--toolbar-search-container-active.bx--search {
     width: 30%;
+  }
+  .msgcont .tilecont .buttons {
+    display: flex;
+    flex-flow: row wrap;
+    align-items: center;
+    justify-content: flex-start;
+  }
+  .msgcont .tilecont .buttons button {
+    margin: 0.2rem;
   }
   .msgtab th:first-child,
   .msgtab td:first-child {

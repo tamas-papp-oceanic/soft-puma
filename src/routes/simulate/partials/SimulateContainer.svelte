@@ -4,9 +4,12 @@
     DataTableSkeleton, DataTable, NumberInput, TextInput, Dropdown,
     DropdownSkeleton, Checkbox } from "carbon-components-svelte";
   import Delete from "carbon-icons-svelte/lib/RowDelete16";
-  import Open from "carbon-icons-svelte/lib/Folder16";
+  import Open from "carbon-icons-svelte/lib/Document16";
   import Save from "carbon-icons-svelte/lib/Save16";
-  import Empty from "carbon-icons-svelte/lib/TrashCan16";
+  import Empty from "carbon-icons-svelte/lib/Delete16";
+  import Send from "carbon-icons-svelte/lib/SkipForward16";
+  import Start from "carbon-icons-svelte/lib/Play16";
+  import Stop from "carbon-icons-svelte/lib/Pause16";
 
   export let data;
   export let style;
@@ -54,7 +57,6 @@
   let selection2 = null;
   let ranges = false;
   let simulation = 0;
-  let files;
 
   function getFlu(id) {
     for (let i in fluts) {
@@ -112,11 +114,28 @@
     }
   };
 
+  function input0(e) {
+    if (e.detail != null) {
+      for (let i in data.table) {
+        if (data.table[i].id == selection1.id) {
+          data.table[i].fields[selection2.id].value = parseInt(e.detail.selectedId);
+          data.table[i].fluidtype = parseInt(e.detail.selectedId);
+          break;
+        }
+      }
+    }
+  };
+
   function input1(e) {
     if (e.detail != null) {
       for (let i in data.table) {
         if (data.table[i].id == selection1.id) {
           data.table[i].fields[selection2.id].value = parseFloat(e.detail);
+          if (typeof data.table[i].fields[selection2.id].instance !== 'undefined') {
+            data.table[i].instance = parseInt(e.detail);
+          } else if (typeof data.table[i].fields[selection2.id].fluid !== 'undefined') {
+            data.table[i].fluidtype = parseInt(e.detail);
+          }
           break;
         }
       }
@@ -168,12 +187,12 @@
     selection1 = null;
   };
 
-  function opeTab() {
-    dispatch("opetab");
+  function load() {
+    dispatch("load");
   };
 
-  function savTab(e) {
-    dispatch("savtab");
+  function save(e) {
+    dispatch("save");
   };
 
   function clrTab(e) {
@@ -286,7 +305,6 @@
   $: selection2, divSet(selection2);
   $: running, divSet(running ? null : selection2);
   $: success, clrSel1(success);
-  $: files, opeTab(files);
 </script>
 
 <div class="simcont" style={style}>
@@ -378,12 +396,25 @@
                             <Column>
                               <Row style="display:flex; flex-flow: row nowrap; align-items: center;">
                                 <Column style="display:flex; flex-flow: row nowrap; align-items: center;">
-                                  {#if selection2['type'].startsWith('int') || selection2['type'].startsWith('uint') ||
+                                  {#if typeof selection2.fluid !== 'undefined'}
+                                    <Dropdown
+                                      id="input"
+                                      size="sm"
+                                      direction="top"
+                                      titleText={selection2.title}
+                                      selectedId={selection2.value}
+                                      items={fluts}
+                                      on:select={input0} />
+                                  {:else if selection2['type'].startsWith('int') || selection2['type'].startsWith('uint') ||
                                     selection2['type'].startsWith('float') || selection2['type'].startsWith('bit(')}
                                     <NumberInput
                                       id="input"
                                       min={getlim(selection2, 'min')}
                                       max={getlim(selection2, 'max')}
+                                      step={
+                                        (typeof selection2.multiplier !== 'undefined') && (selection2.multiplier < 1) ?
+                                        selection2.multiplier : 1
+                                      }
                                       label={selection2.title}
                                       invalidText={"Number must be between " + getlim(selection2, 'min') + " and " + getlim(selection2, 'max')}
                                       value={selection2.value}
@@ -444,19 +475,15 @@
             <Row>
               <Column>
                 <Row>
-                  <Column>Operation</Column>
+                  <Column>Operations</Column>
                 </Row>
                 <Row padding>
                   <Column>
                     <div class="buttons">
-                      <div>
-                        <Button disabled={(selectedIds1.length == 0) || running} iconDescription="Delete message" icon={Delete} on:click={delRow} />
-                        <Button disabled={(rows1.length == 0) || running} iconDescription="Clear table" icon={Empty} on:click={clrTab} />
-                      </div>
-                      <div>
-                        <Button disabled={running} iconDescription="Open table" icon={Open} on:click={opeTab} />
-                        <Button disabled={(rows1.length == 0) || running} iconDescription="Save table" icon={Save} on:click={savTab} />
-                      </div>
+                      <Button disabled={running} iconDescription="Load table" icon={Open} on:click={load} />
+                      <Button disabled={(rows1.length == 0) || running} iconDescription="Save table" icon={Save} on:click={save} />
+                      <Button disabled={(selectedIds1.length == 0) || running} iconDescription="Delete message" icon={Delete} on:click={delRow} />
+                      <Button disabled={(rows1.length == 0) || running} iconDescription="Clear table" icon={Empty} on:click={clrTab} />
                     </div>
                   </Column>
                 </Row>
@@ -478,11 +505,11 @@
                 </Row>
                 <Row>
                   <Column>
-                    <ButtonSet stacked style="padding: 0.2rem;">
-                      <Button style="margin: 0.2rem 0" disabled={(selectedIds1.length == 0) || running} on:click={send}>Send message</Button>
-                      <Button style="margin: 0.2rem 0" disabled={(rows1.length == 0) || running} on:click={start}>Start simulation</Button>
-                      <Button style="margin: 0.2rem 0" disabled={!running} on:click={stop}>Stop simulation</Button>
-                    </ButtonSet>
+                    <div class="buttons">
+                      <Button disabled={(selectedIds1.length == 0) || running} iconDescription="Send message" icon={Send} on:click={send} />
+                      <Button disabled={(rows1.length == 0) || running} iconDescription="Start simulation" icon={Start} on:click={start} />
+                      <Button disabled={!running}  iconDescription="Stop simulation" icon={Stop} on:click={stop} />
+                    </div>
                   </Column>
                 </Row>
               </Column>
@@ -532,20 +559,14 @@
     font-size: 0.8rem;
     color: #c6c6c6;
   }
-  .simcont .tilecont .bx--btn--icon-only {
-    width: auto;
-    margin: 0.25rem;
-    padding: 0 0.75rem;
-  }
-  .simcont .tilecont .bx--btn--icon-only .bx--btn__icon {
-    width: 1.25rem;
-    height: 1.25rem;
-  }
   .simcont .tilecont .buttons {
     display: flex;
     flex-flow: row wrap;
     align-items: center;
     justify-content: flex-start;
+  }
+  .simcont .tilecont .buttons button {
+    margin: 0.2rem;
   }
   .simtab {
     max-height: calc(100% - 3.5rem);
@@ -602,12 +623,13 @@
   .tabfld .bx--form-item.bx--checkbox-wrapper {
     align-items: center;
   }
+  .simcont button[type="button"],
   .simcont input[type="number"],
   .simcont input[type="text"] {
     font-size: 1rem;
   }
-  .simcont input[type="file"] {
-    display: none;
+  .simcont .bx--dropdown__wrapper.bx--list-box__wrapper {
+    width: 100%;
   }
   .simcont input[type="number"] {
     padding-right: 5.5rem;

@@ -29,7 +29,12 @@ function ranges(def) {
     } else if (def['unit'] == 'deg') {
       return { min: -180, max: 180 };
     } else if (def['unit'] == 'rad') {
-      return { min: 0, max: 360 };
+      let max = 2 * Math.PI;
+      if ((def.multiplier != null) && (def.multiplier < 1)) {
+        let dec = Math.floor(def.multiplier) !== def.multiplier ? def.multiplier.toString().split('.')[1].length || 0 : 0;
+        max = max.toFixed(dec);
+      }
+      return { min: 0, max: max };
     }
   }
   return typeof def.ranges !== 'undefined' ? def.ranges : null;

@@ -15,8 +15,7 @@ const bwipjs = require('bwip-js');
 const PDFDocument = require('pdfkit');
 const prt = 'HP-LaserJet-Pro-M404-M405';
 const { writeBoot, downFile, downUpdates, upFile } = require('./src/services/program.js')
-const { readFile, writeFile } = require('./src/services/volume.js');
-const { readSim, writeSim } = require('./src/services/simulator.js');
+const { readFile, writeFile } = require('./src/services/files.js');
 const EventEmitter = require('node:events');
 const crc32 = require('buffer-crc32');
 
@@ -166,8 +165,8 @@ app.on('activate', function () {
 // code. You can also put them in separate files and require them here.
 // Data processing
 // FOR INIT ONLY
-let tool = require('./src/tools/nmea.js');
-tool.create();
+// let tool = require('./src/tools/nmea.js');
+// tool.create();
 
 // Discovering interfaces
 async function discover() {
@@ -263,7 +262,9 @@ function proc(dev, frm) {
         break;
       case 65289:
       case 130825:
-        mainWindow.webContents.send('n2k-volume', [dev, msg]);
+        if ((com.getFld(1, msg.fields).value == manu) && (com.getFld(3, msg.fields).value == indu)) {
+          mainWindow.webContents.send('n2k-volume', [dev, msg]);
+        }
         break;
       case 65446:
         if ((com.getFld(1, msg.fields).value == manu) && (com.getFld(3, msg.fields).value == indu)) {
@@ -765,23 +766,31 @@ function bootToProgram(eng, typ, ins, func) {
 }
 
 // Starts volume file reading
-ipcMain.on('volfile-read', (e, ...args) => {
-  readFile(args[0]).then((res) => {
-    if ((mainWindow != null) && (typeof mainWindow.webContents !== 'undefined')) {
-      mainWindow.webContents.send('volfile-data', res);
-      mainWindow.webContents.send('volfile-done');
+ipcMain.on('volfile-read', (e, args) => {
+  const [title, name] = args;
+  readFile(title, name).then((res) => {
+    if ((typeof res.fluid !== 'undefined') && (typeof res.instance !== 'undefined') &&
+      (typeof res.table !== 'undefined') && (typeof res.mode !== 'undefined')) {
+      if ((mainWindow != null) && (typeof mainWindow.webContents !== 'undefined')) {
+        mainWindow.webContents.send('volfile-done', res);
+      }
+    } else {
+
+      if ((mainWindow != null) && (typeof mainWindow.webContents !== 'undefined')) {
+        mainWindow.webContents.send('volfile-done', new Error('Invalid data structure'));
+      }
     }
   }).catch((err) => {
     if ((mainWindow != null) && (typeof mainWindow.webContents !== 'undefined')) {
-      mainWindow.webContents.send('volfile-data', err);
-      mainWindow.webContents.send('volfile-done');
+      mainWindow.webContents.send('volfile-done', err);
     }
   });
 });
 
 // Starts volume file writing
-ipcMain.on('volfile-write', (e, ...args) => {
-  writeFile(args[0]).then((res) => {
+ipcMain.on('volfile-write', (e, args) => {
+  const [title, name, data] = args;
+  writeFile(title, name, data).then((res) => {
     if ((mainWindow != null) && (typeof mainWindow.webContents !== 'undefined')) {
       mainWindow.webContents.send('volfile-done', res);
     }
@@ -1674,29 +1683,36 @@ ipcMain.on('sim-data', (e, args) => {
   }
 });
 
-// Reads file content
-ipcMain.on('open-file', (e, args) => {
-  readSim().then((res) => {
-    if ((mainWindow != null) && (typeof mainWindow.webContents !== 'undefined')) {
-      mainWindow.webContents.send('open-done', res);
+// Reads simulator file content
+ipcMain.on('simfile-read', (e, args) => {
+  const [title, name] = args;
+  readFile(title, name).then((res) => {
+    if ((typeof res.simulation !== 'undefined') && (typeof res.table !== 'undefined')) {
+      if ((mainWindow != null) && (typeof mainWindow.webContents !== 'undefined')) {
+        mainWindow.webContents.send('simfile-done', res);
+      }
+    } else {
+      if ((mainWindow != null) && (typeof mainWindow.webContents !== 'undefined')) {
+        mainWindow.webContents.send('simfile-done', new Error('Invalid data structure'));
+      }
     }
   }).catch((err) => {
     if ((mainWindow != null) && (typeof mainWindow.webContents !== 'undefined')) {
-      mainWindow.webContents.send('open-done', err);
+      mainWindow.webContents.send('simfile-done', err);
     }
   });
 });
 
 // Saves file content
-ipcMain.on('save-file', (e, args) => {
-  const [fil] = args;
-  writeSim(fil).then((res) => {
+ipcMain.on('simfile-write', (e, args) => {
+  const [title, name, data] = args;
+  writeFile(title, name, data).then((res) => {
     if ((mainWindow != null) && (typeof mainWindow.webContents !== 'undefined')) {
-      mainWindow.webContents.send('save-done', res);
+      mainWindow.webContents.send('simfile-done', res);
     }
   }).catch((err) => {
     if ((mainWindow != null) && (typeof mainWindow.webContents !== 'undefined')) {
-      mainWindow.webContents.send('save-done', err);
+      mainWindow.webContents.send('simfile-done', err);
     }
   });
 });

@@ -2,19 +2,14 @@ const { dialog } = require('electron');
 const fs = require('fs');
 const path = require('path');
 
-async function readSim() {
+async function readFile(title, name) {
   return new Promise((resolve, reject) => {
-    let fp = dialog.showOpenDialogSync({ title: 'Open simulator file', defaultPath: path.join(process.env.HOME, 'puma', 'save', 'simulator.json'),
+    let fp = dialog.showOpenDialogSync({ title: title, defaultPath: path.join(process.env.HOME, 'Downloads', name),
       filters: [{ name: 'JSON file', extensions: ['json'] }]});
     if (typeof fp !== 'undefined') {
-      let cnt = fs.readFileSync(fp[0], { encoding: 'UTF8'} );
+      let data = fs.readFileSync(fp[0], { encoding: 'UTF8'} );
       try {
-        let dat = JSON.parse(cnt);
-        if ((typeof dat.simulation !== 'undefined') && (typeof dat.table !== 'undefined')) {
-          resolve(dat);
-        } else {
-          reject(new Error('Invalid data structure'));
-        }
+        resolve(JSON.parse(data));
       } catch (err) {
         reject(err);
       }
@@ -24,9 +19,9 @@ async function readSim() {
   });
 };
 
-async function writeSim(data) {
+async function writeFile(title, name, data) {
   return new Promise((resolve, reject) => {
-    let fp = dialog.showSaveDialogSync({ title: 'Save simulator table', defaultPath: path.join(process.env.HOME, 'puma', 'save', 'simulator.json'),
+    let fp = dialog.showSaveDialogSync({ title: title, defaultPath: path.join(process.env.HOME, 'Downloads', name),
       filters: [{ name: 'JSON file', extensions: ['json'] }]});
     if (typeof fp !== 'undefined') {
       try {
@@ -43,6 +38,6 @@ async function writeSim(data) {
 };
 
 module.exports = {
-  readSim,
-  writeSim,
+  readFile,
+  writeFile,
 };

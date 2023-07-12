@@ -33,12 +33,12 @@ function decode(frm, din) {
     if (def == null) {
       return null;
     }
-    if (pgn == 126208) {
+    if (pgn === 126208) {
       def = proc126208(def, frm);
     } else {
       def = extend(pgn, def, frm);
     }
-    if (def == null) {
+    if (def === null) {
       return null;
     }
     let msg = null;
@@ -260,19 +260,19 @@ function decodeDataTransfer(frm) {
       if (frm.raw.length < 8) {
         tra.corrupted = true;
       }
-      if (!tra,corupted) {
+      if (!tra.corupted) {
         let seq = frm.data.readUInt8(0);
         if (seq != (tra.sequence + 1)) {
           tra.corrupted = true;
         }
       }
-      if (!tra,corupted) {
+      if (!tra.corupted) {
         tra.sequence = seq;
       }
       if (!tra.corrupted && ((Date.now() - tra.start) > tra.timeout)) {
         tra.corrupted = true;
       }
-      if (!tra,corupted) {
+      if (!tra.corupted) {
         frm.data.copy(tra.data, seq * 7, 1);
         tra.finished = tra.sequence >= tra.frames;
       }

@@ -1002,7 +1002,7 @@ class NMEAEngine {
         ],
       };
       this.#heartbeat.sequence++;
-      this.#heartbeat.sequence %= 252;
+      this.#heartbeat.sequence %= 253;
       return this.sendMsg(msg);
     }
     return false;

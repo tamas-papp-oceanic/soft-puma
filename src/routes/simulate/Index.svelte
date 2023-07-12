@@ -14,8 +14,6 @@
   import { splitKey, joinKey } from "../../helpers/route.js";
   import { isproprietary } from "../../stores/common.js";
     
-  const timeout = 60000;
-  let timer = null;
   let selector = new Array();
   let simulator = {
     table: new Array(),
@@ -98,11 +96,9 @@
       }
       let cnv = spl.protocol + '/' + spl.pgn;
       if (typeof nmeaconv[cnv] !== 'undefined') {
-        if ((spl.pgn !== '065289') && (spl.pgn !== '130825')) {
-          rec.fields[nmeaconv[cnv].function].value = parseInt(spl.function);
-          rec.disabledIds.push(nmeaconv[cnv].function);
-          rec.fields[nmeaconv[cnv].function].static = null;
-        }
+        rec.fields[nmeaconv[cnv].field].value = parseInt(spl.function);
+        rec.disabledIds.push(nmeaconv[cnv].field);
+        rec.fields[nmeaconv[cnv].field].static = null;
       }
       arr.push(rec);
     }
@@ -113,20 +109,11 @@
   });
 
   onDestroy((e) => {
-    if (timer != null) {
-      clearTimeout(timer);
-      timer = null
-    }
     stop(e);
   });
 
   function reml(lis) {
-    if (timer != null) {
-      clearTimeout(timer);
-      timer = null;
-    }
     // Remove listeners
-    window.pumaAPI.reml(lis + '-file');
     window.pumaAPI.reml(lis + '-done');
   }
 
@@ -153,9 +140,7 @@
         }
         let cnv = spl.protocol + '/' + spl.pgn;
         if (typeof nmeaconv[cnv] !== 'undefined') {
-          if ((spl.pgn !== '065289') && (spl.pgn !== '130825')) {
-            simulator.table[i].disabledIds.push(nmeaconv[cnv].function);
-          }
+          simulator.table[i].disabledIds.push(nmeaconv[cnv].field);
         }
       }
     }
@@ -199,34 +184,56 @@
     }
   };
 
-  function opeTab(e) {
+  function load(e) {
+    stop();
+    kind = null
+    title = null;
+    subttl = null;
+    notify = false;
     running = true;
-    timer = setTimeout(() => {
-      reml('open');
-      running = false;
-    }, timeout);
     // Receives opening result
-    window.pumaAPI.recv('open-done', (e, res) => {
-      reml('open');
+    window.pumaAPI.recv('simfile-done', (e, res) => {
+      if (res instanceof Error) {
+        if (res.message != 'Nothing selected') {
+          kind = 'error'
+          title = 'Error';
+          subttl = res;
+          notify = true;
+        }
+      } else {
+        simulator = JSON.parse(JSON.stringify(res));
+        simulator = simulator;
+      }
+      reml('simfile');
       running = false;
-      simulator = JSON.parse(JSON.stringify(res));
-      simulator = simulator;
     });
-    window.pumaAPI.send('open-file');
+    window.pumaAPI.send('simfile-read', ['Select simulator file', 'simulator.json']);
   };
 
-  function savTab(e) {
+  function save(e) {
+    stop();
+    kind = null
+    title = null;
+    subttl = null;
+    notify = false;
     running = true;
-    timer = setTimeout(() => {
-      reml('save');
-      running = false;
-    }, timeout);
     // Receives saving result
-    window.pumaAPI.recv('save-done', (e, res) => {
-      reml('save');
+    window.pumaAPI.recv('simfile-done', (e, res) => {
+      if (res instanceof Error) {
+        kind = 'error'
+        title = 'Error';
+        subttl = res;
+        notify = true;
+      } else {
+        kind = 'info'
+        title = 'Success';
+        subttl = 'Simulation table has been saved.';
+        notify = true;
+      }
+      reml('simfile');
       running = false;
     });
-    window.pumaAPI.send('save-file', [simulator]);
+    window.pumaAPI.send('simfile-write', ['Select simulator file', 'simulator.json', JSON.parse(JSON.stringify(simulator))]);
   };
 
   function clrTab(e) {
@@ -243,7 +250,7 @@
       let fld = simulator.table[idx].fields[i];
       let val = (typeof fld.value === 'undefined') ? null : fld.value;
       if (fld.dictionary == 'DD056') {
-        val++;
+        val = (val + 1) % 253;
       } else {
         if (fld['type'] != null) {
           if (fld['type'].startsWith('int') || fld['type'].startsWith('uint')) {
@@ -370,8 +377,8 @@
               running={running}
               success={success}
               on:delrow={delRow}
-              on:opetab={opeTab}
-              on:savtab={savTab}
+              on:load={load}
+              on:save={save}
               on:clrtab={clrTab}
               on:setsim={setSim}
               on:send={send}

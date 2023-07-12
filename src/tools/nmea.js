@@ -125,13 +125,13 @@ function create() {
     fs.writeFileSync(nde, JSON.stringify(out, null, 2));
     delete out;
     out = {
-      "nmea2000/060416": { function: 0 },
-      "nmea2000/065289": { function: 3 },
-      "nmea2000/126208": { function: 0 },
-      "nmea2000/126464": { function: 0 },
-      "nmea2000/126720": { function: 2 },
-      "nmea2000/130825": { function: 3 },
-      "nmea2000/131011": { function: 4 },
+      "nmea2000/060416": { function: 0, field: 0 },
+      "nmea2000/065289": { function: 5, field: 5 },
+      "nmea2000/126208": { function: 0, field: 0 },
+      "nmea2000/126464": { function: 0, field: 0 },
+      "nmea2000/126720": { function: 2, field: 3 },
+      "nmea2000/130825": { function: 5, field: 5 },
+      "nmea2000/131011": { function: 4, field: 5 },
     };
     fs.writeFileSync(nco, JSON.stringify(out, null, 2));
   } catch(err) {
