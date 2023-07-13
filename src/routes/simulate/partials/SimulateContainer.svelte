@@ -515,6 +515,7 @@
                         step={0.1}
                         label="Rate of change (%)"
                         invalidText={"Number must be between 0.1% and 50%"}
+                        disabled={simulation === 3}
                         value={data.rate}
                         on:input={input5} />
                       <div style="height: 1rem;"></div>

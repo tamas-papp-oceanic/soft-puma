@@ -23,8 +23,8 @@ function minmax(def) {
         res.max = Math.round(res.max / def.multiplier);
         let num = def.multiplier.toString().split('.')[1].length || 0;
         if (Number.isInteger(num)) {
-          res.min = res.min.toFixed(num);
-          res.max = res.max.toFixed(num);
+          res.min = parseFloat(res.min.toFixed(num));
+          res.max = parseFloat(res.max.toFixed(num));
         }
       }
     } else {
@@ -37,9 +37,10 @@ function minmax(def) {
         let num = parseInt(def['type'].replace('uint', '').replace('int', ''));
         if (Number.isInteger(num)) {
           if (def['type'].startsWith('int')) {
-            res = { min: -Math.pow(2, num), max: Math.pow(2, num - 1) - 1 };
+            res = { min: -Math.pow(2, num - 1), max: Math.pow(2, num - 1) - 1 };
+          } else {
+            res = { min: 0, max: Math.pow(2, num) - 1 };
           }
-          res = { min: 0, max: Math.pow(2, num) - 1 };
         }
       } else if (def['type'].startsWith('float')) {
         let num = parseInt(def['type'].replace('float', ''));
@@ -55,7 +56,7 @@ function minmax(def) {
 };
 
 function limits(def) {
-  let lim = minmax(def);
+  let lim = def.limits;
   if (def.ranges != null) {
     lim = { min: def.ranges.min, max: def.ranges.max };
     if ((def.multiplier != null) && (def.multiplier < 1)) {
@@ -136,6 +137,9 @@ function nextNatural(def, rat) {
 
 function nextRandom(def) {
   let lim = limits(def);
+if (def.title === "Fluid Level") {
+  console.log(lim)
+}
   let res = Math.round((Math.random() * (lim.max - lim.min)) + lim.min);
   return encode(def, lim, 3, res);
 };

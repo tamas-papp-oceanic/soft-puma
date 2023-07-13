@@ -36,9 +36,7 @@
       let pgn = parseInt(spl.pgn);
       for (let i in rec.fields) {
         rec.fields[i] = Object.assign(
-          { id: parseInt(i) },
-          rec.fields[i],
-          {
+          { id: parseInt(i) }, rec.fields[i], {
             static: false,
             limits: minmax(rec.fields[i]),
             ranges: null,
@@ -202,6 +200,11 @@
           notify = true;
         }
       } else {
+        for (let i in res.table) {
+          for (let j in res.table[i].fields) {
+            res.table[i].fields[j].limits = minmax(res.table[i].fields[j]);
+          }
+        }
         simulator = JSON.parse(JSON.stringify(res));
         simulator = simulator;
       }
