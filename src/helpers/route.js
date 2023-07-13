@@ -73,4 +73,14 @@ function joinKey(spl) {
   return ret;
 };
 
-export { isRoute, splitKey, joinKey };
+function joinKey2(spl) {
+  let ret = '';
+  ret += (spl.protocol != null ? spl.protocol : '-');
+  ret += '/' + (spl.pgn != null ? spl.pgn : '-');
+  ret += '/' + (spl.function != null ? spl.function : '-');
+  ret += '/' + (spl.manufacturer != null ? spl.manufacturer : '-');
+  ret += '/' + (spl.industry != null ? spl.industry : '-');
+  return ret;
+};
+
+export { isRoute, splitKey, joinKey, joinKey2 };

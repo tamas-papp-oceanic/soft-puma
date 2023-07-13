@@ -9,12 +9,15 @@
   import Empty from "carbon-icons-svelte/lib/Delete16";
   import Send from "carbon-icons-svelte/lib/SkipForward16";
   import Start from "carbon-icons-svelte/lib/Play16";
-  import Stop from "carbon-icons-svelte/lib/Pause16";
+  import Pause from "carbon-icons-svelte/lib/Pause16";
+  import Record from "carbon-icons-svelte/lib/Recording16";
+  import Stop from "carbon-icons-svelte/lib/Stop16";
 
   export let data;
   export let style;
   export let loading;
   export let running;
+  export let capturing;
   export let success;
 
   const dispatch = createEventDispatcher();
@@ -190,10 +193,16 @@
   function delRow(e) {
     dispatch("delrow", selection1);
     selectedIds1 = new Array();
+    selectedIds2 = new Array();
     selection1 = null;
+    selection2 = null;
   };
 
   function load() {
+    selectedIds1 = new Array();
+    selectedIds2 = new Array();
+    selection1 = null;
+    selection2 = null;
     dispatch("load");
   };
 
@@ -202,9 +211,23 @@
   };
 
   function clrTab(e) {
-    dispatch("clrtab");
     selectedIds1 = new Array();
+    selectedIds2 = new Array();
     selection1 = null;
+    selection2 = null;
+    dispatch("clrtab");
+  };
+
+  function capStart(e) {
+    selectedIds1 = new Array();
+    selectedIds2 = new Array();
+    selection1 = null;
+    selection2 = null;
+    dispatch("capstart");
+  };
+
+  function capStop(e) {
+    dispatch("capstop");
   };
 
   function setSim(e) {
@@ -215,14 +238,14 @@
     dispatch("send", selection1);
   };
 
-  function start(e) {
+  function simStart(e) {
     selectedIds2 = new Array();
     selection2 = null;
-    dispatch("start");
+    dispatch("simstart");
   };      
   
-  function stop(e) {
-    dispatch("stop");
+  function simStop(e) {
+    dispatch("simstop");
   };  
 
   function cancel(e) {
@@ -490,6 +513,8 @@
                       <Button disabled={(rows1.length == 0) || running} iconDescription="Save table" icon={Save} on:click={save} />
                       <Button disabled={(selectedIds1.length == 0) || running} iconDescription="Delete message" icon={Delete} on:click={delRow} />
                       <Button disabled={(rows1.length == 0) || running} iconDescription="Clear table" icon={Empty} on:click={clrTab} />
+                      <Button disabled={capturing || running} iconDescription="Start capturing" icon={Record} on:click={capStart} />
+                      <Button disabled={!capturing} iconDescription="Stop capturing" icon={Stop} on:click={capStop} />
                     </div>
                   </Column>
                 </Row>
@@ -527,8 +552,8 @@
                   <Column>
                     <div class="buttons">
                       <Button disabled={(selectedIds1.length == 0) || running} iconDescription="Send message" icon={Send} on:click={send} />
-                      <Button disabled={(rows1.length == 0) || running} iconDescription="Start simulation" icon={Start} on:click={start} />
-                      <Button disabled={!running}  iconDescription="Stop simulation" icon={Stop} on:click={stop} />
+                      <Button disabled={(rows1.length == 0) || running} iconDescription="Start simulation" icon={Start} on:click={simStart} />
+                      <Button disabled={!running}  iconDescription="Stop simulation" icon={Pause} on:click={simStop} />
                     </div>
                   </Column>
                 </Row>
@@ -596,7 +621,7 @@
   .simtab th:first-child,
   .simtab td:first-child {
     width: 3rem;
-  }
+  }Pause
   .simtab th:nth-child(3),
   .simtab td:nth-child(3) {
     text-align: center;
@@ -625,7 +650,7 @@
   .tabfld th:nth-child(2),
   .tabfld td:nth-child(2) {
     width: 3rem;
-  }
+  }TableShortcut
   .tabfld th:nth-child(2),
   .tabfld th:nth-child(4),
   .tabfld th:nth-child(6),

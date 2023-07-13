@@ -10,7 +10,7 @@
   import Notification from "../../components/Notification.svelte";
   import { minmax, nextIncremetal, nextDecremetal, nextNatural, nextRandom } from '../../helpers/simulate.js';
   import { device } from '../../stores/data.js';
-  import { splitKey, joinKey } from "../../helpers/route.js";
+  import { splitKey, joinKey, joinKey2 } from "../../helpers/route.js";
   import { isproprietary } from "../../stores/common.js";
     
   let selector = new Array();
@@ -21,6 +21,7 @@
   };
   let loading = true;
   let running = false;
+  let capturing = false;
   let success = false;
   let tab = 0;
   let notify = false;
@@ -103,12 +104,13 @@
     arr.sort((a, b) => { return a.key.localeCompare(b.key); });
     selector = JSON.parse(JSON.stringify(arr));
     simulator.simulation = 0;
-    simulator.rate = 0.5;
+    simulator.rate = 0.2;
     loading = false;
   });
 
   onDestroy((e) => {
-    stop(e);
+    capStop(e);
+    simStop(e);
   });
 
   function reml(lis) {
@@ -146,7 +148,8 @@
   }
 
   function tabChg(e) {
-    stop(e);
+    capStop(e);
+    simStop(e);
     tab = e.detail;
   };
 
@@ -174,6 +177,10 @@
   };
 
   function delRow(e) {
+
+console.log(e)
+
+
     for (let i in simulator.table) {
       if (JSON.stringify(simulator.table[i].id) === JSON.stringify(e.detail.id)) {
         simulator.table.splice(i, 1);
@@ -184,7 +191,6 @@
   };
 
   function load(e) {
-    stop();
     kind = null
     title = null;
     subttl = null;
@@ -215,7 +221,6 @@
   };
 
   function save(e) {
-    stop();
     kind = null
     title = null;
     subttl = null;
@@ -244,6 +249,109 @@
     simulator.table = new Array();
     simulator = simulator;
     tab = 0;
+  };
+
+  function capStart(e) {
+    simulator.table = new Array();
+    simulator = simulator;
+    capturing = true;
+    // Captures NMEA messages
+    window.pumaAPI.recv('capt-data', (e, args) => {
+      let [ dev, msg ] = args;
+      let spl = splitKey(msg.key);
+      let pgn = parseInt(spl.pgn);
+      let ins = spl.instance !== null ? parseInt(spl.instance) : null;
+      let flu = spl.fluidtype !== null ? parseInt(spl.fluidtype) : null;
+      for (const [key, val] of Object.entries(nmeadefs)) {
+        if (key === joinKey2(spl)) {
+          let rec = Object.assign({ id: uuidv4(), key: msg.key, pgn: spl.pgn, instance: ins, fluidtype: flu }, val, { disabledIds: new Array(), timer: null });
+          for (let i in rec.fields) {
+            rec.fields[i] = Object.assign(
+              { id: parseInt(i) }, rec.fields[i], {
+                static: false,
+                limits: minmax(rec.fields[i]),
+                ranges: null,
+                chrnum: null,
+              },
+            );
+            let fld = rec.fields[i];
+            if (fld.dictionary == "DD056") {
+              rec.fields[i].value = 0;
+              rec.disabledIds.push(parseInt(i));
+              rec.fields[i].static = null;
+            } else {
+              if (fld['type'] != null) {
+                if (typeof fld.instance !== 'undefined') {
+                  rec.fields[i].value = 0;
+                  rec.fields[i].static = null;
+                }
+                if (typeof fld.fluid !== 'undefined') {
+                  rec.fields[i].value = 0;
+                  rec.fields[i].static = null;
+                }
+                if (fld['type'].startsWith('int') || fld['type'].startsWith('uint')) {
+                  rec.fields[i].value = 0;
+                } else if (fld['type'].startsWith('float')) {
+                  rec.fields[i].value = 0.0;
+                } else if (fld['type'].startsWith('bit(')) {
+                  rec.fields[i].value = 0;
+                  if (fld.dictionary == 'DD001') {
+                    rec.fields[i].value = fld.limits.max;
+                    rec.disabledIds.push(parseInt(i))
+                  }
+                  rec.fields[i].static = null;
+                } else if (fld['type'].startsWith('chr(')) {
+                  rec.fields[i].value = '';
+                  let num = parseInt(fld['type'].replace('chr(', '').replace(')', ''));
+                  rec.fields[i].chrnum = num;
+                  rec.fields[i].static = null;
+                } else if (fld['type'] == 'str') {
+                  rec.fields[i].value = '';
+                  rec.fields[i].chrnum = 250;
+                  rec.fields[i].static = null;
+                }
+              } else {
+                rec.fields[i].value = null;
+              }
+            }
+          }
+          if (isproprietary(pgn)) {
+            rec.fields[0].value = parseInt(spl.manufacturer);
+            rec.disabledIds.push(0);
+            rec.fields[0].static = null;
+            rec.fields[2].value = parseInt(spl.industry);
+            rec.disabledIds.push(2);
+            rec.fields[2].static = null;
+          }
+          let cnv = spl.protocol + '/' + spl.pgn;
+          if (typeof nmeaconv[cnv] !== 'undefined') {
+            rec.fields[nmeaconv[cnv].field].value = parseInt(spl.function);
+            rec.disabledIds.push(nmeaconv[cnv].field);
+            rec.fields[nmeaconv[cnv].field].static = null;
+          }
+          let fnd = false;
+          for (let i in simulator.table) {
+            if (simulator.table[i].key === rec.key) {
+              fnd = true;
+              break;
+            }
+          }
+          if (!fnd) {
+            simulator.table.push(JSON.parse(JSON.stringify(rec)));
+            simulator = simulator;
+          }
+          break;
+        }
+      }
+    });
+    window.pumaAPI.send('capt-start', [$device]);
+  };
+
+  function capStop(e) {
+    capturing = false;
+    // Remove NMEA capture
+    window.pumaAPI.reml('capt-data');
+    window.pumaAPI.send('capt-stop', [$device]);
   };
 
   function simMsg(idx) {
@@ -331,7 +439,7 @@
     }  
   };  
 
-  function start(e) {
+  function simStart(e) {
     running = true;
     setDisabled(true);
     for (let i in simulator.table) {
@@ -341,7 +449,7 @@
     }
   };
 
-  function stop(e) {
+  function simStop(e) {
     setDisabled(false);
     for (let i in simulator.table) {
       if ((typeof simulator.table[i].timer !== 'undefined') && (simulator.table[i].timer != null)) {
@@ -369,6 +477,7 @@
             <MessageContainer
               bind:data={selector}
               loading={loading}
+              capturing={capturing}
               running={running}
               on:addrow={addRow}
               on:cancel={cancel}
@@ -379,15 +488,18 @@
               bind:data={simulator}
               loading={loading}
               running={running}
+              capturing={capturing}
               success={success}
               on:delrow={delRow}
               on:load={load}
               on:save={save}
               on:clrtab={clrTab}
+              on:capstart={capStart}
+              on:capstop={capStop}
               on:setsim={setSim}
               on:send={send}
-              on:start={start}
-              on:stop={stop}
+              on:simstart={simStart}
+              on:simstop={simStop}
               on:cancel={cancel}
               style="height: calc(100vh - 10rem);" />
           </TabContent>

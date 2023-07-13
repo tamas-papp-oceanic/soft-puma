@@ -32,6 +32,7 @@ let devices = {};
 let timer = null;
 let Can = null;
 let cancelToken;
+let simCapt = false;
 
 log.transports.console.level = 'info';
 log.transports.file.maxSize = 10 * 1024 * 1024;
@@ -352,6 +353,9 @@ function proc(dev, frm) {
         break;
       default:
         mainWindow.webContents.send('n2k-data', [dev, msg]);
+        if (simCapt) {
+          mainWindow.webContents.send('capt-data', [dev, msg]);
+        }
         break;
       }
     }
@@ -1715,6 +1719,26 @@ ipcMain.on('simfile-write', (e, args) => {
       mainWindow.webContents.send('simfile-done', err);
     }
   });
+});
+
+// Starts NMEA capturing
+ipcMain.on('capt-start', (e, args) => {
+  const [dev] = args;
+  if ((typeof dev === 'string') && (typeof devices[dev] !== 'undefined')) {
+    simCapt = true;
+  } else {
+    console.log("No device selected!");
+  }
+});
+
+// Stops NMEA capturing
+ipcMain.on('capt-stop', (e, args) => {
+  const [dev] = args;
+  if ((typeof dev === 'string') && (typeof devices[dev] !== 'undefined')) {
+    simCapt = false;
+  } else {
+    console.log("No device selected!");
+  }
 });
 
 // Stop device processing
