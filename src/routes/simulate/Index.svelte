@@ -2,6 +2,7 @@
   import { onDestroy, onMount } from "svelte";
   import { Grid, Row, Column, Tabs, Tab, TabContent } from "carbon-components-svelte";
   import { pop } from "svelte-spa-router";
+  import configureMeasurements, { allMeasures } from 'convert-units';
   import { v4 as uuidv4 } from "uuid";
   import MessageContainer from "./partials/MessageContainer.svelte";
   import SimulateContainer from "./partials/SimulateContainer.svelte";
@@ -13,6 +14,14 @@
   import { splitKey, joinKey, joinKey2 } from "../../helpers/route.js";
   import { isproprietary } from "../../stores/common.js";
     
+  const convert = configureMeasurements(allMeasures);
+
+  console.log(allMeasures)
+
+  allMeasures.charge.systems.SI['Ah'] = {};
+  allMeasures.charge.systems.SI['Ah'].name = { plural: "Ampere-hour", singular: "Ampere-hour" };
+  allMeasures.charge.systems.SI['Ah'].to_anchor = 1;
+  
   let selector = new Array();
   let simulator = {
     table: new Array(),
@@ -29,76 +38,44 @@
   let title = null;
   let subttl = null;
 
+  let units = {
+    "s": { orig: "sec" },
+    "d": { orig: "day" },
+    "deg": { orig: "deg" },
+    "rad": { orig: "rad" },
+    "m/s": { orig: "m/s" },
+    "m": { orig: "m" },
+    "rad/s": { orig: "rad/s" },
+    "rpm": { orig: "RPM" },
+    "Pa": { orig: "Pa" },
+    "%": { orig: "%" },
+    "K": { orig: "K" },
+    "V": { orig: "V" },
+    "m3/h": { orig: "m3/h" },
+    "m3": { orig: "m3" },
+    "A": { orig: "A" },
+    "Hz": { orig: "Hz" },
+    "W": { orig: "W" },
+    "VAR": { orig: "VAR" },
+    "min": { orig: "min" },
+    "C": { orig: "C" },
+    "arcsec": { orig: "degs" },
+    "dB": { orig: "dB" },
+    "Pa/h": { orig: "Pa/h" },
+    "kg": { orig: "kg" },
+    "ppm": { orig: "ppm" },
+    "kPa": { orig: "kPa" },
+    "Ah": { orig: "Ah" },
+    "dB":{ orig: "vol" },
+  };
+
+console.log(convert().list())
+
   onMount((e) => {
     let arr = new Array();
     for (const [key, val] of Object.entries(nmeadefs)) {
       let rec = Object.assign({ id: uuidv4(), key: key }, val, { disabledIds: new Array() });
-      let spl = splitKey(key);
-      let pgn = parseInt(spl.pgn);
-      for (let i in rec.fields) {
-        rec.fields[i] = Object.assign(
-          { id: parseInt(i) }, rec.fields[i], {
-            static: false,
-            limits: minmax(rec.fields[i]),
-            ranges: null,
-            chrnum: null,
-          },
-        );
-        let fld = rec.fields[i];
-        if (fld.dictionary == "DD056") {
-          rec.fields[i].value = 0;
-          rec.disabledIds.push(parseInt(i));
-          rec.fields[i].static = null;
-        } else {
-          if (fld['type'] != null) {
-            if (typeof fld.instance !== 'undefined') {
-              rec.fields[i].value = 0;
-              rec.fields[i].static = null;
-            }
-            if (typeof fld.fluid !== 'undefined') {
-              rec.fields[i].value = 0;
-              rec.fields[i].static = null;
-            }
-            if (fld['type'].startsWith('int') || fld['type'].startsWith('uint')) {
-              rec.fields[i].value = 0;
-            } else if (fld['type'].startsWith('float')) {
-              rec.fields[i].value = 0.0;
-            } else if (fld['type'].startsWith('bit(')) {
-              rec.fields[i].value = 0;
-              if (fld.dictionary == 'DD001') {
-                rec.fields[i].value = fld.limits.max;
-                rec.disabledIds.push(parseInt(i))
-              }
-              rec.fields[i].static = null;
-            } else if (fld['type'].startsWith('chr(')) {
-              rec.fields[i].value = '';
-              let num = parseInt(fld['type'].replace('chr(', '').replace(')', ''));
-              rec.fields[i].chrnum = num;
-              rec.fields[i].static = null;
-            } else if (fld['type'] == 'str') {
-              rec.fields[i].value = '';
-              rec.fields[i].chrnum = 250;
-              rec.fields[i].static = null;
-            }
-          } else {
-            rec.fields[i].value = null;
-          }
-        }
-      }
-      if (isproprietary(pgn)) {
-        rec.fields[0].value = parseInt(spl.manufacturer);
-        rec.disabledIds.push(0);
-        rec.fields[0].static = null;
-        rec.fields[2].value = parseInt(spl.industry);
-        rec.disabledIds.push(2);
-        rec.fields[2].static = null;
-      }
-      let cnv = spl.protocol + '/' + spl.pgn;
-      if (typeof nmeaconv[cnv] !== 'undefined') {
-        rec.fields[nmeaconv[cnv].field].value = parseInt(spl.function);
-        rec.disabledIds.push(nmeaconv[cnv].field);
-        rec.fields[nmeaconv[cnv].field].static = null;
-      }
+      rec = prepFields(rec, key);
       arr.push(rec);
     }
     arr.sort((a, b) => { return a.key.localeCompare(b.key); });
@@ -106,6 +83,16 @@
     simulator.simulation = 0;
     simulator.rate = 0.2;
     loading = false;
+
+    for (const [key, val] of Object.entries(units)) {
+      try {
+        units[key].new = convert().from(key).possibilities(); 
+      } catch (err) {
+        // console.log(err)
+      }
+    }
+    console.log(units);
+  
   });
 
   onDestroy((e) => {
@@ -113,11 +100,78 @@
     simStop(e);
   });
 
-  function reml(lis) {
-    // Remove listeners
-    window.pumaAPI.reml(lis + '-done');
-  }
+  // Prepares message fields
+  function prepFields(rec, key) {
+    let spl = splitKey(key);
+    let pgn = parseInt(spl.pgn);
+    for (let i in rec.fields) {
+      rec.fields[i] = Object.assign(
+        { id: parseInt(i) }, rec.fields[i], {
+          static: false,
+          limits: minmax(rec.fields[i]),
+          ranges: null,
+          chrnum: null,
+        },
+      );
+      let fld = rec.fields[i];
+      if (fld.dictionary == "DD056") {
+        rec.fields[i].value = 0;
+        rec.disabledIds.push(parseInt(i));
+        rec.fields[i].static = null;
+      } else {
+        if (fld['type'] != null) {
+          if (typeof fld.instance !== 'undefined') {
+            rec.fields[i].value = 0;
+            rec.fields[i].static = null;
+          }
+          if (typeof fld.fluid !== 'undefined') {
+            rec.fields[i].value = 0;
+            rec.fields[i].static = null;
+          }
+          if (fld['type'].startsWith('int') || fld['type'].startsWith('uint')) {
+            rec.fields[i].value = 0;
+          } else if (fld['type'].startsWith('float')) {
+            rec.fields[i].value = 0.0;
+          } else if (fld['type'].startsWith('bit(')) {
+            rec.fields[i].value = 0;
+            if (fld.dictionary == 'DD001') {
+              rec.fields[i].value = fld.limits.max;
+              rec.disabledIds.push(parseInt(i))
+            }
+            rec.fields[i].static = null;
+          } else if (fld['type'].startsWith('chr(')) {
+            rec.fields[i].value = '';
+            let num = parseInt(fld['type'].replace('chr(', '').replace(')', ''));
+            rec.fields[i].chrnum = num;
+            rec.fields[i].static = null;
+          } else if (fld['type'] == 'str') {
+            rec.fields[i].value = '';
+            rec.fields[i].chrnum = 250;
+            rec.fields[i].static = null;
+          }
+        } else {
+          rec.fields[i].value = null;
+        }
+      }
+    }
+    if (isproprietary(pgn)) {
+      rec.fields[0].value = parseInt(spl.manufacturer);
+      rec.disabledIds.push(0);
+      rec.fields[0].static = null;
+      rec.fields[2].value = parseInt(spl.industry);
+      rec.disabledIds.push(2);
+      rec.fields[2].static = null;
+    }
+    let cnv = spl.protocol + '/' + spl.pgn;
+    if (typeof nmeaconv[cnv] !== 'undefined') {
+      rec.fields[nmeaconv[cnv].field].value = parseInt(spl.function);
+      rec.disabledIds.push(nmeaconv[cnv].field);
+      rec.fields[nmeaconv[cnv].field].static = null;
+    }
+    return rec;
+  };
 
+  // Toggle disabled fields
   function setDisabled(val) {
     for (let i in simulator.table) {
       simulator.table[i].disabledIds = new Array();
@@ -145,12 +199,11 @@
         }
       }
     }
-  }
+  };
 
-  function tabChg(e) {
-    capStop(e);
-    simStop(e);
-    tab = e.detail;
+  // Remove listeners
+  function reml(lis) {
+    window.pumaAPI.reml(lis + '-done');
   };
 
   function getValue(rec, pro) {
@@ -160,7 +213,13 @@
       }
     }
     return null;
-  }
+  };
+
+  function tabChg(e) {
+    capStop(e);
+    simStop(e);
+    tab = e.detail;
+  };
 
   function addRow(e) {
     let spl = splitKey(e.detail.key);
@@ -177,10 +236,6 @@
   };
 
   function delRow(e) {
-
-console.log(e)
-
-
     for (let i in simulator.table) {
       if (JSON.stringify(simulator.table[i].id) === JSON.stringify(e.detail.id)) {
         simulator.table.splice(i, 1);
@@ -259,76 +314,12 @@ console.log(e)
     window.pumaAPI.recv('capt-data', (e, args) => {
       let [ dev, msg ] = args;
       let spl = splitKey(msg.key);
-      let pgn = parseInt(spl.pgn);
       let ins = spl.instance !== null ? parseInt(spl.instance) : null;
       let flu = spl.fluidtype !== null ? parseInt(spl.fluidtype) : null;
       for (const [key, val] of Object.entries(nmeadefs)) {
         if (key === joinKey2(spl)) {
           let rec = Object.assign({ id: uuidv4(), key: msg.key, pgn: spl.pgn, instance: ins, fluidtype: flu }, val, { disabledIds: new Array(), timer: null });
-          for (let i in rec.fields) {
-            rec.fields[i] = Object.assign(
-              { id: parseInt(i) }, rec.fields[i], {
-                static: false,
-                limits: minmax(rec.fields[i]),
-                ranges: null,
-                chrnum: null,
-              },
-            );
-            let fld = rec.fields[i];
-            if (fld.dictionary == "DD056") {
-              rec.fields[i].value = 0;
-              rec.disabledIds.push(parseInt(i));
-              rec.fields[i].static = null;
-            } else {
-              if (fld['type'] != null) {
-                if (typeof fld.instance !== 'undefined') {
-                  rec.fields[i].value = 0;
-                  rec.fields[i].static = null;
-                }
-                if (typeof fld.fluid !== 'undefined') {
-                  rec.fields[i].value = 0;
-                  rec.fields[i].static = null;
-                }
-                if (fld['type'].startsWith('int') || fld['type'].startsWith('uint')) {
-                  rec.fields[i].value = 0;
-                } else if (fld['type'].startsWith('float')) {
-                  rec.fields[i].value = 0.0;
-                } else if (fld['type'].startsWith('bit(')) {
-                  rec.fields[i].value = 0;
-                  if (fld.dictionary == 'DD001') {
-                    rec.fields[i].value = fld.limits.max;
-                    rec.disabledIds.push(parseInt(i))
-                  }
-                  rec.fields[i].static = null;
-                } else if (fld['type'].startsWith('chr(')) {
-                  rec.fields[i].value = '';
-                  let num = parseInt(fld['type'].replace('chr(', '').replace(')', ''));
-                  rec.fields[i].chrnum = num;
-                  rec.fields[i].static = null;
-                } else if (fld['type'] == 'str') {
-                  rec.fields[i].value = '';
-                  rec.fields[i].chrnum = 250;
-                  rec.fields[i].static = null;
-                }
-              } else {
-                rec.fields[i].value = null;
-              }
-            }
-          }
-          if (isproprietary(pgn)) {
-            rec.fields[0].value = parseInt(spl.manufacturer);
-            rec.disabledIds.push(0);
-            rec.fields[0].static = null;
-            rec.fields[2].value = parseInt(spl.industry);
-            rec.disabledIds.push(2);
-            rec.fields[2].static = null;
-          }
-          let cnv = spl.protocol + '/' + spl.pgn;
-          if (typeof nmeaconv[cnv] !== 'undefined') {
-            rec.fields[nmeaconv[cnv].field].value = parseInt(spl.function);
-            rec.disabledIds.push(nmeaconv[cnv].field);
-            rec.fields[nmeaconv[cnv].field].static = null;
-          }
+          rec = prepFields(rec, key);
           let fnd = false;
           for (let i in simulator.table) {
             if (simulator.table[i].key === rec.key) {

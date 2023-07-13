@@ -1482,6 +1482,11 @@
   dependencies:
     "safe-buffer" "5.2.1"
 
+"convert-units@^3.0.0-beta.5":
+  "integrity" "sha512-qCy+1W8CqfK8TDuJTdT2E9hNBpG9kDub6rYsrVXOVfdmuFOLqj8RQnW8o26MFCz2XdD3beyOYZYoh9Nh7jSABA=="
+  "resolved" "https://registry.npmjs.org/convert-units/-/convert-units-3.0.0-beta.5.tgz"
+  "version" "3.0.0-beta.5"
+
 "core-util-is@~1.0.0":
   "integrity" "sha512-ZQBvi1DcpJ4GDqanjucZ2Hj3wEO5pZDS89BWbkcrvdxksJorwUDDZamX9ldFkp9aw2lmBDLgkObEA4DWNJ9FYQ=="
   "resolved" "https://registry.npmjs.org/core-util-is/-/core-util-is-1.0.3.tgz"
