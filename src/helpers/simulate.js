@@ -1,59 +1,63 @@
 function minmax(def) {
+  let res = null;
   if (def['type'] !== null) {
-    if (def['type'].startsWith('bit(')) {
-      let num = parseInt(def['type'].replace('bit(', '').replace(')', ''));
-      if (Number.isInteger(num)) {
-        return { min: 0, max: Math.pow(2, num) - 1 };
-      }
-    } else if (def['type'].startsWith('int') || def['type'].startsWith('uint')) {
-      let num = parseInt(def['type'].replace('uint', '').replace('int', ''));
-      if (Number.isInteger(num)) {
-        return { min: def['type'].startsWith('uint') ? 0 : -Math.pow(2, num - 1), max: def['type'].startsWith('uint') ? Math.pow(2, num) : Math.pow(2, num - 1) - 1 };
-      }
-    } else if (def['type'].startsWith('float')) {
-      let num = parseInt(def['type'].replace('float', ''));
-      if (num === 32) {
-        return { min: -3.40282347e+38, max: 3.40282347e+38 };
-      } else if (num === 64) {
-        return { min: Number.MIN_VALUE, max: Number.MAX_VALUE };
-      }
-    }
-  }
-  return null;
-};
-
-function ranges(def) {
-  if (def['unit'] !== null) {
     if (def['unit'] === '%') {
-      return { min: 0, max: 100 };
+      res = { min: 0, max: 100 };
+      if ((def.multiplier != null) && (def.multiplier < 1)) {
+        res.max = Math.round(res.max / def.multiplier);
+      }
     } else if (def['unit'] == 'deg') {
-      return { min: -180, max: 180 };
+      res = { min: -180, max: 180 };
+      if ((def.multiplier != null) && (def.multiplier < 1)) {
+        res.min = Math.round(res.min / def.multiplier);
+        res.max = Math.round(res.max / def.multiplier);
+      }
     } else if (def['unit'] == 'rad') {
       if (def['type'].startsWith('int')) {
-        let num = Math.PI;
-        if ((def.multiplier != null) && (def.multiplier < 1)) {
-          let dec = Math.floor(def.multiplier) !== def.multiplier ? def.multiplier.toString().split('.')[1].length || 0 : 0;
-          num = num.toFixed(dec);
+        res = { min: -Math.PI, max: Math.PI };
+      } else {
+        res = { min: 0, max: 2 * Math.PI };
+      }
+      if ((def.multiplier != null) && (def.multiplier < 1)) {
+        res.min = Math.round(res.min / def.multiplier);
+        res.max = Math.round(res.max / def.multiplier);
+        let num = def.multiplier.toString().split('.')[1].length || 0;
+        if (Number.isInteger(num)) {
+          res.min = res.min.toFixed(num);
+          res.max = res.max.toFixed(num);
         }
-        return { min: -num, max: num };
-      } else if (def['type'].startsWith('uint')) {
-        let num = 2 * Math.PI;
-        if ((def.multiplier != null) && (def.multiplier < 1)) {
-          let dec = Math.floor(def.multiplier) !== def.multiplier ? def.multiplier.toString().split('.')[1].length || 0 : 0;
-          num = num.toFixed(dec);
+      }
+    } else {
+      if (def['type'].startsWith('bit(')) {
+        let num = parseInt(def['type'].replace('bit(', '').replace(')', ''));
+        if (Number.isInteger(num)) {
+          res = { min: 0, max: Math.pow(2, num) - 1 };
         }
-        return { min: 0, max: num };
+      } else if (def['type'].startsWith('int') || def['type'].startsWith('uint')) {
+        let num = parseInt(def['type'].replace('uint', '').replace('int', ''));
+        if (Number.isInteger(num)) {
+          if (def['type'].startsWith('int')) {
+            res = { min: -Math.pow(2, num), max: Math.pow(2, num - 1) - 1 };
+          }
+          res = { min: 0, max: Math.pow(2, num) - 1 };
+        }
+      } else if (def['type'].startsWith('float')) {
+        let num = parseInt(def['type'].replace('float', ''));
+        if (num === 32) {
+          res = { min: -3.40282347e+38, max: 3.40282347e+38 };
+        } else if (num === 64) {
+          res = { min: Number.MIN_VALUE, max: Number.MAX_VALUE };
+        }
       }
     }
   }
-  return typeof def.ranges !== 'undefined' ? def.ranges : null;
+  return res;
 };
 
 function limits(def) {
   let lim = minmax(def);
-  let rng = ranges(def);
-  if (rng != null) {
-    lim = { min: rng.min, max: rng.max };
+  if (def.ranges != null) {
+    lim = { min: def.ranges.min, max: def.ranges.max };
     if ((def.multiplier != null) && (def.multiplier < 1)) {
       lim.min = Math.round(lim.min / def.multiplier);
       lim.max = Math.round(lim.max / def.multiplier);
@@ -67,12 +71,14 @@ function decode(def, lim) {
   if ((def.multiplier != null) && (def.multiplier < 1)) {
     res = Math.round(res / def.multiplier);
   }
-  if (res < lim.min) {
-    res = lim.min;
-  } else if (res > lim.max) {
-    res = lim.max;
+  if (lim != null) {
+    if (res < lim.min) {
+      res = lim.min;
+    } else if (res > lim.max) {
+      res = lim.max;
+    }
   }
-return res;
+  return res;
 };
 
 function encode(def, lim, typ, val) {
@@ -134,4 +140,4 @@ function nextRandom(def) {
   return encode(def, lim, 3, res);
 };
 
-export { minmax, ranges, nextIncremetal, nextDecremetal, nextNatural, nextRandom };
+export { minmax, nextIncremetal, nextDecremetal, nextNatural, nextRandom };

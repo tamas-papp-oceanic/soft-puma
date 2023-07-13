@@ -8,8 +8,7 @@
   import nmeaconv from "../../config/nmeaconv.json";
   import nmeadefs from "../../config/nmeadefs.json";
   import Notification from "../../components/Notification.svelte";
-  import { minmax, ranges, nextIncremetal, nextDecremetal, nextNatural,
-    nextRandom } from '../../helpers/simulate.js';
+  import { minmax, nextIncremetal, nextDecremetal, nextNatural, nextRandom } from '../../helpers/simulate.js';
   import { device } from '../../stores/data.js';
   import { splitKey, joinKey } from "../../helpers/route.js";
   import { isproprietary } from "../../stores/common.js";
@@ -42,7 +41,7 @@
           {
             static: false,
             limits: minmax(rec.fields[i]),
-            ranges: ranges(rec.fields[i]),
+            ranges: null,
             chrnum: null,
           },
         );
