@@ -2,7 +2,6 @@
   import { onDestroy, onMount } from "svelte";
   import { Grid, Row, Column, Tabs, Tab, TabContent } from "carbon-components-svelte";
   import { pop } from "svelte-spa-router";
-  import configureMeasurements, { allMeasures } from 'convert-units';
   import { v4 as uuidv4 } from "uuid";
   import MessageContainer from "./partials/MessageContainer.svelte";
   import SimulateContainer from "./partials/SimulateContainer.svelte";
@@ -14,14 +13,6 @@
   import { splitKey, joinKey, joinKey2 } from "../../helpers/route.js";
   import { isproprietary } from "../../stores/common.js";
     
-  const convert = configureMeasurements(allMeasures);
-
-  console.log(allMeasures)
-
-  allMeasures.charge.systems.SI['Ah'] = {};
-  allMeasures.charge.systems.SI['Ah'].name = { plural: "Ampere-hour", singular: "Ampere-hour" };
-  allMeasures.charge.systems.SI['Ah'].to_anchor = 1;
-  
   let selector = new Array();
   let simulator = {
     table: new Array(),
@@ -38,39 +29,6 @@
   let title = null;
   let subttl = null;
 
-  let units = {
-    "s": { orig: "sec" },
-    "d": { orig: "day" },
-    "deg": { orig: "deg" },
-    "rad": { orig: "rad" },
-    "m/s": { orig: "m/s" },
-    "m": { orig: "m" },
-    "rad/s": { orig: "rad/s" },
-    "rpm": { orig: "RPM" },
-    "Pa": { orig: "Pa" },
-    "%": { orig: "%" },
-    "K": { orig: "K" },
-    "V": { orig: "V" },
-    "m3/h": { orig: "m3/h" },
-    "m3": { orig: "m3" },
-    "A": { orig: "A" },
-    "Hz": { orig: "Hz" },
-    "W": { orig: "W" },
-    "VAR": { orig: "VAR" },
-    "min": { orig: "min" },
-    "C": { orig: "C" },
-    "arcsec": { orig: "degs" },
-    "dB": { orig: "dB" },
-    "Pa/h": { orig: "Pa/h" },
-    "kg": { orig: "kg" },
-    "ppm": { orig: "ppm" },
-    "kPa": { orig: "kPa" },
-    "Ah": { orig: "Ah" },
-    "dB":{ orig: "vol" },
-  };
-
-console.log(convert().list())
-
   onMount((e) => {
     let arr = new Array();
     for (const [key, val] of Object.entries(nmeadefs)) {
@@ -83,16 +41,6 @@ console.log(convert().list())
     simulator.simulation = 0;
     simulator.rate = 0.2;
     loading = false;
-
-    for (const [key, val] of Object.entries(units)) {
-      try {
-        units[key].new = convert().from(key).possibilities(); 
-      } catch (err) {
-        // console.log(err)
-      }
-    }
-    console.log(units);
-  
   });
 
   onDestroy((e) => {

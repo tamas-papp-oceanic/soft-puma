@@ -9,8 +9,9 @@
 
   export let data;
   export let style;
-  // export let running;
   export let loading;
+  export let capturing;
+  export let running;
 
   const dispatch = createEventDispatcher();
 

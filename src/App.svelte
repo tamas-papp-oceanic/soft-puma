@@ -33,6 +33,7 @@
 	import { allRoutes, updates } from './stores/data.js';
   import { compareVersions } from 'compare-versions';
 	import { routeGuard } from './helpers/guard.js';
+	import { test } from './helpers/unit.js';
 
 	export let version;
 	export let appName;
@@ -76,7 +77,10 @@
 	let txt;
 	let started = false;
 
-	// Updater available hook
+  test();
+
+
+  // Updater available hook
   window.pumaAPI.recv('upd-available', (e, val) => {
     $update = true;
     $updmsg = val;
