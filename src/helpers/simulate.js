@@ -101,7 +101,12 @@ function encode(def, lim, typ, val) {
     }
   }
   if ((def.multiplier != null) && (def.multiplier < 1)) {
-    let dec = Math.floor(def.multiplier) !== def.multiplier ? def.multiplier.toString().split('.')[1].length || 0 : 0;
+    let dec = 0;
+    if (("" + def.multiplier).toLowerCase().indexOf('e') !== -1) {
+      dec = Math.abs(parseInt(("" + def.multiplier).toLowerCase().split('e')[1]))
+    } else {
+      dec = def.multiplier.toString().split('.')[1].length;
+    }
     val = parseFloat((val * def.multiplier).toFixed(dec));
   }
   return val;
