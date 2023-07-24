@@ -416,8 +416,6 @@
             <MessageContainer
               bind:data={selector}
               loading={loading}
-              capturing={capturing}
-              running={running}
               on:addrow={addRow}
               on:cancel={cancel}
               style="height: calc(100vh - 10rem);" />
