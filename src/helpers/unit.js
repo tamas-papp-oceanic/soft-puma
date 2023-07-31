@@ -101,72 +101,52 @@ allMeasures['pressurePerTime'] = {
   },
 };
 
-allMeasures['levelOfPowerIntensity'] = {
-  "systems": {
-    "SI": {
-      "B": {
-        name: {
-          singular: 'Bel',
-          plural: 'Bels',
-        },
-        to_anchor: 1,
-      },
-      "dB": {
-        name: {
-          singular: 'Decibel',
-          plural: 'Decibels',
-        },
-        to_anchor: 10,
-      },
-    },
-  },
-};
-
 // NMEA2000 standard units
 let units = {
-   "sec":   "s",
-   "day":   "d",
-   "deg":   "deg",
-   "rad":   "rad",
-   "m/s":   "m/s",
-   "m":     "m",
-   "rad/s": "rad/s",
-   "RPM":   "rpm",
-   "Pa":    "Pa",
-   "%":     "%",
-   "K":     "K",
-   "V":     "V",
-   "m3/h":  "m3/h",
-   "m3":    "m3",
-   "A":     "A",
-   "Hz":    "Hz",
-   "W":     "W",
-   "VAR":   "VAR",
-   "min":   "min",
-   "C":     "C",
-   "degs":  "arcsec",
-   "dB":    "dB",
-   "Pa/h":  "Pa/h",
-   "kg":    "kg",
-   "ppm":   "ppm",
-   "kPa":   "kPa",
-   "Ah":    "Ah",
-   "vol":   "dB",
+   "sec":   { unit: "s", default: "s"},
+   "day":   { unit: "d", default: "d"},
+   "deg":   { unit: "deg", default: "deg"},
+   "rad":   { unit: "rad", default: "deg"},
+   "m/s":   { unit: "m/s", default: "m/s"},
+   "m":     { unit: "m", default: "m"},
+   "rad/s": { unit: "rad/s", default: "deg/s"},
+   "RPM":   { unit: "rpm", default: "rpm"},
+   "Pa":    { unit: "Pa", default: "Pa"},
+   "%":     { unit: "%", default: "%"},
+   "K":     { unit: "K", default: "C"},
+   "V":     { unit: "V", default: "V"},
+   "m3/h":  { unit: "m3/h", default: "m3/h"},
+   "m3":    { unit: "m3", default: "m3"},
+   "A":     { unit: "A", default: "A"},
+   "Hz":    { unit: "Hz", default: "Hz"},
+   "W":     { unit: "W", default: "W"},
+   "VAR":   { unit: "VAR", default: "VAR"},
+   "min":   { unit: "min", default: "s"},
+   "C":     { unit: "C", default: "C"},
+   "degs":  { unit: "arcsec", default: "deg"},
+   "dB":    { unit: "dB", default: "dB"},
+   "Pa/h":  { unit: "Pa/h", default: "Pa/h"},
+   "kg":    { unit: "kg", default: "kg"},
+   "ppm":   { unit: "ppm", default: "ppm"},
+   "kPa":   { unit: "kPa", default: "kPa"},
+   "Ah":    { unit: "Ah", default: "Ah"},
+   "vol":   { unit: "dB", default: "dB"},
 };
 
-for (const [key, val] of Object.entries(units)) {
+function defValue(obj) {
+  let ret = obj;
   try {
-    let pos = convert().from(val).possibilities();
-    console.log(key, pos); 
+    let uni = units[obj.unit].unit;
+    let def = units[obj.unit].default;
+    try {
+      ret  = { value: Math.round(convert(obj.value).from(uni).to(def) * 100000) / 100000, unit: def};
+    } catch (err) {
+      // console.log(err);
+    }
   } catch (err) {
-    // console.log(err)
-    console.log(key, []); 
+    // console.log(err);
   }
-}
-console.log(units);
-
-function test() {
-  console.log(convert(1).from('dB').to('B'));
+  return ret;
 }
 
-export { test };
+export { defValue };

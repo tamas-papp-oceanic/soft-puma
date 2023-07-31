@@ -69,14 +69,12 @@
       } else {
         if (fld['type'] != null) {
           if (typeof fld.instance !== 'undefined') {
-            rec.fields[i].value = 0;
+            rec.fields[i].value = rec.instance;
             rec.fields[i].static = null;
-          }
-          if (typeof fld.fluid !== 'undefined') {
-            rec.fields[i].value = 0;
+          } else if (typeof fld.fluid !== 'undefined') {
+            rec.fields[i].value = rec.fluidtype;
             rec.fields[i].static = null;
-          }
-          if (fld['type'].startsWith('int') || fld['type'].startsWith('uint')) {
+          } else if (fld['type'].startsWith('int') || fld['type'].startsWith('uint')) {
             rec.fields[i].value = 0;
           } else if (fld['type'].startsWith('float')) {
             rec.fields[i].value = 0.0;
@@ -264,23 +262,39 @@
       let spl = splitKey(msg.key);
       let ins = spl.instance !== null ? parseInt(spl.instance) : null;
       let flu = spl.fluidtype !== null ? parseInt(spl.fluidtype) : null;
+      let srt = false;
       for (const [key, val] of Object.entries(nmeadefs)) {
         if (key === joinKey2(spl)) {
-          let rec = Object.assign({ id: uuidv4(), key: msg.key, pgn: spl.pgn, instance: ins, fluidtype: flu }, val, { disabledIds: new Array(), timer: null });
+          let rec = Object.assign(
+            { id: uuidv4(), key: msg.key, pgn: spl.pgn, instance: ins, fluidtype: flu }, val,
+            { disabledIds: new Array(), timer: null }
+          );
           rec = prepFields(rec, key);
           let fnd = false;
           for (let i in simulator.table) {
             if (simulator.table[i].key === rec.key) {
               fnd = true;
+              srt = true;
               break;
             }
           }
           if (!fnd) {
             simulator.table.push(JSON.parse(JSON.stringify(rec)));
-            simulator = simulator;
           }
           break;
         }
+      }
+      if (srt) {
+        simulator.table.sort((a, b) => {
+          if (a.key < b.key) {
+            return -1;
+          }
+          if (a.key > b.key) {
+            return 1;
+          }
+          return 0;
+        });
+        simulator = simulator;
       }
     });
     window.pumaAPI.send('capt-start', [$device]);

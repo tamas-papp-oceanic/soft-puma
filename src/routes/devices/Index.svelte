@@ -249,9 +249,9 @@
             <Button icon={Scan} on:click={(e) => scan(e)}>Scan</Button>
           </ToolbarContent>
         </Toolbar>
-        <span slot="cell" let:cell let:row>
+        <span slot="cell" let:cell let:row let:rowIndex>
           {#if cell.key === 'overflow'}
-            <OverflowMenu>
+            <OverflowMenu direction={rowIndex < (pagination.pageSize / 2) ? "bottom" : "top"}>
               <OverflowMenuItem text="Configure" disabled={!isRoute('/configure', row.id)} on:click={(e) => conf(e, row)} />
               <OverflowMenuItem text="Monitor" disabled={!isRoute('/monitor')} on:click={(e) => monitor(e, row)} />
               <OverflowMenuItem text="Testing" disabled={!isRoute('/testing', row.id)} on:click={(e) => test(e, row)} />

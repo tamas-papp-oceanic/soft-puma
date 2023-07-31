@@ -121,9 +121,9 @@
             <Button icon={SkipBack} on:click={(e) => back(e)}>Back</Button>
           </ToolbarContent>
         </Toolbar>
-        <span slot="cell" let:cell let:row>
+        <span slot="cell" let:cell let:row let:rowIndex>
           {#if cell.key === 'overflow'}
-            <OverflowMenu>
+            <OverflowMenu direction={rowIndex < (pagination.pageSize / 2) ? "bottom" : "top"}>
               <OverflowMenuItem text="Content" disabled={!isRoute('/messages')} on:click={(e) => content(e, row)} />
             </OverflowMenu>
           {:else}

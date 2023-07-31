@@ -188,9 +188,9 @@
         <div class="wrap flip">
           <div class="cont">
             <DataTable {headers} {rows} pageSize={pagination.pageSize} page={pagination.page} size="short" class="last">
-              <span slot="cell" let:cell let:row>
+              <span slot="cell" let:cell let:row let:rowIndex>
                 {#if (cell.key === 'overflow') && (row.id !== 'first')}
-                  <OverflowMenu>
+                  <OverflowMenu direction={rowIndex < (pagination.pageSize / 2) ? "bottom" : "top"}>
                     <OverflowMenuItem text="Details" disabled={!isRoute('/details')} on:click={(e) => details(e, row)} />
                   </OverflowMenu>
                 {:else}

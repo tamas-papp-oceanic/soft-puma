@@ -26,7 +26,7 @@
     { key: 'pgn', value: 'PGN', sort: false },
     { key: 'instance', value: 'Instance', display: (item) => item != null ? item : '-', sort: false },
     { key: 'fluidtype', value: 'Fluid', display: (item) => item != null ? getFlu(item) : '-', sort: false },
-    { key: 'title', value: 'Title', sort: false, width: '55%' },
+    { key: 'title', value: 'Title', sort: false, width: '50%' },
   );
   const header2 = new Array(
     { key: 'field', value: 'Field', sort: false },

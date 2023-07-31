@@ -1,6 +1,8 @@
 import { writable, get } from 'svelte/store';
+import { defValue } from '../helpers/unit.js';
 
 const qlimit = 1024;
+const unitconv = false;
 
 export const devices = writable(new Array());
 export const device = writable(null);
@@ -218,6 +220,15 @@ window.pumaAPI.recv('n2k-data', (e, args) => {
   if (typeof msg.key !== 'undefined') {
     let key = msg.key;
     delete msg.key;
+    if (unitconv) {
+      for (let i in msg.fields) {
+        if (msg.fields[i].unit !== null) {
+          let val = defValue({ value: msg.fields[i].value, unit: msg.fields[i].unit});
+          msg.fields[i].value = val.value;
+          msg.fields[i].unit = val.unit;
+        }
+      }
+    }
     let dat = get(data);
     if (typeof dat[dev] === 'undefined') {
       dat[dev] = {};
