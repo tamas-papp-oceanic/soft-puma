@@ -55,10 +55,12 @@
     for (let i in rec.fields) {
       rec.fields[i] = Object.assign(
         { id: parseInt(i) }, rec.fields[i], {
+          simulation: null,
           static: false,
           limits: minmax(rec.fields[i]),
           ranges: null,
           chrnum: null,
+          rate: null,
         },
       );
       let fld = rec.fields[i];
@@ -68,10 +70,10 @@
         rec.fields[i].static = null;
       } else {
         if (fld['type'] != null) {
-          if (typeof fld.instance !== 'undefined') {
+          if ((typeof fld.instance !== 'undefined') && (typeof rec.instance !== 'undefined')) {
             rec.fields[i].value = rec.instance;
             rec.fields[i].static = null;
-          } else if (typeof fld.fluid !== 'undefined') {
+          } else if ((typeof fld.fluid !== 'undefined') && (typeof rec.fluid !== 'undefined')) {
             rec.fields[i].value = rec.fluidtype;
             rec.fields[i].static = null;
           } else if (fld['type'].startsWith('int') || fld['type'].startsWith('uint')) {
@@ -79,12 +81,13 @@
           } else if (fld['type'].startsWith('float')) {
             rec.fields[i].value = 0.0;
           } else if (fld['type'].startsWith('bit(')) {
-            rec.fields[i].value = 0;
             if (fld.dictionary == 'DD001') {
               rec.fields[i].value = fld.limits.max;
               rec.disabledIds.push(parseInt(i))
+              rec.fields[i].static = null;
+            } else {
+              rec.fields[i].value = 0;
             }
-            rec.fields[i].static = null;
           } else if (fld['type'].startsWith('chr(')) {
             rec.fields[i].value = '';
             let num = parseInt(fld['type'].replace('chr(', '').replace(')', ''));
@@ -329,15 +332,17 @@
                   dif = 1;
                 }
               }
-              switch (simulator.simulation) {
+              let sim = (fld.simulation !== null) ? fld.simulation : simulator.simulation;
+              let rat = (fld.rate !== null) ? fld.rate : simulator.rate;
+              switch (sim) {
               case 0:
-                val = nextIncremetal(fld, simulator.rate);
+                val = nextIncremetal(fld, rat);
                 break;
               case 1:
-                val = nextDecremetal(fld, simulator.rate);
+                val = nextDecremetal(fld, rat);
                 break;
               case 2:
-                val = nextNatural(fld, simulator.rate);
+                val = nextNatural(fld, rat);
                 break;
               case 3:
                 val = nextRandom(fld);
