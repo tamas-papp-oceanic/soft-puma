@@ -61,6 +61,7 @@
   let selection2 = null;
   let ranges = false;
   let custom = false;
+  let repeat = false;
 
   function getFlu(id) {
     for (let i in fluts) {
@@ -310,10 +311,14 @@
   };
 
   function setData(val) {
+    repeat = false;
     let arr = new Array();
     if (val != null) {
       let dat = JSON.parse(JSON.stringify(val.table));
       for (let i in dat) {
+        if (dat[i].interval != null) {
+          repeat = true;
+        }
         arr.push(dat[i]);
       }
     }
@@ -402,7 +407,7 @@
             </Row>
             {#if selection1 != null}
               <Row style="height: 1rem;"><Column>&nbsp;</Column></Row>
-              <Row style="max-height: 66%;">
+              <Row style="min-height: 33%; max-height: 66%;">
                 <Column style="height: 100%; display:flex; flex-flow: column nowrap; align-items: flex-start; justify-content: flex-start;">
                   <Tile class="head">
                     <h4 class="title">Message fields.</h4>
@@ -458,7 +463,7 @@
                 </Column>
               </Row>
               {#if !running && (selection2 != null)}
-                <Row>
+                <Row style="max-height: 33%;">
                   <Column style="height: 100%;">
                     <Grid fullWidth noGutter>
                       <Row>
@@ -630,7 +635,7 @@
                   <Column>
                     <div class="buttons">
                       <Button disabled={(selectedIds1.length == 0) || running} iconDescription="Send message" icon={Send} on:click={send} />
-                      <Button disabled={(rows1.length == 0) || running} iconDescription="Start simulation" icon={Start} on:click={simStart} />
+                      <Button disabled={(rows1.length == 0) || running || !repeat} iconDescription="Start simulation" icon={Start} on:click={simStart} />
                       <Button disabled={!running}  iconDescription="Stop simulation" icon={Pause} on:click={simStop} />
                     </div>
                   </Column>
