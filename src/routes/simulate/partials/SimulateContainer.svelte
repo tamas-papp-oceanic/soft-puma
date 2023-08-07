@@ -75,7 +75,7 @@
     selection1 = e.detail.row;
     selectedIds2 = new Array();
     selection2 = null;
-    scroll1();
+    scroll1(150);
   };
 
   function rowSel2(e) {
@@ -83,11 +83,11 @@
     ranges = selection2.ranges !== null;
     custom = ((selection2.simulation !== null) && (selection2.simulation !== data.simulation)) ||
       ((selection2.rate !== null) &&(selection2.rate !== data.rate));
-    scroll1();
-    scroll2();
+    scroll1(250);
+    scroll2(150);
     setTimeout(() => {
       document.getElementById('input').focus();
-    }, 100);
+    }, 200);
   };
 
   function check2(e) {
@@ -282,10 +282,12 @@
   function simStart(e) {
     selectedIds2 = new Array();
     selection2 = null;
+    scroll1(150);
     dispatch("simstart");
   };      
   
   function simStop(e) {
+    scroll1(150);
     dispatch("simstop");
   };  
 
@@ -340,11 +342,11 @@
     }
   }
 
-  function scroll1() {
+  function scroll1(dly) {
     setTimeout(() => {
       let elm = document.querySelector('.simtab tr.bx--data-table--selected');
       elm.scrollIntoView({ behavior: "smooth", block: "nearest" });
-    }, 150);
+    }, dly);
   }
 
   function clrSel1(val) {
@@ -354,11 +356,11 @@
     }
   }
 
-  function scroll2() {
+  function scroll2(dly) {
     setTimeout(() => {
       let elm = document.querySelector('.tabfld tr.bx--data-table--selected');
-      elm[val.id + 1].scrollIntoView({ behavior: "smooth", block: "nearest" });
-    }, 150);
+      elm.scrollIntoView({ behavior: "smooth", block: "nearest" });
+    }, dly);
   }
 
   for (let i = 0; i < 253; i++) {
@@ -399,7 +401,8 @@
               </Column>
             </Row>
             {#if selection1 != null}
-              <Row style="min-height: 33%; max-height: 66%;">
+              <Row style="height: 1rem;"><Column>&nbsp;</Column></Row>
+              <Row style="max-height: 66%;">
                 <Column style="height: 100%; display:flex; flex-flow: column nowrap; align-items: flex-start; justify-content: flex-start;">
                   <Tile class="head">
                     <h4 class="title">Message fields.</h4>
@@ -455,12 +458,12 @@
                 </Column>
               </Row>
               {#if !running && (selection2 != null)}
-                <Row style="max-height: 33%;">
+                <Row>
                   <Column style="height: 100%;">
                     <Grid fullWidth noGutter>
                       <Row>
                         <Column>
-                          <Row style="height: 0.5rem;"></Row>
+                          <Row style="height: 0.5rem;"><Column>&nbsp;</Column></Row>
                           <Row style="display:flex; flex-flow: row nowrap; align-items: center; justify-content: flex-start;">
                             <Column sm={4} md={4} lg={4}>
                               {#if typeof selection2.fluid !== 'undefined'}
@@ -529,7 +532,7 @@
                                 on:input={input4} />
                             </Column>
                           </Row>
-                          <Row style="height: 0.5rem;"></Row>
+                          <Row style="height: 0.5rem;"><Column>&nbsp;</Column></Row>
                           <Row style="display:flex; flex-flow: row nowrap; align-items: center; justify-content: flex-start;">
                             <Column sm={4} md={4} lg={4}>&nbsp;</Column>
                             <Column sm={1} md={1} lg={1}>&nbsp;</Column>
