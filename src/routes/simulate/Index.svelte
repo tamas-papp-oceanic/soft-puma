@@ -384,10 +384,6 @@
     window.pumaAPI.send('sim-data', [$device, msg]);
   };
     
-  function setSim(e) {
-    simulator.simulation = e.detail.selectedId;
-  };
-
   function send(e) {
     for (let i in simulator.table) {
       if (JSON.stringify(simulator.table[i]) === JSON.stringify(e.detail)) {
@@ -452,7 +448,6 @@
               on:clrtab={clrTab}
               on:capstart={capStart}
               on:capstop={capStop}
-              on:setsim={setSim}
               on:send={send}
               on:simstart={simStart}
               on:simstop={simStop}

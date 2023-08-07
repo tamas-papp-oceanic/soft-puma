@@ -60,7 +60,7 @@
   let selection1 = null;
   let selection2 = null;
   let ranges = false;
-  let simulation = 0;
+  let custom = false;
 
   function getFlu(id) {
     for (let i in fluts) {
@@ -71,24 +71,20 @@
     return '-';
   };
 
-  function getSim(id) {
-    for (let i in sims) {
-      if (sims[i].id == id) {
-        return sims[i].text;
-      }
-    }
-    return '-';
-  };
-
   function rowSel1(e) {
     selection1 = e.detail.row;
     selectedIds2 = new Array();
     selection2 = null;
+    scroll1();
   };
 
   function rowSel2(e) {
     selection2 = e.detail.row;
     ranges = selection2.ranges !== null;
+    custom = ((selection2.simulation !== null) && (selection2.simulation !== data.simulation)) ||
+      ((selection2.rate !== null) &&(selection2.rate !== data.rate));
+    scroll1();
+    scroll2();
     setTimeout(() => {
       document.getElementById('input').focus();
     }, 100);
@@ -201,11 +197,27 @@
     }
   };
 
-  function setSim2(e) {
+  function check3(e) {
+    for (let i in  data.table) {
+      if (data.table[i].id == selection1.id) {
+        if (e.detail) {
+          data.table[i].fields[selection2.id].simulation = data.simulation;
+          data.table[i].fields[selection2.id].rate = data.rate;
+        } else {
+          data.table[i].fields[selection2.id].simulation = null;
+          data.table[i].fields[selection2.id].rate = null;
+        }
+        data = data;
+        break;
+      }
+    }
+  }
+
+  function setSim(e) {
     if (e.detail != null) {
       for (let i in  data.table) {
         if (data.table[i].id == selection1.id) {
-          data.table[i].fields[selection2.id].simulation = (e.detail.selectedId !== simulation) ? e.detail.selectedId : null;
+          data.table[i].fields[selection2.id].simulation = (e.detail.selectedId !== data.simulation) ? e.detail.selectedId : null;
           break;
         }
       }
@@ -263,10 +275,6 @@
     dispatch("capstop");
   };
 
-  function setSim(e) {
-    dispatch("setsim", e.detail);
-  };
-
   function send(e) {
     dispatch("send", selection1);
   };
@@ -302,7 +310,6 @@
   function setData(val) {
     let arr = new Array();
     if (val != null) {
-      simulation = val.simulation != null ? val.simulation : 0;
       let dat = JSON.parse(JSON.stringify(val.table));
       for (let i in dat) {
         arr.push(dat[i]);
@@ -333,21 +340,11 @@
     }
   }
 
-  function divSet(val) {
-    let div = document.querySelector('.tabdiv');
-    if (div !== null) {
-      if (val === null) {
-        div.style.height = "100%";
-      } else {
-        div.style.height = "75%"
-      }
-      if (val !== null) {
-        setTimeout(() => {
-          let elm = document.querySelectorAll('.tabfld tr');
-          elm[val.id + 1].scrollIntoView({ behavior: "smooth", block: "nearest" });
-        }, 150);
-      }
-    }
+  function scroll1() {
+    setTimeout(() => {
+      let elm = document.querySelector('.simtab tr.bx--data-table--selected');
+      elm.scrollIntoView({ behavior: "smooth", block: "nearest" });
+    }, 150);
   }
 
   function clrSel1(val) {
@@ -357,6 +354,13 @@
     }
   }
 
+  function scroll2() {
+    setTimeout(() => {
+      let elm = document.querySelector('.tabfld tr.bx--data-table--selected');
+      elm[val.id + 1].scrollIntoView({ behavior: "smooth", block: "nearest" });
+    }, 150);
+  }
+
   for (let i = 0; i < 253; i++) {
     insts.push({ id: i, text: i.toString() });
   }
@@ -364,8 +368,6 @@
   $: data, setData(data);
   $: data, filter();
   $: selection1, filter();
-  // $: selection2, divSet(selection2);
-  // $: running, divSet(running ? null : selection2);
   $: success, clrSel1(success);
 </script>
 
@@ -374,28 +376,26 @@
     <div class="tilecont">
       <Grid fullWidth noGutter>
         <Row style="height: inherit;">
-          <Column sm={13} md={13} lg={13} style="height: 100%; display:flex; flex-flow: column nowrap; align-items: flex-start; justify-content: flex-start;">
+          <Column sm={13} md={13} lg={13} style="height: 100%; display:flex; flex-flow: column nowrap; align-items: flex-start; justify-content: space-between;">
             <Row style="min-height: 33%; max-height: 100%;">
               <Column style="height: 100%; display:flex; flex-flow: column nowrap; align-items: flex-start; justify-content: flex-start;">
-                <div class="seldiv">
-                  <Tile class="head">
-                    <h4 class="title">NMEA2000 message(s) as part of simulation.</h4>
-                    <p class="descr">(select message for setting field values)</p>
-                  </Tile>
-                  {#if loading}
-                    <DataTableSkeleton showHeader={false} showToolbar={false} headers={header1} size="compact" rows={20} />
-                  {:else}
-                    <DataTable
-                      class="simtab"
-                      size="compact"
-                      radio
-                      bind:selectedRowIds={selectedIds1}
-                      headers={header1}
-                      rows={rows1}
-                      on:click:row--select={rowSel1}>
-                    </DataTable>
-                  {/if}
-                </div>
+                <Tile class="head">
+                  <h4 class="title">NMEA2000 message(s) as part of simulation.</h4>
+                  <p class="descr">(select message for setting field values)</p>
+                </Tile>
+                {#if loading}
+                  <DataTableSkeleton showHeader={false} showToolbar={false} headers={header1} size="compact" rows={20} />
+                {:else}
+                  <DataTable
+                    class="simtab"
+                    size="compact"
+                    radio
+                    bind:selectedRowIds={selectedIds1}
+                    headers={header1}
+                    rows={rows1}
+                    on:click:row--select={rowSel1}>
+                  </DataTable>
+                {/if}
               </Column>
             </Row>
             {#if selection1 != null}
@@ -439,7 +439,7 @@
                             {"-"}
                           {/if}
                         {:else if cell.key === "simulation"}
-                          {getSim(row.simulation)}
+                          {((row.simulation !== null) && (row.simulation !== data.simulation)) || ((row.rate !== null) &&(row.rate !== data.rate)) ? "Custom" : "-"}
                         {:else if cell.key === "static"}
                           {#if row.static != null}
                             <Checkbox labelText="Static" hideLabel checked={row.static} on:check={(e) => setSta(e, rowIndex)} />
@@ -457,108 +457,114 @@
               {#if !running && (selection2 != null)}
                 <Row style="max-height: 33%;">
                   <Column style="height: 100%;">
-                    <div class="detdiv">
-                      <Grid fullWidth noGutter>
-                        <Row>
-                          <Column>
-                            <Row style="height: 0.5rem;"></Row>
-                            <Row style="display:flex; flex-flow: row nowrap; align-items: center; justify-content: flex-start;">
-                              <Column sm={4} md={4} lg={4}>
-                                {#if typeof selection2.fluid !== 'undefined'}
-                                  <Dropdown
-                                    id="input"
-                                    size="sm"
-                                    direction="top"
-                                    titleText={selection2.title}
-                                    selectedId={selection2.value}
-                                    items={fluts}
-                                    on:select={input0} />
-                                {:else if selection2['type'].startsWith('int') || selection2['type'].startsWith('uint') ||
-                                  selection2['type'].startsWith('float') || selection2['type'].startsWith('bit(')}
-                                  <NumberInput
-                                    id="input"
-                                    min={getlim(selection2, 'min')}
-                                    max={getlim(selection2, 'max')}
-                                    step={
-                                      (typeof selection2.multiplier !== 'undefined') && (selection2.multiplier < 1) ?
-                                      selection2.multiplier : 1
-                                    }
-                                    label={selection2.title}
-                                    invalidText={"Number must be between " + getlim(selection2, 'min') + " and " + getlim(selection2, 'max')}
-                                    value={selection2.value}
-                                    on:input={input1} />
-                                {:else if selection2['type'].startsWith('chr(') || selection2['type'].startsWith('str')}
-                                  <TextInput
-                                    id="input"
-                                    disabled={running}
-                                    labelText={selection2.title}
-                                    invalidText={"Text length must be between 0 and " + selection2.chrnum}
-                                    value={selection2.value}
-                                    on:input={input2} />
-                                {/if}
-                              </Column>
-                              <Column sm={4} md={4} lg={4}>
-                                <Checkbox disabled={running} labelText="Custom ranges" bind:checked={ranges} on:check={check2} />
-                              </Column>
-                              <Column sm={4} md={4} lg={4}>
-                                <NumberInput
-                                  id="min"
-                                  allowEmpty
-                                  min={getlim(selection2, 'min')}
-                                  max={getlim(selection2, 'max')}
-                                  disabled={!ranges}
-                                  label="Minimum"
-                                  invalidText={"Number must be between " + getlim(selection2, 'min') + " and " + getlim(selection2, 'max')}
-                                  value={getrng(selection2, 'min')}
-                                  on:input={input3} />
-                              </Column>
-                              <Column sm={4} md={4} lg={4}>
-                                <NumberInput
-                                  id="max"
-                                  allowEmpty
-                                  min={getrng(selection2, 'min') !== null ? getrng(selection2, 'min') : getlim(selection2, 'min')}
-                                  max={getlim(selection2, 'max')}
-                                  disabled={!ranges}
-                                  label="Maximum"
-                                  invalidText={
-                                    "Number must be between " +
-                                    getrng(selection2, 'min') !== null ? getrng(selection2, 'min') : getlim(selection2, 'min') +
-                                    " and " +
-                                    getlim(selection2, 'max')}
-                                  value={getrng(selection2, 'max')}
-                                  on:input={input4} />
-                              </Column>
-                            </Row>
-                            <Row style="height: 0.5rem;"></Row>
-                            <Row style="display:flex; flex-flow: row nowrap; align-items: center; justify-content: flex-start;">
-                              <Column sm={4} md={4} lg={4}>
+                    <Grid fullWidth noGutter>
+                      <Row>
+                        <Column>
+                          <Row style="height: 0.5rem;"></Row>
+                          <Row style="display:flex; flex-flow: row nowrap; align-items: center; justify-content: flex-start;">
+                            <Column sm={4} md={4} lg={4}>
+                              {#if typeof selection2.fluid !== 'undefined'}
                                 <Dropdown
                                   id="input"
                                   size="sm"
                                   direction="top"
-                                  titleText="Simulation"
-                                  selectedId={selection2.simulation !== null ? selection2.simulation : simulation}
-                                  items={sims}
-                                  on:select={setSim2} />
-                              </Column>
-                              <Column sm={4} md={4} lg={4}>
+                                  titleText={selection2.title}
+                                  selectedId={selection2.value}
+                                  items={fluts}
+                                  on:select={input0} />
+                              {:else if selection2['type'].startsWith('int') || selection2['type'].startsWith('uint') ||
+                                selection2['type'].startsWith('float') || selection2['type'].startsWith('bit(')}
                                 <NumberInput
-                                  id="rate2"
-                                  allowEmpty
-                                  min={0.1}
-                                  max={5.0}
-                                  step={0.1}
-                                  label="Rate of change (%)"
-                                  invalidText={"Number must be between 0.1% and 50%"}
-                                  disabled={selection2.simulation === 3}
-                                  value={selection2.rate !== null ? selection2.rate : data.rate}
-                                  on:input={setRate} />
-                              </Column>
-                            </Row>
-                          </Column>
-                        </Row>
-                      </Grid>
-                    </div>
+                                  id="input"
+                                  min={getlim(selection2, 'min')}
+                                  max={getlim(selection2, 'max')}
+                                  step={
+                                    (typeof selection2.multiplier !== 'undefined') && (selection2.multiplier < 1) ?
+                                    selection2.multiplier : 1
+                                  }
+                                  label={selection2.title}
+                                  invalidText={"Number must be between " + getlim(selection2, 'min') + " and " + getlim(selection2, 'max')}
+                                  value={selection2.value}
+                                  on:input={input1} />
+                              {:else if selection2['type'].startsWith('chr(') || selection2['type'].startsWith('str')}
+                                <TextInput
+                                  id="input"
+                                  disabled={running}
+                                  labelText={selection2.title}
+                                  invalidText={"Text length must be between 0 and " + selection2.chrnum}
+                                  value={selection2.value}
+                                  on:input={input2} />
+                              {/if}
+                            </Column>
+                            <Column sm={1} md={1} lg={1}>&nbsp;</Column>
+                            <Column sm={4} md={4} lg={4}>
+                              <Checkbox disabled={running} labelText="Custom ranges" bind:checked={ranges} on:check={check2} />
+                            </Column>
+                            <Column sm={4} md={4} lg={4}>
+                              <NumberInput
+                                id="min"
+                                allowEmpty
+                                min={getlim(selection2, 'min')}
+                                max={getlim(selection2, 'max')}
+                                disabled={!ranges}
+                                label="Minimum"
+                                invalidText={"Number must be between " + getlim(selection2, 'min') + " and " + getlim(selection2, 'max')}
+                                value={getrng(selection2, 'min')}
+                                on:input={input3} />
+                            </Column>
+                            <Column sm={4} md={4} lg={4}>
+                              <NumberInput
+                                id="max"
+                                allowEmpty
+                                min={getrng(selection2, 'min') !== null ? getrng(selection2, 'min') : getlim(selection2, 'min')}
+                                max={getlim(selection2, 'max')}
+                                disabled={!ranges}
+                                label="Maximum"
+                                invalidText={
+                                  "Number must be between " +
+                                  getrng(selection2, 'min') !== null ? getrng(selection2, 'min') : getlim(selection2, 'min') +
+                                  " and " +
+                                  getlim(selection2, 'max')}
+                                value={getrng(selection2, 'max')}
+                                on:input={input4} />
+                            </Column>
+                          </Row>
+                          <Row style="height: 0.5rem;"></Row>
+                          <Row style="display:flex; flex-flow: row nowrap; align-items: center; justify-content: flex-start;">
+                            <Column sm={4} md={4} lg={4}>&nbsp;</Column>
+                            <Column sm={1} md={1} lg={1}>&nbsp;</Column>
+                            <Column sm={4} md={4} lg={4}>
+                              <Checkbox disabled={running} labelText="Custom simulation" bind:checked={custom} on:check={check3} />
+                            </Column>
+                            <Column sm={4} md={4} lg={4}>
+                              <Dropdown
+                                id="simulation"
+                                allowEmpty
+                                size="sm"
+                                direction="top"
+                                disabled={!custom}
+                                titleText="Simulation"
+                                selectedId={selection2.simulation !== null ? selection2.simulation : data.simulation}
+                                items={sims}
+                                on:select={setSim} />
+                            </Column>
+                            <Column sm={4} md={4} lg={4}>
+                              <NumberInput
+                                id="rate2"
+                                allowEmpty
+                                min={0.1}
+                                max={5.0}
+                                step={0.1}
+                                disabled={!custom}
+                                label="Rate of change (%)"
+                                invalidText={"Number must be between 0.1% and 50%"}
+                                value={selection2.rate !== null ? selection2.rate : data.rate}
+                                on:input={setRate} />
+                            </Column>
+                          </Row>
+                        </Column>
+                      </Row>
+                    </Grid>
                   </Column>
                 </Row>
               {/if}
@@ -592,23 +598,28 @@
                 <Row padding>
                   <Column style="display: flex; flex-flow: column nowrap; justify-content: flex-start;">
                     {#if loading}
-                      <NumberInputSkeleton />
-                      <div style="height: 1rem;"></div>
                       <DropdownSkeleton />
-                    {:else}
-                      <NumberInput
-                        id="rate"
-                        allowEmpty
-                        min={0.1}
-                        max={5.0}
-                        step={0.1}
-                        label="Rate of change (%)"
-                        invalidText={"Number must be between 0.1% and 50%"}
-                        disabled={simulation === 3}
-                        value={data.rate}
-                        on:input={input5} />
                       <div style="height: 1rem;"></div>
-                      <Dropdown titleText="Simulation mode" size="sm" bind:selectedId={simulation} items={sims} on:select={setSim} />
+                      <NumberInputSkeleton />
+                    {:else}
+                    <Dropdown
+                      size="sm"
+                      titleText="Simulation mode"
+                      disabled={(rows1.length === 0)}
+                      bind:selectedId={data.simulation}
+                      items={sims} />
+                    <div style="height: 1rem;"></div>
+                    <NumberInput
+                      id="rate"
+                      allowEmpty
+                      min={0.1}
+                      max={5.0}
+                      step={0.1}
+                      label="Rate of change (%)"
+                      invalidText={"Number must be between 0.1% and 50%"}
+                      disabled={(rows1.length === 0) || (data.simulation === 3)}
+                      value={data.rate}
+                      on:input={input5} />
                     {/if}
                   </Column>
                 </Row>
@@ -685,7 +696,7 @@
   .simtab th:first-child,
   .simtab td:first-child {
     width: 3rem;
-  }Pause
+  }
   .simtab th:nth-child(3),
   .simtab td:nth-child(3) {
     text-align: center;
@@ -697,9 +708,6 @@
   }
   .simtab .bx--form-item.bx--checkbox-wrapper {
     align-items: center;
-  }
-  .seldiv, .tabdiv {
-    height: 100%;
   }
   .tabfld {
     max-height: calc(100% - 3.5rem);
@@ -743,11 +751,4 @@
   .simcont input[type="number"] {
     padding-right: 5.5rem;
   }
-  .simcont .detdiv .field {
-    padding-right: 1rem;
-  }
-  .simcont .detdiv .field.disabled {
-    color: #525252;
-  }
-
 </style>
