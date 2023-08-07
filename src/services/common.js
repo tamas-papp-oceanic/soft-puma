@@ -186,7 +186,9 @@ function calcLength(typ, val) {
 // Returns with field status
 function getStatus(typ, val) {
   let sts = 'V';
-  if (typ.startsWith('int')) {
+  if (typ == null) {
+    sts = 'E';
+  } else if (typ.startsWith('int')) {
     let bit = parseInt(typ.replace('int', ''));
     if (BigInt(val) == (2n ** BigInt(bit - 1)) - 1n) {
       sts = '-';

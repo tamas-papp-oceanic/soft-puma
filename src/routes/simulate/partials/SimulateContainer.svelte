@@ -76,7 +76,7 @@
     selection1 = e.detail.row;
     selectedIds2 = new Array();
     selection2 = null;
-    scroll1(150);
+    scroll1(250);
   };
 
   function rowSel2(e) {
@@ -84,11 +84,11 @@
     ranges = selection2.ranges !== null;
     custom = ((selection2.simulation !== null) && (selection2.simulation !== data.simulation)) ||
       ((selection2.rate !== null) &&(selection2.rate !== data.rate));
-    scroll1(250);
-    scroll2(150);
+    scroll1(500);
+    scroll2(250);
     setTimeout(() => {
       document.getElementById('input').focus();
-    }, 200);
+    }, 100);
   };
 
   function check2(e) {
@@ -283,12 +283,12 @@
   function simStart(e) {
     selectedIds2 = new Array();
     selection2 = null;
-    scroll1(150);
+    scroll1(250);
     dispatch("simstart");
   };      
   
   function simStop(e) {
-    scroll1(150);
+    scroll1(250);
     dispatch("simstop");
   };  
 

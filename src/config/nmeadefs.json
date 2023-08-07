@@ -3354,7 +3354,7 @@
       {
         "field": 4,
         "title": "Status",
-        "type": "bit(16)",
+        "type": "bit(13)",
         "unit": null,
         "multiplier": null,
         "dictionary": null
@@ -5129,7 +5129,7 @@
       {
         "field": 5,
         "title": "NMEA Reserved",
-        "type": "bit(16)",
+        "type": "bit(8)",
         "unit": null,
         "multiplier": null,
         "dictionary": "DD001"

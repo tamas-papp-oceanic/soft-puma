@@ -37,12 +37,15 @@ function encode(msg) {
       let fld = def.fields[i];
       let mfl = com.getFld(fld.field, msg.fields);
       let len = null;
-      if ((fld.type == 'chr(x)') || (fld.type == 'str')) {
-        len = com.calcLength(fld.type, mfl != null ? mfl.value.length : 0);
-      } else if (fld.type.startsWith('chr(') && (typeof mfl.value.type !== 'undefined') && (mfl.value.type == 'Buffer'))  {
-        len = com.calcLength(fld.type, mfl != null ? mfl.value.data.length : 0);
-      } else {
-        len = com.calcLength(fld.type);
+      if (fld.type !== null) {
+        if ((fld.type == 'chr(x)') || (fld.type == 'str')) {
+          len = com.calcLength(fld.type, mfl != null ? mfl.value.length : 0);
+        } else if (fld.type.startsWith('chr(') && (typeof mfl.value.type !== 'undefined') &&
+          (mfl.value.type == 'Buffer')) {
+          len = com.calcLength(fld.type, mfl != null ? mfl.value.data.length : 0);
+        } else {
+          len = com.calcLength(fld.type);
+        }
       }
       if (len != null) {
         ptr += len;
@@ -58,12 +61,14 @@ function encode(msg) {
       }
       let byt = Math.floor(ptr / 8);
       let len = null;
-      if ((fld.type == 'chr(x)') || (fld.type == 'str')) {
-        len = com.calcLength(fld.type, mfl != null ? mfl.value.length : 0);
-      } else if (fld.type.startsWith('chr(') && (typeof mfl.value.type !== 'undefined') && (mfl.value.type == 'Buffer'))  {
-        len = com.calcLength(fld.type, mfl != null ? mfl.value.data.length : 0);
-      } else {
-        len = com.calcLength(fld.type);
+      if (fld.type !== null) {
+        if ((fld.type == 'chr(x)') || (fld.type == 'str')) {
+          len = com.calcLength(fld.type, mfl != null ? mfl.value.length : 0);
+        } else if (fld.type.startsWith('chr(') && (typeof mfl.value.type !== 'undefined') && (mfl.value.type == 'Buffer'))  {
+          len = com.calcLength(fld.type, mfl != null ? mfl.value.data.length : 0);
+        } else {
+          len = com.calcLength(fld.type);
+        }
       }
       if ((len != null) && (len > 0)) {
         if (fld.type.startsWith('bit(')) {
@@ -142,10 +147,10 @@ function encode(msg) {
               raw.writeUIntLE(Math.round(mfl.value), byt, 6);
               break;
             case "int64":
-              raw.writeBigInt64LE(Math.round(mfl.value), byt);
+              raw.writeBigInt64LE(BigInt(Math.round(mfl.value)), byt);
               break;
             case "uint64":
-              raw.writeBigUInt64LE(Math.round(mfl.value), byt);
+              raw.writeBigUInt64LE(BigInt(Math.round(mfl.value)), byt);
               break;
             case "float64":
               raw.writeDoubleLE(mfl.value, byt);

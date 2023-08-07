@@ -68,10 +68,12 @@ function decode(frm, din) {
       let fld = def.fields[i];
       let byt = Math.floor(ptr / 8);
       let len = null;
-      if ((fld.type == 'chr(x)') || (fld.type == 'str')) {
-        len = com.calcLength(fld.type, frm.data.readUInt8(byt));
-      } else {
-        len = com.calcLength(fld.type);
+      if (fld.type !== null) {
+        if ((fld.type == 'chr(x)') || (fld.type == 'str')) {
+          len = com.calcLength(fld.type, frm.data.readUInt8(byt));
+        } else {
+          len = com.calcLength(fld.type);
+        }
       }
       if ((len != null) && (len > 0) && (frm.data.length >= (byt + Math.ceil(len / 8)))) {
         fld.state = 'V';
