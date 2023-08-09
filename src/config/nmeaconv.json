@@ -4,7 +4,7 @@
     "field": 0
   },
   "nmea2000/065289": {
-    "function": 3,
+    "function": 5,
     "field": 5
   },
   "nmea2000/126208": {
@@ -20,7 +20,7 @@
     "field": 3
   },
   "nmea2000/130825": {
-    "function": 3,
+    "function": 5,
     "field": 5
   },
   "nmea2000/131011": {

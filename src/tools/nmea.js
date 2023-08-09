@@ -87,6 +87,7 @@ function create() {
         }
         let dic = null;
         switch (fld.dictionary) {
+        case "DD000":
         case "DD001":
         case "DD002":
         case "DD003":

@@ -52,7 +52,32 @@
   function prepFields(rec, key) {
     let spl = splitKey(key);
     let pgn = parseInt(spl.pgn);
+    if (typeof rec.repeat !== 'undefined') {
+      let tmp = JSON.parse(JSON.stringify(rec.fields));
+      rec.fields = new Array();
+      for (let i in tmp) {
+        let skip = false;
+        for (let j in rec.repeat) {
+          if (((typeof tmp[i].dictionary !== 'undefined') && (tmp[i].dictionary === 'DD000')) || 
+            // (tmp[i].field == rec.repeat[j].field) ||
+            ((tmp[i].field >= rec.repeat[j].start) && (tmp[i].field < rec.repeat[j].start + rec.repeat[j].count)) ) {
+            skip = true;
+          }
+        }
+        if (!skip) {
+          rec.fields.push(tmp[i]);
+        }
+      }
+    }
+
+
     for (let i in rec.fields) {
+      if (typeof rec.repeat !== 'undefined') {
+        if ((rec.fields[i].field == rec.repeat.field) ||
+          ((rec.fields[i].field >= rec.repeat.start) && (rec.fields[i].field < rec.repeat.start + rec.repeat.count))) {
+          continue;
+        }
+      }
       rec.fields[i] = Object.assign(
         { id: parseInt(i) }, rec.fields[i], {
           simulation: null,
@@ -116,6 +141,9 @@
       rec.fields[nmeaconv[cnv].field].value = parseInt(spl.function);
       rec.disabledIds.push(nmeaconv[cnv].field);
       rec.fields[nmeaconv[cnv].field].static = null;
+    }
+    if (typeof rec.repeat !== 'undefined') {
+      console.log(rec)
     }
     return rec;
   };
