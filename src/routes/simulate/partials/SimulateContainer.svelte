@@ -477,11 +477,11 @@
                 <Row style="max-height: 33%;">
                   <Column style="height: 100%;">
                     <Grid fullWidth noGutter>
+                      <Row style="height: 0.5rem;"><Column>&nbsp;</Column></Row>
                       <Row>
-                        <Column>
-                          <Row style="height: 0.5rem;"><Column>&nbsp;</Column></Row>
+                        <Column sm={6} md={6} lg={6}>
                           <Row style="display:flex; flex-flow: row nowrap; align-items: center; justify-content: flex-start;">
-                            <Column sm={5} md={5} lg={5}>
+                            <Column>
                               {#if typeof selection2.fluid !== 'undefined'}
                                 <Dropdown
                                   id="input"
@@ -524,11 +524,16 @@
                                   on:input={input2} />
                               {/if}
                             </Column>
-                            <Column sm={1} md={1} lg={1}>&nbsp;</Column>
-                            <Column sm={4} md={4} lg={4}>
+                          </Row>
+                        </Column>
+                        <Column sm={10} md={10} lg={10}>
+                          <!-- <Row style="height: 0.5rem;"><Column>&nbsp;</Column></Row> -->
+                          <Row style="display:flex; flex-flow: row nowrap; align-items: center; justify-content: flex-start;">
+                          <!-- <Column sm={1} md={1} lg={1}>&nbsp;</Column> -->
+                            <Column sm={6} md={6} lg={6}>
                               <Checkbox disabled={running} labelText="Custom ranges" bind:checked={ranges} on:check={check2} />
                             </Column>
-                            <Column sm={4} md={4} lg={4}>
+                            <Column sm={6} md={6} lg={6}>
                               <NumberInput
                                 id="min"
                                 allowEmpty
@@ -540,7 +545,7 @@
                                 value={getrng(selection2, 'min')}
                                 on:input={input3} />
                             </Column>
-                            <Column sm={4} md={4} lg={4}>
+                            <Column sm={6} md={6} lg={6}>
                               <NumberInput
                                 id="max"
                                 allowEmpty
@@ -557,14 +562,14 @@
                                 on:input={input4} />
                             </Column>
                           </Row>
-                          <Row style="height: 0.5rem;"><Column>&nbsp;</Column></Row>
+                          <!-- <Row style="height: 0.5rem;"><Column>&nbsp;</Column></Row> -->
                           <Row style="display:flex; flex-flow: row nowrap; align-items: center; justify-content: flex-start;">
-                            <Column sm={5} md={5} lg={5}>&nbsp;</Column>
-                            <Column sm={1} md={1} lg={1}>&nbsp;</Column>
-                            <Column sm={4} md={4} lg={4}>
+                            <!-- <Column sm={5} md={5} lg={5}>&nbsp;</Column>
+                            <Column sm={1} md={1} lg={1}>&nbsp;</Column> -->
+                            <Column sm={6} md={6} lg={6}>
                               <Checkbox disabled={running} labelText="Custom simulation" bind:checked={custom} on:check={check3} />
                             </Column>
-                            <Column sm={4} md={4} lg={4}>
+                            <Column sm={6} md={6} lg={6}>
                               <Dropdown
                                 id="simulation"
                                 allowEmpty
@@ -576,7 +581,7 @@
                                 items={sims}
                                 on:select={setSim} />
                             </Column>
-                            <Column sm={4} md={4} lg={4}>
+                            <Column sm={6} md={6} lg={6}>
                               <NumberInput
                                 id="rate2"
                                 allowEmpty
