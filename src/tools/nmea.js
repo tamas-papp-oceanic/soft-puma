@@ -85,22 +85,13 @@ function create() {
         if (fld.divider != null) {
           mul = (mul != null ? mul : 1) / fld.divider;
         }
-        let dic = null;
-        switch (fld.dictionary) {
-        case "DD000":
-        case "DD001":
-        case "DD002":
-        case "DD003":
-        case "DD056":
-          dic = fld.dictionary;
-        }
         let tmp = {
           field: fld.field,
           title: fld.description,
           type: typ,
           unit: fld.unit,
           multiplier: mul,
-          dictionary: dic,
+          dictionary: fld.dictionary,
         };
         if (typeof fld.instance !== 'undefined') {
           tmp.instance = true;

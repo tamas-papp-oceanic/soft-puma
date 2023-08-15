@@ -51,11 +51,11 @@
     "Name": "Loran-C station status",
     "Format": "DF52",
     "Bits": 4,
-    "Values": {
-      "1": "Station in use",
-      "2": "Low SNR",
-      "4": "Cycle error",
-      "8": "Blink"
+    "Positions": {
+      "0": "Station in use",
+      "1": "Low SNR",
+      "2": "Cycle error",
+      "3": "Blink"
     }
   },
   "DD037": {
@@ -236,9 +236,9 @@
     "Format": "DF52",
     "Bits": 3,
     "Values": {
-      "0": "time from mark",
-      "2": "time to go to mark",
-      "3": "estimated time of arrival (ETA) at mark"
+      "0": "Time from mark",
+      "2": "Time to go to mark",
+      "3": "Estimated time of arrival (ETA) at mark"
     }
   },
   "DD124": {
@@ -279,11 +279,6 @@
       "2": "Auto Range"
     }
   },
-  "DD128": {
-    "Name": "Generic instance",
-    "Format": "DF52",
-    "Bits": 8
-  },
   "DD139": {
     "Name": "Error codesTransmit interval acknowledgement",
     "Format": "DF52",
@@ -309,15 +304,6 @@
       "5": "Request or Command is not supported",
       "6": "Read or Write is not supported"
     }
-  },
-  "DD142": {
-    "Name": "Binary Bit Field",
-    "Format": "DF52"
-  },
-  "DD143": {
-    "Name": "Satellite Service ID",
-    "Bits": 16,
-    "Format": "DF52"
   },
   "DD144": {
     "Name": "Group Function, Request/Command/Acknowledge",
@@ -351,10 +337,6 @@
       "1": "Move to starboard",
       "2": "Move to port"
     }
-  },
-  "DD148": {
-    "Name": "Angular Limit",
-    "Format": "DF02"
   },
   "DD152": {
     "Name": "Turn Method",
@@ -438,11 +420,6 @@
       "5": "Industrial - Process Control - Stationary (Gen-Sets)"
     }
   },
-  "DD176": {
-    "Name": "Network Address",
-    "Format": "DF52",
-    "Bits": 8
-  },
   "DD177": {
     "Name": "ISO 11783 ACK Status",
     "Format": "DF52",
@@ -524,7 +501,7 @@
     "Format": "DF52",
     "Bits": 6,
     "Values": {
-      "0-59": "UTC second when the report was generated",
+      "0": "UTC second when the report was generated",
       "60": "Time stamp not available",
       "61": "Positioning system is in manual input mode",
       "62": "Electronic position fixing system operates in estimated (dead reckoning) mode",
@@ -577,11 +554,6 @@
       "1": "ITDMA"
     }
   },
-  "DD201": {
-    "Name": "Generic instance 2 (3-bit)",
-    "Format": "DF52",
-    "Bits": 3
-  },
   "DD205": {
     "Name": "Wind Reference",
     "Format": "DF52",
@@ -598,23 +570,23 @@
     "Name": "Engine Discrete Warning Status",
     "Format": "DF52",
     "Bits": 16,
-    "Values": {
-      "1": "Check Engine",
-      "2": "Over Temperature",
-      "4": "Low Oil Pressure",
-      "8": "Low Oil Level",
-      "16": "Low Fuel Pressure",
-      "32": "Low System Voltage",
-      "64": "Low Coolant Level",
-      "128": "Water Flow",
-      "256": "Water in Fuel",
-      "512": "Charge Indicator",
-      "1024": "Preheat Indicator",
-      "2048": "High Boost Pressure",
-      "4096": "Rev Limit Exceeded",
-      "5192": "EGR System",
-      "10384": "Throttle Position Sensor",
-      "20768": "Engine Emergency Stop Mode"
+    "Positions": {
+      "0": "Check Engine",
+      "1": "Over Temperature",
+      "2": "Low Oil Pressure",
+      "3": "Low Oil Level",
+      "4": "Low Fuel Pressure",
+      "5": "Low System Voltage",
+      "6": "Low Coolant Level",
+      "7": "Water Flow",
+      "8": "Water in Fuel",
+      "9": "Charge Indicator",
+      "10": "Preheat Indicator",
+      "11": "High Boost Pressure",
+      "12": "Rev Limit Exceeded",
+      "13": "EGR System",
+      "14": "Throttle Position Sensor",
+      "15": "Engine Emergency Stop Mode"
     }
   },
   "DD207": {
@@ -707,12 +679,12 @@
     "Name": "Transmission Discrete Warning Status",
     "Format": "DF52",
     "Bits": 8,
-    "Values": {
-      "1": "Check Tranmission",
-      "2": "Over Temperature",
-      "4": "Low Oil Pressure",
-      "8": "Low Oil Level",
-      "16": "Sail Drive"
+    "Positions": {
+      "0": "Check Tranmission",
+      "1": "Over Temperature",
+      "2": "Low Oil Pressure",
+      "3": "Low Oil Level",
+      "4": "Sail Drive"
     }
   },
   "DD222": {
@@ -729,15 +701,15 @@
     "Name": "Engine Discrete Warning Status",
     "Format": "DF52",
     "Bits": 16,
-    "Values": {
-      "1": "Warning Level 1",
-      "2": "Warning Level 2",
-      "4": "Power Reduction",
-      "8": "Maintenance Needed",
-      "16": "Engine Comm Error",
-      "32": "Sub or Secondary Throttle",
-      "64": "Neutral Start Protect",
-      "128": "Engine Shutting Down"
+    "Positions": {
+      "0": "Warning Level 1",
+      "1": "Warning Level 2",
+      "2": "Power Reduction",
+      "3": "Maintenance Needed",
+      "4": "Engine Comm Error",
+      "5": "Sub or Secondary Throttle",
+      "6": "Neutral Start Protect",
+      "7": "Engine Shutting Down"
     }
   },
   "DD226": {
@@ -791,12 +763,12 @@
     "Name": "Changed at timestamp flag",
     "Format": "DF52",
     "Bits": 8,
-    "Values": {
-      "0": "No change in data",
-      "1": "WP: Change in main data (Position, Name)",
-      "2": "WP: Change in supplementary parameters (or new added)",
-      "4": "Changed no. of WP's in Route/WP-List, and/or name changed/added",
-      "8": "Route: Change supplementary parameters (or new added)"
+    "Positions": {
+      "0": "WP: Change in main data (Position, Name)",
+      "1": "WP: Change in supplementary parameters (or new added)",
+      "2": "Changed no. of WP's in Route/WP-List, and/or name changed/added",
+      "3": "Route: Change supplementary parameters (or new added)",
+      "6": "Other not specifyed change"
     }
   },
   "DD238": {
@@ -938,10 +910,9 @@
     "Name": "Critical supplementary Route parameters",
     "Format": "DF52",
     "Bits": 8,
-    "Values": {
-      "0": "There are no parameters additional to the Waypoint Positions",
-      "1": "Navigation Method (GC/RL), PGN 130069",
-      "2": "XTE Limit, PGN 130069"
+    "Positions": {
+      "0": "Navigation Method (GC/RL), PGN 130069",
+      "1": "XTE Limit, PGN 130069"
     }
   },
   "DD259": {
@@ -1197,8 +1168,7 @@
       "5": "Filter Pressure",
       "6": "Altimiter Setting",
       "7": "Oil Pressure",
-      "8": "Fuel Pressure",
-      "129-252": "Generic pressure sources other than those defined"
+      "8": "Fuel Pressure"
     }
   },
   "DD291": {
@@ -1340,24 +1310,6 @@
       "11": "2 sec (not applicable to the Class B “CS”)"
     }
   },
-  "DD303": {
-    "Name": "AIS Quiet Time",
-    "Format": "DF52",
-    "Bits": 4,
-    "Values": {
-      "0": "No quiet time commanded",
-      "1-15": "Quiet time of 1 to 15 min"
-    }
-  },
-  "DD304": {
-    "Name": "AIS Version Indicator",
-    "Format": "DF52",
-    "Bits": 2,
-    "Values": {
-      "0": "Station compliant with AIS edition 0",
-      "1-3": "Station compliant with AIS editions 1, 2, and 3"
-    }
-  },
   "DD305": {
     "Name": "AIS Aids to Navigation Type",
     "Format": "DF52",
@@ -1423,11 +1375,6 @@
       "0": "Autonomous and continuous mode",
       "1": "Assigned mode"
     }
-  },
-  "DD309": {
-    "Name": "AtoN Status",
-    "Format": "DF52",
-    "Bits": 8
   },
   "DD310": {
     "Name": "Special Maneuver Indicator",
@@ -1528,15 +1475,19 @@
     "Name": "NAME Selection Criteria Mask",
     "Format": "DF52",
     "Bits": 12,
-    "Values": {
-      "1": "NAME shall match Unique ID field",
-      "2": "NAME shall match Manufacturer Code field",
-      "4": "NAME shall match Device Instance Lower field",
-      "8": "NAME shall match Device Instance Upper field",
-      "16": "NAME shall match Device Function field",
-      "64": "NAME shall match Device Class field",
-      "128": "NAME shall match System Instance field",
-      "256": "NAME shall match Industry Group field"
+    "Positions": {
+      "0": "NAME shall match Unique ID field",
+      "1": "NAME shall match Manufacturer Code field",
+      "2": "NAME shall match Device Instance Lower field",
+      "3": "NAME shall match Device Instance Upper field",
+      "4": "NAME shall match Device Function field",
+      "5": "Reserved",
+      "6": "NAME shall match Device Class field",
+      "7": "NAME shall match System Instance field",
+      "8": "NAME shall match Industry Group field",
+      "9": "Reserved",
+      "10": "Reserved",
+      "11": "Reserved"
     }
   },
   "DD328": {
@@ -1677,17 +1628,17 @@
     "Format": "DF52",
     "Bits": 16,
     "Values": {
-      "1": "SENSED_HIGH-HIGH voltage level detected",
-      "2": "SENSED_LOW- voltage level detected",
-      "4": "SHORT- Current draw Exceeds device capability",
-      "8": "NO_LOAD- When HIGH, No Load detected",
-      "16": "FUSE_FAIL- Blown or removed",
-      "32": "FUSE_DESTRUCT - Fuse was Commanded to destroy",
-      "64": "GFCI_FAULT- Ground fault leakage detected",
-      "128": "OVER_VOLTAGE- Voltage Greater than Over Voltage Value",
-      "256": "OVER_CURRENT- Current Greater than Over Current Value",
-      "512": "UNDER_VOLTAGE- Voltage Less than Under Voltage Value",
-      "1024": "UNDER_CURRENT- Current Less than Under Current Value"
+      "0": "SENSED_HIGH-HIGH voltage level detected",
+      "1": "SENSED_LOW- voltage level detected",
+      "2": "SHORT- Current draw Exceeds device capability",
+      "3": "NO_LOAD- When HIGH, No Load detected",
+      "4": "FUSE_FAIL- Blown or removed",
+      "5": "FUSE_DESTRUCT - Fuse was Commanded to destroy",
+      "6": "GFCI_FAULT- Ground fault leakage detected",
+      "7": "OVER_VOLTAGE- Voltage Greater than Over Voltage Value",
+      "8": "OVER_CURRENT- Current Greater than Over Current Value",
+      "9": "UNDER_VOLTAGE- Voltage Less than Under Voltage Value",
+      "10": "UNDER_CURRENT- Current Less than Under Current Value"
     }
   },
   "DD353": {
@@ -1747,21 +1698,6 @@
       "0": "Forward (Ahead)",
       "1": "Astern (Backward)"
     }
-  },
-  "DD357": {
-    "Name": "Hardware Channel ID",
-    "Format": "DF53",
-    "Bits": 8
-  },
-  "DD358": {
-    "Name": "Secondary Enumeration Field Value",
-    "Format": "DF53",
-    "Bits": 8
-  },
-  "DD359": {
-    "Name": "Data Source Channel ID",
-    "Format": "DF53",
-    "Bits": 8
   },
   "DD360": {
     "Name": "Source Selection Status",
@@ -2133,58 +2069,73 @@
     "Name": "Supported Play Status",
     "Format": "DF52",
     "Bits": 32,
-    "Values": {
-      "1": "Play ( Normal)",
+    "Positons": {
+      "0": "Play ( Normal)",
+      "1": "Pause",
       "2": "Pause",
-      "4": "Pause",
-      "8": "FF (1x)",
-      "16": "FF (2x)",
-      "32": "FF (3x)",
-      "64": "FF (4x)",
-      "128": "RW (1x)",
-      "256": "RW (2x)",
-      "512": "RW (3x)",
-      "1024": "RW (4x)",
-      "2048": "Skip Ahead",
-      "4096": "Skip Back",
-      "8192": "Jog Ahead",
-      "16384": "Jog Back",
-      "32768": "Seek Up",
-      "65563": "Seek Down",
-      "131072": "Scan Up",
-      "262144": "Scan Down",
-      "524288": "Tune Up",
-      "1048576": "Tune Down",
-      "2097152": "Slow Mot. (.75x)",
-      "4194304": "Slow Mot. (.5x)",
-      "8388608": "Slow Mot. (.25x)",
-      "16777216": "Slow Mot. (.125x)"
+      "3": "FF (1x)",
+      "4": "FF (2x)",
+      "5": "FF (3x)",
+      "6": "FF (4x)",
+      "7": "RW (1x)",
+      "8": "RW (2x)",
+      "9": "RW (3x)",
+      "10": "RW (4x)",
+      "11": "Skip Ahead",
+      "12": "Skip Back",
+      "13": "Jog Ahead",
+      "14": "Jog Back",
+      "15": "Seek Up",
+      "16": "Seek Down",
+      "17": "Scan Up",
+      "18": "Scan Down",
+      "19": "Tune Up",
+      "20": "Tune Down",
+      "21": "Slow Mot. (.75x)",
+      "22": "Slow Mot. (.5x)",
+      "23": "Slow Mot. (.25x)",
+      "24": "Slow Mot. (.125x)",
+      "25": "Reserved",
+      "26": "Reserved",
+      "27": "Reserved",
+      "28": "Reserved",
+      "29": "Reserved",
+      "30": "Reserved",
+      "31": "Reserved"
     }
   },
   "DD404": {
     "Name": "Supported Browsing Methods",
     "Format": "DF52",
     "Bits": 16,
-    "Values": {
-      "1": "Filename",
-      "2": "Playlist",
-      "4": "Genre",
-      "8": "Album",
-      "16": "Artist",
-      "32": "Track",
-      "64": "Station Name",
-      "128": "Station Number",
-      "256": "Favorite Number",
-      "512": "Play Queue"
+    "Positions": {
+      "0": "Filename",
+      "1": "Playlist",
+      "2": "Genre",
+      "3": "Album",
+      "4": "Artist",
+      "5": "Track",
+      "6": "Station Name",
+      "7": "Station Number",
+      "8": "Favorite Number",
+      "9": "Play Queue",
+      "10": "Reserved",
+      "11": "Reserved",
+      "12": "Reserved",
+      "13": "Reserved",
+      "14": "Reserved",
+      "15": "Reserved"
     }
   },
   "DD405": {
     "Name": "Repeat Supported",
     "Format": "DF52",
     "Bits": 4,
-    "Values": {
-      "1": "Song",
-      "2": "Play Queue"
+    "Positions": {
+      "0": "Song",
+      "1": "Play Queue",
+      "2": "Reserved",
+      "3": "Reserved"
     }
   },
   "DD406": {
@@ -2212,15 +2163,12 @@
     "Name": "Shuffle Supported",
     "Format": "DF52",
     "Bits": 4,
-    "Values": {
-      "1": "Play Queue",
-      "2": "All"
+    "Positions": {
+      "0": "Play Queue",
+      "1": "All",
+      "2": "Reserved",
+      "3": "Reserved"
     }
-  },
-  "DD410": {
-    "Name": "Engine / Transmission Instance",
-    "Format": "DF52",
-    "Bits": 8
   },
   "DD411": {
     "Name": "User Defined Alert Assignment",

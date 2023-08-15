@@ -137,6 +137,17 @@
     }
   };
 
+  function choice(e) {
+    if (e.detail != null) {
+      for (let i in data.table) {
+        if (data.table[i].id == selection1.id) {
+          data.table[i].fields[selection2.id].value = parseInt(e.detail.selectedId);
+          break;
+        }
+      }
+    }
+  };
+
   function input1(e) {
     if (e.detail != null) {
       for (let i in data.table) {
@@ -470,7 +481,7 @@
                         <Column>
                           <Row style="height: 0.5rem;"><Column>&nbsp;</Column></Row>
                           <Row style="display:flex; flex-flow: row nowrap; align-items: center; justify-content: flex-start;">
-                            <Column sm={4} md={4} lg={4}>
+                            <Column sm={5} md={5} lg={5}>
                               {#if typeof selection2.fluid !== 'undefined'}
                                 <Dropdown
                                   id="input"
@@ -480,6 +491,15 @@
                                   selectedId={selection2.value}
                                   items={fluts}
                                   on:select={input0} />
+                              {:else if typeof selection2.choices !== 'undefined'}
+                                <Dropdown
+                                  id="input"
+                                  size="sm"
+                                  direction="top"
+                                  titleText={selection2.title}
+                                  selectedId={selection2.value}
+                                  items={selection2.choices}
+                                  on:select={choice} />
                               {:else if selection2['type'].startsWith('int') || selection2['type'].startsWith('uint') ||
                                 selection2['type'].startsWith('float') || selection2['type'].startsWith('bit(')}
                                 <NumberInput
@@ -539,7 +559,7 @@
                           </Row>
                           <Row style="height: 0.5rem;"><Column>&nbsp;</Column></Row>
                           <Row style="display:flex; flex-flow: row nowrap; align-items: center; justify-content: flex-start;">
-                            <Column sm={4} md={4} lg={4}>&nbsp;</Column>
+                            <Column sm={5} md={5} lg={5}>&nbsp;</Column>
                             <Column sm={1} md={1} lg={1}>&nbsp;</Column>
                             <Column sm={4} md={4} lg={4}>
                               <Checkbox disabled={running} labelText="Custom simulation" bind:checked={custom} on:check={check3} />

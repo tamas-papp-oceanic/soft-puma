@@ -7,6 +7,8 @@
   import SimulateContainer from "./partials/SimulateContainer.svelte";
   import nmeaconv from "../../config/nmeaconv.json";
   import nmeadefs from "../../config/nmeadefs.json";
+  import datakinds from "../../config/datakinds.json";
+  // import datatypes from "../../config/datatypes.json";
   import Notification from "../../components/Notification.svelte";
   import { minmax, nextIncremetal, nextDecremetal, nextNatural, nextRandom } from '../../helpers/simulate.js';
   import { device } from '../../stores/data.js';
@@ -32,7 +34,7 @@
   onMount((e) => {
     let arr = new Array();
     for (const [key, val] of Object.entries(nmeadefs)) {
-      let rec = Object.assign({ id: uuidv4(), key: key }, val, { disabledIds: new Array() });
+      let rec = Object.assign({ id: uuidv4(), key: key }, val, { disabledIds: new Array(), disabledSim: new Array() });
       rec = prepFields(rec, key);
       arr.push(rec);
     }
@@ -76,6 +78,7 @@
       if (fld.dictionary == "DD056") {
         rec.fields[i].value = 0;
         rec.disabledIds.push(parseInt(i));
+        rec.disabledSim.push(parseInt(i));
         rec.fields[i].static = null;
       } else {
         if (fld['type'] != null) {
@@ -92,7 +95,8 @@
           } else if (fld['type'].startsWith('bit(')) {
             if (fld.dictionary == 'DD001') {
               rec.fields[i].value = fld.limits.max;
-              rec.disabledIds.push(parseInt(i))
+              rec.disabledIds.push(parseInt(i));
+              rec.disabledSim.push(parseInt(i));
               rec.fields[i].static = null;
             } else {
               rec.fields[i].value = 0;
@@ -111,11 +115,20 @@
           rec.fields[i].value = null;
         }
       }
+      if ((fld.dictionary !== null) && (typeof datakinds[fld.dictionary] !== 'undefined') &&
+        (typeof datakinds[fld.dictionary].Values !== 'undefined')) {
+        rec.fields[i].choices = new Array();
+        for (const [key, val] of Object.entries(datakinds[fld.dictionary].Values)) {
+          rec.fields[i].choices.push({ id: parseInt(key), text: val });
+        }
+        rec.fields[i].value = rec.fields[i].choices[0].id;
+      }
       if (typeof rec.repeat !== 'undefined') {
         for (let j in rec.repeat) {
           if ((rec.fields[i].field === rec.repeat[j].field) || 
             (rec.fields[i].field >= rec.repeat[0].start)) {
             rec.disabledIds.push(parseInt(i));
+            rec.disabledSim.push(parseInt(i));
             rec.fields[i].static = null;
           }
         }
@@ -124,15 +137,18 @@
     if (isproprietary(pgn)) {
       rec.fields[0].value = parseInt(spl.manufacturer);
       rec.disabledIds.push(0);
+      rec.disabledSim.push(0);
       rec.fields[0].static = null;
       rec.fields[2].value = parseInt(spl.industry);
       rec.disabledIds.push(2);
+      rec.disabledSim.push(2);
       rec.fields[2].static = null;
     }
     let cnv = spl.protocol + '/' + spl.pgn;
     if (typeof nmeaconv[cnv] !== 'undefined') {
       rec.fields[nmeaconv[cnv].field].value = parseInt(spl.function);
       rec.disabledIds.push(nmeaconv[cnv].field);
+      rec.disabledSim.push(nmeaconv[cnv].field);
       rec.fields[nmeaconv[cnv].field].static = null;
     }
     return rec;
@@ -297,7 +313,7 @@
         if (key === joinKey2(spl)) {
           let rec = Object.assign(
             { id: uuidv4(), key: msg.key, pgn: spl.pgn, instance: ins, fluidtype: flu }, val,
-            { disabledIds: new Array(), timer: null }
+            { disabledIds: new Array(), disabledSim: new Array(), timer: null }
           );
           rec = prepFields(rec, key);
           let fnd = false;
@@ -351,8 +367,8 @@
           if (fld['type'].startsWith('int') || fld['type'].startsWith('uint')) {
             val = (val === null) ? 0 : val;
             let ena = true;
-            if ((typeof simulator.table[idx].disabledIds !== 'undefined') &&
-              (simulator.table[idx].disabledIds.indexOf(fld.id) !== -1)) {
+            if ((typeof simulator.table[idx].disabledSim !== 'undefined') &&
+              (simulator.table[idx].disabledSim.indexOf(fld.id) !== -1)) {
               ena = false;
             }
             if (fld.static) {
