@@ -1,0 +1,735 @@
+{
+  "DF00": {
+    "Title": "Undefined",
+    "Range": "undefined",
+    "Resolution": "undefined",
+    "Resolution": "Undefined",
+    "Type": "Application specific, defined at time of use"
+  },
+  "DF01": {
+    "Title": "Acceleration",
+    "Range": "+/- 327.64 m/s2",
+    "Resolution": "1x10E-2 m/s2",
+    "Type": "int16",
+    "Notes": "1G = 9.80665 m/s2"
+  },
+  "DF02": {
+    "Title": "Angle",
+    "Range": "0 to 2Pi rad",
+    "Resolution": "1x10E-4 rad",
+    "Type": "uint16",
+    "Notes": "Resolution ~0.0057deg, 1 deg = .01745 rad"
+  },
+  "DF03": {
+    "Title": "Angle, precise",
+    "Range": "Variable radians",
+    "Resolution": "Floats, radian",
+    "Type": "float32",
+    "Notes": "Resolution ~1x10E-6 rad at range of 2 Pi"
+  },
+  "DF04": {
+    "Title": "Angle, signed",
+    "Range": "+/-Pi rad",
+    "Resolution": "1x10E-4 rad",
+    "Type": "int16",
+    "Notes": "Resolution ~0.0057deg"
+  },
+  "DF05": {
+    "Title": "Angular acceleration",
+    "Range": "+/- 3,276.4 rad/s*s",
+    "Resolution": "1x10E-1 rad/s*s",
+    "Type": "int16"
+  },
+  "DF06": {
+    "Title": "Time of day",
+    "Range": "0 to 86,401 s",
+    "Resolution": "1x10E-4 s",
+    "Type": "uint32"
+  },
+  "DF07": {
+    "Title": "Current, electric, high",
+    "Range": "+/- 3,276.4 A",
+    "Resolution": "1x10E-1 A",
+    "Type": "int16"
+  },
+  "DF08": {
+    "Title": "Current, electric, low",
+    "Range": "+/- 3.2764 A",
+    "Resolution": "1x10E-4 A",
+    "Type": "int16"
+  },
+  "DF09": {
+    "Title": "Distance",
+    "Range": "0 to ~4.295x10E+7 m",
+    "Resolution": "1x10E-2 m",
+    "Type": "uint32"
+  },
+  "DF10": {
+    "Title": "Distance, length, signed",
+    "Range": "+/- 3.2764 m",
+    "Resolution": "1x10E-4 m",
+    "Type": "int16"
+  },
+  "DF11": {
+    "Title": "Distance, long",
+    "Range": "0 to ~4.295x10E+9 m",
+    "Resolution": "1m",
+    "Type": "uint32"
+  },
+  "DF12": {
+    "Title": "Distance, long, precise",
+    "Range": "Variable meters",
+    "Resolution": "Floats, meters",
+    "Type": "float64",
+    "Notes": "Resolution ~0.1 u-meter at 99,000 km"
+  },
+  "DF13": {
+    "Title": "Distance, short",
+    "Range": "0 to 655.32 m",
+    "Resolution": "1x10E-2 m",
+    "Type": "uint16"
+  },
+  "DF14": {
+    "Title": "Distance, short, signed",
+    "Range": "+/-327.64 m",
+    "Resolution": "1x10E-2 m",
+    "Type": "int16"
+  },
+  "DF15": {
+    "Title": "Distance, signed",
+    "Range": "+/-~2.147x10E+7 m",
+    "Resolution": "1x10E-2 m",
+    "Type": "int32"
+  },
+  "DF16": {
+    "Title": "Electric field",
+    "Range": "+/-327.64 dB re: uV/m",
+    "Resolution": "1x10E-2 dB re: uV/m",
+    "Type": "int32"
+  },
+  "DF17": {
+    "Title": "Flow rate, high",
+    "Range": "+/-32.764 cu-m/hr",
+    "Resolution": "1x10E-3 cu-m/hr",
+    "Type": "int16"
+  },
+  "DF18": {
+    "Title": "Flow rate, low",
+    "Range": "+/-3.2764 cu-m/hr",
+    "Resolution": "1x10E-4 cu-m/hr",
+    "Type": "int16"
+  },
+  "DF19": {
+    "Title": "Force, high",
+    "Range": "+/- 327,640 N",
+    "Resolution": "10 N",
+    "Type": "int16",
+    "Notes": "'-' = compression"
+  },
+  "DF20": {
+    "Title": "Force, low",
+    "Range": "+/- 3,276.4 N",
+    "Resolution": "1x10E-1 N",
+    "Type": "int16",
+    "Notes": "'-' = compression"
+  },
+  "DF21": {
+    "Title": "Frequency",
+    "Range": "0 to ~4.295x10E+10 Hz",
+    "Resolution": "10 Hz",
+    "Type": "uint32"
+  },
+  "DF22": {
+    "Title": "Frequency, low",
+    "Range": "0 to 655.32 Hz",
+    "Resolution": "1x10E-2 Hz",
+    "Type": "uint16"
+  },
+  "DF23": {
+    "Title": "Latitude",
+    "Range": "+/- 90 deg",
+    "Resolution": "1x10E-7 deg",
+    "Type": "int32",
+    "Notes": "'-' = South, resolution ~1.1 cm"
+  },
+  "DF25": {
+    "Title": "Longitude",
+    "Range": "+/- 180 deg",
+    "Resolution": "1x10E-7 deg",
+    "Type": "int32",
+    "Notes": "'-' = West, resolution ~1.1 cm"
+  },
+  "DF26": {
+    "Title": "Frequency, mid",
+    "Range": "0 to 65,532 Hz",
+    "Resolution": "1 Hz",
+    "Type": "uint16"
+  },
+  "DF27": {
+    "Title": "Magnetic flux density",
+    "Range": "0 to 6.5532x10E-2T",
+    "Resolution": "1x10E-6 T",
+    "Type": "uint16",
+    "Notes": "1 Tesla = 10,000 gauss"
+  },
+  "DF28": {
+    "Title": "Power",
+    "Range": "0 to 65,532 W",
+    "Resolution": "1W",
+    "Type": "uint16"
+  },
+  "DF29": {
+    "Title": "Pressure",
+    "Range": "0 to 65,532,000 Pa",
+    "Resolution": "1x10E+3 Pa",
+    "Type": "uint16"
+  },
+  "DF30": {
+    "Title": "Percent, Relative measure",
+    "Range": "+/- 124%",
+    "Resolution": "1%",
+    "Type": "int8"
+  },
+  "DF31": {
+    "Title": "dB, relative measure",
+    "Range": "+/- 327.64 dB",
+    "Resolution": "1x10E-2 dB",
+    "Type": "int16"
+  },
+  "DF32": {
+    "Title": "Resistance, electric, high",
+    "Range": "0 to ~4.295x10E+9 Ohm",
+    "Resolution": "1 Ohm",
+    "Type": "uint32"
+  },
+  "DF33": {
+    "Title": "Resistance, electric, low",
+    "Range": "0 to 655.32 Ohm",
+    "Resolution": "1x10E-2 Ohm",
+    "Type": "uint16"
+  },
+  "DF34": {
+    "Title": "Rotational rate",
+    "Range": "+/- 32,764 RPM",
+    "Resolution": "1 RPM",
+    "Type": "int16"
+  },
+  "DF35": {
+    "Title": "Speed",
+    "Range": "0 to 655.32 m/s",
+    "Resolution": "1x10E-2 m/s",
+    "Type": "uint16",
+    "Notes": "1 Knot = 0.5144 m/s"
+  },
+  "DF36": {
+    "Title": "Speed, signed",
+    "Range": "+/-32.764 m/s",
+    "Resolution": "1x10E-3 m/s",
+    "Type": "int16"
+  },
+  "DF38": {
+    "Title": "Temperature, high",
+    "Range": "0 to 6,553.2 deg K",
+    "Resolution": "1x10E-1 deg K",
+    "Type": "uint16"
+  },
+  "DF39": {
+    "Title": "Temperature, low",
+    "Range": "0 to 655.32 deg K",
+    "Resolution": "1x10E-2 deg K",
+    "Type": "uint16"
+  },
+  "DF40": {
+    "Title": "Time interval, signed, standard",
+    "Resolution": "+/- ~2.148x10E+6 s",
+    "Type": "1x10E-3 s",
+    "Notes": "int32"
+  },
+  "DF41": {
+    "Title": "Date, day count",
+    "Range": "0 to 65,532 days",
+    "Resolution": "1 day",
+    "Type": "uint16",
+    "Notes": "0 = January 1, 1970, max = ~179 years"
+  },
+  "DF42": {
+    "Title": "Voltage, high",
+    "Range": "+/- 327.64 V",
+    "Resolution": "1x10E-2 V",
+    "Type": "int16"
+  },
+  "DF43": {
+    "Title": "Voltage, low",
+    "Range": "+/- 3.2764 V",
+    "Resolution": "1x10E-4 V",
+    "Type": "int16"
+  },
+  "DF44": {
+    "Title": "Volume",
+    "Range": "0 to 65.532 cum",
+    "Resolution": "1x10E-3 cum",
+    "Type": "uint16"
+  },
+  "DF45": {
+    "Title": "Time interval, precise",
+    "Range": "+/- 2.14 s",
+    "Resolution": "1x10E-9 s",
+    "Type": "int32"
+  },
+  "DF46": {
+    "Title": "Distance, signed, medium",
+    "Range": "+/- 32.764 m",
+    "Resolution": "1x10E-3 m",
+    "Type": "int16"
+  },
+  "DF47": {
+    "Title": "Pressure, medium",
+    "Range": "0 to 6,553,200 Pa",
+    "Resolution": "1x10E+2 Pa",
+    "Type": "uint16"
+  },
+  "DF48": {
+    "Title": "Pressure rate",
+    "Range": "+/- 327,640 Pa/hr",
+    "Resolution": "1x10E+1 Pa/hr",
+    "Type": "int16",
+    "Notes": "+ = increasing rate"
+  },
+  "DF49": {
+    "Title": "Ratio, Relative measure",
+    "Range": "Variable",
+    "Resolution": "Floats",
+    "Type": "float32",
+    "Notes": "Unit-less number"
+  },
+  "DF50": {
+    "Title": "String, variable, short",
+    "Range": "0 to 250 ASCII or 0 to 125 Unicode Characters",
+    "Resolution": "1 ASCII or 1 Unicode Character",
+    "Type": "ch8or16(n)",
+    "Notes": "2-252 bytes. First byte in string (uint8) is the Count byte indicating the number of bytes in the string, including the Count and Control bytes. Second byte in string is the Control byte. The Control byte indicates if the string consists of ASCII characters (Char8) or Unicode characters (Char16)."
+  },
+  "DF51": {
+    "Title": "String, variable, medium",
+    "Range": "0 to 1,782 ASCII or 0 to 891 Unicode Characters",
+    "Resolution": "1 ASCII or 1 Unicode Character",
+    "Type": "ch8or16(n)",
+    "Notes": "3-1,785 bytes. First and Second bytes in string (unit16) is the Count byte indicating the number of bytes in the string, including the Count and Control bytes. Third byte in string is the Control byte. The Control byte indicates if the string consists of ASCII characters (Char8) or Unicode characters (Char16)."
+  },
+  "DF52": {
+    "Title": "Bit field",
+    "Range": "Variable",
+    "Resolution": "1",
+    "Type": "bit(n)",
+    "Notes": "Used to construct bit fields"
+  },
+  "DF53": {
+    "Title": "Integer, 8 bit unsigned",
+    "Range": "0 to 252",
+    "Resolution": "1 bit",
+    "Type": "uint8",
+    "Notes": "Unit-less number"
+  },
+  "DF54": {
+    "Title": "Integer, 16 bit unsigned",
+    "Range": "0 to 65,532",
+    "Resolution": "1 bit",
+    "Type": "uint16",
+    "Notes": "Unit-less number"
+  },
+  "DF55": {
+    "Title": "Integer, 32 bit unsigned",
+    "Range": "0 to 4,294,967,292",
+    "Resolution": "1 bit",
+    "Type": "uint32",
+    "Notes": "Unit-less number"
+  },
+  "DF56": {
+    "Title": "Integer, 64 bit unsigned",
+    "Range": "0 to (2E+64)-4",
+    "Resolution": "1 bit",
+    "Type": "uint64",
+    "Notes": "Unit-less number"
+  },
+  "DF57": {
+    "Title": "Integer, 8 bit 2's complement",
+    "Range": "-128 to +124",
+    "Resolution": "1 bit",
+    "Type": "int8",
+    "Notes": "Unit-less number"
+  },
+  "DF58": {
+    "Title": "Integer, 16 bit 2's complement",
+    "Range": "-32,768 to +32,764",
+    "Resolution": "1 bit",
+    "Type": "int16",
+    "Notes": "Unit-less number"
+  },
+  "DF59": {
+    "Title": "Integer, 32 bit 2's complement",
+    "Range": "-2,147,483,648 to +2,147,483,644",
+    "Resolution": "1 bit",
+    "Type": "int32",
+    "Notes": "Unit-less number"
+  },
+  "DF60": {
+    "Title": "Integer, 64 bit 2's complement",
+    "Range": "-(2E+63) to +(2E+63)-4",
+    "Resolution": "1 bit",
+    "Type": "int64",
+    "Notes": "Unit-less number"
+  },
+  "DF61": {
+    "Title": "Floating point, IEEE 754 single precision",
+    "Range": "Variable",
+    "Resolution": "Floats",
+    "Type": "float32",
+    "Notes": "Unit-less number"
+  },
+  "DF62": {
+    "Title": "Floating point, IEEE 754 double precision",
+    "Range": "Variable",
+    "Resolution": "Floats",
+    "Type": "float64",
+    "Notes": "Unit-less number"
+  },
+  "DF63": {
+    "Title": "String, fixed",
+    "Range": "0 to 1,785 characters",
+    "Resolution": "1 char",
+    "Type": "char8(n)",
+    "Notes": "0 to 1,785 bytes. Character count not included, length is specified by application in Data Dictionary. Unused characters shall be treated as not available, and filled with [0xFF] = Data not available."
+  },
+  "DF64": {
+    "Title": "Floating point, IEEE 754 expanded",
+    "Range": "Variable",
+    "Resolution": "Floats",
+    "Type": "float80"
+  },
+  "DF65": {
+    "Title": "Time interval, standard",
+    "Range": "0 to ~4.295x10E+6 s",
+    "Resolution": "1x10E-3 s",
+    "Type": "uint32"
+  },
+  "DF66": {
+    "Title": "Time interval, .01sec",
+    "Range": "0 to 655.32s",
+    "Resolution": "1x10E-2sec",
+    "Type": "uint16"
+  },
+  "DF67": {
+    "Title": "Time interval, large",
+    "Range": "0 to ~4.295x10E+9 s",
+    "Resolution": "1 sec",
+    "Type": "uint32"
+  },
+  "DF68": {
+    "Title": "Power, low",
+    "Range": "0 to 65.532 W",
+    "Resolution": "1x10E-3 W",
+    "Type": "uint16"
+  },
+  "DF69": {
+    "Title": "Ratio, Relative measure, small",
+    "Range": "+/-327.64",
+    "Resolution": "1x10E-2",
+    "Type": "int16"
+  },
+  "DF70": {
+    "Title": "Angle, tiny",
+    "Range": "Variable radians",
+    "Resolution": "Floats, radian",
+    "Type": "float32"
+  },
+  "DF71": {
+    "Title": "Time interval, medium",
+    "Range": "+/-32,764 minutes",
+    "Resolution": "1.0 minute",
+    "Type": "int16"
+  },
+  "DF72": {
+    "Title": "Rotational rate, unsigned",
+    "Range": "0-16,383 RPM",
+    "Resolution": "1/4 RPM",
+    "Type": "uint16"
+  },
+  "DF73": {
+    "Title": "Angular rate, signed",
+    "Range": "+/-1.0 rad/s",
+    "Resolution": "1/32 x 10E-3 rad/s",
+    "Type": "int16"
+  },
+  "DF74": {
+    "Title": "Distance, rough",
+    "Range": "+/-32,764 m",
+    "Resolution": "1m",
+    "Type": "int16"
+  },
+  "DF75": {
+    "Title": "Distance, Medium",
+    "Range": "0 to 6553.2 m",
+    "Resolution": "1x10E-1 m",
+    "Type": "uint16"
+  },
+  "DF76": {
+    "Title": "Latitude (Extended)",
+    "Range": "+/- 90 deg",
+    "Resolution": "1x10E-16 deg",
+    "Type": "int64",
+    "Notes": "'-' = South, resolution ~.01 nanometer"
+  },
+  "DF77": {
+    "Title": "Longitude (Extended)",
+    "Range": "+/- 180 deg",
+    "Resolution": "1x10E-16 deg",
+    "Type": "int64",
+    "Notes": "'-' = West, resolution ~.01 nanometer"
+  },
+  "DF78": {
+    "Title": "Distance (Extended)",
+    "Range": "+/-~9.223x10E+12 m",
+    "Resolution": "1x10E-6 m",
+    "Type": "int64"
+  },
+  "DF79": {
+    "Title": "Distance signed fine",
+    "Range": "+/-~2.147x10E+4 m",
+    "Resolution": "1x10E-5 m",
+    "Type": "int32"
+  },
+  "DF80": {
+    "Title": "Time, 1sec",
+    "Range": "0 to 65532 seconds",
+    "Resolution": "1 second",
+    "Type": "uint16"
+  },
+  "DF81": {
+    "Title": "Time, 0.1sec",
+    "Range": "0 to 6553.2 seconds",
+    "Resolution": "1x10E-1 sec",
+    "Type": "uint16"
+  },
+  "DF82": {
+    "Title": "Speed, signed 4dpt",
+    "Range": "+/-3.2764 m/s",
+    "Resolution": "1x10E-4 m/s",
+    "Type": "int16"
+  },
+  "DF83": {
+    "Title": "Distance, signed 4dp",
+    "Range": "+/-~2.147x10E+5 m",
+    "Resolution": "1x10E-4 m",
+    "Type": "int32"
+  },
+  "DF84": {
+    "Title": "Percent, Relative Measure,",
+    "Range": "Medium",
+    "Resolution": "-131.072% to 131.056%",
+    "Type": "4x10E-3 %",
+    "Notes": "int16"
+  },
+  "DF85": {
+    "Title": "Angular rate, signed Precise",
+    "Range": "+/-67.0 rad/s (approx. 230703",
+    "Resolution": "deg/min",
+    "Type": "1/32 x 10E-6 rad/s",
+    "Notes": "int32"
+  },
+  "DF86": {
+    "Title": "Volume. Large",
+    "Range": "0 to~4.296x10E+5 cu m",
+    "Resolution": "1x10E-4 cu m",
+    "Type": "uint32"
+  },
+  "DF87": {
+    "Title": "Speed, signed - large",
+    "Range": "+/- 327.66 m/s",
+    "Resolution": "(+/- 636 knots)",
+    "Type": "1x10E-2 m/s",
+    "Notes": "int16"
+  },
+  "DF88": {
+    "Title": "Time Interval, short",
+    "Range": "0 to 1.26 sec",
+    "Resolution": "5x10E-3 sec",
+    "Type": "uint8"
+  },
+  "DF89": {
+    "Title": "Latitude, 24 bit",
+    "Range": "+/-83 sec",
+    "Resolution": "1x10E-5 sec",
+    "Type": "int24"
+  },
+  "DF90": {
+    "Title": "Longitude, 24 bit",
+    "Range": "+/-83 sec",
+    "Resolution": "1x10E-5 sec",
+    "Type": "int24"
+  },
+  "DF91": {
+    "Title": "Altitude, 24 bit",
+    "Range": "+/-8,388m",
+    "Resolution": "1x10E-3m",
+    "Type": "int24"
+  },
+  "DF92": {
+    "Title": "Power - VAR",
+    "Range": "0 - 4,294,967,292 VAR",
+    "Resolution": "1 VAR",
+    "Type": "uint32"
+  },
+  "DF93": {
+    "Title": "Percent, Absolute",
+    "Range": "0 - 252%",
+    "Resolution": "1%",
+    "Type": "uint8"
+  },
+  "DF94": {
+    "Title": "Power",
+    "Range": "0 - 4,294,967,292 W",
+    "Resolution": "1W",
+    "Type": "uint32"
+  },
+  "DF95": {
+    "Title": "Current, electric, high",
+    "Range": "0 - 6553.2 A",
+    "Resolution": "1x10E-1 A",
+    "Type": "uint16"
+  },
+  "DF96": {
+    "Title": "Voltage, high, unsigned",
+    "Range": "+/- 655.32 V",
+    "Resolution": "1x10E-2 V",
+    "Type": "uint16"
+  },
+  "DF97": {
+    "Title": "Power Factor",
+    "Range": "+/- 1.00",
+    "Resolution": "1x10E-2",
+    "Type": "int8"
+  },
+  "DF98": {
+    "Title": "Time interval, medium, unsigned",
+    "Range": "0 - 65,532 minutes",
+    "Resolution": "1 minute",
+    "Type": "uint16"
+  },
+  "DF99": {
+    "Title": "Power",
+    "Range": "0 - 65,532 watts",
+    "Resolution": "1W",
+    "Type": "uint16"
+  },
+  "DF100": {
+    "Title": "Battery Capacity",
+    "Range": "0 - 235,915,200 Coulombs",
+    "Resolution": "3600 C",
+    "Type": "uint16"
+  },
+  "DF101": {
+    "Title": "Peukert Exponent",
+    "Range": "1 - 1.5",
+    "Resolution": "2x10E-3",
+    "Type": "uint8"
+  },
+  "DF102": {
+    "Title": "AC Vrms",
+    "Range": "0 - 65.532",
+    "Resolution": "1x10E-3 V",
+    "Type": "uint16"
+  },
+  "DF103": {
+    "Title": "Pressure",
+    "Range": "+/- 2.1E8",
+    "Resolution": "1x10E-1 Pa",
+    "Type": "int32",
+    "Notes": "~24 hours, 0 = midnight, range allows for up to two leap seconds per day. This maps directly into Ampere Hours (AH) where 3600C = 1AH."
+  },
+  "DF104": {
+    "Title": "Mass",
+    "Range": "0 - 429,496.7292 kilograms",
+    "Resolution": "1x10E-4 kg",
+    "Type": "uint32"
+  },
+  "DF105": {
+    "Title": "Temperature, extended range and precision",
+    "Range": "0 to 16,777.212 deg K",
+    "Resolution": "0.001 deg K",
+    "Type": "uint24"
+  },
+  "DF106": {
+    "Title": "Voltage AC- High Range",
+    "Range": "0 - 6553.2 V",
+    "Resolution": "0.1V",
+    "Type": "uint16"
+  },
+  "DF107": {
+    "Title": "Frequency-Medium",
+    "Range": "0-6553.2 Hz",
+    "Resolution": "0.1 Hz",
+    "Type": "uint16"
+  },
+  "DF108": {
+    "Title": "Power- Extended Range",
+    "Range": "-2,147,483,648 to +2,147,483,644 Watts",
+    "Resolution": "1W",
+    "Type": "int32"
+  },
+  "DF109": {
+    "Title": "Distance, Rough Approximation",
+    "Range": "0 - 2,520 meters",
+    "Resolution": "10 meters",
+    "Type": "uint8"
+  },
+  "DF110": {
+    "Title": "PWM Duty Cycle",
+    "Range": "0-100%",
+    "Resolution": "1%",
+    "Type": "uint8"
+  },
+  "DF111": {
+    "Title": "Time Interval MediumShort",
+    "Range": "0.00 - 2.52 seconds",
+    "Resolution": "0.01 seconds",
+    "Type": "uint8"
+  },
+  "DF112": {
+    "Title": "Salinity",
+    "Range": "0 to 65,535 ppm",
+    "Resolution": "1 ppm",
+    "Type": "uint16"
+  },
+  "DF113": {
+    "Title": "Pressure, Compound",
+    "Range": "+/- 32,764 Kpa",
+    "Resolution": "1 Kpa",
+    "Type": "int16"
+  },
+  "DF114": {
+    "Title": "Current, DC, high range/resolution",
+    "Range": "-83886.08 A to 83886.05 A",
+    "Resolution": "0.01A",
+    "Type": "int24"
+  },
+  "DF115": {
+    "Title": "Bit field defaulting to zero when NULL",
+    "Range": "N2KUnitless",
+    "Resolution": "1",
+    "Type": "bit0(n)"
+  },
+  "DF116": {
+    "Title": "Time Interval, .001 sec.",
+    "Range": "0 - 65.532s",
+    "Resolution": "1x10E-3 sec.",
+    "Type": "uint16",
+    "Notes": "Data Format Notes Special data format applicable to AIS field that must be set to zero for a NULL data condition or when unused - applies to AIS spare fields and AIS fields that are for future use"
+  },
+  "DF117": {
+    "Title": "Integer 48 bit unsigned",
+    "Range": "0 to 281474976710656",
+    "Resolution": "1",
+    "Type": "uint48",
+    "Notes": "Unit-less number"
+  }
+}

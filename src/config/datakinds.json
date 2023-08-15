@@ -1,0 +1,2234 @@
+{
+  "DD002": {
+    "Name": "Generic status pair",
+    "Format": "DF52",
+    "Bits": 2,
+    "Values": {
+      "0": "[No, Off, Disabled, Reset, '0']",
+      "1": "[Yes, On, Enabled, Set, '1']"
+    }
+  },
+  "DD003": {
+    "Name": "Generic command pair",
+    "Format": "DF52",
+    "Bits": 2,
+    "Values": {
+      "0": "[Turn Off, Disable, Reset, '0']",
+      "1": "[Turn On, Enable, Set, '1']"
+    }
+  },
+  "DD019": {
+    "Name": "Mode, Radiotelephone",
+    "Format": "DF52",
+    "Bits": 8,
+    "Values": {
+      "0": "F3E/G3E simplex, telephone",
+      "1": "F3E/G3E duplex, telephone",
+      "2": "J3E, telephone",
+      "3": "H3E, telephone",
+      "4": "F1B/J2B FEC NBDP, telex/teleprinter",
+      "5": "F1B/J2B ARQ NBDP, telex/teleprinter",
+      "6": "F1B/J2B receive only, teleprinter/DSC",
+      "7": "F1B/J2B, teleprinter/DSC",
+      "8": "A1A Morse, tape recorder",
+      "9": "A1A Morse, Morse key/head set",
+      "10": "F1C/F2C/F3C, FAX-machine"
+    }
+  },
+  "DD025": {
+    "Name": "Mode, Data",
+    "Format": "DF52",
+    "Bits": 4,
+    "Values": {
+      "0": "Autonomous mode",
+      "1": "Differential, enhanced mode",
+      "2": "Estimated mode",
+      "3": "Simulator mode",
+      "4": "Manual mode"
+    }
+  },
+  "DD030": {
+    "Name": "Loran-C station status",
+    "Format": "DF52",
+    "Bits": 4,
+    "Values": {
+      "1": "Station in use",
+      "2": "Low SNR",
+      "4": "Cycle error",
+      "8": "Blink"
+    }
+  },
+  "DD037": {
+    "Name": "Error codes, Acknowledgement",
+    "Format": "DF52",
+    "Bits": 4,
+    "Values": {
+      "0": "No Error/Acknowledge",
+      "1": "PGN not supported",
+      "2": "PGN temporarily not available",
+      "3": "Access denied",
+      "4": "Request or Command is not supported",
+      "5": "Definer Tag is not supported",
+      "6": "Read or Write is not supported"
+    }
+  },
+  "DD038": {
+    "Name": "Tide direction",
+    "Format": "DF52",
+    "Bits": 2,
+    "Values": {
+      "0": "Falling",
+      "1": "Rising"
+    }
+  },
+  "DD046": {
+    "Name": "Water Current State",
+    "Format": "DF52",
+    "Bits": 3,
+    "Values": {
+      "0": "Flood",
+      "1": "Slack",
+      "2": "Ebb"
+    }
+  },
+  "DD058": {
+    "Name": "Mode, GNSS",
+    "Format": "DF52",
+    "Bits": 3,
+    "Values": {
+      "0": "1D",
+      "1": "2D",
+      "2": "3D",
+      "3": "Auto"
+    }
+  },
+  "DD059": {
+    "Name": "Mode, DGNSS",
+    "Format": "DF52",
+    "Bits": 3,
+    "Values": {
+      "0": "Off",
+      "1": "Auto",
+      "2": "RTCM SC104 Pseudorange Corrections",
+      "3": "RTCA SC159 Network Corrections",
+      "4": "RTK Differential Corrections"
+    }
+  },
+  "DD066": {
+    "Name": "Time Source",
+    "Format": "DF52",
+    "Bits": 4,
+    "Values": {
+      "0": "GPS",
+      "1": "GLONASS",
+      "2": "WWV or equivalent Radio Station Time Sync",
+      "3": "Local Cesium clock",
+      "4": "Local Rubidium clock",
+      "5": "Local Crystal clock"
+    }
+  },
+  "DD067": {
+    "Name": "Quality, GNSS",
+    "Format": "DF52",
+    "Bits": 4,
+    "Values": {
+      "0": "no GPS",
+      "1": "GNSS fix",
+      "2": "DGNSS fix",
+      "3": "Precise GNSS*",
+      "4": "RTK Fixed Integer",
+      "5": "RTK Float",
+      "6": "Estimated (DR) mode",
+      "7": "Manual Input",
+      "8": "Simulate mode"
+    }
+  },
+  "DD070": {
+    "Name": "Ref Station Type",
+    "Format": "DF52",
+    "Bits": 4,
+    "Values": {
+      "0": "GPS",
+      "1": "GLONASS"
+    }
+  },
+  "DD072": {
+    "Name": "Range Residual Mode",
+    "Format": "DF52",
+    "Bits": 2,
+    "Values": {
+      "0": "Range residuals were used to calculate data",
+      "1": "Range residuals were calculated after the position."
+    }
+  },
+  "DD074": {
+    "Name": "Satellite ID Number",
+    "Format": "DF53",
+    "Bits": 8,
+    "Values": {
+      "0": "value not used",
+      "1": "GPS",
+      "33": "SBAS, Satellite",
+      "65": "GLONASS"
+    }
+  },
+  "DD078": {
+    "Name": "Differential Correction Broadcast Bit Rate",
+    "Format": "DF52",
+    "Bits": 5,
+    "Values": {
+      "0": "25bps",
+      "1": "50bps",
+      "2": "100bps",
+      "3": "200bps",
+      "4": "300bps",
+      "5": "500bps",
+      "6": "1200bps",
+      "7": "2400bps",
+      "8": "4800bps",
+      "9": "9600bps",
+      "10": "19200bps",
+      "11": "38400bps",
+      "12": "57600bps"
+    }
+  },
+  "DD079": {
+    "Name": "Mode, Bit Rate",
+    "Format": "DF52",
+    "Bits": 3,
+    "Values": {
+      "0": "Auto bit rate set",
+      "1": "Manual bit rate set"
+    }
+  },
+  "DD117": {
+    "Name": "Direction reference",
+    "Format": "DF52",
+    "Bits": 2,
+    "Values": {
+      "0": "True",
+      "1": "Magnetic"
+    }
+  },
+  "DD119": {
+    "Name": "Calculation Type",
+    "Format": "DF52",
+    "Bits": 2,
+    "Values": {
+      "0": "Great Circle calculations",
+      "1": "Rhumb Line calculations"
+    }
+  },
+  "DD122": {
+    "Name": "Mark Type",
+    "Format": "DF52",
+    "Bits": 4,
+    "Values": {
+      "0": "Collision",
+      "1": "Turning Point",
+      "2": "Reference (general)",
+      "3": "Wheelover",
+      "4": "Waypoint"
+    }
+  },
+  "DD123": {
+    "Name": "To / From Indicator",
+    "Format": "DF52",
+    "Bits": 3,
+    "Values": {
+      "0": "time from mark",
+      "2": "time to go to mark",
+      "3": "estimated time of arrival (ETA) at mark"
+    }
+  },
+  "DD124": {
+    "Name": "PRN Usage Status",
+    "Format": "DF52",
+    "Bits": 4,
+    "Values": {
+      "0": "Not Tracked",
+      "1": "Tracked but not used in solution",
+      "2": "Used in solution without Differential corrections",
+      "3": "Differential Corrections available",
+      "4": "Tracked with Differential Corrections",
+      "5": "used with Differential Corrections"
+    }
+  },
+  "DD125": {
+    "Name": "Differential Source",
+    "Format": "DF52",
+    "Bits": 4,
+    "Values": {
+      "0": "Auto Select",
+      "1": "Loran Communications",
+      "2": "MSK Beacon",
+      "3": "FM Subcarrier",
+      "4": "AIS (Automatic Identification System)",
+      "5": "Other Ground-based Radio",
+      "6": "SBAS (Satellite Based Augmentation System",
+      "7": "Other Satellite"
+    }
+  },
+  "DD126": {
+    "Name": "Differential Operating Mode",
+    "Format": "DF52",
+    "Bits": 4,
+    "Values": {
+      "0": "Manual",
+      "1": "Auto Power",
+      "2": "Auto Range"
+    }
+  },
+  "DD128": {
+    "Name": "Generic instance",
+    "Format": "DF52",
+    "Bits": 8
+  },
+  "DD139": {
+    "Name": "Error codesTransmit interval acknowledgement",
+    "Format": "DF52",
+    "Bits": 4,
+    "Values": {
+      "0": "No Error/Acknowledge",
+      "1": "Transmit Interval /Priority not supported",
+      "2": "Transmit interval is less than measurement/calculation interval",
+      "3": "Access denied",
+      "4": "Request is not supported."
+    }
+  },
+  "DD141": {
+    "Name": "Error Codes Command Acknowledgement",
+    "Format": "DF52",
+    "Bits": 4,
+    "Values": {
+      "0": "No Error/Acknowledge",
+      "1": "Invalid request or command parameter field",
+      "2": "Temporarily unable to comply",
+      "3": "Request or command parameter out-of-range",
+      "4": "Access denied",
+      "5": "Request or Command is not supported",
+      "6": "Read or Write is not supported"
+    }
+  },
+  "DD142": {
+    "Name": "Binary Bit Field",
+    "Format": "DF52"
+  },
+  "DD143": {
+    "Name": "Satellite Service ID",
+    "Bits": 16,
+    "Format": "DF52"
+  },
+  "DD144": {
+    "Name": "Group Function, Request/Command/Acknowledge",
+    "Format": "DF53",
+    "Bits": 8,
+    "Values": {
+      "0": "Request Message",
+      "1": "Command Message",
+      "2": "Acknowledge Message",
+      "3": "Read Fields",
+      "4": "Read Fields Reply",
+      "5": "Write Fields",
+      "6": "Write Fields Reply"
+    }
+  },
+  "DD145": {
+    "Name": "Group Function, Transmit and Receive PGN List",
+    "Format": "DF53",
+    "Bits": 8,
+    "Values": {
+      "0": "Transmit PGN List Message",
+      "1": "Receive PGN List Message"
+    }
+  },
+  "DD147": {
+    "Name": "Directional Command",
+    "Format": "DF52",
+    "Bits": 3,
+    "Values": {
+      "0": "No Order",
+      "1": "Move to starboard",
+      "2": "Move to port"
+    }
+  },
+  "DD148": {
+    "Name": "Angular Limit",
+    "Format": "DF02"
+  },
+  "DD152": {
+    "Name": "Turn Method",
+    "Format": "DF52",
+    "Bits": 3,
+    "Values": {
+      "0": "Rudder Limit controlled",
+      "1": "Turn rate controlled",
+      "2": "Radius controlled"
+    }
+  },
+  "DD153": {
+    "Name": "Steering Mode",
+    "Format": "DF52",
+    "Bits": 3,
+    "Values": {
+      "0": "Main Steering",
+      "1": "Non-Follow-up Device",
+      "2": "Follow-up Device",
+      "3": "Heading Control Standalone",
+      "4": "Heading Control",
+      "5": "Track Control"
+    }
+  },
+  "DD156": {
+    "Name": "Functional Division",
+    "Format": "DF52",
+    "Bits": 4,
+    "Values": {
+      "1": "Steering",
+      "2": "Voyage Management",
+      "4": "Propulsion"
+    }
+  },
+  "DD157": {
+    "Name": "Control Method",
+    "Format": "DF52",
+    "Bits": 4,
+    "Values": {
+      "0": "Main Steering/Outside of System",
+      "1": "Non-Follow-up Device",
+      "2": "Follow-up Device",
+      "3": "Heading Control Standalone",
+      "4": "Heading Control",
+      "5": "Track Control"
+    }
+  },
+  "DD159": {
+    "Name": "Station Control Message Type",
+    "Format": "DF52",
+    "Bits": 4,
+    "Values": {
+      "0": "3D Current Control",
+      "1": "3D Assign Control",
+      "2": "3D Offer Control",
+      "3": "3D Request Control",
+      "4": "3D Accept Control",
+      "5": "3D Release Control",
+      "6": "3D Refuse Control"
+    }
+  },
+  "DD163": {
+    "Name": "Autopilot Override",
+    "Format": "DF52",
+    "Bits": 2,
+    "Values": {
+      "1": "Yes",
+      "0": "No."
+    }
+  },
+  "DD168": {
+    "Name": "Industry Group",
+    "Format": "DF52",
+    "Bits": 3,
+    "Values": {
+      "0": "Global",
+      "1": "On-Highway",
+      "2": "Agricultural and Forestry",
+      "3": "Construction",
+      "4": "Marine",
+      "5": "Industrial - Process Control - Stationary (Gen-Sets)"
+    }
+  },
+  "DD176": {
+    "Name": "Network Address",
+    "Format": "DF52",
+    "Bits": 8
+  },
+  "DD177": {
+    "Name": "ISO 11783 ACK Status",
+    "Format": "DF52",
+    "Bits": 8,
+    "Values": {
+      "0": "Positive Acknowledgment",
+      "1": "Negative Acknowledgment",
+      "2": "PGN supported but access denied"
+    }
+  },
+  "DD179": {
+    "Name": "Group Function, Connection Management",
+    "Format": "DF52",
+    "Bits": 8,
+    "Values": {
+      "10": "Request to Send",
+      "11": "Clear to Send",
+      "13": "End of Message",
+      "20": "Broadcast Announce Message",
+      "255": "Abort"
+    }
+  },
+  "DD182": {
+    "Name": "Priority, Set",
+    "Format": "DF52",
+    "Bits": 4,
+    "Values": {
+      "0": "Commanded priority value (0)",
+      "1": "Commanded priority value (1)",
+      "2": "Commanded priority value (2)",
+      "3": "Commanded priority value (3)",
+      "4": "Commanded priority value (4)",
+      "5": "Commanded priority value (5)",
+      "6": "Commanded priority value (6)",
+      "7": "Commanded priority value (7)",
+      "8": "Do not change priority",
+      "9": "Return priority to default"
+    }
+  },
+  "DD183": {
+    "Name": "AIS Navigational Status",
+    "Format": "DF52",
+    "Bits": 4,
+    "Values": {
+      "0": "Under way using engine",
+      "1": "At anchor",
+      "2": "Not under command",
+      "3": "Restricted manoeuvrability",
+      "4": "Constrained by her draught",
+      "5": "Moored",
+      "6": "Aground",
+      "7": "Engaged in fishing",
+      "8": "Under way sailing",
+      "15": "Not defined"
+    }
+  },
+  "DD184": {
+    "Name": "AIS Position Accuracy",
+    "Format": "DF52",
+    "Bits": 1,
+    "Values": {
+      "0": "Low accuracy > 10m",
+      "1": "High accuracy < 10m"
+    }
+  },
+  "DD185": {
+    "Name": "AIS Repeater Indicator",
+    "Format": "DF52",
+    "Bits": 2,
+    "Values": {
+      "0": "Default",
+      "1": "First retransmission",
+      "2": "Second retransmission",
+      "3": "Final retransmission"
+    }
+  },
+  "DD186": {
+    "Name": "AIS Time Stamp",
+    "Format": "DF52",
+    "Bits": 6,
+    "Values": {
+      "0-59": "UTC second when the report was generated",
+      "60": "Time stamp not available",
+      "61": "Positioning system is in manual input mode",
+      "62": "Electronic position fixing system operates in estimated (dead reckoning) mode",
+      "63": "Positioning system is inoperative"
+    }
+  },
+  "DD189": {
+    "Name": "AIS RAIM-flag",
+    "Format": "DF52",
+    "Bits": 1,
+    "Values": {
+      "0": "RAIM not in use",
+      "1": "RAIM in use"
+    }
+  },
+  "DD190": {
+    "Name": "Heading Source",
+    "Format": "DF52",
+    "Bits": 4,
+    "Values": {
+      "0": "Gyro",
+      "1": "Magnetic Compass",
+      "2": "Hall Effect Compass",
+      "3": "Flux Gate Compass",
+      "4": "GPS Attitude Determination System"
+    }
+  },
+  "DD191": {
+    "Name": "AIS Electronic Positioning Device Type",
+    "Format": "DF52",
+    "Bits": 4,
+    "Values": {
+      "0": "Undefined",
+      "1": "GPS",
+      "2": "GLONASS",
+      "3": "Combined GPS/GLONASS",
+      "4": "Loran-C",
+      "5": "Chayka",
+      "6": "Integrated Navigation System",
+      "7": "Surveyed",
+      "8": "Galilieo"
+    }
+  },
+  "DD197": {
+    "Name": "U.AIS Communications State Indicator",
+    "Format": "DF52",
+    "Bits": 2,
+    "Values": {
+      "0": "SOTDMA",
+      "1": "ITDMA"
+    }
+  },
+  "DD201": {
+    "Name": "Generic instance 2 (3-bit)",
+    "Format": "DF52",
+    "Bits": 3
+  },
+  "DD205": {
+    "Name": "Wind Reference",
+    "Format": "DF52",
+    "Bits": 3,
+    "Values": {
+      "0": "Theoretical Wind (ground referenced, referenced to True North; calculated using COG/SOG)",
+      "1": "Theoretical Wind (ground referenced, referenced to Magnetic North; calculated using COG/SOG)",
+      "2": "Apparent Wind (relative to the vessel centerline)",
+      "3": "Theoretical (Calculated to Centerline of the vessel, refernced to ground; calculated using COG/SOG)",
+      "4": "Theoretical (Calculated to Centerline of the vessel, refernced to water; calculated using Heading/Speed through Water)"
+    }
+  },
+  "DD206": {
+    "Name": "Engine Discrete Warning Status",
+    "Format": "DF52",
+    "Bits": 16,
+    "Values": {
+      "1": "Check Engine",
+      "2": "Over Temperature",
+      "4": "Low Oil Pressure",
+      "8": "Low Oil Level",
+      "16": "Low Fuel Pressure",
+      "32": "Low System Voltage",
+      "64": "Low Coolant Level",
+      "128": "Water Flow",
+      "256": "Water in Fuel",
+      "512": "Charge Indicator",
+      "1024": "Preheat Indicator",
+      "2048": "High Boost Pressure",
+      "4096": "Rev Limit Exceeded",
+      "5192": "EGR System",
+      "10384": "Throttle Position Sensor",
+      "20768": "Engine Emergency Stop Mode"
+    }
+  },
+  "DD207": {
+    "Name": "Type of System",
+    "Format": "DF52",
+    "Bits": 4,
+    "Values": {
+      "0": "GPS",
+      "1": "GLONASS",
+      "2": "GPS+GLONASS",
+      "3": "GPS+SBAS(WAAS)",
+      "4": "GPS+SBAS+GLONASS"
+    }
+  },
+  "DD208": {
+    "Name": "Type of Fluid",
+    "Format": "DF52",
+    "Bits": 4,
+    "Values": {
+      "0": "Fuel",
+      "1": "Fresh Water",
+      "2": "Waste Water",
+      "3": "Live Well",
+      "4": "Oil",
+      "5": "Black Water (Sewage)",
+      "6": "Fuel (Gasoline)"
+    }
+  },
+  "DD209": {
+    "Name": "GNSS Integrity",
+    "Format": "DF52",
+    "Bits": 2,
+    "Values": {
+      "0": "No Integrity checking",
+      "1": "Safe",
+      "2": "Caution",
+      "3": "Unsafe"
+    }
+  },
+  "DD212": {
+    "Name": "Station Heath",
+    "Format": "DF52",
+    "Bits": 4,
+    "Values": {
+      "0": "Not Working",
+      "1": "Unmonitored",
+      "2": "Healthy & Operational",
+      "3": "Healthy & in Test Mode",
+      "4": "In Test Mode - DO NOT USE"
+    }
+  },
+  "DD216": {
+    "Name": "Track Status",
+    "Format": "DF52",
+    "Bits": 4,
+    "Values": {
+      "0": "Cancelled or Not Available",
+      "1": "Initial Acquisition Target",
+      "2": "Tracking Target",
+      "3": "Lost Target",
+      "4": "Reported Target",
+      "8": "Acquision Auto"
+    }
+  },
+  "DD217": {
+    "Name": "Unstable/Reference Target",
+    "Format": "DF52",
+    "Bits": 2,
+    "Values": {
+      "0": "Unreferenced Target",
+      "1": "Referenced Target",
+      "2": "Unstable Target",
+      "3": "Stable Target",
+      "4": "Reported Target",
+      "8": "Acquision Auto"
+    }
+  },
+  "DD218": {
+    "Name": "Direction reference for target",
+    "Format": "DF52",
+    "Bits": 2,
+    "Values": {
+      "0": "True",
+      "1": "Magnetic",
+      "2": "Error",
+      "3": "Releative"
+    }
+  },
+  "DD221": {
+    "Name": "Transmission Discrete Warning Status",
+    "Format": "DF52",
+    "Bits": 8,
+    "Values": {
+      "1": "Check Tranmission",
+      "2": "Over Temperature",
+      "4": "Low Oil Pressure",
+      "8": "Low Oil Level",
+      "16": "Sail Drive"
+    }
+  },
+  "DD222": {
+    "Name": "Transmission Gear",
+    "Format": "DF52",
+    "Bits": 2,
+    "Values": {
+      "0": "Forward",
+      "1": "Neutral",
+      "2": "Reverse"
+    }
+  },
+  "DD223": {
+    "Name": "Engine Discrete Warning Status",
+    "Format": "DF52",
+    "Bits": 16,
+    "Values": {
+      "1": "Warning Level 1",
+      "2": "Warning Level 2",
+      "4": "Power Reduction",
+      "8": "Maintenance Needed",
+      "16": "Engine Comm Error",
+      "32": "Sub or Secondary Throttle",
+      "64": "Neutral Start Protect",
+      "128": "Engine Shutting Down"
+    }
+  },
+  "DD226": {
+    "Name": "NMEA Certification Level",
+    "Format": "DF53",
+    "Bits": 8,
+    "Values": {
+      "0": "Level A",
+      "1": "Level B",
+      "2": "Not Applicable"
+    }
+  },
+  "DD229": {
+    "Name": "Temperature Instance",
+    "Format": "DF52",
+    "Bits": 6,
+    "Values": {
+      "0": "Sea Temperature",
+      "1": "Outside Temperature",
+      "2": "Inside Temperature",
+      "3": "Engine Room Temperature",
+      "4": "Main Cabin Temperature"
+    }
+  },
+  "DD230": {
+    "Name": "Humidity Instance",
+    "Format": "DF52",
+    "Bits": 2,
+    "Values": {
+      "0": "Inside Humidity",
+      "1": "Outside Humidity"
+    }
+  },
+  "DD232": {
+    "Name": "Variation Source",
+    "Format": "DF52",
+    "Bits": 4,
+    "Values": {
+      "0": "Manual Entry",
+      "1": "Automatic - Chart",
+      "2": "Automatic Table",
+      "3": "Automatic Calculation",
+      "4": "WMM 2000",
+      "5": "WMM 2005",
+      "6": "WMM 2010",
+      "7": "WMM 2015",
+      "8": "WMM 2020"
+    }
+  },
+  "DD237": {
+    "Name": "Changed at timestamp flag",
+    "Format": "DF52",
+    "Bits": 8,
+    "Values": {
+      "0": "No change in data",
+      "1": "WP: Change in main data (Position, Name)",
+      "2": "WP: Change in supplementary parameters (or new added)",
+      "4": "Changed no. of WP's in Route/WP-List, and/or name changed/added",
+      "8": "Route: Change supplementary parameters (or new added)"
+    }
+  },
+  "DD238": {
+    "Name": "WP Position Resolution",
+    "Format": "DF52",
+    "Bits": 4,
+    "Values": {
+      "0": "[>0.1]",
+      "1": "[<=0.1 & >0.01]",
+      "2": "[<=0.01 & >0.001]",
+      "3": "[<=0.001 & >0.0001]",
+      "4": "[<=0.0001 & >=0.000001]"
+    }
+  },
+  "DD239": {
+    "Name": "Route Status",
+    "Format": "DF52",
+    "Bits": 4,
+    "Values": {
+      "0": "Active",
+      "1": "Inactive",
+      "2": "Deleted"
+    }
+  },
+  "DD240": {
+    "Name": "WP Identification Method",
+    "Format": "DF52",
+    "Bits": 2,
+    "Values": {
+      "0": "WP's in WP-List",
+      "1": "WP embedded in Rute"
+    }
+  },
+  "DD241": {
+    "Name": "Navigation Direction",
+    "Format": "DF52",
+    "Bits": 3,
+    "Values": {
+      "0": "Forward",
+      "1": "Reverse"
+    }
+  },
+  "DD242": {
+    "Name": "Data Terminal Equipment (DTE)",
+    "Format": "DF52",
+    "Bits": 1,
+    "Values": {
+      "0": "Available",
+      "1": "Not available."
+    }
+  },
+  "DD244": {
+    "Name": "AIS Retransmit Flag",
+    "Format": "DF52",
+    "Bits": 1,
+    "Values": {
+      "0": "No retransmission",
+      "1": "Retransmitted."
+    }
+  },
+  "DD245": {
+    "Name": "AIS Communication State Selctor Flag",
+    "Format": "DF52",
+    "Bits": 1,
+    "Values": {
+      "0": "SOTDMA communication state",
+      "1": "ITDMA communication state follows"
+    }
+  },
+  "DD246": {
+    "Name": "AIS Transceiver Information",
+    "Format": "DF52",
+    "Bits": 5,
+    "Values": {
+      "0": "Channel A VDL reception",
+      "1": "Channel B VDL reception",
+      "2": "Channel A VDL transmission",
+      "3": "Channel B VDL transmission",
+      "4": "Own information not broadcast"
+    }
+  },
+  "DD250": {
+    "Name": "Types of Aids-to-Navigation",
+    "Format": "DF52",
+    "Bits": 5,
+    "Values": {
+      "0": "Not available",
+      "1-15": "Fixed aid-to-navigation",
+      "16-31": "Floating aid-to-navigation"
+    }
+  },
+  "DD251": {
+    "Name": "AIS Off Position Indicator",
+    "Format": "DF52",
+    "Bits": 1,
+    "Values": {
+      "0": "On position",
+      "1": "Off position"
+    }
+  },
+  "DD252": {
+    "Name": "AIS Power",
+    "Format": "DF52",
+    "Bits": 1,
+    "Values": {
+      "0": "High",
+      "1": "Low"
+    }
+  },
+  "DD253": {
+    "Name": "AIS Tx/Rx Mode",
+    "Format": "DF52",
+    "Bits": 4,
+    "Values": {
+      "0": "Tx A/Tx B, Rx A/Rx B",
+      "1": "Tx A, Rx A/Rx B",
+      "2": "Tx B, Rx A/Rx B"
+    }
+  },
+  "DD254": {
+    "Name": "AIS Addressed or Broadcast Message Indicator",
+    "Format": "DF52",
+    "Bits": 1,
+    "Values": {
+      "0": "Broadcast geographical area message",
+      "1": "Addressed message (to individual station(s))"
+    }
+  },
+  "DD255": {
+    "Name": "AIS Channel Bandwidth",
+    "Format": "DF52",
+    "Bits": 1,
+    "Values": {
+      "0": "default (as specified by channel number)",
+      "1": "12.5 kHz bandwidth"
+    }
+  },
+  "DD258": {
+    "Name": "Critical supplementary Route parameters",
+    "Format": "DF52",
+    "Bits": 8,
+    "Values": {
+      "0": "There are no parameters additional to the Waypoint Positions",
+      "1": "Navigation Method (GC/RL), PGN 130069",
+      "2": "XTE Limit, PGN 130069"
+    }
+  },
+  "DD259": {
+    "Name": "AC Acceptability",
+    "Format": "DF52",
+    "Bits": 2,
+    "Values": {
+      "0": "Bad Level",
+      "1": "Bad Frequency",
+      "2": "Being Qualified",
+      "3": "Good"
+    }
+  },
+  "DD264": {
+    "Name": "Charger Operating State",
+    "Format": "DF52",
+    "Bits": 4,
+    "Values": {
+      "0": "Not Charging",
+      "1": "Bulk",
+      "2": "Absorption",
+      "3": "Overcharge",
+      "4": "Equalize",
+      "5": "Float",
+      "6": "No Float",
+      "7": "Constant VI",
+      "8": "Disabled"
+    }
+  },
+  "DD265": {
+    "Name": "Charger Mode",
+    "Format": "DF52",
+    "Bits": 4,
+    "Values": {
+      "0": "Standalone",
+      "1": "Primary",
+      "2": "Secondary",
+      "3": "Echo"
+    }
+  },
+  "DD266": {
+    "Name": "Invertor Operating State",
+    "Format": "DF52",
+    "Bits": 4,
+    "Values": {
+      "0": "Invert",
+      "1": "AC Passthru",
+      "2": "Load Sense",
+      "3": "Fault",
+      "4": "Disabled"
+    }
+  },
+  "DD270": {
+    "Name": "AC Line",
+    "Format": "DF52",
+    "Bits": 2,
+    "Values": {
+      "0": "Line 1",
+      "1": "Line 2",
+      "2": "Line 3"
+    }
+  },
+  "DD272": {
+    "Name": "Charging Algorithm",
+    "Format": "DF52",
+    "Bits": 4,
+    "Values": {
+      "0": "Trickle",
+      "1": "CVCC (Constant Voltage Constant Current)",
+      "2": "2 Stage (No float)",
+      "3": "3 Stage"
+    }
+  },
+  "DD273": {
+    "Name": "Waveform",
+    "Format": "DF52",
+    "Bits": 3,
+    "Values": {
+      "0": "Sine Wave",
+      "1": "Modified Sine Wave"
+    }
+  },
+  "DD274": {
+    "Name": "Batt Temp - No Sensor",
+    "Format": "DF52",
+    "Bits": 4,
+    "Values": {
+      "0": "Cold",
+      "1": "Warm",
+      "2": "Hot"
+    }
+  },
+  "DD275": {
+    "Name": "Inverter Mode",
+    "Format": "DF52",
+    "Bits": 4,
+    "Values": {
+      "0": "Standalone",
+      "1": "Series Master",
+      "2": "Series Slave",
+      "3": "Parallel Master",
+      "4": "Parallel Slave"
+    }
+  },
+  "DD277": {
+    "Name": "AGS Mode",
+    "Format": "DF52",
+    "Bits": 4,
+    "Values": {
+      "0": "Off",
+      "1": "On",
+      "2": "Automatic"
+    }
+  },
+  "DD278": {
+    "Name": "AGS Operating State",
+    "Format": "DF52",
+    "Bits": 4,
+    "Values": {
+      "0": "Quiet Time",
+      "1": "Auto On",
+      "2": "Auto Off",
+      "3": "Manual On",
+      "4": "Manual Off",
+      "5": "Generator Shutdown",
+      "6": "External Shutdown",
+      "7": "Fault",
+      "8": "Suspend",
+      "9": "Not Operating"
+    }
+  },
+  "DD279": {
+    "Name": "Generator State",
+    "Format": "DF52",
+    "Bits": 4,
+    "Values": {
+      "0": "Preheating",
+      "1": "Start Delay",
+      "2": "Cranking",
+      "3": "Starter Cooling",
+      "4": "Warming Up",
+      "5": "Cooling Down",
+      "6": "Spinning Down",
+      "7": "Shutdown Bypass",
+      "8": "Stopping",
+      "9": "Running",
+      "10": "Stopped",
+      "11": "Crank Delay"
+    }
+  },
+  "DD280": {
+    "Name": "Generator On Reason",
+    "Format": "DF52",
+    "Bits": 8,
+    "Values": {
+      "0": "Not On",
+      "1": "DC Voltage Low",
+      "2": "Battery State Of Charge Low",
+      "3": "AC Current High",
+      "4": "Contact Closed",
+      "5": "Manual On",
+      "6": "Exercise",
+      "7": "Non Quiet Time",
+      "8": "External On Via AGS",
+      "9": "External On Via Generator",
+      "10": "Unable to Stop"
+    }
+  },
+  "DD281": {
+    "Name": "Generator Off Reason",
+    "Format": "DF52",
+    "Bits": 8,
+    "Values": {
+      "0": "Not Off",
+      "1": "DC Voltage High",
+      "2": "Battery State Of Charge High",
+      "3": "AC Current Low",
+      "4": "Contact Opened",
+      "5": "Reached Absorption",
+      "6": "Reached Float",
+      "7": "Manual Off",
+      "8": "Max Run Time",
+      "9": "Max Auto Cycle",
+      "10": "Exercise Done",
+      "11": "Quiet Time",
+      "12": "External Off Via AGS",
+      "13": "Safe Mode",
+      "14": "External Off Via Generator",
+      "15": "External Shutdown",
+      "16": "Auto Off",
+      "17": "Fault",
+      "18": "Unable to Start"
+    }
+  },
+  "DD282": {
+    "Name": "Battery Type",
+    "Format": "DF52",
+    "Bits": 4,
+    "Values": {
+      "0": "Flooded",
+      "1": "GEL",
+      "2": "AGM"
+    }
+  },
+  "DD284": {
+    "Name": "Nominal Voltage",
+    "Format": "DF52",
+    "Bits": 4,
+    "Values": {
+      "0": "6 Volts",
+      "1": "12 Volts",
+      "2": "24 Volts",
+      "3": "32 Volts",
+      "4": "36 Volts",
+      "5": "42 Volts",
+      "6": "48 Volts"
+    }
+  },
+  "DD285": {
+    "Name": "Battery Chemistry",
+    "Format": "DF52",
+    "Bits": 4,
+    "Values": {
+      "0": "Lead Acid",
+      "1": "LiIon",
+      "2": "NiCad",
+      "3": "ZnO",
+      "4": "NiMH"
+    }
+  },
+  "DD288": {
+    "Name": "DC Type",
+    "Format": "DF52",
+    "Bits": 8,
+    "Values": {
+      "0": "Battery",
+      "1": "Alternator",
+      "2": "Convertor",
+      "3": "Solar Cell",
+      "4": "Wind Generator"
+    }
+  },
+  "DD289": {
+    "Name": "Pressure Source",
+    "Format": "DF52",
+    "Bits": 8,
+    "Values": {
+      "0": "Atmospheric Pressure",
+      "1": "Water Pressure",
+      "2": "Steam Pressure",
+      "3": "Compressed Air Pressure",
+      "4": "Hydraulic Pressure",
+      "5": "Filter Pressure",
+      "6": "Altimiter Setting",
+      "7": "Oil Pressure",
+      "8": "Fuel Pressure",
+      "129-252": "Generic pressure sources other than those defined"
+    }
+  },
+  "DD291": {
+    "Name": "Temperature Source",
+    "Format": "DF52",
+    "Bits": 8,
+    "Values": {
+      "0": "Sea Temperature",
+      "1": "Outside Temperature",
+      "2": "Inside Temperature",
+      "3": "Engine Room Temperature",
+      "4": "Main Cabin Temperature",
+      "5": "Live Well Temperature",
+      "6": "Bait Well Temperature",
+      "7": "Refrigeration Temperature",
+      "8": "Heating System Temperature",
+      "9": "Dew Point Temperature",
+      "10": "Wind Chill Temperature, Apparent",
+      "11": "Wind Chill Temperature, Theoretical",
+      "12": "Heat Index Temperature",
+      "13": "Freezer Temperature",
+      "14": "Exhaust Gas Temperature"
+    }
+  },
+  "DD292": {
+    "Name": "Humidity Source",
+    "Format": "DF52",
+    "Bits": 8,
+    "Values": {
+      "0": "Inside Humidity",
+      "1": "Outside Humidity"
+    }
+  },
+  "DD293": {
+    "Name": "Speed Water Reference Type",
+    "Format": "DF52",
+    "Bits": 8,
+    "Values": {
+      "0": "Paddle Wheel",
+      "1": "Pitot Tube",
+      "2": "Doppler Log",
+      "3": "Correlation Log (Ultra-Sound)",
+      "4": "EM Log (Electro - Magnetic)"
+    }
+  },
+  "DD294": {
+    "Name": "AIS ClassB Unit Flag",
+    "Format": "DF52",
+    "Bits": 1,
+    "Values": {
+      "0": "Class B SOTDMA unit",
+      "1": "Class B “CS” unit"
+    }
+  },
+  "DD295": {
+    "Name": "AIS Class B Display Flag",
+    "Format": "DF52",
+    "Bits": 1,
+    "Values": {
+      "0": "No display available",
+      "1": "Equipped with integrated display"
+    }
+  },
+  "DD296": {
+    "Name": "AIS Class B DSC Flag",
+    "Format": "DF52",
+    "Bits": 1,
+    "Values": {
+      "0": "Not equipped with DSC function",
+      "1": "Equipped with DSC function"
+    }
+  },
+  "DD297": {
+    "Name": "AIS Class B Band Flag",
+    "Format": "DF52",
+    "Bits": 1,
+    "Values": {
+      "0": "Upper 525 kHz band",
+      "1": "Whole marine band"
+    }
+  },
+  "DD298": {
+    "Name": "AIS Class B Msg 22 Flag",
+    "Format": "DF52",
+    "Bits": 1,
+    "Values": {
+      "0": "No frequency management",
+      "1": "Frequency management"
+    }
+  },
+  "DD299": {
+    "Name": "AIS Mode Flag",
+    "Format": "DF52",
+    "Bits": 1,
+    "Values": {
+      "0": "Autonomous mode",
+      "1": "Assigned mode"
+    }
+  },
+  "DD300": {
+    "Name": "Ship/Cargo Filter",
+    "Format": "DF52",
+    "Bits": 8,
+    "Values": {
+      "0": "All types",
+      "1-99": "Identifiers to be used by ships to report their type"
+    }
+  },
+  "DD301": {
+    "Name": "AIS Station Type",
+    "Format": "DF52",
+    "Bits": 4,
+    "Values": {
+      "0": "All types of mobiles",
+      "1": "Reserved for future use",
+      "2": "All types of Class B mobile stations",
+      "3": "SAR airborne mobile station",
+      "4": "AtoN station",
+      "5": "Class B “CS” shipborne mobile station only",
+      "6": "Inland waterways"
+    }
+  },
+  "DD302": {
+    "Name": "AIS Reporting Interval for Class B",
+    "Format": "DF52",
+    "Bits": 4,
+    "Values": {
+      "0": "As given by the autonomous mode",
+      "1": "10 min",
+      "2": "6 min",
+      "3": "3 min",
+      "4": "1 min",
+      "5": "30 sec",
+      "6": "15 sec",
+      "7": "10 sec",
+      "8": "5 sec",
+      "9": "Next shorter reporting interval",
+      "10": "Next longer reporting interval",
+      "11": "2 sec (not applicable to the Class B “CS”)"
+    }
+  },
+  "DD303": {
+    "Name": "AIS Quiet Time",
+    "Format": "DF52",
+    "Bits": 4,
+    "Values": {
+      "0": "No quiet time commanded",
+      "1-15": "Quiet time of 1 to 15 min"
+    }
+  },
+  "DD304": {
+    "Name": "AIS Version Indicator",
+    "Format": "DF52",
+    "Bits": 2,
+    "Values": {
+      "0": "Station compliant with AIS edition 0",
+      "1-3": "Station compliant with AIS editions 1, 2, and 3"
+    }
+  },
+  "DD305": {
+    "Name": "AIS Aids to Navigation Type",
+    "Format": "DF52",
+    "Bits": 5,
+    "Values": {
+      "0": "Type of AtoN not specified",
+      "1": "Reference point",
+      "2": "RACON",
+      "3": "Fixed structures off-shore",
+      "4": "Spare, Reserved for future use",
+      "5": "Light, without sectors",
+      "6": "Light, with sectors",
+      "7": "Leading Light Front",
+      "8": "Leading Light Rear",
+      "9": "Beacon, Cardinal N",
+      "10": "Beacon, Cardinal E",
+      "11": "Beacon, Cardinal S",
+      "12": "Beacon, Cardinal W",
+      "13": "Beacon, Port hand",
+      "14": "Beacon, Starboard hand",
+      "15": "Beacon, Preferred Channel port hand",
+      "16": "Beacon, Preferred Channel starboard hand",
+      "17": "Beacon, Isolated danger",
+      "18": "Beacon, Safe water",
+      "19": "Beacon, Special mark",
+      "20": "Cardinal Mark N",
+      "21": "Cardinal Mark E",
+      "22": "Cardinal Mark S",
+      "23": "Cardinal Mark W",
+      "24": "Port hand Mark",
+      "25": "Starboard hand Mark",
+      "26": "Preferred Channel Port hand",
+      "27": "Preferred Channel Starboard hand",
+      "28": "Isolated danger",
+      "29": "Safe Water",
+      "30": "Special Mark",
+      "31": "Light Vessel/LANBY/Rigs"
+    }
+  },
+  "DD306": {
+    "Name": "Off position indicator",
+    "Format": "DF52",
+    "Bits": 1,
+    "Values": {
+      "0": "on position",
+      "1": "off position"
+    }
+  },
+  "DD307": {
+    "Name": "Virtual AtoN Flag",
+    "Format": "DF52",
+    "Bits": 1,
+    "Values": {
+      "0": "Real AtoN at indicated position",
+      "1": "Virtual AtoN, does not physically exist"
+    }
+  },
+  "DD308": {
+    "Name": "AIS Assigned Mode Flag",
+    "Format": "DF52",
+    "Bits": 1,
+    "Values": {
+      "0": "Autonomous and continuous mode",
+      "1": "Assigned mode"
+    }
+  },
+  "DD309": {
+    "Name": "AtoN Status",
+    "Format": "DF52",
+    "Bits": 8
+  },
+  "DD310": {
+    "Name": "Special Maneuver Indicator",
+    "Format": "DF52",
+    "Bits": 2,
+    "Values": {
+      "0": "Not available",
+      "1": "Not engaged in special Maneuver",
+      "2": "Engaged in special Maneuver"
+    }
+  },
+  "DD312": {
+    "Name": "Scale Measurement Status",
+    "Format": "DF52",
+    "Bits": 3,
+    "Values": {
+      "0": "Current Changing",
+      "1": "Current Stable",
+      "2": "Measurement Locked",
+      "4": "Almanac Mass"
+    }
+  },
+  "DD315": {
+    "Name": "Alert Type",
+    "Format": "DF52",
+    "Bits": 4,
+    "Values": {
+      "1": "Emergency Alarm",
+      "2": "Alarm",
+      "5": "Warning",
+      "8": "Caution"
+    }
+  },
+  "DD316": {
+    "Name": "Alert Category",
+    "Format": "DF52",
+    "Bits": 4,
+    "Values": {
+      "0": "Navigational",
+      "1": "Technical"
+    }
+  },
+  "DD321": {
+    "Name": "Temporary Silence Status",
+    "Format": "DF52",
+    "Bits": 1,
+    "Values": {
+      "0": "Not Temporary Silence",
+      "1": "Temporary Silence"
+    }
+  },
+  "DD322": {
+    "Name": "Acknowledge Status",
+    "Format": "DF52",
+    "Bits": 1,
+    "Values": {
+      "0": "Not Acknowledged",
+      "1": "Acknowledged"
+    }
+  },
+  "DD323": {
+    "Name": "Escalation Status",
+    "Format": "DF52",
+    "Bits": 1,
+    "Values": {
+      "0": "Not Escalated",
+      "1": "Escalated"
+    }
+  },
+  "DD324": {
+    "Name": "Temporary Silence Support",
+    "Format": "DF52",
+    "Bits": 1,
+    "Values": {
+      "0": "Not Supported",
+      "1": "Supported"
+    }
+  },
+  "DD325": {
+    "Name": "Acknowledge Support",
+    "Format": "DF52",
+    "Bits": 1,
+    "Values": {
+      "0": "Not Supported",
+      "1": "Supported"
+    }
+  },
+  "DD326": {
+    "Name": "Escalation Support",
+    "Format": "DF52",
+    "Bits": 1,
+    "Values": {
+      "0": "Not Supported",
+      "1": "Supported"
+    }
+  },
+  "DD327": {
+    "Name": "NAME Selection Criteria Mask",
+    "Format": "DF52",
+    "Bits": 12,
+    "Values": {
+      "1": "NAME shall match Unique ID field",
+      "2": "NAME shall match Manufacturer Code field",
+      "4": "NAME shall match Device Instance Lower field",
+      "8": "NAME shall match Device Instance Upper field",
+      "16": "NAME shall match Device Function field",
+      "64": "NAME shall match Device Class field",
+      "128": "NAME shall match System Instance field",
+      "256": "NAME shall match Industry Group field"
+    }
+  },
+  "DD328": {
+    "Name": "Trigger Condition",
+    "Format": "DF52",
+    "Bits": 4,
+    "Values": {
+      "0": "Manual",
+      "1": "Auto",
+      "2": "Test",
+      "3": "Disabled"
+    }
+  },
+  "DD329": {
+    "Name": "Threshold Status",
+    "Format": "DF52",
+    "Bits": 4,
+    "Values": {
+      "0": "Normal",
+      "1": "Threshold Exceeded",
+      "2": "Extreme Threshold Exceeded",
+      "3": "Low Threshold Exceeded",
+      "4": "Extreme Low Threshold Exceeded"
+    }
+  },
+  "DD332": {
+    "Name": "Response Command",
+    "Format": "DF52",
+    "Bits": 2,
+    "Values": {
+      "0": "Acknowledge",
+      "1": "Temporary Silence",
+      "2": "Test Command Off",
+      "3": "Test Command On"
+    }
+  },
+  "DD333": {
+    "Name": "Alert Control",
+    "Format": "DF52",
+    "Bits": 2,
+    "Values": {
+      "0": "Disabled",
+      "1": "Enabled"
+    }
+  },
+  "DD337": {
+    "Name": "Trigger Method",
+    "Format": "DF52",
+    "Bits": 8,
+    "Values": {
+      "0": "Manual",
+      "1": "Automatic",
+      "2": "Threshold Reached Ascending",
+      "3": "Threshold Reached Descending"
+    }
+  },
+  "DD342": {
+    "Name": "Converter Operating State",
+    "Format": "DF52",
+    "Bits": 8,
+    "Values": {
+      "0": "Off",
+      "1": "Low Power Mode",
+      "2": "Fault",
+      "3": "Bulk",
+      "4": "Absorption",
+      "5": "Float",
+      "6": "Storage",
+      "7": "Equalize",
+      "8": "Pass thru",
+      "9": "Inverting",
+      "10": "Assisting"
+    }
+  },
+  "DD343": {
+    "Name": "Converter Temperature State",
+    "Format": "DF52",
+    "Bits": 2,
+    "Values": {
+      "0": "Ok",
+      "1": "Warning",
+      "2": "Over Temperature",
+      "3": "Not Available"
+    }
+  },
+  "DD344": {
+    "Name": "Converter Overload State",
+    "Format": "DF52",
+    "Bits": 2,
+    "Values": {
+      "0": "Ok",
+      "1": "Warning",
+      "2": "Overload",
+      "3": "Not Available"
+    }
+  },
+  "DD345": {
+    "Name": "Converter Low DC Voltage State",
+    "Format": "DF52",
+    "Bits": 2,
+    "Values": {
+      "0": "Ok",
+      "1": "Warning",
+      "2": "DC voltage too low"
+    }
+  },
+  "DD346": {
+    "Name": "Converter Ripple State",
+    "Format": "DF52",
+    "Bits": 2,
+    "Values": {
+      "0": "Ok",
+      "1": "Ripple Warning",
+      "2": "Ripple Too High"
+    }
+  },
+  "DD351": {
+    "Name": "Connection State",
+    "Format": "DF52",
+    "Bits": 8,
+    "Values": {
+      "0": "OFF Connection is OFF - Hi Impedance",
+      "1": "LOW Connected to Ground",
+      "2": "HIGH Connected to Supply",
+      "3": "TRIPPED Max. Device capabilities Exceeded Connection is OFF",
+      "4": "PWM Connection is Pulse Width Modulated - Dimmer",
+      "5": "TIMED_OFF Connection is OFF for TimeOFF, then HIGH",
+      "6": "TIMED_ON Connection is HIGH for TimeON, then OFF",
+      "7": "CYCLE_OFF Connection is OFF for TimeOFF, then CYCLE_ON",
+      "8": "CYCLE_ON Connection is HIGH for TimeON, then CYCLE_OFF",
+      "128": "FAULT Internal Failure",
+      "192": "RESET Reset TRIPPED to OFF",
+      "193": "DESTROY Command to Destroy Fuse"
+    }
+  },
+  "DD352": {
+    "Name": "Connection Status",
+    "Format": "DF52",
+    "Bits": 16,
+    "Values": {
+      "1": "SENSED_HIGH-HIGH voltage level detected",
+      "2": "SENSED_LOW- voltage level detected",
+      "4": "SHORT- Current draw Exceeds device capability",
+      "8": "NO_LOAD- When HIGH, No Load detected",
+      "16": "FUSE_FAIL- Blown or removed",
+      "32": "FUSE_DESTRUCT - Fuse was Commanded to destroy",
+      "64": "GFCI_FAULT- Ground fault leakage detected",
+      "128": "OVER_VOLTAGE- Voltage Greater than Over Voltage Value",
+      "256": "OVER_CURRENT- Current Greater than Over Current Value",
+      "512": "UNDER_VOLTAGE- Voltage Less than Under Voltage Value",
+      "1024": "UNDER_CURRENT- Current Less than Under Current Value"
+    }
+  },
+  "DD353": {
+    "Name": "AIS Channel Management Source",
+    "Format": "DF52",
+    "Bits": 3,
+    "Values": {
+      "0": "When this PGN is sent to an AIS unit",
+      "1": "ITU-R M.1371 message 22: Channel Management addressed message",
+      "2": "ITU-R M.1371 message 22: Channel Management broadcast geographical area message",
+      "3": "NMEA 0183 ACA Sentence or NMEA Network PGN129806",
+      "4": "DSC Channel 70 Telecommand",
+      "5": "Operator manual input"
+    }
+  },
+  "DD354": {
+    "Name": "AIS Channel Management Parameters Usage",
+    "Format": "DF52",
+    "Bits": 2,
+    "Values": {
+      "0": "Not in use",
+      "1": "In use"
+    }
+  },
+  "DD355": {
+    "Name": "Language ID",
+    "Format": "DF53",
+    "Bits": 8,
+    "Values": {
+      "0": "English (US)",
+      "1": "English (UK)",
+      "2": "Arabic",
+      "3": "Chinese (simplified)",
+      "4": "Croatian",
+      "5": "Danish",
+      "6": "Dutch",
+      "7": "Finnish",
+      "8": "French",
+      "9": "German",
+      "10": "Greek",
+      "11": "Italian",
+      "12": "Japanese",
+      "13": "Korean",
+      "14": "Norwegian",
+      "15": "Polish",
+      "16": "Portuguese(Brazilian)",
+      "17": "Russian",
+      "18": "Spanish",
+      "19": "Sweedish"
+    }
+  },
+  "DD356": {
+    "Name": "Speed Direction",
+    "Format": "DF52",
+    "Bits": 4,
+    "Values": {
+      "0": "Forward (Ahead)",
+      "1": "Astern (Backward)"
+    }
+  },
+  "DD357": {
+    "Name": "Hardware Channel ID",
+    "Format": "DF53",
+    "Bits": 8
+  },
+  "DD358": {
+    "Name": "Secondary Enumeration Field Value",
+    "Format": "DF53",
+    "Bits": 8
+  },
+  "DD359": {
+    "Name": "Data Source Channel ID",
+    "Format": "DF53",
+    "Bits": 8
+  },
+  "DD360": {
+    "Name": "Source Selection Status",
+    "Format": "DF52",
+    "Bits": 2,
+    "Values": {
+      "0": "No source selected for this channel",
+      "1": "Source selected for this channel"
+    }
+  },
+  "DD362": {
+    "Name": "Operational Status & Control",
+    "Format": "DF52",
+    "Bits": 3,
+    "Values": {
+      "1": "Locked - Disable/Enable ability to Change State",
+      "2": "Security - Disable/Enable ability to Lock/Unlock"
+    }
+  },
+  "DD363": {
+    "Name": "Watermaker Operating State",
+    "Format": "DF52",
+    "Bits": 6,
+    "Values": {
+      "0": "Stopped",
+      "1": "Starting",
+      "2": "Running",
+      "3": "Stopping",
+      "4": "Flushing",
+      "5": "Rinsing",
+      "6": "Initiating",
+      "7": "Manual Mode"
+    }
+  },
+  "DD364": {
+    "Name": "Sensor Status",
+    "Format": "DF52",
+    "Bits": 2,
+    "Values": {
+      "0": "OK",
+      "1": "Warning"
+    }
+  },
+  "DD370": {
+    "Name": "Position Source",
+    "Format": "DF52",
+    "Bits": 3,
+    "Values": {
+      "0": "MOB Position estimated by the Vessel",
+      "1": "MOB position reported by MOB emitter"
+    }
+  },
+  "DD371": {
+    "Name": "Battery Status",
+    "Format": "DF52",
+    "Bits": 3,
+    "Values": {
+      "0": "Good",
+      "1": "Low"
+    }
+  },
+  "DD374": {
+    "Name": "Measurement Delay Source",
+    "Format": "DF52",
+    "Bits": 4,
+    "Values": {
+      "0": "User Defined",
+      "1": "Minimum Supported Value",
+      "2": "Factory Default Value",
+      "3": "Maximum Supported Value"
+    }
+  },
+  "DD376": {
+    "Name": "Command / Report",
+    "Format": "DF52",
+    "Bits": 3,
+    "Values": {
+      "0": "Command",
+      "1": "Report"
+    }
+  },
+  "DD378": {
+    "Name": "Transmit Mode of Operation",
+    "Format": "DF52",
+    "Bits": 3,
+    "Values": {
+      "0": "Normal",
+      "1": "Receive-Only",
+      "2": "Restricted"
+    }
+  },
+  "DD379": {
+    "Name": "Encrypted Message Selection",
+    "Format": "DF52",
+    "Bits": 3,
+    "Values": {
+      "0": "ITU-R M.1371 Messages 25 and 26",
+      "1": "ITU-R M.1371 Messages 6 and 8"
+    }
+  },
+  "DD380": {
+    "Name": "Non Volatile Persistence",
+    "Format": "DF52",
+    "Bits": 3,
+    "Values": {
+      "0": "Transponder will default to last known Mode of Operation when power is cycled.",
+      "1": "Transponder will default to Restricted Mode of Operation when power is cycled."
+    }
+  },
+  "DD381": {
+    "Name": "Type of AIS Asset",
+    "Format": "DF52",
+    "Bits": 3,
+    "Values": {
+      "0": "Vessel",
+      "1": "Aircraft"
+    }
+  },
+  "DD382": {
+    "Name": "AES Encryption Key Size",
+    "Format": "DF52",
+    "Bits": 3,
+    "Values": {
+      "0": "128 bits",
+      "1": "192 bits",
+      "2": "256 bits"
+    }
+  },
+  "DD384": {
+    "Name": "CAN State",
+    "Format": "DF52",
+    "Bits": 2,
+    "Values": {
+      "0": "Error active",
+      "1": "Error passive",
+      "2": "Bus off"
+    }
+  },
+  "DD385": {
+    "Name": "Device Status",
+    "Format": "DF52",
+    "Bits": 2,
+    "Values": {
+      "0": "Operational",
+      "1": "Fault"
+    }
+  },
+  "DD386": {
+    "Name": "AIS Binary Structure",
+    "Format": "DF52",
+    "Bits": 1,
+    "Values": {
+      "0": "Unstructured binary data (no Application Identifier bits used)",
+      "1": "Binary data coded as defined by using the 16-bit"
+    }
+  },
+  "DD387": {
+    "Name": "AIS Destination Indicator",
+    "Format": "DF52",
+    "Bits": 1,
+    "Values": {
+      "0": "Broadcast (no Destination ID field used)",
+      "1": "Addressed (Destination ID field uses 30 data bits for MMSI)"
+    }
+  },
+  "DD388": {
+    "Name": "AIS Position Latency Flag",
+    "Format": "DF52",
+    "Bits": 1,
+    "Values": {
+      "0": "Reported position latency is less than 5 seconds",
+      "1": "Reported position latency is greater than 5 seconds"
+    }
+  },
+  "DD389": {
+    "Name": "Audio/Video Source Type",
+    "Format": "DF52",
+    "Bits": 8,
+    "Values": {
+      "0": "Vessel Alarm",
+      "1": "AM",
+      "2": "FM",
+      "3": "Weather",
+      "4": "DAB",
+      "5": "Aux",
+      "6": "USB",
+      "7": "CD",
+      "8": "MP3",
+      "9": "Apple iOS",
+      "10": "Android",
+      "11": "Bluetooth",
+      "12": "Sirius XM",
+      "13": "Pandora",
+      "14": "Spotify",
+      "15": "Slacker",
+      "16": "Songza",
+      "17": "Apple Radio",
+      "18": "Last FM",
+      "19": "Ethernet",
+      "20": "Video MP4",
+      "21": "Video DVD",
+      "22": "Video BlueRay",
+      "23": "HDMI",
+      "24": "Video"
+    }
+  },
+  "DD390": {
+    "Name": "Play Status",
+    "Format": "DF52",
+    "Bits": 8,
+    "Values": {
+      "0": "Play (Normal functionality)",
+      "1": "Pause",
+      "2": "Stop",
+      "3": "FF (1x)",
+      "4": "FF (2x)",
+      "5": "FF (3x)",
+      "6": "FF (4x)",
+      "7": "RW (1x)",
+      "8": "RW (2x)",
+      "9": "RW (3x)",
+      "10": "RW (4x)",
+      "11": "Skip Ahead",
+      "12": "Skip Back",
+      "13": "Jog Ahead",
+      "14": "Jog Back",
+      "15": "Seek Up",
+      "16": "Seek Down",
+      "17": "Scan Up",
+      "18": "Scan Down",
+      "19": "Tune Up",
+      "20": "Tune Down",
+      "21": "Slow Motion (.75x)",
+      "22": "Slow Motion (.5x)",
+      "23": "Slow Motion (.25x)",
+      "24": "Slow Motion (.125x)"
+    }
+  },
+  "DD392": {
+    "Name": "Repeat",
+    "Format": "DF52",
+    "Bits": 4,
+    "Values": {
+      "0": "Off",
+      "1": "One (Current File)",
+      "2": "All (Play Queue)"
+    }
+  },
+  "DD393": {
+    "Name": "Shuffle",
+    "Format": "DF52",
+    "Bits": 4,
+    "Values": {
+      "0": "Off",
+      "1": "Play Queue",
+      "2": "All"
+    }
+  },
+  "DD394": {
+    "Name": "Thumbs Up / Thumbs Down",
+    "Format": "DF52",
+    "Bits": 8,
+    "Values": {
+      "0": "None",
+      "1": "Thumbs Up",
+      "2": "Thumbs Down"
+    }
+  },
+  "DD395": {
+    "Name": "Library Data Type",
+    "Format": "DF52",
+    "Bits": 8,
+    "Values": {
+      "0": "File",
+      "1": "Playlist Name",
+      "2": "Genre Name",
+      "3": "Album Name",
+      "4": "Artist Name",
+      "5": "Track Name",
+      "6": "Station Name",
+      "7": "Station Number",
+      "8": "Favorite Number",
+      "9": "Play Queue"
+    }
+  },
+  "DD396": {
+    "Name": "Entertainment Zones",
+    "Format": "DF52",
+    "Bits": 8,
+    "Values": {
+      "0": "All Zones",
+      "1": "Zone 1",
+      "2": "Zone 2",
+      "3": "Zone 3"
+    }
+  },
+  "DD397": {
+    "Name": "ID Type",
+    "Format": "DF52",
+    "Bits": 8,
+    "Values": {
+      "0": "Group",
+      "1": "File"
+    }
+  },
+  "DD398": {
+    "Name": "Default Setting",
+    "Format": "DF52",
+    "Bits": 2,
+    "Values": {
+      "0": "Save current settings as user default",
+      "1": "Load user default (soft reset)",
+      "2": "Load manufacturer default (hard reset)"
+    }
+  },
+  "DD399": {
+    "Name": "Tuner Regions",
+    "Format": "DF52",
+    "Bits": 4,
+    "Values": {
+      "0": "US",
+      "1": "Europe",
+      "2": "Asia",
+      "3": "Middle East",
+      "4": "Latin America",
+      "5": "Australia",
+      "6": "Russia"
+    }
+  },
+  "DD400": {
+    "Name": "Audio Volume - Relative",
+    "Format": "DF52",
+    "Bits": 2,
+    "Values": {
+      "0": "Volume Up",
+      "1": "Volume Down"
+    }
+  },
+  "DD401": {
+    "Name": "EQ Preset Type",
+    "Format": "DF52",
+    "Bits": 8,
+    "Values": {
+      "0": "Flat",
+      "1": "Rock",
+      "2": "Hall",
+      "3": "Jazz",
+      "4": "Pop",
+      "5": "Live",
+      "6": "Classic",
+      "7": "Vocal",
+      "8": "Arena",
+      "9": "Cinema"
+    }
+  },
+  "DD402": {
+    "Name": "Audio Filter Setting",
+    "Format": "DF52",
+    "Bits": 8,
+    "Values": {
+      "0": "Full Range",
+      "1": "High Pass",
+      "2": "Low Pass",
+      "3": "Band Pass",
+      "4": "Notch Filter"
+    }
+  },
+  "DD403": {
+    "Name": "Supported Play Status",
+    "Format": "DF52",
+    "Bits": 32,
+    "Values": {
+      "1": "Play ( Normal)",
+      "2": "Pause",
+      "4": "Pause",
+      "8": "FF (1x)",
+      "16": "FF (2x)",
+      "32": "FF (3x)",
+      "64": "FF (4x)",
+      "128": "RW (1x)",
+      "256": "RW (2x)",
+      "512": "RW (3x)",
+      "1024": "RW (4x)",
+      "2048": "Skip Ahead",
+      "4096": "Skip Back",
+      "8192": "Jog Ahead",
+      "16384": "Jog Back",
+      "32768": "Seek Up",
+      "65563": "Seek Down",
+      "131072": "Scan Up",
+      "262144": "Scan Down",
+      "524288": "Tune Up",
+      "1048576": "Tune Down",
+      "2097152": "Slow Mot. (.75x)",
+      "4194304": "Slow Mot. (.5x)",
+      "8388608": "Slow Mot. (.25x)",
+      "16777216": "Slow Mot. (.125x)"
+    }
+  },
+  "DD404": {
+    "Name": "Supported Browsing Methods",
+    "Format": "DF52",
+    "Bits": 16,
+    "Values": {
+      "1": "Filename",
+      "2": "Playlist",
+      "4": "Genre",
+      "8": "Album",
+      "16": "Artist",
+      "32": "Track",
+      "64": "Station Name",
+      "128": "Station Number",
+      "256": "Favorite Number",
+      "512": "Play Queue"
+    }
+  },
+  "DD405": {
+    "Name": "Repeat Supported",
+    "Format": "DF52",
+    "Bits": 4,
+    "Values": {
+      "1": "Song",
+      "2": "Play Queue"
+    }
+  },
+  "DD406": {
+    "Name": "Bluetooth Pairing Status",
+    "Format": "DF52",
+    "Bits": 4,
+    "Values": {
+      "0": "Discovering",
+      "1": "Connect",
+      "2": "Connecting (read only)",
+      "3": "Not Connected / Disconnect"
+    }
+  },
+  "DD407": {
+    "Name": "Bluetooth Device Status",
+    "Format": "DF52",
+    "Bits": 8,
+    "Values": {
+      "0": "Connected",
+      "1": "Not Connected (In Memory)",
+      "2": "Not Paired (Available)"
+    }
+  },
+  "DD409": {
+    "Name": "Shuffle Supported",
+    "Format": "DF52",
+    "Bits": 4,
+    "Values": {
+      "1": "Play Queue",
+      "2": "All"
+    }
+  },
+  "DD410": {
+    "Name": "Engine / Transmission Instance",
+    "Format": "DF52",
+    "Bits": 8
+  },
+  "DD411": {
+    "Name": "User Defined Alert Assignment",
+    "Format": "DF52",
+    "Bits": 2,
+    "Values": {
+      "0": "Instantiate (new) User Defined Alert",
+      "1": "Remove (existing) User Defined Alert"
+    }
+  }
+}

@@ -56,28 +56,12 @@
       let tmp = JSON.parse(JSON.stringify(rec.fields));
       rec.fields = new Array();
       for (let i in tmp) {
-        let skip = false;
-        for (let j in rec.repeat) {
-          if (((typeof tmp[i].dictionary !== 'undefined') && (tmp[i].dictionary === 'DD000')) || 
-            // (tmp[i].field == rec.repeat[j].field) ||
-            ((tmp[i].field >= rec.repeat[j].start) && (tmp[i].field < rec.repeat[j].start + rec.repeat[j].count)) ) {
-            skip = true;
-          }
-        }
-        if (!skip) {
+        if (tmp[i].field < rec.repeat[0].start) {
           rec.fields.push(tmp[i]);
         }
       }
     }
-
-
     for (let i in rec.fields) {
-      if (typeof rec.repeat !== 'undefined') {
-        if ((rec.fields[i].field == rec.repeat.field) ||
-          ((rec.fields[i].field >= rec.repeat.start) && (rec.fields[i].field < rec.repeat.start + rec.repeat.count))) {
-          continue;
-        }
-      }
       rec.fields[i] = Object.assign(
         { id: parseInt(i) }, rec.fields[i], {
           simulation: null,
@@ -127,6 +111,15 @@
           rec.fields[i].value = null;
         }
       }
+      if (typeof rec.repeat !== 'undefined') {
+        for (let j in rec.repeat) {
+          if ((rec.fields[i].field === rec.repeat[j].field) || 
+            (rec.fields[i].field >= rec.repeat[0].start)) {
+            rec.disabledIds.push(parseInt(i));
+            rec.fields[i].static = null;
+          }
+        }
+      }
     }
     if (isproprietary(pgn)) {
       rec.fields[0].value = parseInt(spl.manufacturer);
@@ -141,9 +134,6 @@
       rec.fields[nmeaconv[cnv].field].value = parseInt(spl.function);
       rec.disabledIds.push(nmeaconv[cnv].field);
       rec.fields[nmeaconv[cnv].field].static = null;
-    }
-    if (typeof rec.repeat !== 'undefined') {
-      console.log(rec)
     }
     return rec;
   };
@@ -162,6 +152,15 @@
           let fld = msg.fields[j];
           if ((fld.dictionary == "DD001") || (fld.dictionary == "DD056")) {
             simulator.table[i].disabledIds.push(parseInt(j));
+          }
+        }
+        if (typeof simulator.table[i].repeat !== 'undefined') {
+          for (let k in simulator.table[i].repeat) {
+            if ((simulator.table[i].fields[j].field === simulator.table[i].repeat[k].field) || 
+            (simulator.table[i].fields[j].field >= simulator.table[i].repeat[0].start)) {
+              simulator.table[i].disabledIds.push(parseInt(j));
+              simulator.table[i].fields[j].static = null;
+            }
           }
         }
       }
@@ -351,7 +350,15 @@
         if (fld['type'] != null) {
           if (fld['type'].startsWith('int') || fld['type'].startsWith('uint')) {
             val = (val === null) ? 0 : val;
-            if (!fld.static) {
+            let ena = true;
+            if ((typeof simulator.table[idx].disabledIds !== 'undefined') &&
+              (simulator.table[idx].disabledIds.indexOf(fld.id) !== -1)) {
+              ena = false;
+            }
+            if (fld.static) {
+              ena = false;
+            }
+            if (ena) {
               let dif = 0;
               if (simulator.table[idx].interval !== null) {
                 if (fld.multiplier !== null) {
