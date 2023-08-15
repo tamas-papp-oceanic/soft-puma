@@ -3,8 +3,8 @@
     "Title": "Undefined",
     "Range": "undefined",
     "Resolution": "undefined",
-    "Resolution": "Undefined",
-    "Type": "Application specific, defined at time of use"
+    "Type": "Undefined",
+    "Notes": "Application specific, defined at time of use"
   },
   "DF01": {
     "Title": "Acceleration",
