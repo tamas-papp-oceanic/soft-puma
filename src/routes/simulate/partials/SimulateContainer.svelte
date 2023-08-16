@@ -500,6 +500,22 @@
                                   selectedId={selection2.value}
                                   items={selection2.choices}
                                   on:select={choice} />
+                              {:else if typeof selection2.positions !== 'undefined'}
+                                <Row>
+                                  <Column style="display:flex; flex-flow: row wrap; align-items: center; justify-content: flex-start;">
+                                    {#each selection2.positions as pos, idx}
+                                      <Checkbox hideLabel checked={pos.value} />
+                                    {/each}
+                                  </Column>
+                                </Row>
+                                <!-- <Dropdown
+                                  id="input"
+                                  size="sm"
+                                  direction="top"
+                                  titleText={selection2.title}
+                                  selectedId={selection2.value}
+                                  items={selection2.choices}
+                                  on:select={choice} /> -->
                               {:else if selection2['type'].startsWith('int') || selection2['type'].startsWith('uint') ||
                                 selection2['type'].startsWith('float') || selection2['type'].startsWith('bit(')}
                                 <NumberInput

@@ -115,13 +115,19 @@
           rec.fields[i].value = null;
         }
       }
-      if ((fld.dictionary !== null) && (typeof datakinds[fld.dictionary] !== 'undefined') &&
-        (typeof datakinds[fld.dictionary].Values !== 'undefined')) {
-        rec.fields[i].choices = new Array();
-        for (const [key, val] of Object.entries(datakinds[fld.dictionary].Values)) {
-          rec.fields[i].choices.push({ id: parseInt(key), text: val });
-        }
-        rec.fields[i].value = rec.fields[i].choices[0].id;
+      if ((fld.dictionary !== null) && (typeof datakinds[fld.dictionary] !== 'undefined')) {
+        if (typeof datakinds[fld.dictionary].Values !== 'undefined') {
+          rec.fields[i].choices = new Array();
+          for (const [key, val] of Object.entries(datakinds[fld.dictionary].Values)) {
+            rec.fields[i].choices.push({ id: parseInt(key), text: val });
+          }
+          rec.fields[i].value = rec.fields[i].choices[0].id;
+        } else if (typeof datakinds[fld.dictionary].Positions !== 'undefined') {
+          rec.fields[i].positions = new Array();
+          for (const [key, val] of Object.entries(datakinds[fld.dictionary].Positions)) {
+            rec.fields[i].positions.push({ id: parseInt(key), text: val, value: false });
+          }
+        }          
       }
       if (typeof rec.repeat !== 'undefined') {
         for (let j in rec.repeat) {
