@@ -501,21 +501,24 @@
                                   items={selection2.choices}
                                   on:select={choice} />
                               {:else if typeof selection2.positions !== 'undefined'}
+                                <Row><Column>{selection2.title}</Column></Row>
                                 <Row>
-                                  <Column style="display:flex; flex-flow: row wrap; align-items: center; justify-content: flex-start;">
-                                    {#each selection2.positions as pos, idx}
-                                      <Checkbox hideLabel checked={pos.value} />
+                                  <Column style="display:flex; flex-flow: column nowrap; align-items: flex-start; justify-content: flex-start;">
+                                    {#each Array(4) as _, idx1}
+                                      {#if selection2.positions.length > (idx1 * 8)}
+                                        <Row>
+                                          <Column style="width: 100%; display:flex; flex-flow: row nowrap; align-items: flex-start; justify-content: flex-start;">
+                                            {#each selection2.positions as pos, idx2}
+                                              {#if Math.round(idx2 / 8) == idx1}
+                                                <Checkbox hideLabel checked={pos.value} />{idx2}
+                                              {/if}
+                                            {/each}
+                                          </Column>
+                                        </Row>
+                                      {/if}
                                     {/each}
                                   </Column>
                                 </Row>
-                                <!-- <Dropdown
-                                  id="input"
-                                  size="sm"
-                                  direction="top"
-                                  titleText={selection2.title}
-                                  selectedId={selection2.value}
-                                  items={selection2.choices}
-                                  on:select={choice} /> -->
                               {:else if selection2['type'].startsWith('int') || selection2['type'].startsWith('uint') ||
                                 selection2['type'].startsWith('float') || selection2['type'].startsWith('bit(')}
                                 <NumberInput
@@ -543,9 +546,7 @@
                           </Row>
                         </Column>
                         <Column sm={10} md={10} lg={10}>
-                          <!-- <Row style="height: 0.5rem;"><Column>&nbsp;</Column></Row> -->
                           <Row style="display:flex; flex-flow: row nowrap; align-items: center; justify-content: flex-start;">
-                          <!-- <Column sm={1} md={1} lg={1}>&nbsp;</Column> -->
                             <Column sm={6} md={6} lg={6}>
                               <Checkbox disabled={running} labelText="Custom ranges" bind:checked={ranges} on:check={check2} />
                             </Column>
@@ -578,10 +579,7 @@
                                 on:input={input4} />
                             </Column>
                           </Row>
-                          <!-- <Row style="height: 0.5rem;"><Column>&nbsp;</Column></Row> -->
                           <Row style="display:flex; flex-flow: row nowrap; align-items: center; justify-content: flex-start;">
-                            <!-- <Column sm={5} md={5} lg={5}>&nbsp;</Column>
-                            <Column sm={1} md={1} lg={1}>&nbsp;</Column> -->
                             <Column sm={6} md={6} lg={6}>
                               <Checkbox disabled={running} labelText="Custom simulation" bind:checked={custom} on:check={check3} />
                             </Column>
@@ -799,5 +797,8 @@
   }
   .simcont input[type="number"] {
     padding-right: 5.5rem;
+  }
+  .simcont .bx--form-item.bx--checkbox-wrapper:first-of-type {
+    margin-top: 0;
   }
 </style>
