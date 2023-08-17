@@ -75,7 +75,8 @@
         },
       );
       let fld = rec.fields[i];
-      if (fld.dictionary == "DD056") {
+      if ((fld.dictionary == 'DD001') || (fld.dictionary == "DD002") ||
+        (fld.dictionary == "DD003") || (fld.dictionary == "DD056")) {
         rec.fields[i].value = 0;
         rec.disabledIds.push(parseInt(i));
         rec.disabledSim.push(parseInt(i));
@@ -93,14 +94,7 @@
           } else if (fld['type'].startsWith('float')) {
             rec.fields[i].value = 0.0;
           } else if (fld['type'].startsWith('bit(')) {
-            if (fld.dictionary == 'DD001') {
-              rec.fields[i].value = fld.limits.max;
-              rec.disabledIds.push(parseInt(i));
-              rec.disabledSim.push(parseInt(i));
-              rec.fields[i].static = null;
-            } else {
-              rec.fields[i].value = 0;
-            }
+            rec.fields[i].value = 0;
           } else if (fld['type'].startsWith('chr(')) {
             rec.fields[i].value = '';
             let num = parseInt(fld['type'].replace('chr(', '').replace(')', ''));
@@ -114,9 +108,8 @@
         } else {
           rec.fields[i].value = null;
         }
-      }
-      if ((fld.dictionary !== null) && (typeof datakinds[fld.dictionary] !== 'undefined')) {
-        if (typeof datakinds[fld.dictionary].Values !== 'undefined') {
+        if ((fld.dictionary !== null) && (typeof datakinds[fld.dictionary] !== 'undefined')) {
+          if (typeof datakinds[fld.dictionary].Values !== 'undefined') {
           rec.fields[i].choices = new Array();
           for (const [key, val] of Object.entries(datakinds[fld.dictionary].Values)) {
             rec.fields[i].choices.push({ id: parseInt(key), text: val });
@@ -128,8 +121,9 @@
           for (const [key, val] of Object.entries(datakinds[fld.dictionary].Positions)) {
             rec.fields[i].positions.push({ id: parseInt(key), text: val, value: false });
           }
-          rec.fields[i].static = null;
         }          
+        rec.fields[i].static = null;
+        }
       }
       if (typeof rec.repeat !== 'undefined') {
         for (let j in rec.repeat) {
@@ -174,7 +168,8 @@
           simulator.table[i].disabledIds.push(parseInt(j));
         } else {
           let fld = msg.fields[j];
-          if ((fld.dictionary == "DD001") || (fld.dictionary == "DD056")) {
+          if ((fld.dictionary == "DD001") || (fld.dictionary == "DD002") ||
+            (fld.dictionary == "DD003") || (fld.dictionary == "DD056")) {
             simulator.table[i].disabledIds.push(parseInt(j));
           }
         }

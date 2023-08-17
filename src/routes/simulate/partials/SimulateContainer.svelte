@@ -116,6 +116,17 @@
     }
   }
 
+  function setDig(e, row) {
+    if (e.detail != null) {
+      for (let i in data.table) {
+        if (data.table[i].id == selection1.id) {
+          data.table[i].fields[row].value = e.detail;
+          break;
+        }
+      }
+    }
+  };
+
   function setSta(e, row) {
     if (e.detail != null) {
       for (let i in data.table) {
@@ -486,6 +497,14 @@
                           {:else}
                             {cell.value}
                           {/if}
+                        {:else if ((row.dictionary === 'DD002') || (row.dictionary === 'DD003'))}
+                          {#if (cell.key === "value")}
+                            <Checkbox hideLabel checked={cell.value} on:check={(e) => setDig(e, rowIndex)} />
+                          {:else if (cell.key === "unit") || (cell.key === "ranges") || (cell.key === "simulation") || (cell.key === "static")}
+                            {""}
+                          {:else}
+                            {cell.value}
+                          {/if}    
                         {:else if ((cell.key === "unit") && (cell.value === null))}
                           {"-"}
                         {:else if cell.key === "ranges"}
