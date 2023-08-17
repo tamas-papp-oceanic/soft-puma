@@ -123,10 +123,12 @@
           }
           rec.fields[i].value = rec.fields[i].choices[0].id;
         } else if (typeof datakinds[fld.dictionary].Positions !== 'undefined') {
+          rec.fields[i].bits = datakinds[fld.dictionary].Bits;
           rec.fields[i].positions = new Array();
           for (const [key, val] of Object.entries(datakinds[fld.dictionary].Positions)) {
             rec.fields[i].positions.push({ id: parseInt(key), text: val, value: false });
           }
+          rec.fields[i].static = null;
         }          
       }
       if (typeof rec.repeat !== 'undefined') {

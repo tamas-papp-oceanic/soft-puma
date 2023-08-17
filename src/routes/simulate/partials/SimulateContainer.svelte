@@ -86,9 +86,11 @@
       ((selection2.rate !== null) &&(selection2.rate !== data.rate));
     scroll1(500);
     scroll2(250);
-    setTimeout(() => {
-      document.getElementById('input').focus();
-    }, 100);
+    if (typeof e.detail.row.positions === 'undefined') {
+      setTimeout(() => {
+        document.getElementById('input').focus();
+      }, 100);
+    }
   };
 
   function check2(e) {
@@ -221,6 +223,41 @@
         }
         data = data;
         break;
+      }
+    }
+  }
+
+  function calcPos(fld) {
+    let res = 0;
+    for (let i in fld.positions) {
+      if (fld.positions[i].value) {
+        res += Math.pow(2, fld.positions[i].id);
+      }
+    }
+    return res;
+  }
+
+  function setPos(fld, pos, val) {
+    for (let i in fld.positions) {
+      if (fld.positions[i].id === pos) {
+        fld.positions[i].value = val;
+        break;
+      }
+    }
+    return fld.positions;
+  }
+
+  function check4(e, pos) {
+    for (let i in  data.table) {
+      if (data.table[i].id == selection1.id) {
+        for (let j in  data.table[i].fields) {
+          if (data.table[i].fields[j].id == selection2.id) {
+            data.table[i].fields[j].positions = setPos(data.table[i].fields[j], pos, e.detail);
+            data.table[i].fields[j].value = calcPos(data.table[i].fields[j]);
+            data = data;
+            break;
+          }
+        }
       }
     }
   }
@@ -501,16 +538,24 @@
                                   items={selection2.choices}
                                   on:select={choice} />
                               {:else if typeof selection2.positions !== 'undefined'}
-                                <Row><Column>{selection2.title}</Column></Row>
+                                <Row style="height: 2rem;">
+                                  <Column>
+                                    <Tile class="bhead">
+                                      <p class="descr">{selection2.title}</p>
+                                    </Tile>
+                                  </Column>
+                                </Row>
                                 <Row>
                                   <Column style="display:flex; flex-flow: column nowrap; align-items: flex-start; justify-content: flex-start;">
                                     {#each Array(4) as _, idx1}
-                                      {#if selection2.positions.length > (idx1 * 8)}
+                                      {#if selection2.bits > (idx1 * 8)}
                                         <Row>
                                           <Column style="width: 100%; display:flex; flex-flow: row nowrap; align-items: flex-start; justify-content: flex-start;">
                                             {#each selection2.positions as pos, idx2}
-                                              {#if Math.round(idx2 / 8) == idx1}
-                                                <Checkbox hideLabel checked={pos.value} />{idx2}
+                                              {#if Math.floor(idx2 / 8) == idx1}
+                                                <div class="bit">
+                                                  <Checkbox hideLabel checked={pos.value} on:check={(e) => check4(e, pos.id)} />
+                                                </div>
                                               {/if}
                                             {/each}
                                           </Column>
@@ -800,5 +845,14 @@
   }
   .simcont .bx--form-item.bx--checkbox-wrapper:first-of-type {
     margin-top: 0;
+  }
+  .simcont .tilecont .bhead {
+    padding: 0 !important;
+    width: 100%;
+    font-size: 0.8rem;
+    color: #c6c6c6;
+  }
+  .simcont .bit {
+    padding-right: 1em;
   }
 </style>
