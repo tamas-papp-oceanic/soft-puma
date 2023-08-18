@@ -83,7 +83,7 @@
     selection2 = e.detail.row;
     ranges = selection2.ranges !== null;
     custom = ((selection2.simulation !== null) && (selection2.simulation !== data.simulation)) ||
-      ((selection2.rate !== null) &&(selection2.rate !== data.rate));
+      ((selection2.rate !== null) && (selection2.rate !== data.rate));
     scroll1(500);
     scroll2(250);
     if (typeof e.detail.row.positions === 'undefined') {
@@ -95,7 +95,7 @@
 
   function check2(e) {
     for (let i in  data.table) {
-      if (data.table[i].id == selection1.id) {
+      if (data.table[i].id === selection1.id) {
         if (e.detail) {
           if (selection2.limits !== null) {
             let mul = selection2.multiplier;
@@ -117,12 +117,19 @@
   }
 
   function setDig(e, row) {
-    if (e.detail != null) {
-      for (let i in data.table) {
-        if (data.table[i].id == selection1.id) {
-          data.table[i].fields[row].value = e.detail;
-          break;
+    for (let i in data.table) {
+      if (data.table[i].id === selection1.id) {
+        let val = data.table[i].fields[row].value;
+        if (val === 0) {
+          val = 3;
+        } else if (val === 1) {
+          val = 0;
+        } else if (val === 3) {
+          val = 1;
         }
+        data.table[i].fields[row].value = val;
+        e.currentTarget.value = val;
+        break;
       }
     }
   };
@@ -443,7 +450,7 @@
       <Grid fullWidth noGutter>
         <Row style="height: inherit;">
           <Column sm={13} md={13} lg={13} style="height: 100%; display:flex; flex-flow: column nowrap; align-items: flex-start; justify-content: space-between;">
-            <Row style="min-height: 33%; max-height: 100%;">
+            <Row style="min-height: 33%; max-height: 100%; width: 100%;">
               <Column style="height: 100%; display:flex; flex-flow: column nowrap; align-items: flex-start; justify-content: flex-start;">
                 <Tile class="head">
                   <h4 class="title">NMEA2000 message(s) as part of simulation.</h4>
@@ -465,8 +472,8 @@
               </Column>
             </Row>
             {#if selection1 != null}
-              <Row style="height: 1rem;"><Column>&nbsp;</Column></Row>
-              <Row style="min-height: 33%; max-height: 66%;">
+              <Row style="height: 1rem; width: 100%;"><Column>&nbsp;</Column></Row>
+              <Row style="min-height: 33%; max-height: 66%; width: 100%;">
                 <Column style="height: 100%; display:flex; flex-flow: column nowrap; align-items: flex-start; justify-content: flex-start;">
                   <Tile class="head">
                     <h4 class="title">Message fields.</h4>
@@ -484,29 +491,29 @@
                       headers={header2}
                       rows={rows2}
                       on:click:row--select={rowSel2}>
-                      <svelte:fragment slot="cell" let:row let:rowIndex let:cell let:cellIndex>
-                        {#if (row.dictionary === 'DD001')}
-                          {#if (cell.key === "value") || (cell.key === "unit")}
-                            {"-"}
-                          {:else if cell.key === "ranges"}
-                            {"-"}
-                          {:else if cell.key === "simulation"}
-                            {"-"}
-                          {:else if cell.key === "static"}
+                      <svelte:fragment slot="cell" let:row let:rowIndex let:cell>
+                        {#if (selection1.disabledSim.indexOf(row.id) !== -1)}
+                          {#if (cell.key === "value")}
+                            {#if row.dictionary === 'DD001'}
+                              {""}
+                            {:else if ((row.dictionary === 'DD002') || (row.dictionary === 'DD003'))}
+                              <Checkbox hideLabel checked={cell.value === 1} indeterminate={cell.value === 3} on:change={(e) => setDig(e, rowIndex)} />
+                            {:else}
+                              {cell.value}
+                            {/if}
+                          {:else if ((cell.key === "unit") || (cell.key === "static") || (cell.key === "ranges") || (cell.key === "simulation"))}
                             {""}
                           {:else}
                             {cell.value}
                           {/if}
-                        {:else if ((row.dictionary === 'DD002') || (row.dictionary === 'DD003'))}
-                          {#if (cell.key === "value")}
-                            <Checkbox hideLabel checked={cell.value} on:check={(e) => setDig(e, rowIndex)} />
-                          {:else if (cell.key === "unit") || (cell.key === "ranges") || (cell.key === "simulation") || (cell.key === "static")}
-                            {""}
-                          {:else}
-                            {cell.value}
-                          {/if}    
                         {:else if ((cell.key === "unit") && (cell.value === null))}
                           {"-"}
+                        {:else if cell.key === "static"}
+                          {#if row.static !== null}
+                            <Checkbox labelText="Static" hideLabel checked={row.static} on:check={(e) => setSta(e, rowIndex)} />
+                          {:else}
+                            {""}
+                          {/if}
                         {:else if cell.key === "ranges"}
                           {#if row.ranges !== null}
                             {(row.ranges.min !== null ? row.ranges.min + " " : "")  + "-" + (row.ranges.max !== null ? " " + row.ranges.max : "")}
@@ -514,12 +521,10 @@
                             {"-"}
                           {/if}
                         {:else if cell.key === "simulation"}
-                          {((row.simulation !== null) && (row.simulation !== data.simulation)) || ((row.rate !== null) &&(row.rate !== data.rate)) ? "Custom" : "-"}
-                        {:else if cell.key === "static"}
-                          {#if row.static != null}
-                            <Checkbox labelText="Static" hideLabel checked={row.static} on:check={(e) => setSta(e, rowIndex)} />
+                          {#if ((row.simulation !== null) && (row.simulation !== data.simulation)) || ((row.rate !== null) && (row.rate !== data.rate))}
+                            {"Custom"}
                           {:else}
-                            {""}
+                            {"-"}
                           {/if}
                         {:else}
                           {cell.value}
@@ -530,12 +535,12 @@
                 </Column>
               </Row>
               {#if !running && (selection2 != null)}
-                <Row style="max-height: 33%;">
+                <Row style="max-height: 33%; width: 100%;">
                   <Column style="height: 100%;">
                     <Grid fullWidth noGutter>
-                      <Row style="height: 0.5rem;"><Column>&nbsp;</Column></Row>
-                      <Row>
-                        <Column sm={6} md={6} lg={6}>
+                      <Row style="height: 0.5rem; width 100%;"><Column>&nbsp;</Column></Row>
+                      <Row style="width 100%;">
+                        <Column sm={5} md={5} lg={5}>
                           <Row style="display:flex; flex-flow: row nowrap; align-items: center; justify-content: flex-start;">
                             <Column>
                               {#if typeof selection2.fluid !== 'undefined'}
@@ -609,12 +614,12 @@
                             </Column>
                           </Row>
                         </Column>
-                        <Column sm={10} md={10} lg={10}>
-                          <Row style="display:flex; flex-flow: row nowrap; align-items: center; justify-content: flex-start;">
-                            <Column sm={6} md={6} lg={6}>
-                              <Checkbox disabled={running} labelText="Custom ranges" bind:checked={ranges} on:check={check2} />
+                        <Column>
+                          <Row style="display:flex; flex-flow: row nowrap; align-items: center; justify-content: space-between;">
+                            <Column sm={5} md={5} lg={5}>
+                              <Checkbox disabled={running || (selection1.disabledSim.indexOf(selection2.id) !== -1)} labelText="Custom ranges" bind:checked={ranges} on:check={check2} />
                             </Column>
-                            <Column sm={6} md={6} lg={6}>
+                            <Column sm={5} md={5} lg={5}>
                               <NumberInput
                                 id="min"
                                 allowEmpty
@@ -626,7 +631,7 @@
                                 value={getrng(selection2, 'min')}
                                 on:input={input3} />
                             </Column>
-                            <Column sm={6} md={6} lg={6}>
+                            <Column sm={5} md={5} lg={5}>
                               <NumberInput
                                 id="max"
                                 allowEmpty
@@ -643,11 +648,11 @@
                                 on:input={input4} />
                             </Column>
                           </Row>
-                          <Row style="display:flex; flex-flow: row nowrap; align-items: center; justify-content: flex-start;">
-                            <Column sm={6} md={6} lg={6}>
-                              <Checkbox disabled={running} labelText="Custom simulation" bind:checked={custom} on:check={check3} />
+                          <Row style="display:flex; flex-flow: row nowrap; align-items: center; justify-content: space-between;">
+                            <Column sm={5} md={5} lg={5}>
+                              <Checkbox disabled={running || (selection1.disabledSim.indexOf(selection2.id) !== -1)} labelText="Custom simulation" bind:checked={custom} on:check={check3} />
                             </Column>
-                            <Column sm={6} md={6} lg={6}>
+                            <Column sm={5} md={5} lg={5}>
                               <Dropdown
                                 id="simulation"
                                 allowEmpty
@@ -659,7 +664,7 @@
                                 items={sims}
                                 on:select={setSim} />
                             </Column>
-                            <Column sm={6} md={6} lg={6}>
+                            <Column sm={5} md={5} lg={5}>
                               <NumberInput
                                 id="rate2"
                                 allowEmpty
@@ -865,6 +870,12 @@
   .simcont .bx--form-item.bx--checkbox-wrapper:first-of-type {
     margin-top: 0;
   }
+  .simcont  .bx--checkbox:indeterminate+.bx--checkbox-label::before {
+    background-color: rgba(0,0,0,0);
+  }
+  .simcont  .bx--checkbox:indeterminate+.bx--checkbox-label::after {
+    border-bottom: 2px solid gray;
+  }
   .simcont .tilecont .bhead {
     padding: 0 !important;
     width: 100%;
@@ -872,6 +883,6 @@
     color: #c6c6c6;
   }
   .simcont .bit {
-    padding-right: 1em;
+    padding-right: 0.5rem;
   }
 </style>

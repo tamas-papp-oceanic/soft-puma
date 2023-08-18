@@ -26,7 +26,6 @@
     { id: 5, text: 'Black Water (Sewage)' },
     { id: 6, text: 'Fuel (Gasoline)' },
   );
-  let insts = new Array();
   let rows = new Array();
   let selectedRowIds = new Array();
   let filteredRowIds = new Array();
@@ -70,10 +69,6 @@
     rows = JSON.parse(JSON.stringify(arr));
   };
 
-  for (let i = 0; i < 253; i++) {
-    insts.push({ id: i, text: i.toString() });
-  }
-
   $: data, setData(data);
   $: pagination.totalItems = filteredRowIds.length;
   $: pagination.pageSize = Math.round(((height - 350) / 24));
@@ -103,7 +98,7 @@
                   <ToolbarContent>
                     <Tile class="head">
                       <h4 class="title">NMEA2000 message(s) for simulation.</h4>
-                      <p class="descr">(select message for change of parameter(s) or add to simulaton)</p>
+                      <p class="descr">(select message for add to simulaton)</p>
                     </Tile>
                     <ToolbarSearch
                       bind:filteredRowIds

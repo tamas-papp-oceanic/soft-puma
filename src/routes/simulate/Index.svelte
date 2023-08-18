@@ -5,6 +5,7 @@
   import { v4 as uuidv4 } from "uuid";
   import MessageContainer from "./partials/MessageContainer.svelte";
   import SimulateContainer from "./partials/SimulateContainer.svelte";
+  import MimicContainer from "./partials/MimicContainer.svelte";
   import nmeaconv from "../../config/nmeaconv.json";
   import nmeadefs from "../../config/nmeadefs.json";
   import datakinds from "../../config/datakinds.json";
@@ -21,6 +22,7 @@
     simulation: null,
     rate: null,
   };
+  let mimic = new Array();
   let loading = true;
   let running = false;
   let capturing = false;
@@ -54,6 +56,12 @@
   function prepFields(rec, key) {
     let spl = splitKey(key);
     let pgn = parseInt(spl.pgn);
+    if (typeof rec.disabledIds === 'undefined') {
+      rec.disabledIds = new Array();
+    }
+    if (typeof rec.disabledSim === 'undefined') {
+      rec.disabledSim = new Array();
+    }
     if (typeof rec.repeat !== 'undefined') {
       let tmp = JSON.parse(JSON.stringify(rec.fields));
       rec.fields = new Array();
@@ -64,66 +72,116 @@
       }
     }
     for (let i in rec.fields) {
-      rec.fields[i] = Object.assign(
-        { id: parseInt(i) }, rec.fields[i], {
-          simulation: null,
-          static: false,
-          limits: minmax(rec.fields[i]),
-          ranges: null,
-          chrnum: null,
-          rate: null,
-        },
-      );
+      if ((typeof rec.fields[i].dictionary === 'undefined') || (rec.fields[i].dictionary === null)) {
+        let spl = splitKey(rec.key);
+        let key = joinKey2(spl);
+        let def = nmeadefs[key];
+        if (typeof def !== 'undefined') {
+          rec.fields[i].dictionary = def.fields[i].dictionary;
+        }
+      }
       let fld = rec.fields[i];
-      if ((fld.dictionary == 'DD001') || (fld.dictionary == "DD002") ||
-        (fld.dictionary == "DD003") || (fld.dictionary == "DD056")) {
-        rec.fields[i].value = 0;
+      if (typeof fld.id === 'undefined') {
+        rec.fields[i].id = parseInt(i);
+      }
+      if (typeof fld.static === 'undefined') {
+        rec.fields[i].static = false;
+      }
+      if (typeof fld.simulation === 'undefined') {
+        rec.fields[i].simulation = null;
+      }
+      if (typeof fld.limits === 'undefined') {
+        rec.fields[i].limits = minmax(rec.fields[i]);
+      }
+      if (typeof fld.ranges === 'undefined') {
+        rec.fields[i].ranges = null;
+      }
+      if (typeof fld.chrnum === 'undefined') {
+        rec.fields[i].chrnum = null;
+      }
+      if (typeof fld.rate === 'undefined') {
+        rec.fields[i].rate = null;
+      }
+      if ((fld.dictionary === 'DD001') || (fld.dictionary === "DD002") ||
+        (fld.dictionary === "DD003") || (fld.dictionary === "DD056")) {
+        if (typeof fld.value === 'undefined') {
+          if ((fld.dictionary === "DD002") || (fld.dictionary === "DD003")) {
+            rec.fields[i].value = 3;
+          } else {
+            rec.fields[i].value = 0;
+          }
+        }
         rec.disabledIds.push(parseInt(i));
         rec.disabledSim.push(parseInt(i));
         rec.fields[i].static = null;
-      } else {
-        if (fld['type'] != null) {
-          if ((typeof fld.instance !== 'undefined') && (typeof rec.instance !== 'undefined')) {
-            rec.fields[i].value = rec.instance;
-            rec.fields[i].static = null;
-          } else if ((typeof fld.fluid !== 'undefined') && (typeof rec.fluid !== 'undefined')) {
-            rec.fields[i].value = rec.fluidtype;
-            rec.fields[i].static = null;
-          } else if (fld['type'].startsWith('int') || fld['type'].startsWith('uint')) {
+      } else if (typeof fld.instance !== 'undefined') {
+        rec.disabledSim.push(parseInt(i));
+        rec.fields[i].static = null;
+        if (typeof rec.instance !== 'undefined') {
+          rec.fields[i].value = rec.instance;
+        } else if (typeof fld.value === 'undefined') {
+          rec.fields[i].value = 0;
+        }
+      } else if (typeof fld.fluid !== 'undefined') {
+        rec.fluid = fld.fluid;
+        rec.disabledSim.push(parseInt(i));
+        rec.fields[i].static = null;
+        if (typeof rec.fluidtype !== 'undefined') {
+          rec.fields[i].value = rec.fluidtype;
+        } else if (typeof fld.value === 'undefined') {
+          rec.fields[i].value = 0;
+        }
+      } else if (fld['type'] !== null) {
+        if (fld['type'].startsWith('int') || fld['type'].startsWith('uint')) {
+          if (typeof fld.value === 'undefined') {
             rec.fields[i].value = 0;
-          } else if (fld['type'].startsWith('float')) {
-            rec.fields[i].value = 0.0;
-          } else if (fld['type'].startsWith('bit(')) {
-            rec.fields[i].value = 0;
-          } else if (fld['type'].startsWith('chr(')) {
-            rec.fields[i].value = '';
-            let num = parseInt(fld['type'].replace('chr(', '').replace(')', ''));
-            rec.fields[i].chrnum = num;
-            rec.fields[i].static = null;
-          } else if (fld['type'] == 'str') {
-            rec.fields[i].value = '';
-            rec.fields[i].chrnum = 250;
-            rec.fields[i].static = null;
           }
-        } else {
+        } else if (fld['type'].startsWith('float')) {
+          if (typeof fld.value === 'undefined') {
+            rec.fields[i].value = 0.0;
+          }
+        } else if (fld['type'].startsWith('bit(')) {
+          if (typeof fld.value === 'undefined') {
+            rec.fields[i].value = 0;
+          }
+        } else if (fld['type'].startsWith('chr(')) {
+          if (typeof fld.value === 'undefined') {
+            rec.fields[i].value = '';
+          }
+          let num = parseInt(fld['type'].replace('chr(', '').replace(')', ''));
+          rec.fields[i].chrnum = num;
+          rec.fields[i].static = null;
+        } else if (fld['type'] == 'str') {
+          if (typeof fld.value === 'undefined') {
+            rec.fields[i].value = '';
+          }
+          rec.fields[i].chrnum = 250;
+          rec.fields[i].static = null;
+        }
+      } else {
+        if (typeof fld.value === 'undefined') {
           rec.fields[i].value = null;
         }
-        if ((fld.dictionary !== null) && (typeof datakinds[fld.dictionary] !== 'undefined')) {
-          if (typeof datakinds[fld.dictionary].Values !== 'undefined') {
-          rec.fields[i].choices = new Array();
-          for (const [key, val] of Object.entries(datakinds[fld.dictionary].Values)) {
-            rec.fields[i].choices.push({ id: parseInt(key), text: val });
+      }
+      if ((fld.dictionary !== null) && (typeof datakinds[fld.dictionary] !== 'undefined')) {
+        if (typeof datakinds[fld.dictionary].Values !== 'undefined') {
+          if ((fld.dictionary !== "DD002") && (fld.dictionary !== "DD003")) {
+            rec.fields[i].choices = new Array();
+            for (const [key, val] of Object.entries(datakinds[fld.dictionary].Values)) {
+              rec.fields[i].choices.push({ id: parseInt(key), text: val });
+            }
+            rec.fields[i].value = rec.fields[i].choices[0].id;
           }
-          rec.fields[i].value = rec.fields[i].choices[0].id;
         } else if (typeof datakinds[fld.dictionary].Positions !== 'undefined') {
           rec.fields[i].bits = datakinds[fld.dictionary].Bits;
           rec.fields[i].positions = new Array();
           for (const [key, val] of Object.entries(datakinds[fld.dictionary].Positions)) {
-            rec.fields[i].positions.push({ id: parseInt(key), text: val, value: false });
+            let bit = rec.fields[i].value & Math.pow(2, parseInt(key));
+            rec.fields[i].positions.push({ id: parseInt(key), text: val, value: (bit !== 0) });
           }
+          rec.disabledSim.push(parseInt(i));
         }          
         rec.fields[i].static = null;
-        }
       }
       if (typeof rec.repeat !== 'undefined') {
         for (let j in rec.repeat) {
@@ -153,6 +211,8 @@
       rec.disabledSim.push(nmeaconv[cnv].field);
       rec.fields[nmeaconv[cnv].field].static = null;
     }
+    rec.disabledIds.sort();
+    rec.disabledSim.sort();
     return rec;
   };
 
@@ -178,7 +238,6 @@
             if ((simulator.table[i].fields[j].field === simulator.table[i].repeat[k].field) || 
             (simulator.table[i].fields[j].field >= simulator.table[i].repeat[0].start)) {
               simulator.table[i].disabledIds.push(parseInt(j));
-              simulator.table[i].fields[j].static = null;
             }
           }
         }
@@ -193,6 +252,7 @@
           simulator.table[i].disabledIds.push(nmeaconv[cnv].field);
         }
       }
+      simulator.table[i].disabledIds.sort();
     }
   };
 
@@ -256,10 +316,15 @@
           notify = true;
         }
       } else {
+        if (typeof res.simulation === 'undefied') {
+          res.simulation = 0;
+        }
+        if (typeof res.rate === 'undefied') {
+          res.rate = 0.2;
+        }
         for (let i in res.table) {
-          for (let j in res.table[i].fields) {
-            res.table[i].fields[j].limits = minmax(res.table[i].fields[j]);
-          }
+          let row = prepFields(res.table[i], res.table[i].key);
+          res.table[i] = JSON.parse(JSON.stringify(row));
         }
         simulator = JSON.parse(JSON.stringify(res));
         simulator = simulator;
@@ -480,6 +545,7 @@
       <Tabs type="container" selected={tab} on:change={tabChg}>
         <Tab label="Messages" />
         <Tab label="Simulator" />
+        <Tab label="Mimics" />
         <svelte:fragment slot="content">
           <TabContent>
             <MessageContainer
@@ -505,6 +571,12 @@
               on:send={send}
               on:simstart={simStart}
               on:simstop={simStop}
+              on:cancel={cancel}
+              style="height: calc(100vh - 10rem);" />
+          </TabContent>
+          <TabContent>
+            <MimicContainer
+              bind:data={mimic}
               on:cancel={cancel}
               style="height: calc(100vh - 10rem);" />
           </TabContent>
