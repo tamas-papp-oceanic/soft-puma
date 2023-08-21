@@ -5,7 +5,7 @@
     OverflowMenuItem, Pagination, Dropdown } from "carbon-components-svelte";
   import Scan from "carbon-icons-svelte/lib/SearchLocate16";
   import Warning from "carbon-icons-svelte/lib/WarningAltFilled16";
-  import { name, devices, device, data, updates } from "../../stores/data.js";
+  import { name, devices, device, protocol, data, updates } from "../../stores/data.js";
   import { compareVersions } from 'compare-versions';
   import { getdev } from '../../config/devices.js';
   import { isRoute } from '../../helpers/route.js'
@@ -38,14 +38,19 @@
     key: "uniqueNumber",
     value: "Unique Number"
   }];
+  const proItems = [
+    { id: '0', text: 'nmea2000' },
+    { id: '1', text: 'j1939' },
+  ];
 
-  let items = new Array();
-  let selected;
+  let devItems = new Array();
+  let devSelected;
+  let proSelected = '0';
   let height;
   let rows = new Array();
   let pagination = {
     pageSize: 10,
-    totalItems: 0,
+    totalitems: 0,
     page: 1,
   };
 
@@ -129,8 +134,18 @@
     window.pumaAPI.send('bus-scan');
   };
   
-  function select(e) {
+  function devSelect(e) {
     $device = e.detail.selectedItem.text;
+  };
+
+  function proSelect(e) {
+    if ($protocol !== e.detail.selectedItem.text) {
+      $protocol = e.detail.selectedItem.text;
+      
+console.log($device, $protocol)
+      
+      window.pumaAPI.send('set-prot', [$device, $protocol]);
+    }
   };
   
   function isUpdate(src) {
@@ -149,31 +164,32 @@
     return false;
   };
     
-  function getSelected() {
-    if (typeof selected === "undefined") {
-      if ($device != null) {
-        for (let i in $devices) {
-          if ($devices[i] == $device) {
-            selected = i.toString();
+  function getDevSelected() {
+    if (typeof devSelected === "undefined") {
+      if ($device !== null) {
+        for (const [key, val] of Object.entries($devices)) {
+          if (key === $device) {
+            devSelected = val.id;
+            break;
           }
         }
       } else {
         if (Object.keys($devices).length > 0) {
-          $device = Object.values($devices)[0];          
-          selected = '0';
+          $device = Object.keys($devices)[0];
+          devSelected = Object.values($devices)[0].id;
         }
       }
     }
   };
 
-  function getItems() {
+  function getDevItems() {
     let tmp = new Array();
-    for (let i in $devices) {
+    for (const [key, val] of Object.entries($devices)) {
       tmp.push(
-        { id: i.toString(), text: $devices[i] },
+        { id: val.id, text: val.text, protocol: val.protocol },
       );
     }
-    items = JSON.parse(JSON.stringify(tmp));
+    devItems = JSON.parse(JSON.stringify(tmp));
   };
 
   function isNewDevice(old, cur) {
@@ -215,12 +231,12 @@
       window.pumaAPI.send('updates');
     }
     rows = JSON.parse(JSON.stringify(tmp));
-    pagination.totalItems = rows.length;
+    pagination.items = rows.length;
   };
 
   // Data getters, setters
-  $: $devices, getSelected();
-  $: $devices, getItems();
+  $: $devices, getDevSelected();
+  $: $devices, getDevItems();
   $: $name[$device], getRows();
   $: pagination.pageSize = Math.round(((height * 0.9) / getComputedStyle(document.documentElement).fontSize.replace('px', '')) / 3) - 4;
 </script>
@@ -241,9 +257,17 @@
             titleText="Interface"
             type="inline"
             size="xl"
-            bind:selectedId={selected}
-            items={items}
-            on:select={(e) => select(e)} />
+            bind:selectedId={devSelected}
+            items={devItems}
+            on:select={(e) => devSelect(e)} />
+          <Dropdown
+            style="margin-left: 1rem; grid-gap: 0 1rem;"
+            titleText="Protocol"
+            type="inline"
+            size="xl"
+            bind:selectedId={proSelected}
+            items={proItems}
+            on:select={(e) => proSelect(e)} />
           <ToolbarContent>
             <ToolbarSearch />
             <Button icon={Scan} on:click={(e) => scan(e)}>Scan</Button>
@@ -265,10 +289,10 @@
           {/if}
         </span>
       </DataTable>
-      {#if pagination.totalItems > pagination.pageSize}
+      {#if pagination.totaldevItems > pagination.pageSize}
         <Pagination
           bind:pageSize={pagination.pageSize}
-          totalItems={pagination.totalItems}
+          totaldevItems={pagination.totaldevItems}
           bind:page={pagination.page}
           pageSizeInputDisabled
           pageInputDisabled

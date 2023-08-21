@@ -4,8 +4,9 @@ import { defValue } from '../helpers/unit.js';
 const qlimit = 1024;
 const unitconv = false;
 
-export const devices = writable(new Array());
+export const devices = writable({});
 export const device = writable(null);
+export const protocol = writable(null);
 export const clas = writable({});
 export const func = writable({});
 export const indu = writable({});
@@ -18,9 +19,9 @@ export const selected = writable({program: null, config: null, device: null, tes
 export const allRoutes = writable(new Array());
 export const updates = writable({});
 
-window.pumaAPI.send('n2k-ready');
+window.pumaAPI.send('can-ready');
 
-window.pumaAPI.recv('n2k-devs', (e, val) => {
+window.pumaAPI.recv('can-devs', (e, val) => {
   devices.set(val);
 });
 

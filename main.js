@@ -11,6 +11,7 @@ const log = require('electron-log');
 const Serial = require('./src/services/serial.js');
 const com = require('./src/services/common.js');
 const NMEAEngine = require('./src/services/nmea.js');
+const J1939Engine = require('./src/services/j1939.js');
 const bwipjs = require('bwip-js');
 const PDFDocument = require('pdfkit');
 const prt = 'HP-LaserJet-Pro-M404-M405';
@@ -184,7 +185,7 @@ async function discover() {
               log.info('New serial interface (' + sls[i].path + ')')
               let dev = new Serial(sls[i].path, 115200);
               let eng = new NMEAEngine(dev);
-              devices[sls[i].path] = { type: 'serial', device: dev, engine: eng, process: proc };
+              devices[sls[i].path] = { type: 'serial', device: dev, protocol: 'nmea2000', engine: eng, process: nmeaProc };
               updates.push(devices[sls[i].path]);
             }
           }
@@ -202,7 +203,7 @@ async function discover() {
                 log.info('New CAN interface (' + cls[i] + ')')
                 let dev = new Can(cls[i]);
                 let eng = new NMEAEngine(dev);
-                devices[cls[i]] = { type: 'can', device: dev, engine: eng, process: proc };
+                devices[cls[i]] = { type: 'can', device: dev, protocol: 'nmea2000', engine: eng, process: nmeaProc };
                 updates.push(devices[cls[i]]);
               }
             }
@@ -215,7 +216,7 @@ async function discover() {
               if (typeof devices[cls[0].path] === "undefined") {
                 log.info('New CAN interface (' + cls[0].path + ')')
                 let eng = new NMEAEngine(can);
-                devices[cls[0].path] = { type: 'can', device: can, engine: eng, process: proc };
+                devices[cls[0].path] = { type: 'can', device: can, protocol: 'nmea2000', engine: eng, process: nmeaProc };
                 updates.push(devices[cls[0].path]);
               }
             }
@@ -237,7 +238,12 @@ async function discover() {
           }
           if ((updates.length > 0) && (mainWindow != null) &&
             (typeof mainWindow.webContents !== 'undefined')) {
-            mainWindow.webContents.send('n2k-devs', Object.keys(devices));
+              let des = {};
+              let id = 0;
+              for (const [key, val] of Object.entries(devices)) {
+                des[key] = { id: (id++).toString(), text: key, protocol: val.protocol };
+              }
+              mainWindow.webContents.send('can-devs', des);
           }
           resolve(true);
         }, 1000);
@@ -251,7 +257,7 @@ async function discover() {
 }
 
 // NMEA processing
-function proc(dev, frm) {
+function nmeaProc(dev, frm) {
   if (devices[dev].engine.active() && (mainWindow != null) && (typeof mainWindow.webContents !== 'undefined')) {
     let msg = devices[dev].engine.process(frm);
     let manu = devices[dev].engine.name[2];
@@ -378,15 +384,61 @@ timer = setInterval(() => {
 }, 10000);
 
 // Load configurations
-ipcMain.on('n2k-ready', (e, ...args) => {
+ipcMain.on('can-ready', (e, ...args) => {
   if ((mainWindow != null) && (typeof mainWindow.webContents !== 'undefined')) {
-    mainWindow.webContents.send('n2k-devs', Object.keys(devices));
+    let des = {};
+    let id = 0;
+    for (const [key, val] of Object.entries(devices)) {
+      des[key] = { id: (id++).toString(), text: key, protocol: val.protocol };
+    }
+    mainWindow.webContents.send('can-devs', des);
     const configs = ['classes', 'functions', 'industries', 'manufacturers'];
     for (let i in configs) {
       let cnf = configs[i];
       let dat = com.load(cnf);
       if (dat != null) {
         mainWindow.webContents.send('n2k-' + cnf.substring(0, 4), dat);
+      }
+    }
+  }
+});
+
+// Processing outgoing message
+ipcMain.on('set-prot', (e, args) => {
+  const [dev, pro] = args;
+
+
+  console.log(dev, pro)
+
+
+
+  if ((typeof dev !== 'undefined') && (typeof devices[dev] !== 'undefined')) {
+    if (devices[dev].protocol !== pro) {
+      if (typeof devices[dev].device !== 'undefined') {
+        devices[dev].device.stop();
+      }
+      if (typeof devices[dev].engine !== 'undefined') {
+        devices[dev].engine.destroy();
+        setTimeout(() => {
+          devices[dev].engine.destroy();
+          delete devices[dev].engine;
+          if (pro === 'nmea2000') {
+            devices[dev].engine = new NMEAEngine(devices[dev].device);
+          } else if (pro === 'j1939') {
+            devices[dev].engine = new J1939Engine(devices[dev].device);
+          }
+          setTimeout(() => {
+            devices[dev].device.start();
+            if ((mainWindow != null) && (typeof mainWindow.webContents !== 'undefined')) {
+              let des = {};
+              let id = 0;
+              for (const [key, val] of Object.entries(devices)) {
+                des[key] = { id: (id++).toString(), text: key, protocol: val.protocol };
+              }
+              mainWindow.webContents.send('can-devs', des);
+            }
+          }, 500);
+        }, 500);
       }
     }
   }
