@@ -14,7 +14,7 @@
   }
 
   onMount(() => {
-    window.pumaAPI.recv('n2k-digi-data', (e, args) => {
+    window.pumaAPI.recv('n2k-digi-stat-data', (e, args) => {
       const [ dev, msg ] = args;
       if (msg.fields[0].value == data.instance) {
         for (let i = 0; i < 16; i++) {
@@ -25,7 +25,7 @@
   });
   
   onDestroy(() => {
-    window.pumaAPI.reml('n2k-digi-data');
+    window.pumaAPI.reml('n2k-digi-stat-data');
   });
 
   function cancel(e) {

@@ -2,7 +2,7 @@
   import { createEventDispatcher } from "svelte";
   import { ButtonSet, Button, Tile, Grid, Row, Column,
     DataTableSkeleton, DataTable, NumberInput, NumberInputSkeleton,
-    TextInput, Dropdown, DropdownSkeleton, Checkbox } from "carbon-components-svelte";
+    TextInput, Dropdown, DropdownSkeleton, CheckboxSkeleton, Checkbox } from "carbon-components-svelte";
   import Delete from "carbon-icons-svelte/lib/RowDelete16";
   import Open from "carbon-icons-svelte/lib/Document16";
   import Save from "carbon-icons-svelte/lib/Save16";
@@ -280,6 +280,10 @@
     }
   }
 
+  function setMimic(e) {
+    dispatch("mimic");
+  }
+
   function setSim(e) {
     if (e.detail != null) {
       for (let i in  data.table) {
@@ -414,10 +418,12 @@
   }
 
   function scroll1(dly) {
-    setTimeout(() => {
-      let elm = document.querySelector('.simtab tr.bx--data-table--selected');
-      elm.scrollIntoView({ behavior: "smooth", block: "nearest" });
-    }, dly);
+    if (selectedIds1.length > 0) {
+      setTimeout(() => {
+        let elm = document.querySelector('.simtab tr.bx--data-table--selected');
+        elm.scrollIntoView({ behavior: "smooth", block: "nearest" });
+      }, dly);
+    }
   }
 
   function clrSel1(val) {
@@ -717,25 +723,29 @@
                       <DropdownSkeleton />
                       <div style="height: 1rem;"></div>
                       <NumberInputSkeleton />
+                      <div style="height: 1rem;"></div>
+                      <CheckboxSkeleton />
                     {:else}
-                    <Dropdown
-                      size="sm"
-                      titleText="Simulation mode"
-                      disabled={(rows1.length === 0)}
-                      bind:selectedId={data.simulation}
-                      items={sims} />
-                    <div style="height: 1rem;"></div>
-                    <NumberInput
-                      id="rate"
-                      allowEmpty
-                      min={0.1}
-                      max={5.0}
-                      step={0.1}
-                      label="Rate of change (%)"
-                      invalidText={"Number must be between 0.1% and 50%"}
-                      disabled={(rows1.length === 0) || (data.simulation === 3)}
-                      value={data.rate}
-                      on:input={input5} />
+                      <Dropdown
+                        size="sm"
+                        titleText="Simulation mode"
+                        disabled={(rows1.length === 0)}
+                        bind:selectedId={data.simulation}
+                        items={sims} />
+                      <div style="height: 1rem;"></div>
+                      <NumberInput
+                        id="rate"
+                        allowEmpty
+                        min={0.1}
+                        max={5.0}
+                        step={0.1}
+                        label="Rate of change (%)"
+                        invalidText={"Number must be between 0.1% and 50%"}
+                        disabled={(rows1.length === 0) || (data.simulation === 3)}
+                        value={data.rate}
+                        on:input={input5} />
+                      <div style="height: 1rem;"></div>
+                      <Checkbox labelText="Relay mimic" bind:checked={data.mimic} on:check={setMimic} />
                     {/if}
                   </Column>
                 </Row>

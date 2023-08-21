@@ -21,8 +21,9 @@
     table: new Array(),
     simulation: null,
     rate: null,
+    mimic: null,
   };
-  let mimic = new Array();
+  let mimics = new Array();
   let loading = true;
   let running = false;
   let capturing = false;
@@ -44,10 +45,50 @@
     selector = JSON.parse(JSON.stringify(arr));
     simulator.simulation = 0;
     simulator.rate = 0.2;
+    simulator.mimic = false;
+    window.pumaAPI.recv('n2k-digi-ctrl-data', (e, args) => {
+      const [ dev, msg ] = args;
+      if (simulator.mimic) {
+        let spl = splitKey(msg.key);
+        let id = 0;
+        let mim = mimByInstance('3478', spl.instance);
+        if (mim === null) {
+          for (let i in mimics) {
+            if (mimics[i].id > id) {
+              id = mimics[i].id;
+            }
+          }
+          mimics.push({
+            id: ++id,
+            device: '3478',
+            instance: spl.instance,
+            title: 'Relay Output Module',
+            status: new Array(28).fill(3),
+            timer: setInterval((key) => {
+              mimMsg(key);
+            }, 2500, msg.key),
+          });
+        } else {
+          id = mim.id
+        }
+        let idx = mimById(id);
+        if (idx !== -1) {
+          for (let i = 1; i < 29; i++) {
+            if (msg.fields[i].value !== 3) {
+              mimics[idx].status[i - 1] = msg.fields[i].value;
+            }
+          }
+        }
+        mimMsg(msg.key);
+      }
+    });
     loading = false;
   });
 
   onDestroy((e) => {
+    window.pumaAPI.reml('n2k-digi-ctrl-data');
+    simulator.mimic = false;
+    setMimic(e);
     capStop(e);
     simStop(e);
   });
@@ -503,6 +544,51 @@
     window.pumaAPI.send('sim-data', [$device, msg]);
   };
     
+  function mimByInstance(dev, ins) {
+    for (let i in mimics) {
+      if ((mimics[i].device === dev) && (mimics[i].instance == ins)) {
+        return mimics[i];
+      }
+    }
+    return null;
+  }
+
+  function mimById(id) {
+    for (let i in mimics) {
+      if (mimics[i].id === id) {
+        return i;
+      }
+    }
+    return -1;
+  }
+
+  function mimMsg(key) {
+    let spl = splitKey(key);
+    spl.pgn = 127501;
+    key = joinKey(spl);
+    let msg = {
+      key: key,
+      header: { pgn: spl.pgn, src: null, dst: 0xFF },
+      fields: new Array(),
+    }
+    msg.fields.push({
+      field: 1,
+      title: "Binary Device Bank Instance",
+      type: "uint8",
+      value: spl.instance,
+    });
+    let val = mimByInstance('3478', spl.instance);
+    for (let i = 0; i < 28; i++) {
+      msg.fields.push({
+        field: i + 2,
+        title: "Status " + (i + 1),
+        type: "bit(2)",
+        value: ((val !== null) && (typeof val.status[i] !== 'undefined')) ? val.status[i] : 2,
+      });
+    }
+    window.pumaAPI.send('sim-data', [$device, msg]);
+  };
+
   function send(e) {
     for (let i in simulator.table) {
       if (JSON.stringify(simulator.table[i]) === JSON.stringify(e.detail)) {
@@ -533,6 +619,16 @@
     running = false;
   };
 
+  function setMimic(e) {
+    if (!simulator.mimic) {
+      for (let i in mimics) {
+        clearInterval(mimics[i].timer);
+        mimics[i].timer = null;
+      }
+      mimics = new Array();
+    }
+  };
+
   function cancel(e) {
     running = false;
     pop();
@@ -545,7 +641,9 @@
       <Tabs type="container" selected={tab} on:change={tabChg}>
         <Tab label="Messages" />
         <Tab label="Simulator" />
-        <Tab label="Mimics" />
+        {#if simulator.mimic}
+          <Tab label="Mimics" />
+        {/if}
         <svelte:fragment slot="content">
           <TabContent>
             <MessageContainer
@@ -571,15 +669,18 @@
               on:send={send}
               on:simstart={simStart}
               on:simstop={simStop}
+              on:mimic={setMimic}
               on:cancel={cancel}
               style="height: calc(100vh - 10rem);" />
           </TabContent>
-          <TabContent>
-            <MimicContainer
-              bind:data={mimic}
-              on:cancel={cancel}
-              style="height: calc(100vh - 10rem);" />
-          </TabContent>
+          {#if simulator.mimic}
+            <TabContent>
+              <MimicContainer
+                bind:data={mimics}
+                on:cancel={cancel}
+                style="height: calc(100vh - 10rem);" />
+            </TabContent>
+          {/if}          
         </svelte:fragment>
       </Tabs>
       {#if notify}

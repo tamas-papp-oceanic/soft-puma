@@ -313,7 +313,11 @@ function proc(dev, frm) {
         break;
       case 127501:
         mainWindow.webContents.send('n2k-data', [dev, msg]);
-        mainWindow.webContents.send('n2k-digi-data', [dev, msg]);
+        mainWindow.webContents.send('n2k-digi-stat-data', [dev, msg]);
+        break;
+      case 127502:
+        mainWindow.webContents.send('n2k-data', [dev, msg]);
+        mainWindow.webContents.send('n2k-digi-ctrl-data', [dev, msg]);
         break;
       case 130982:
         if ((com.getFld(1, msg.fields).value == manu) && (com.getFld(3, msg.fields).value == indu)) {
