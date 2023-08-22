@@ -28,9 +28,13 @@
   });
 
   onMount(() => {
-    key = params.protocol + '/' + params.pgn + '/' + params.function + '/' +
-      params.manufacturer + '/' + params.industry + '/' + params.instance + '/' +
-      params.type;
+    if (params.protocol === 'nmea2000') {
+      key = params.protocol + '/' + params.pgn + '/' + params.function + '/' +
+        params.manufacturer + '/' + params.industry + '/' + params.instance + '/' +
+        params.type;
+    } else {
+      key = params.protocol + '/' + params.pgn + '/' + params.instance;
+    }
     title = 'Content of PGN' + params.pgn;
     start(key);
   }); 

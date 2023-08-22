@@ -135,6 +135,7 @@ function decode(frm) {
         msg.fields.push(fld);
       }
     }
+    msg.header.ins = ins;
     msg.key += "/" + ins;
     return msg;
   } catch (err) {

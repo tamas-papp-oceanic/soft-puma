@@ -4,7 +4,7 @@
     ComposedModal, ModalHeader, ModalFooter, TooltipDefinition, Dropdown } from "carbon-components-svelte";
   import { logout } from '../auth/auth.js'
   import { loggedIn } from '../stores/user.js';
-  import { devices, device } from '../stores/data.js';
+  import { devices, device, name, data } from '../stores/data.js';
 	import { update, updmsg, download } from '../stores/update.js';
   import Update20 from "carbon-icons-svelte/lib/UpdateNow20";
   import Login20 from "carbon-icons-svelte/lib/Login20";
@@ -16,12 +16,12 @@
   export let version;
   
   const menu = [
-    { text: 'Devices', path: '/', selected: false },
-    { text: 'Configure', path: '/configure', selected: false },
-    { text: 'Testing', path: '/testing', selected: false },
-    { text: 'Update', path: '/program', selected: false },
-    { text: 'Simulate', path: '/simulate', selected: false },
-    { text: 'Advanced', path: '/advanced', selected: false },
+    { text: 'Devices', path: '/', selected: false, enabled: true },
+    { text: 'Configure', path: '/configure', selected: false, enabled: true },
+    { text: 'Testing', path: '/testing', selected: false, enabled: true },
+    { text: 'Update', path: '/program', selected: false, enabled: true },
+    { text: 'Simulate', path: '/simulate', selected: false, enabled: true },
+    { text: 'Advanced', path: '/advanced', selected: false, enabled: true },
   ];
   const proItems = [
     { id: '0', text: 'nmea2000' },
@@ -33,14 +33,23 @@
   let platform = product + " v" + version;
   let re = /(\/[A-z]+)/;
   let selected = {
-    menu: null,
+    menu: menu[0],
     device: '0',
     protocol: '0',
   }
 
   function mark(rou) {
+    if (rou == '/monitor/-1') {
+      menu[0].text = 'Messages';
+      rou = '/';
+    } else {
+      menu[0].text = 'Devices';
+    }
     for (let i in menu) {
       menu[i].selected = (menu[i].path == rou);
+      if ((i > 0) && (i < 4)) {
+        menu[i].enabled = (selected.protocol === '0');
+      }
     }
   };
 
@@ -48,6 +57,8 @@
     selected.menu = itm;
     mark(itm.path);
     if ((itm.text === 'Devices') && (selected.protocol === '1')) {
+      $name[$device] = {};
+      $data[$device] = {};
       push('/monitor/-1');
     } else {
       push(itm.path);
@@ -89,8 +100,11 @@
     }
     for (let i in proItems) {
       if (proItems[i].text === $devices[$device].protocol) {
-        selected.protocol = proItems[i].id;
-        break;
+        if (selected.protocol !== proItems[i].id) {
+          selected.protocol = proItems[i].id;
+          select(null, selected.menu);
+          break;
+        }
       }
     }
   };
@@ -120,19 +134,16 @@
     if (devItems.length > 0) {
       for (let i in proItems) {
         if (proItems[i].text === $devices[$device].protocol) {
-          if (selected.protocol !== proItems[i].id) {
-            selected.protocol = proItems[i].id;
-            select(null, selected.menu);
-          }
+          select(null, selected.menu);
           break;
         }
       }
     }
   };
 
+  $: $devices, getDevices();
   $: platform = product + " v" + version
   $: $location, mark($location.replace(re, '$1'));
-  $: $devices, getDevices();
 </script>
 
 <div>
@@ -157,7 +168,9 @@
     </HeaderNav>
     <HeaderNav>
       {#each menu as item}
-        <HeaderNavItem bind:isSelected={item.selected} on:click={(e) => { select(e, item) }} text={item.text} />
+        {#if item.enabled}
+          <HeaderNavItem bind:isSelected={item.selected} on:click={(e) => { select(e, item) }} text={item.text} />
+        {/if}
       {/each}
     </HeaderNav>
     <HeaderUtilities>
@@ -172,7 +185,7 @@
         </TooltipDefinition>
       {:else}
         <TooltipDefinition direction="bottom" align="center" tooltipText="Logout">
-          <HeaderGlobalAction on:click={(e) => logout(e)} aria-label="Logout" icon={Logout20} />
+          <HeaderGlobalAction on:click={(e) => _logout(e)} aria-label="Logout" icon={Logout20} />
         </TooltipDefinition>
       {/if}
       <TooltipDefinition direction="bottom" align="center" tooltipText="Exit">

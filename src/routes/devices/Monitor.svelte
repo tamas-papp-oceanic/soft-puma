@@ -3,7 +3,7 @@
     Button, Pagination, OverflowMenu, OverflowMenuItem } from "carbon-components-svelte";
   import SkipBack from "carbon-icons-svelte/lib/SkipBack16";
   import { push, pop } from 'svelte-spa-router'
-  import { devices, device, name, data } from "../../stores/data.js";
+  import { device, name, data } from "../../stores/data.js";
   import { isRoute } from "../../helpers/route.js";
 
   export let params;
@@ -62,21 +62,19 @@
       if (typeof nam !== 'undefined') {
         title = 'Messages of ' + nam.manufacturer + (nam.modelID != null ? ' - ' + nam.modelID : '');
       } else {
-        title = 'Messages';
+        title = 'J1939 messages';
       }
     } else {
       title = 'Messages';
     }
   };
 
-  // Data getters, setters
-  $: $device, setTitle($device);
-  $: {
+  function setData(dat) {
     let tmp = new Array();
-    if (typeof $data[$device] !== "undefined") {
-      for (const [key, val] of Object.entries($data[$device])) {
+    if (typeof dat !== "undefined") {
+      for (const [key, val] of Object.entries(dat)) {
         let add = parseInt(params["address"]);
-        if (val.raw[3] == add) {
+        if ((add === -1) || (val.raw[3] === add)) {
           let dat = new Uint8Array(val.raw.slice(4));
           let spl = key.split("/");
           let obj = {
@@ -104,6 +102,10 @@
     rows = JSON.parse(JSON.stringify(tmp));
     pagination.totalItems = rows.length;
   };
+
+  // Data getters, setters
+  $: $device, setTitle($device);
+  $: $data[$device], setData($data[$device]);
   $: pagination.pageSize = Math.round(((height * 0.9) / getComputedStyle(document.documentElement).fontSize.replace('px', '')) / 3) - 4;
 </script>
 

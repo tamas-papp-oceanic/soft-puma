@@ -63,7 +63,9 @@
 		"/restricted":                      wrap({ component: Restricted,     conditions: [(detail) => { return routeGuard(detail); }] }),
 		"/welcome":                         wrap({ component: Welcome,        conditions: [(detail) => { return routeGuard(detail); }] }),
 		"/monitor/:address":                wrap({ component: Monitor,        conditions: [(detail) => { return routeGuard(detail); }] }),
-		"/messages/:protocol/:pgn/:function/:manufacturer/:industry/:instance/:type":
+		"/messages/:protocol/:pgn/:instance":
+                                        wrap({ component: Content,        conditions: [(detail) => { return routeGuard(detail); }] }),
+    "/messages/:protocol/:pgn/:function/:manufacturer/:industry/:instance/:type":
                                         wrap({ component: Content,        conditions: [(detail) => { return routeGuard(detail); }] }),
 		"/details/:protocol/:pgn/:function/:manufacturer/:industry/:instance/:type":
                                         wrap({ component: Details,        conditions: [(detail) => { return routeGuard(detail); }] }),

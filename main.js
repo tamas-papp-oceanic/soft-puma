@@ -9,7 +9,8 @@ const serve = require('electron-serve');
 const loadURL = serve({ directory: 'public' });
 const log = require('electron-log');
 const Serial = require('./src/services/serial.js');
-const com = require('./src/services/n2000/common.js');
+const nmeaCom = require('./src/services/n2000/common.js');
+const j1939Com = require('./src/services/j1939/common.js');
 const N2000Engine = require('./src/services/n2000/nmea.js');
 const J1939Engine = require('./src/services/j1939/j1939.js');
 const bwipjs = require('bwip-js');
@@ -272,18 +273,18 @@ function n2000Proc(dev, frm) {
         break;
       case 65289:
       case 130825:
-        if ((com.getFld(1, msg.fields).value == manu) && (com.getFld(3, msg.fields).value == indu)) {
+        if ((nmeaCom.getFld(1, msg.fields).value == manu) && (nmeaCom.getFld(3, msg.fields).value == indu)) {
           mainWindow.webContents.send('n2k-volume', [dev, msg]);
         }
         break;
       case 65446:
-        if ((com.getFld(1, msg.fields).value == manu) && (com.getFld(3, msg.fields).value == indu)) {
-          switch (com.getFld(6, msg.fields).value) {
+        if ((nmeaCom.getFld(1, msg.fields).value == manu) && (nmeaCom.getFld(3, msg.fields).value == indu)) {
+          switch (nmeaCom.getFld(6, msg.fields).value) {
             case 0xB0:
               pub.emit('reboot-ack', msg);
               break;
             default:
-              switch (com.getFld(4, msg.fields).value) {
+              switch (nmeaCom.getFld(4, msg.fields).value) {
                 case 0x04:
                   // Exhaust gas data
                   mainWindow.webContents.send('n2k-egt-cfg-data', [dev, msg]);
@@ -329,8 +330,8 @@ function n2000Proc(dev, frm) {
         mainWindow.webContents.send('n2k-digi-ctrl-data', [dev, msg]);
         break;
       case 130982:
-        if ((com.getFld(1, msg.fields).value == manu) && (com.getFld(3, msg.fields).value == indu)) {
-          switch (com.getFld(6, msg.fields).value) {
+        if ((nmeaCom.getFld(1, msg.fields).value == manu) && (nmeaCom.getFld(3, msg.fields).value == indu)) {
+          switch (nmeaCom.getFld(6, msg.fields).value) {
             case 0xC2:
               pub.emit('crc-ack', msg);
               break;
@@ -347,7 +348,7 @@ function n2000Proc(dev, frm) {
               pub.emit('prog-ack', msg);
               break;
             default:
-              switch (com.getFld(4, msg.fields).value) {
+              switch (nmeaCom.getFld(4, msg.fields).value) {
                 case 0x16:
                   // Flow monitor data
                   mainWindow.webContents.send('n2k-flow-f-cfg-data', [dev, msg]);
@@ -359,7 +360,7 @@ function n2000Proc(dev, frm) {
         }
         break;
       case 131000:
-        if ((com.getFld(1, msg.fields).value == manu) && (com.getFld(3, msg.fields).value == indu)) {
+        if ((nmeaCom.getFld(1, msg.fields).value == manu) && (nmeaCom.getFld(3, msg.fields).value == indu)) {
           mainWindow.webContents.send('n2k-dc-cfg-data', [dev, msg]);
           pub.emit('conf-ack', msg);
         }
@@ -382,7 +383,7 @@ function j1939Proc(dev, frm) {
     if (msg != null) {
       switch (msg.header.pgn) {
       default:
-        mainWindow.webContents.send('j1393-data', [dev, msg]);
+        mainWindow.webContents.send('j1939-data', [dev, msg]);
         if (simCapt) {
           mainWindow.webContents.send('capt-data', [dev, msg]);
         }
@@ -392,8 +393,10 @@ function j1939Proc(dev, frm) {
   }
 }
 
-// Initialize NMEA translator
-com.init();
+// Initialize NMEA2000 translator
+nmeaCom.init();
+// Initialize J1939 translator
+j1939Com.init();
 
 // Start discovery loop
 log.info('Discovering interfaces...')
@@ -415,7 +418,7 @@ ipcMain.on('can-ready', (e, ...args) => {
     const configs = ['classes', 'functions', 'industries', 'manufacturers'];
     for (let i in configs) {
       let cnf = configs[i];
-      let dat = com.load(cnf);
+      let dat = nmeaCom.load(cnf);
       if (dat != null) {
         mainWindow.webContents.send('n2k-' + cnf.substring(0, 4), dat);
       }
@@ -953,8 +956,8 @@ function c3410Read(eng, typ, ins, dst) {
         clearTimeout(btimer);
         btimer = null;
         if ((typeof res.fields !== 'undefined') && Array.isArray(res.fields) &&
-          (com.getFld(4, res.fields).value == typ) && (com.getFld(5, res.fields).value == dst) &&
-          (com.getFld(6, res.fields).value == ins)) {
+          (nmeaCom.getFld(4, res.fields).value == typ) && (nmeaCom.getFld(5, res.fields).value == dst) &&
+          (nmeaCom.getFld(6, res.fields).value == ins)) {
           let msg = 'Configuration successfuly read.';
           log.info(msg);
           resolve(true);
@@ -1004,8 +1007,8 @@ function c3410Write(eng, typ, ins, dst, dat) {
         clearTimeout(btimer);
         btimer = null;
         if ((typeof res.fields !== 'undefined') && Array.isArray(res.fields) &&
-          (com.getFld(4, res.fields).value == typ) && (com.getFld(5, res.fields).value == dst) &&
-          (com.getFld(6, res.fields).value == ins)) {
+          (nmeaCom.getFld(4, res.fields).value == typ) && (nmeaCom.getFld(5, res.fields).value == dst) &&
+          (nmeaCom.getFld(6, res.fields).value == ins)) {
           let msg = 'Configuration successfuly written.';
           log.info(msg);
           resolve(true);
@@ -1241,8 +1244,8 @@ function c4510Read(eng, ins, did) {
         clearTimeout(btimer);
         btimer = null;
         if ((typeof res.fields !== 'undefined') && Array.isArray(res.fields) &&
-          (com.getFld(4, res.fields).value == 0x04) && (com.getFld(5, res.fields).value == ins) &&
-          (com.getFld(6, res.fields).value == did)) {
+          (nmeaCom.getFld(4, res.fields).value == 0x04) && (nmeaCom.getFld(5, res.fields).value == ins) &&
+          (nmeaCom.getFld(6, res.fields).value == did)) {
           let msg = 'Configuration successfuly read.';
           log.info(msg);
           resolve(true);
@@ -1295,8 +1298,8 @@ function c4510Write(eng, ins, cmd, dat) {
         clearTimeout(btimer);
         btimer = null;
         if ((typeof res.fields !== 'undefined') && Array.isArray(res.fields) &&
-          (com.getFld(4, res.fields).value == 0x04) && (com.getFld(5, res.fields).value == ins) &&
-          (com.getFld(6, res.fields).value == cmd) && ((com.getFld(7, res.fields).value & 0xFF) == dat)) {
+          (nmeaCom.getFld(4, res.fields).value == 0x04) && (nmeaCom.getFld(5, res.fields).value == ins) &&
+          (nmeaCom.getFld(6, res.fields).value == cmd) && ((nmeaCom.getFld(7, res.fields).value & 0xFF) == dat)) {
           let msg = 'Configuration successfuly written.';
           log.info(msg);
           resolve(true);
@@ -1357,8 +1360,8 @@ function c4521Read(eng, ins, did, chn) {
         clearTimeout(btimer);
         btimer = null;
         if ((typeof res.fields !== 'undefined') && Array.isArray(res.fields) &&
-          (com.getFld(4, res.fields).value == 0x06) && (com.getFld(5, res.fields).value == ins) &&
-          (com.getFld(6, res.fields).value == did)) {
+          (nmeaCom.getFld(4, res.fields).value == 0x06) && (nmeaCom.getFld(5, res.fields).value == ins) &&
+          (nmeaCom.getFld(6, res.fields).value == did)) {
           let msg = 'Configuration successfuly read.';
           log.info(msg);
           resolve(true);
@@ -1421,8 +1424,8 @@ function c4521Write(eng, ins, did, chn, dat) {
         clearTimeout(btimer);
         btimer = null;
         if ((typeof res.fields !== 'undefined') && Array.isArray(res.fields) &&
-          (com.getFld(4, res.fields).value == 0x06) && (com.getFld(5, res.fields).value == ins) &&
-          (com.getFld(6, res.fields).value == did) && ((com.getFld(7, res.fields).value & 0xFF) == dat)) {
+          (nmeaCom.getFld(4, res.fields).value == 0x06) && (nmeaCom.getFld(5, res.fields).value == ins) &&
+          (nmeaCom.getFld(6, res.fields).value == did) && ((nmeaCom.getFld(7, res.fields).value & 0xFF) == dat)) {
           let msg = 'Configuration successfuly written.';
           log.info(msg);
           resolve(true);
@@ -1491,8 +1494,8 @@ function c4601Read(eng, ins, did) {
         clearTimeout(btimer);
         btimer = null;
         if ((typeof res.fields !== 'undefined') && Array.isArray(res.fields) &&
-          (com.getFld(4, res.fields).value == 0x09) && (com.getFld(5, res.fields).value == ins) &&
-          (com.getFld(6, res.fields).value == did)) {
+          (nmeaCom.getFld(4, res.fields).value == 0x09) && (nmeaCom.getFld(5, res.fields).value == ins) &&
+          (nmeaCom.getFld(6, res.fields).value == did)) {
           let msg = 'Configuration successfuly read.';
           log.info(msg);
           resolve(true);
@@ -1546,8 +1549,8 @@ function c4601Write(eng, ins, did, dat) {
         clearTimeout(btimer);
         btimer = null;
         if ((typeof res.fields !== 'undefined') && Array.isArray(res.fields) &&
-          (com.getFld(4, res.fields).value == 0x09) && (com.getFld(5, res.fields).value == ins) &&
-          (com.getFld(6, res.fields).value == did) && ((com.getFld(7, res.fields).value & 0xFF) == dat)) {
+          (nmeaCom.getFld(4, res.fields).value == 0x09) && (nmeaCom.getFld(5, res.fields).value == ins) &&
+          (nmeaCom.getFld(6, res.fields).value == did) && ((nmeaCom.getFld(7, res.fields).value & 0xFF) == dat)) {
           let msg = 'Configuration successfuly written.';
           log.info(msg);
           resolve(true);
@@ -1618,8 +1621,8 @@ function c5720Read(eng, typ, ins, did) {
         clearTimeout(btimer);
         btimer = null;
         if ((typeof res.fields !== 'undefined') && Array.isArray(res.fields) &&
-          (com.getFld(4, res.fields).value == 0x16) && (com.getFld(5, res.fields).value == ins) &&
-          (com.getFld(6, res.fields).value == did)) {
+          (nmeaCom.getFld(4, res.fields).value == 0x16) && (nmeaCom.getFld(5, res.fields).value == ins) &&
+          (nmeaCom.getFld(6, res.fields).value == did)) {
           let msg = 'Configuration successfuly read.';
           log.info(msg);
           resolve(true);
@@ -1686,8 +1689,8 @@ function c5720Write(eng, typ, ins, did, dat) {
         clearTimeout(btimer);
         btimer = null;
         if ((typeof res.fields !== 'undefined') && Array.isArray(res.fields) &&
-          (com.getFld(4, res.fields).value == 0x09) && (com.getFld(5, res.fields).value == ins) &&
-          (com.getFld(6, res.fields).value == did) && ((com.getFld(7, res.fields).value & 0xFF) == dat)) {
+          (nmeaCom.getFld(4, res.fields).value == 0x09) && (nmeaCom.getFld(5, res.fields).value == ins) &&
+          (nmeaCom.getFld(6, res.fields).value == did) && ((nmeaCom.getFld(7, res.fields).value & 0xFF) == dat)) {
           let msg = 'Configuration successfuly written.';
           log.info(msg);
           resolve(true);

@@ -1,5 +1,6 @@
 import { writable, get } from 'svelte/store';
 import { defValue } from '../helpers/unit.js';
+import { construct_svelte_component } from 'svelte/internal';
 
 const qlimit = 1024;
 const unitconv = false;
@@ -214,7 +215,7 @@ window.pumaAPI.recv('n2k-prod', (e, args) => {
   dat[dev][src] = nam;
   name.set(dat);
 });
-// NMEA other messages
+// NMEA2000 other messages
 window.pumaAPI.recv('n2k-data', (e, args) => {
   const [ dev, msg ] = args;
   if (typeof msg.key !== 'undefined') {
@@ -247,6 +248,48 @@ window.pumaAPI.recv('n2k-data', (e, args) => {
     let flt = get(filter);
     let de2 = get(device);
     if ((flt != null) && (de2 == dev) && (key == flt)) {
+      let que = get(queue);
+      if (que.length < qlimit) {
+        msg.cnt = que.length + 1;
+        que.push(msg);
+      }
+      queue.set(que);
+    }
+  }
+});
+// J1939 other messages
+window.pumaAPI.recv('j1939-data', (e, args) => {
+  const [ dev, msg ] = args;
+  if (typeof msg.key !== 'undefined') {
+    let key = msg.key;
+    delete msg.key;
+    if (unitconv) {
+      for (let i in msg.fields) {
+        if (msg.fields[i].unit !== null) {
+          let val = defValue({ value: msg.fields[i].value, unit: msg.fields[i].unit});
+          msg.fields[i].value = val.value;
+          msg.fields[i].unit = val.unit;
+        }
+      }
+    }
+    let dat = get(data);
+    if (typeof dat[dev] === 'undefined') {
+      dat[dev] = {};
+    }
+    if (typeof dat[dev][key] === 'undefined') {
+      dat[dev][key] = { header: { tim: msg.header.tim }};
+      msg.cnt = 0;
+    } else {
+      msg.cnt = dat[dev][key].cnt;
+    }
+    msg.int = Math.round((msg.header.tim - dat[dev][key].header.tim) * 1000);
+    msg.cnt++;
+    dat[dev][key] = msg;
+    data.set(dat);
+    // Queue handling
+    let flt = get(filter);
+    let de2 = get(device);
+    if ((flt !== null) && (de2 === dev) && (key === flt)) {
       let que = get(queue);
       if (que.length < qlimit) {
         msg.cnt = que.length + 1;
