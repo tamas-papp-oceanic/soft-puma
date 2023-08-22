@@ -7,7 +7,7 @@
       065280 - 065535 - global
 
     Fast-packet Proprietary
-      12720           - addressable
+      126720          - addressable
       130816 - 131071 - global
 
     Proprietary required fields:

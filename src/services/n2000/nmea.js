@@ -4,19 +4,19 @@ const dec = require('./decode.js');
 const enc = require('./encode.js');
 const com = require('./common.js');
 let can = null;
-const ser = require('./serial.js');
+const ser = require('../serial.js');
 const tranList = [59392, 59904, 60160, 60416, 60928, 126208, 126464, 126993, 126996, 126998];
 const recvList = [59392, 59904, 60160, 60416, 60928, 126208];
 
 if (os.platform() == 'linux') {
-  can = require('./can.js');
+  can = require('../can.js');
 } else if (os.platform() == 'win32') {
-  can = require('./pcan.js');
+  can = require('../pcan.js');
 }
 
 const Address = require('./address.js');
 // Class definition
-class J1939Engine {
+class NMEAEngine {
   // Static variables
   #device;
   #active;
@@ -1013,4 +1013,4 @@ class J1939Engine {
   }
 };
 
-module.exports = J1939Engine;
+module.exports = NMEAEngine;

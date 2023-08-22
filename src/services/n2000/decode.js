@@ -167,18 +167,23 @@ function decode(frm, din) {
               break;
           }
           fld.state = com.getStatus(fld.type, val);
-          if ((fld.state == 'V') && (fld.multiplier != null)) {
-            if (typeof val == 'bigint') {
-              if (fld.multiplier >= 1) {
-                val *= BigInt(fld.multiplier);
+          if (fld.state == 'V') {
+            if  (fld.multiplier != null) {
+              if (typeof val == 'bigint') {
+                if (fld.multiplier >= 1) {
+                  val *= BigInt(fld.multiplier);
+                } else {
+                  val /= BigInt(1 / fld.multiplier);
+                }
+                val = Number(val);
               } else {
-                val /= BigInt(1 / fld.multiplier);
+                val *= fld.multiplier;
               }
-              val = Number(val);
-            } else {
-              val *= fld.multiplier;
+              val = Math.round(val * 100000) / 100000;
             }
-            val = Math.round(val * 100000) / 100000;
+            if  (fld.offset != null) {
+              val += offset;
+            }
           }
           ptr += len;
         }

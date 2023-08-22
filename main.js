@@ -9,9 +9,9 @@ const serve = require('electron-serve');
 const loadURL = serve({ directory: 'public' });
 const log = require('electron-log');
 const Serial = require('./src/services/serial.js');
-const com = require('./src/services/common.js');
-const NMEAEngine = require('./src/services/nmea.js');
-const J1939Engine = require('./src/services/j1939.js');
+const com = require('./src/services/n2000/common.js');
+const NMEAEngine = require('./src/services/n2000/nmea.js');
+const J1939Engine = require('./src/services/j1939/j1939.js');
 const bwipjs = require('bwip-js');
 const PDFDocument = require('pdfkit');
 const prt = 'HP-LaserJet-Pro-M404-M405';
@@ -169,6 +169,9 @@ app.on('activate', function () {
 // FOR INIT ONLY
 // let tool = require('./src/tools/nmea.js');
 // tool.create();
+let tool = require('./src/tools/j1939.js');
+tool.create();
+
 
 // Discovering interfaces
 async function discover() {
@@ -256,7 +259,7 @@ async function discover() {
   });
 }
 
-// NMEA processing
+// NMEA2000 processing
 function nmeaProc(dev, frm) {
   if (devices[dev].engine.active() && (mainWindow != null) && (typeof mainWindow.webContents !== 'undefined')) {
     let msg = devices[dev].engine.process(frm);
@@ -372,6 +375,23 @@ function nmeaProc(dev, frm) {
   }
 }
 
+// J1939 processing
+function j1939Proc(dev, frm) {
+  if (devices[dev].engine.active() && (mainWindow != null) && (typeof mainWindow.webContents !== 'undefined')) {
+    let msg = devices[dev].engine.process(frm);
+    if (msg != null) {
+      switch (msg.header.pgn) {
+      default:
+        mainWindow.webContents.send('j1393-data', [dev, msg]);
+        if (simCapt) {
+          mainWindow.webContents.send('capt-data', [dev, msg]);
+        }
+        break;
+      }
+    }
+  }
+}
+
 // Initialize NMEA translator
 com.init();
 
@@ -406,12 +426,6 @@ ipcMain.on('can-ready', (e, ...args) => {
 // Processing outgoing message
 ipcMain.on('set-prot', (e, args) => {
   const [dev, pro] = args;
-
-
-  console.log(dev, pro)
-
-
-
   if ((typeof dev !== 'undefined') && (typeof devices[dev] !== 'undefined')) {
     if (devices[dev].protocol !== pro) {
       if (typeof devices[dev].device !== 'undefined') {
@@ -424,8 +438,10 @@ ipcMain.on('set-prot', (e, args) => {
           delete devices[dev].engine;
           if (pro === 'nmea2000') {
             devices[dev].engine = new NMEAEngine(devices[dev].device);
+            devices[dev].process = nmeaProc;
           } else if (pro === 'j1939') {
             devices[dev].engine = new J1939Engine(devices[dev].device);
+            devices[dev].process = j1939Proc;
           }
           setTimeout(() => {
             devices[dev].device.start();
