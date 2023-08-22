@@ -10,7 +10,7 @@ const loadURL = serve({ directory: 'public' });
 const log = require('electron-log');
 const Serial = require('./src/services/serial.js');
 const com = require('./src/services/n2000/common.js');
-const NMEAEngine = require('./src/services/n2000/nmea.js');
+const N2000Engine = require('./src/services/n2000/nmea.js');
 const J1939Engine = require('./src/services/j1939/j1939.js');
 const bwipjs = require('bwip-js');
 const PDFDocument = require('pdfkit');
@@ -169,8 +169,8 @@ app.on('activate', function () {
 // FOR INIT ONLY
 // let tool = require('./src/tools/nmea.js');
 // tool.create();
-let tool = require('./src/tools/j1939.js');
-tool.create();
+// let tool = require('./src/tools/j1939.js');
+// tool.create();
 
 
 // Discovering interfaces
@@ -187,8 +187,8 @@ async function discover() {
             if (typeof devices[sls[i].path] === "undefined") {
               log.info('New serial interface (' + sls[i].path + ')')
               let dev = new Serial(sls[i].path, 115200);
-              let eng = new NMEAEngine(dev);
-              devices[sls[i].path] = { type: 'serial', device: dev, protocol: 'nmea2000', engine: eng, process: nmeaProc };
+              let eng = new N2000Engine(dev);
+              devices[sls[i].path] = { type: 'serial', device: dev, protocol: 'nmea2000', engine: eng, process: n2000Proc };
               updates.push(devices[sls[i].path]);
             }
           }
@@ -205,8 +205,8 @@ async function discover() {
               if (typeof devices[cls[i]] === "undefined") {
                 log.info('New CAN interface (' + cls[i] + ')')
                 let dev = new Can(cls[i]);
-                let eng = new NMEAEngine(dev);
-                devices[cls[i]] = { type: 'can', device: dev, protocol: 'nmea2000', engine: eng, process: nmeaProc };
+                let eng = new N2000Engine(dev);
+                devices[cls[i]] = { type: 'can', device: dev, protocol: 'nmea2000', engine: eng, process: n2000Proc };
                 updates.push(devices[cls[i]]);
               }
             }
@@ -218,8 +218,8 @@ async function discover() {
             if (cls.length > 0) {
               if (typeof devices[cls[0].path] === "undefined") {
                 log.info('New CAN interface (' + cls[0].path + ')')
-                let eng = new NMEAEngine(can);
-                devices[cls[0].path] = { type: 'can', device: can, protocol: 'nmea2000', engine: eng, process: nmeaProc };
+                let eng = new N2000Engine(can);
+                devices[cls[0].path] = { type: 'can', device: can, protocol: 'nmea2000', engine: eng, process: n2000Proc };
                 updates.push(devices[cls[0].path]);
               }
             }
@@ -260,7 +260,7 @@ async function discover() {
 }
 
 // NMEA2000 processing
-function nmeaProc(dev, frm) {
+function n2000Proc(dev, frm) {
   if (devices[dev].engine.active() && (mainWindow != null) && (typeof mainWindow.webContents !== 'undefined')) {
     let msg = devices[dev].engine.process(frm);
     let manu = devices[dev].engine.name[2];
@@ -433,18 +433,19 @@ ipcMain.on('set-prot', (e, args) => {
       }
       if (typeof devices[dev].engine !== 'undefined') {
         devices[dev].engine.destroy();
-        setTimeout(() => {
-          devices[dev].engine.destroy();
-          delete devices[dev].engine;
-          if (pro === 'nmea2000') {
-            devices[dev].engine = new NMEAEngine(devices[dev].device);
-            devices[dev].process = nmeaProc;
-          } else if (pro === 'j1939') {
-            devices[dev].engine = new J1939Engine(devices[dev].device);
-            devices[dev].process = j1939Proc;
-          }
-          setTimeout(() => {
-            devices[dev].device.start();
+        devices[dev].engine = null;
+        devices[dev].protocol = pro;
+        if (pro === 'nmea2000') {
+          devices[dev].engine = new N2000Engine(devices[dev].device);
+          devices[dev].process = n2000Proc;
+        } else if (pro === 'j1939') {
+          devices[dev].engine = new J1939Engine(devices[dev].device);
+          devices[dev].process = j1939Proc;
+        }
+        if (devices[dev].device !== null) {
+          devices[dev].device.start(devices[dev].process);
+          setTimeout((dev) => {
+            devices[dev].engine.init()
             if ((mainWindow != null) && (typeof mainWindow.webContents !== 'undefined')) {
               let des = {};
               let id = 0;
@@ -453,8 +454,8 @@ ipcMain.on('set-prot', (e, args) => {
               }
               mainWindow.webContents.send('can-devs', des);
             }
-          }, 500);
-        }, 500);
+          }, 1000, dev);
+        }
       }
     }
   }
@@ -474,10 +475,12 @@ ipcMain.on('bus-scan', (e) => {
     mainWindow.webContents.send('n2k-clear');
   }
   for (const [key, val] of Object.entries(devices)) {
-    // Clear name records
-    val.engine.clearNames();
-    // Send ISO Request for Address Claim
-    val.engine.send059904(60928, 0xFF);
+    if (val.protocol === 'nmea2000') {
+      // Clear name records
+      val.engine.clearNames();
+      // Send ISO Request for Address Claim
+      val.engine.send059904(60928, 0xFF);
+    }
   }
 });
 

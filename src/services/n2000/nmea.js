@@ -65,8 +65,11 @@ class NMEAEngine {
   }
   // Destroys NMEA engine
   destroy() {
+    this.#active = false;
     this.#addrMngr.stop();
+    this.#addrMngr = null;
     clearInterval(this.#timer);
+    this.#timer = null;
   };
   // Gets device function
   get device() {

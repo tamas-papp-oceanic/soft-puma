@@ -5,7 +5,7 @@
     OverflowMenuItem, Pagination, Dropdown } from "carbon-components-svelte";
   import Scan from "carbon-icons-svelte/lib/SearchLocate16";
   import Warning from "carbon-icons-svelte/lib/WarningAltFilled16";
-  import { name, devices, device, protocol, data, updates } from "../../stores/data.js";
+  import { name, devices, device, data, updates } from "../../stores/data.js";
   import { compareVersions } from 'compare-versions';
   import { getdev } from '../../config/devices.js';
   import { isRoute } from '../../helpers/route.js'
@@ -38,19 +38,11 @@
     key: "uniqueNumber",
     value: "Unique Number"
   }];
-  const proItems = [
-    { id: '0', text: 'nmea2000' },
-    { id: '1', text: 'j1939' },
-  ];
-
-  let devItems = new Array();
-  let devSelected;
-  let proSelected = '0';
   let height;
   let rows = new Array();
   let pagination = {
     pageSize: 10,
-    totalitems: 0,
+    totalItems: 0,
     page: 1,
   };
 
@@ -134,20 +126,6 @@
     window.pumaAPI.send('bus-scan');
   };
   
-  function devSelect(e) {
-    $device = e.detail.selectedItem.text;
-  };
-
-  function proSelect(e) {
-    if ($protocol !== e.detail.selectedItem.text) {
-      $protocol = e.detail.selectedItem.text;
-      
-console.log($device, $protocol)
-      
-      window.pumaAPI.send('set-prot', [$device, $protocol]);
-    }
-  };
-  
   function isUpdate(src) {
     try {
       let nam = $name[$device][src];
@@ -164,34 +142,6 @@ console.log($device, $protocol)
     return false;
   };
     
-  function getDevSelected() {
-    if (typeof devSelected === "undefined") {
-      if ($device !== null) {
-        for (const [key, val] of Object.entries($devices)) {
-          if (key === $device) {
-            devSelected = val.id;
-            break;
-          }
-        }
-      } else {
-        if (Object.keys($devices).length > 0) {
-          $device = Object.keys($devices)[0];
-          devSelected = Object.values($devices)[0].id;
-        }
-      }
-    }
-  };
-
-  function getDevItems() {
-    let tmp = new Array();
-    for (const [key, val] of Object.entries($devices)) {
-      tmp.push(
-        { id: val.id, text: val.text, protocol: val.protocol },
-      );
-    }
-    devItems = JSON.parse(JSON.stringify(tmp));
-  };
-
   function isNewDevice(old, cur) {
     let res = false;
     for (let i in cur) {
@@ -235,8 +185,6 @@ console.log($device, $protocol)
   };
 
   // Data getters, setters
-  $: $devices, getDevSelected();
-  $: $devices, getDevItems();
   $: $name[$device], getRows();
   $: pagination.pageSize = Math.round(((height * 0.9) / getComputedStyle(document.documentElement).fontSize.replace('px', '')) / 3) - 4;
 </script>
@@ -252,22 +200,6 @@ console.log($device, $protocol)
         pageSize={pagination.pageSize}
         page={pagination.page}>
         <Toolbar>
-          <Dropdown
-            style="margin-left: 1rem; grid-gap: 0 1rem;"
-            titleText="Interface"
-            type="inline"
-            size="xl"
-            bind:selectedId={devSelected}
-            items={devItems}
-            on:select={(e) => devSelect(e)} />
-          <Dropdown
-            style="margin-left: 1rem; grid-gap: 0 1rem;"
-            titleText="Protocol"
-            type="inline"
-            size="xl"
-            bind:selectedId={proSelected}
-            items={proItems}
-            on:select={(e) => proSelect(e)} />
           <ToolbarContent>
             <ToolbarSearch />
             <Button icon={Scan} on:click={(e) => scan(e)}>Scan</Button>
@@ -289,10 +221,10 @@ console.log($device, $protocol)
           {/if}
         </span>
       </DataTable>
-      {#if pagination.totaldevItems > pagination.pageSize}
+      {#if pagination.totalItems > pagination.pageSize}
         <Pagination
           bind:pageSize={pagination.pageSize}
-          totaldevItems={pagination.totaldevItems}
+          totalItems={pagination.totalItems}
           bind:page={pagination.page}
           pageSizeInputDisabled
           pageInputDisabled

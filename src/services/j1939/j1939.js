@@ -21,7 +21,6 @@ class J1939Engine {
   constructor(dev) {
     this.#active = false;
     this.#device = dev;
-    // Serial number can be loaded from configuration
   };
   // Initializes J1939 engine
   init() {
@@ -32,7 +31,9 @@ class J1939Engine {
     return this.#active;
   }
   // Destroys J1939 engine
-  destroy() { };
+  destroy() {
+    this.#active = false;
+  };
   // Gets device function
   get device() {
     return this.#device;
@@ -59,14 +60,12 @@ class J1939Engine {
   // J1939 message sending function
   sendMsg(msg) {
     msg.header.src = 252;
-    let frs = this.#createMsg(msg);
-    for (let i in frs) {
-      try {
-        this.#device.send(frs[i]);
-      } catch (err) {
-        log.error(err);
-        return false;
-      }
+    let frm = this.#createMsg(msg);
+    try {
+      this.#device.send(frm);
+    } catch (err) {
+      log.error(err);
+      return false;
     }
     return true;
   };

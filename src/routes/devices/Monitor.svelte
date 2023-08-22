@@ -3,7 +3,7 @@
     Button, Pagination, OverflowMenu, OverflowMenuItem } from "carbon-components-svelte";
   import SkipBack from "carbon-icons-svelte/lib/SkipBack16";
   import { push, pop } from 'svelte-spa-router'
-  import { device, name, data } from "../../stores/data.js";
+  import { devices, device, name, data } from "../../stores/data.js";
   import { isRoute } from "../../helpers/route.js";
 
   export let params;
@@ -56,10 +56,9 @@
     pop();
   };
 
-  // Data getters, setters
-  $: {
-    if (typeof $name[$device] !== "undefined") {
-      let nam = $name[$device][parseInt(params["address"])];
+  function setTitle(dev) {
+    if (typeof $name[dev] !== "undefined") {
+      let nam = $name[dev][parseInt(params["address"])];
       if (typeof nam !== 'undefined') {
         title = 'Messages of ' + nam.manufacturer + (nam.modelID != null ? ' - ' + nam.modelID : '');
       } else {
@@ -68,7 +67,10 @@
     } else {
       title = 'Messages';
     }
-  }
+  };
+
+  // Data getters, setters
+  $: $device, setTitle($device);
   $: {
     let tmp = new Array();
     if (typeof $data[$device] !== "undefined") {
@@ -117,9 +119,11 @@
         page={pagination.page}>
         <Toolbar>
           <Tile>{title}</Tile>
-          <ToolbarContent>
-            <Button icon={SkipBack} on:click={(e) => back(e)}>Back</Button>
-          </ToolbarContent>
+          {#if params["address"] !== "-1"}
+            <ToolbarContent>
+              <Button icon={SkipBack} on:click={(e) => back(e)}>Back</Button>
+            </ToolbarContent>
+          {/if}
         </Toolbar>
         <span slot="cell" let:cell let:row let:rowIndex>
           {#if cell.key === 'overflow'}

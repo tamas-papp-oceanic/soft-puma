@@ -6,7 +6,6 @@ const unitconv = false;
 
 export const devices = writable({});
 export const device = writable(null);
-export const protocol = writable(null);
 export const clas = writable({});
 export const func = writable({});
 export const indu = writable({});
