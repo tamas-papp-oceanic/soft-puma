@@ -59,7 +59,7 @@ class J1939Engine {
   };
   // J1939 message sending function
   sendMsg(msg) {
-    msg.header.src = 252;
+    msg.header.src = 255;
     let frm = this.#createMsg(msg);
     try {
       this.#device.send(frm);

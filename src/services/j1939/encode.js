@@ -8,7 +8,7 @@ function encode(msg) {
       return null;
     }
     let spl = msg.key.split('/');
-    let def = com.getDef(spl.splice(0, spl.length - 2).join('/'));
+    let def = com.getDef(spl.splice(0, spl.length - 1).join('/'));    
     if (def == null) {
       return null;
     }
@@ -17,8 +17,8 @@ function encode(msg) {
     for (let i in def.fields) {
       let fld = def.fields[i];
       let len = null;
-      if (fld.type !== null) {
-        len = com.calcLength(fld.type);
+      if (fld['type'] !== null) {
+        len = com.calcLength(fld['type']);
       }
       if (len != null) {
         ptr += len;
@@ -34,11 +34,11 @@ function encode(msg) {
       }
       let byt = Math.floor(ptr / 8);
       let len = null;
-      if (fld.type !== null) {
-        len = com.calcLength(fld.type);
+      if (fld['type'] !== null) {
+        len = com.calcLength(fld['type']);
       }
       if ((len != null) && (len > 0)) {
-        if (fld.type.startsWith('bit(')) {
+        if (fld['type'].startsWith('bit(')) {
           let cnt = Math.ceil(len / 8);
           let buf = Buffer.alloc(8);
           raw.copy(buf, 0, byt, byt + cnt);
@@ -49,7 +49,14 @@ function encode(msg) {
           buf.writeBigUInt64LE(dat);
           buf.copy(raw, byt);
         } else {
-          if (fld.multiplier != null) {
+          if ((ptr % 8) !== 0) {
+            ptr += (8 - (ptr % 8));
+            byt = Math.floor(ptr / 8);
+          }
+          if (fld.offset !== null) {
+            mfl.value -= fld.offset;
+          }
+          if (fld.multiplier !== null) {
             if (typeof mfl.value == 'bigint') {
               if (fld.multiplier >= 1) {
                 mfl.value /= BigInt(fld.multiplier);
@@ -61,39 +68,21 @@ function encode(msg) {
               mfl.value /= fld.multiplier;
             }
           }
-          switch (fld.type) {
-            case "int8":
-              raw.writeInt8(Math.round(mfl.value), byt);
-              break;
+          switch (fld['type']) {
             case "uint8":
               raw.writeUInt8(Math.round(mfl.value), byt);
-              break;
-            case "int16":
-              raw.writeInt16LE(Math.round(mfl.value), byt);
               break;
             case "uint16":
               raw.writeUInt16LE(Math.round(mfl.value), byt);
               break;
-            case "int24":
-              raw.writeIntLE(Math.round(mfl.value), byt, 3);
-              break;
             case "uint24":
               raw.writeUIntLE(Math.round(mfl.value), byt, 3);
-              break;
-            case "int32":
-              raw.writeInt32LE(Math.round(mfl.value), byt);
               break;
             case "uint32":
               raw.writeUInt32LE(Math.round(mfl.value), byt);
               break;
-            case "int48":
-              raw.writeIntLE(Math.round(mfl.value), byt, 6);
-              break;
             case "uint48":
               raw.writeUIntLE(Math.round(mfl.value), byt, 6);
-              break;
-            case "int64":
-              raw.writeBigInt64LE(BigInt(Math.round(mfl.value)), byt);
               break;
             case "uint64":
               raw.writeBigUInt64LE(BigInt(Math.round(mfl.value)), byt);
@@ -102,20 +91,23 @@ function encode(msg) {
         }
         ptr += len;
       }
+    }
+    let dlc = Math.ceil(ptr / 8);
+    let frm = {
+      id: com.makePgn(msg.header),
+      ext: true,
+      rtr: false,
+      data: Buffer.alloc(dlc),
+    };
+    raw.copy(frm.data, 0, 0, dlc);
+    if (msg.header.pgn === 0) {
+      console.log(frm)
+    }
+    return frm;
+  } catch (err) {
+    log.error("ERROR", err);
+    return null;
   }
-  let dlc = Math.ceil(ptr / 8);
-  let frm = {
-    id: com.makePgn(msg.header),
-    ext: true,
-    rtr: false,
-    data: Buffer.alloc(dlc),
-  };
-  raw.copy(frm.data, 0, 0, dlc);
-  return frm;
-} catch (err) {
-  log.error("ERROR", err);
-  return null;
-}
 };
 
 

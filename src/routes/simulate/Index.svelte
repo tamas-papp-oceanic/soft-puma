@@ -109,7 +109,12 @@
       if ((typeof rec.fields[i].dictionary === 'undefined') || (rec.fields[i].dictionary === null)) {
         let spl = splitKey(rec.key);
         let key = joinKey2(spl);
-        let def = nmeadefs[key];
+        let def = {};
+        if (spl.protocol === 'nmea2000')
+          def = nmeadefs[key];
+        else if (spl.protocol === 'j1939') {
+          def = j1939defs[key];
+        }
         if (typeof def !== 'undefined') {
           rec.fields[i].dictionary = def.fields[i].dictionary;
         }
@@ -136,10 +141,12 @@
       if (typeof fld.rate === 'undefined') {
         rec.fields[i].rate = null;
       }
-      if ((fld.dictionary === 'DD001') || (fld.dictionary === "DD002") ||
-        (fld.dictionary === "DD003") || (fld.dictionary === "DD056")) {
+      if (((spl.protocol === 'nmea2000') && ((fld.dictionary === 'DD001') || (fld.dictionary === "DD002") ||
+        (fld.dictionary === "DD003") || (fld.dictionary === "DD056"))) ||
+        ((spl.protocol === 'j1939') && (fld['type'] === 'bit(2)'))) {
         if (typeof fld.value === 'undefined') {
-          if ((fld.dictionary === "DD002") || (fld.dictionary === "DD003")) {
+          if ((spl.protocol === 'nmea2000') && ((fld.dictionary === "DD002") || (fld.dictionary === "DD003")) ||
+            ((spl.protocol === 'j1939') && (fld['type'] === 'bit(2)'))) {
             rec.fields[i].value = 3;
           } else {
             rec.fields[i].value = 0;
@@ -262,8 +269,9 @@
           simulator.table[i].disabledIds.push(parseInt(j));
         } else {
           let fld = msg.fields[j];
-          if ((fld.dictionary == "DD001") || (fld.dictionary == "DD002") ||
-            (fld.dictionary == "DD003") || (fld.dictionary == "DD056")) {
+          if (((spl.protocol === 'nmea2000') && ((fld.dictionary === 'DD001') || (fld.dictionary === "DD002") ||
+            (fld.dictionary === "DD003") || (fld.dictionary === "DD056"))) ||
+            ((spl.protocol === 'j1939') && (fld['type'] === 'bit(2)'))) {
             simulator.table[i].disabledIds.push(parseInt(j));
           }
         }

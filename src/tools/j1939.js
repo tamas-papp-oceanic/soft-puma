@@ -49,7 +49,7 @@ function create() {
           type: typ,
           unit: fld.unit,
           multiplier: mul,
-          offset: fld.offset,
+          offset: (fld.offset != 0) ? null : fld.offset,
         };
         obj.fields.push(tmp);
       }

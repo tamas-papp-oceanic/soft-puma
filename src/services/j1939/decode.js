@@ -54,12 +54,12 @@ function decode(frm) {
       let fld = def.fields[i];
       let byt = Math.floor(ptr / 8);
       let len = null;
-      if (fld.type !== null) {
-        len = com.calcLength(fld.type);
+      if (fld['type'] !== null) {
+        len = com.calcLength(fld['type']);
       }
       if ((len != null) && (len > 0) && (frm.data.length >= (byt + Math.ceil(len / 8)))) {
         fld.state = 'V';
-        if (fld.type.startsWith('bit(')) {
+        if (fld['type'].startsWith('bit(')) {
           let cnt = Math.ceil(len / 8);
           let buf = Buffer.alloc(8);
           frm.data.copy(buf, 0, byt, byt + cnt);
@@ -74,9 +74,12 @@ function decode(frm) {
               fld.state = '-';
             }
           }
-          ptr += len;
         } else {  
-          switch (fld.type) {
+          if ((ptr % 8) !== 0) {
+            ptr += (8 - (ptr % 8));
+            byt = Math.floor(ptr / 8);
+          }
+          switch (fld['type']) {
             case "uint8":
               val = frm.data.readUInt8(byt);
               break;
@@ -96,7 +99,7 @@ function decode(frm) {
               val = frm.data.readBigUInt64LE(byt);
               break;
           }
-          fld.state = com.getStatus(fld.type, val);
+          fld.state = com.getStatus(fld['type'], val);
           if ((fld.state == 'V') && (fld.multiplier != null)) {
             if (typeof val == 'bigint') {
               if (fld.multiplier >= 1) {
@@ -110,11 +113,14 @@ function decode(frm) {
             }
             val = Math.round(val * 100000) / 100000;
           }
-          ptr += len;
+          if ((fld.state == 'V') && (fld.offset !== null)) {
+            val += fld.offset;
+          }
         }
         fld.value = val;
         delete fld.multiplier;
         msg.fields.push(fld);
+        ptr += len;
       }
     }
     msg.header.ins = ins;

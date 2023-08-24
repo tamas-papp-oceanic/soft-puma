@@ -37,14 +37,14 @@ function encode(msg) {
       let fld = def.fields[i];
       let mfl = com.getFld(fld.field, msg.fields);
       let len = null;
-      if (fld.type !== null) {
-        if ((fld.type == 'chr(x)') || (fld.type == 'str')) {
-          len = com.calcLength(fld.type, mfl != null ? mfl.value.length : 0);
-        } else if (fld.type.startsWith('chr(') && (typeof mfl.value.type !== 'undefined') &&
+      if (fld['type'] !== null) {
+        if ((fld['type'] == 'chr(x)') || (fld['type'] == 'str')) {
+          len = com.calcLength(fld['type'], mfl != null ? mfl.value.length : 0);
+        } else if (fld['type'].startsWith('chr(') && (typeof mfl.value.type !== 'undefined') &&
           (mfl.value.type == 'Buffer')) {
-          len = com.calcLength(fld.type, mfl != null ? mfl.value.data.length : 0);
+          len = com.calcLength(fld['type'], mfl != null ? mfl.value.data.length : 0);
         } else {
-          len = com.calcLength(fld.type);
+          len = com.calcLength(fld['type']);
         }
       }
       if (len != null) {
@@ -61,17 +61,17 @@ function encode(msg) {
       }
       let byt = Math.floor(ptr / 8);
       let len = null;
-      if (fld.type !== null) {
-        if ((fld.type == 'chr(x)') || (fld.type == 'str')) {
-          len = com.calcLength(fld.type, mfl != null ? mfl.value.length : 0);
-        } else if (fld.type.startsWith('chr(') && (typeof mfl.value.type !== 'undefined') && (mfl.value.type == 'Buffer'))  {
-          len = com.calcLength(fld.type, mfl != null ? mfl.value.data.length : 0);
+      if (fld['type'] !== null) {
+        if ((fld['type'] == 'chr(x)') || (fld['type'] == 'str')) {
+          len = com.calcLength(fld['type'], mfl != null ? mfl.value.length : 0);
+        } else if (fld['type'].startsWith('chr(') && (typeof mfl.value.type !== 'undefined') && (mfl.value.type == 'Buffer'))  {
+          len = com.calcLength(fld['type'], mfl != null ? mfl.value.data.length : 0);
         } else {
-          len = com.calcLength(fld.type);
+          len = com.calcLength(fld['type']);
         }
       }
       if ((len != null) && (len > 0)) {
-        if (fld.type.startsWith('bit(')) {
+        if (fld['type'].startsWith('bit(')) {
           let cnt = Math.ceil(len / 8);
           let buf = Buffer.alloc(8);
           raw.copy(buf, 0, byt, byt + cnt);
@@ -81,25 +81,31 @@ function encode(msg) {
           dat |= ((BigInt(mfl.value) & msk) << off);
           buf.writeBigUInt64LE(dat);
           buf.copy(raw, byt);
-        } else if (fld.type == 'chr(x)') {
+        } else {
+          if ((ptr % 8) !== 0) {
+            ptr += (8 - (ptr % 8));
+            byt = Math.floor(ptr / 8);
+          }
+        }
+        if (fld['type'] == 'chr(x)') {
           raw.writeUInt8(Math.ceil((len - 1) / 8), byt,);
           if (len > 8) {
             raw.write(mfl.value, byt + 1, 'utf8');
           }
-        } else if (fld.type.startsWith('chr(')) {
+        } else if (fld['type'].startsWith('chr(')) {
           if (typeof mfl.value === 'string') {
             raw.write(mfl.value.padEnd(Math.ceil(len / 8), ' '), byt, 'utf8');
           } else if ((typeof mfl.value.type !== 'undefined') && (mfl.value.type == 'Buffer')) {
             let buf = Buffer.from(mfl.value.data);
             buf.copy(raw, byt);
           }
-        } else if (fld.type == 'str') {
+        } else if (fld['type'] == 'str') {
           raw.writeUInt8(Math.ceil((len - 2) / 8), byt);
           raw.writeUInt8(0, byt + 1);
           if (len > 16) {
             raw.write(mfl.value, byt + 2, 'utf8');
           }
-        } else {
+        } else if (!fld['type'].startsWith('bit(')) {
           if (fld.multiplier != null) {
             if (typeof mfl.value == 'bigint') {
               if (fld.multiplier >= 1) {
@@ -112,7 +118,7 @@ function encode(msg) {
               mfl.value /= fld.multiplier;
             }
           }
-          switch (fld.type) {
+          switch (fld['type']) {
             case "int8":
               raw.writeInt8(Math.round(mfl.value), byt);
               break;
@@ -159,20 +165,20 @@ function encode(msg) {
         }
         ptr += len;
       }
+    }
+    let dlc = Math.ceil(ptr / 8);
+    let frm = {
+      id: com.makePgn(msg.header),
+      ext: true,
+      rtr: false,
+      data: Buffer.alloc(dlc),
+    };
+    raw.copy(frm.data, 0, 0, dlc);
+    return frm;
+  } catch (err) {
+    log.error("ERROR", err);
+    return null;
   }
-  let dlc = Math.ceil(ptr / 8);
-  let frm = {
-    id: com.makePgn(msg.header),
-    ext: true,
-    rtr: false,
-    data: Buffer.alloc(dlc),
-  };
-  raw.copy(frm.data, 0, 0, dlc);
-  return frm;
-} catch (err) {
-  log.error("ERROR", err);
-  return null;
-}
 };
 
 function encodeFastPacket(fap) {

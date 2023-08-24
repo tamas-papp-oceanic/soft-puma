@@ -68,16 +68,16 @@ function decode(frm, din) {
       let fld = def.fields[i];
       let byt = Math.floor(ptr / 8);
       let len = null;
-      if (fld.type !== null) {
-        if ((fld.type == 'chr(x)') || (fld.type == 'str')) {
-          len = com.calcLength(fld.type, frm.data.readUInt8(byt));
+      if (fld['type'] !== null) {
+        if ((fld['type'] == 'chr(x)') || (fld['type'] == 'str')) {
+          len = com.calcLength(fld['type'], frm.data.readUInt8(byt));
         } else {
-          len = com.calcLength(fld.type);
+          len = com.calcLength(fld['type']);
         }
       }
       if ((len != null) && (len > 0) && (frm.data.length >= (byt + Math.ceil(len / 8)))) {
         fld.state = 'V';
-        if (fld.type.startsWith('bit(')) {
+        if (fld['type'].startsWith('bit(')) {
           let cnt = Math.ceil(len / 8);
           let buf = Buffer.alloc(8);
           frm.data.copy(buf, 0, byt, byt + cnt);
@@ -100,29 +100,32 @@ function decode(frm, din) {
                 break;
             }
           }
-          ptr += len;
-        } else if (fld.type == 'chr(x)') {
+        } else {
+          if ((ptr % 8) !== 0) {
+            ptr += (8 - (ptr % 8));
+            byt = Math.floor(ptr / 8);
+          }
+        }
+        if (fld['type'] == 'chr(x)') {
           if (len > 8) {
             let buf = Buffer.alloc(Math.ceil((len - 1) / 8));
             frm.data.copy(buf, 0, byt + 1);
             val = buf.toString('utf8').replace(/[^\x01-\x7F]/g, "");
           }
-          ptr += len;
-        } else if (fld.type.startsWith('chr(')) {
+        } else if (fld['type'].startsWith('chr(')) {
           let buf = Buffer.alloc(Math.ceil(len / 8));
           frm.data.copy(buf, 0, byt);
           val = buf.toString('utf8');
           ptr += len;
-        } else if (fld.type == 'str') {
+        } else if (fld['type'] == 'str') {
           let asc = frm.data.readUInt8(byt + 1);
           if (len > 16) {
             let buf = Buffer.alloc(Math.ceil((len - 2) / 8) - 2);
             frm.data.copy(buf, 0, byt + 2);
             val = buf.toString(asc == 0 ? 'utf8' : 'ucs2');
           }
-          ptr += len;
-        } else {
-          switch (fld.type) {
+        } else if (!fld['type'].startsWith('bit(')) {
+          switch (fld['type']) {
             case "int8":
               val = frm.data.readInt8(byt);
               break;
@@ -166,7 +169,7 @@ function decode(frm, din) {
               val = frm.data.readDoubleLE(byt);
               break;
           }
-          fld.state = com.getStatus(fld.type, val);
+          fld.state = com.getStatus(fld['type'], val);
           if (fld.state == 'V') {
             if  (fld.multiplier != null) {
               if (typeof val == 'bigint') {
@@ -185,7 +188,6 @@ function decode(frm, din) {
               val += offset;
             }
           }
-          ptr += len;
         }
         fld.value = val;
         delete fld.multiplier;
@@ -197,6 +199,7 @@ function decode(frm, din) {
           typ = val;
         }
         msg.fields.push(fld);
+        ptr += len;
       }
     }
     if (din != null) {
@@ -410,10 +413,10 @@ function extend(pgn, def, frm) {
             if (fld.field > max) {
               max = fld.field;
             }
-            if ((fld.type == 'chr(x)') || (fld.type == 'str')) {
-              len = com.calcLength(fld.type, frm.data.readUInt8(Math.floor(ptr / 8)));
+            if ((fld['type'] == 'chr(x)') || (fld['type'] == 'str')) {
+              len = com.calcLength(fld['type'], frm.data.readUInt8(Math.floor(ptr / 8)));
             } else {
-              len = com.calcLength(fld.type);
+              len = com.calcLength(fld['type']);
             }
             if (len != null) {
               ptr += len;
@@ -527,8 +530,8 @@ function proc126208(def, frm) {
             let fl2 = JSON.parse(JSON.stringify(tp2));
             fl2.field = fst + (i * 2) + 1;
             fl2.title = fld.title;
-            let typ = fld.type;
-            if (fld.type.startsWith('bit(')) {
+            let typ = fld['type'];
+            if (fld['type'].startsWith('bit(')) {
               let tmp = Math.ceil(parseInt(typ.replace('bit(', '').replace(')', '')) / 8) * 8;
               typ = 'uint' + tmp;
             }
@@ -536,10 +539,10 @@ function proc126208(def, frm) {
             def.fields.push(fl1);
             def.fields.push(fl2);
             let len = null;
-            if ((fld.type == 'chr(x)') || (fld.type == 'str')) {
-              len = com.calcLength(fld.type, frm.data.readUInt8(Math.ceil((ptr + 1) / 8)));
+            if ((fld['type'] == 'chr(x)') || (fld['type'] == 'str')) {
+              len = com.calcLength(fld['type'], frm.data.readUInt8(Math.ceil((ptr + 1) / 8)));
             } else {
-              len = com.calcLength(fld.type);
+              len = com.calcLength(fld['type']);
             }
             if (len != null) {
               len = Math.ceil(len / 8) * 8;

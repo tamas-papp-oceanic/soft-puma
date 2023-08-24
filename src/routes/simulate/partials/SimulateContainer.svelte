@@ -502,7 +502,8 @@
                           {#if (cell.key === "value")}
                             {#if row.dictionary === 'DD001'}
                               {""}
-                            {:else if ((row.dictionary === 'DD002') || (row.dictionary === 'DD003'))}
+                            {:else if (selection1.key.startsWith('nmea2000') && ((row.dictionary === 'DD002') || (row.dictionary === 'DD003'))) ||
+                              (selection1.key.startsWith('j1939') && (row.type === 'bit(2)'))}
                               <Checkbox hideLabel checked={cell.value === 1} indeterminate={cell.value === 3} on:change={(e) => setDig(e, rowIndex)} />
                             {:else}
                               {cell.value}
