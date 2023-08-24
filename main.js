@@ -455,6 +455,7 @@ ipcMain.on('set-prot', (e, args) => {
               for (const [key, val] of Object.entries(devices)) {
                 des[key] = { id: (id++).toString(), text: key, protocol: val.protocol };
               }
+              mainWindow.webContents.send('set-prot', pro);
               mainWindow.webContents.send('can-devs', des);
             }
           }, 1000, dev);

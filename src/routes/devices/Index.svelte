@@ -181,7 +181,7 @@
       window.pumaAPI.send('updates');
     }
     rows = JSON.parse(JSON.stringify(tmp));
-    pagination.items = rows.length;
+    pagination.totalItems = rows.length;
   };
 
   // Data getters, setters

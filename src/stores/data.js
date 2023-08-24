@@ -1,12 +1,12 @@
 import { writable, get } from 'svelte/store';
 import { defValue } from '../helpers/unit.js';
-import { construct_svelte_component } from 'svelte/internal';
 
 const qlimit = 1024;
 const unitconv = false;
 
 export const devices = writable({});
 export const device = writable(null);
+export const protocol = writable('nmea2000');
 export const clas = writable({});
 export const func = writable({});
 export const indu = writable({});

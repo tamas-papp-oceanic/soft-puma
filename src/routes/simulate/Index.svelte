@@ -8,11 +8,12 @@
   import MimicContainer from "./partials/MimicContainer.svelte";
   import nmeaconv from "../../config/nmeaconv.json";
   import nmeadefs from "../../config/nmeadefs.json";
+  import j1939defs from "../../config/j1939defs.json";
   import datakinds from "../../config/datakinds.json";
   // import datatypes from "../../config/datatypes.json";
   import Notification from "../../components/Notification.svelte";
   import { minmax, nextIncremetal, nextDecremetal, nextNatural, nextRandom } from '../../helpers/simulate.js';
-  import { device } from '../../stores/data.js';
+  import { device, protocol } from '../../stores/data.js';
   import { splitKey, joinKey, joinKey2 } from "../../helpers/route.js";
   import { isproprietary } from "../../stores/common.js";
     
@@ -35,14 +36,6 @@
   let subttl = null;
 
   onMount((e) => {
-    let arr = new Array();
-    for (const [key, val] of Object.entries(nmeadefs)) {
-      let rec = Object.assign({ id: uuidv4(), key: key }, val, { disabledIds: new Array(), disabledSim: new Array() });
-      rec = prepFields(rec, key);
-      arr.push(rec);
-    }
-    arr.sort((a, b) => { return a.key.localeCompare(b.key); });
-    selector = JSON.parse(JSON.stringify(arr));
     simulator.simulation = 0;
     simulator.rate = 0.2;
     simulator.mimic = false;
@@ -633,6 +626,30 @@
     running = false;
     pop();
   };
+
+  function setProtocol(pro) {
+    if (running) {
+      capStop();
+      simStop();
+    }
+    simulator.table = new Array();
+    let arr = new Array();
+    let des = nmeadefs;
+    if (pro === 'j1939') {
+      des = j1939defs;
+    }
+    for (const [key, val] of Object.entries(des)) {
+      let rec = Object.assign({ id: uuidv4(), key: key }, val, { disabledIds: new Array(), disabledSim: new Array() });
+      rec = prepFields(rec, key);
+      arr.push(rec);
+    }
+    arr.sort((a, b) => { return a.key.localeCompare(b.key); });
+    selector = JSON.parse(JSON.stringify(arr));
+    tab = 0;
+  };
+
+  // Data getters, setters
+  $: $protocol, setProtocol($protocol);
 </script>
 
 <Grid>

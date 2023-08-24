@@ -110,8 +110,8 @@ function isProprietary(pgn) {
 function calcLength(typ, val) {
   let len = null;
   if (typ != null) {
-    if (typ.startsWith('int')) {
-      len = parseInt(typ.replace('int', ''));
+    if (typ.startsWith('bit(')) {
+      len = parseInt(typ.replace('bit(', '').replace(')', ''));
     } else if (typ.startsWith('uint')) {
       len = parseInt(typ.replace('uint', ''));
     } else if (typ.startsWith('float')) {
@@ -126,19 +126,17 @@ function getStatus(typ, val) {
   let sts = 'V';
   if (typ == null) {
     sts = 'E';
-  } else if (typ.startsWith('int')) {
-    let bit = parseInt(typ.replace('int', ''));
-    if (BigInt(val) == (2n ** BigInt(bit - 1)) - 1n) {
-      sts = '-';
-    } else if (BigInt(val) == (2n ** BigInt(bit - 1)) - 2n) {
-      sts = 'E';
-    }
   } else if (typ.startsWith('uint')) {
     let bit = parseInt(typ.replace('uint', ''));
     if (BigInt(val) == (2n ** BigInt(bit)) - 1n) {
       sts = '-';
     } else if (BigInt(val) == (2n ** BigInt(bit)) - 2n) {
       sts = 'E';
+    } else if ((BigInt(val) == (2n ** BigInt(bit)) - 3n) ||
+      (BigInt(val) == (2n ** BigInt(bit)) - 4n)) {
+      sts = 'F';
+    } else if (BigInt(val) == (2n ** BigInt(bit)) - 5n) {
+      sts = 'P';
     }
   }
   return sts;

@@ -57,6 +57,9 @@
   };
 
   function setData(val) {
+    selectedRowIds = new Array();
+    filteredRowIds = new Array();
+    pagination.page = 1;
     let arr = new Array();
     if (val != null) {
       let dat = JSON.parse(JSON.stringify(val));

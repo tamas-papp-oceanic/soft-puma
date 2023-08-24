@@ -1,10 +1,10 @@
 <script>
-  import { location, push } from 'svelte-spa-router'
+  import { push } from 'svelte-spa-router'
   import { Header, HeaderNav, HeaderNavItem, HeaderUtilities, HeaderGlobalAction,
     ComposedModal, ModalHeader, ModalFooter, TooltipDefinition, Dropdown } from "carbon-components-svelte";
   import { logout } from '../auth/auth.js'
   import { loggedIn } from '../stores/user.js';
-  import { devices, device, name, data } from '../stores/data.js';
+  import { devices, device, protocol, data, name } from '../stores/data.js';
 	import { update, updmsg, download } from '../stores/update.js';
   import Update20 from "carbon-icons-svelte/lib/UpdateNow20";
   import Login20 from "carbon-icons-svelte/lib/Login20";
@@ -16,12 +16,13 @@
   export let version;
   
   const menu = [
-    { text: 'Devices', path: '/', selected: false, enabled: true },
-    { text: 'Configure', path: '/configure', selected: false, enabled: true },
-    { text: 'Testing', path: '/testing', selected: false, enabled: true },
-    { text: 'Update', path: '/program', selected: false, enabled: true },
-    { text: 'Simulate', path: '/simulate', selected: false, enabled: true },
-    { text: 'Advanced', path: '/advanced', selected: false, enabled: true },
+    { id: '0', text: 'Devices', path: '/', selected: false, enabled: true, protocols: ['0'] },
+    { id: '1', text: 'Monitor', path: '/monitor', selected: false, enabled: true, protocols: ['0', '1'] },
+    { id: '2', text: 'Configure', path: '/configure', selected: false, enabled: true, protocols: ['0'] },
+    { id: '3', text: 'Testing', path: '/testing', selected: false, enabled: true, protocols: ['0'] },
+    { id: '4', text: 'Update', path: '/program', selected: false, enabled: true, protocols: ['0'] },
+    { id: '5', text: 'Simulate', path: '/simulate', selected: false, enabled: true, protocols: ['0', '1'] },
+    { id: '6', text: 'Advanced', path: '/advanced', selected: false, enabled: true, protocols: ['0', '1'] },
   ];
   const proItems = [
     { id: '0', text: 'nmea2000' },
@@ -38,17 +39,32 @@
     protocol: '0',
   }
 
+  // Initially select "Devices" menu
+  select(null, selected.menu);
+
   function mark(rou) {
-    if (rou == '/monitor/-1') {
-      menu[0].text = 'Messages';
-      rou = '/';
-    } else {
-      menu[0].text = 'Devices';
-    }
     for (let i in menu) {
       menu[i].selected = (menu[i].path == rou);
-      if ((i > 0) && (i < 4)) {
-        menu[i].enabled = (selected.protocol === '0');
+    }
+  };
+
+  function first() {
+    for (let i in menu) {
+      if (menu[i].enabled) {
+        return menu[i];
+      }
+    }
+  };
+
+  function enable(pro) {
+    for (let i in menu) {
+      menu[i].enabled = (menu[i].protocols.indexOf(pro) !== -1);
+      if (menu[i].id === selected.menu.id) {
+        if (!menu[i].enabled) {
+          select(null, first());
+        } else {
+          selected.menu = menu[i];
+        }
       }
     }
   };
@@ -56,13 +72,7 @@
   function select(e, itm) {
     selected.menu = itm;
     mark(itm.path);
-    if ((itm.text === 'Devices') && (selected.protocol === '1')) {
-      $name[$device] = {};
-      $data[$device] = {};
-      push('/monitor/-1');
-    } else {
-      push(itm.path);
-    }
+    push(itm.path);
   };
 
   function login(e) {
@@ -96,54 +106,50 @@
   function devSelect(e) {
     if ($device !== e.detail.selectedItem.text) {
       $device = e.detail.selectedItem.text;
-      select(null, selected.menu);
     }
     for (let i in proItems) {
       if (proItems[i].text === $devices[$device].protocol) {
         if (selected.protocol !== proItems[i].id) {
           selected.protocol = proItems[i].id;
-          select(null, selected.menu);
+          $protocol = proItems[i].protocol;
           break;
         }
       }
     }
+    enable(selected.protocol);
   };
 
   function proSelect(e) {
-    if ($devices[$device].protocol !== e.detail.selectedItem.text) {
-      window.pumaAPI.send('set-prot', [$device, proItems[selected.protocol].text]);
+    let pro = e.detail.selectedItem.text;
+    if ($devices[$device].protocol !== pro) {
+      $protocol = pro;
+      $data[$device] = {};
+      $name[$device] = {};
+      window.pumaAPI.send('set-prot', [$device, pro]);
     }
+    enable(selected.protocol);
   };
 
-  function getDevices() {
+  function getDevices(des) {
     let tmp = new Array();
-    for (const [key, val] of Object.entries($devices)) {
+    for (const [key, val] of Object.entries(des)) {
       tmp.push(
         { id: val.id, text: val.text, protocol: val.protocol },
       );
     }
     devItems = JSON.parse(JSON.stringify(tmp));
-    if (typeof $devices[$device] !== 'undefined') {
-      selected.device = $devices[$device].id;
+    if (typeof des[$device] !== 'undefined') {
+      selected.device = des[$device].id;
     } else {
       if (devItems.length > 0) {
         $device = devItems[0].text;
         selected.device = devItems[0].id;
       }
     }
-    if (devItems.length > 0) {
-      for (let i in proItems) {
-        if (proItems[i].text === $devices[$device].protocol) {
-          select(null, selected.menu);
-          break;
-        }
-      }
-    }
   };
 
-  $: $devices, getDevices();
+  $: $devices, getDevices($devices);
   $: platform = product + " v" + version
-  $: $location, mark($location.replace(re, '$1'));
 </script>
 
 <div>

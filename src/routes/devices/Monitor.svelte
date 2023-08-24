@@ -1,4 +1,5 @@
 <script>
+  import { onMount, onDestroy } from "svelte";
   import { Grid, Row, Column, DataTable, Toolbar, ToolbarContent, Tile,
     Button, Pagination, OverflowMenu, OverflowMenuItem } from "carbon-components-svelte";
   import SkipBack from "carbon-icons-svelte/lib/SkipBack16";
@@ -6,8 +7,8 @@
   import { device, name, data } from "../../stores/data.js";
   import { isRoute } from "../../helpers/route.js";
 
-  export let params;
-
+  export let params = undefined;
+  
   const headers = [{
     key: "overflow",
     empty: true
@@ -34,13 +35,23 @@
   }];
 
   let height;
-  let rows = [];
+  let rows = new Array();
   let title = '';
   let pagination = {
     pageSize: 10,
     totalItems: 0,
     page: 1,
   };
+
+  onMount(() => {
+    window.pumaAPI.recv('set-prot', (e, pro) => {
+      // rows = new Array();
+    });
+  });
+
+  onDestroy(() => {
+    window.pumaAPI.reml('set-prot');
+  });
 
   function buf2hex(buffer) {
     return [...new Uint8Array(buffer)]
@@ -57,12 +68,13 @@
   };
 
   function setTitle(dev) {
-    if (typeof $name[dev] !== "undefined") {
-      let nam = $name[dev][parseInt(params["address"])];
+    if ((typeof $name[dev] !== "undefined") && (typeof params !== 'undefined') &&
+      (typeof params['address'] !== 'undefined')) {
+      let nam = $name[dev][parseInt(params['address'])];
       if (typeof nam !== 'undefined') {
         title = 'Messages of ' + nam.manufacturer + (nam.modelID != null ? ' - ' + nam.modelID : '');
       } else {
-        title = 'J1939 messages';
+        title = 'Messages';
       }
     } else {
       title = 'Messages';
@@ -73,8 +85,11 @@
     let tmp = new Array();
     if (typeof dat !== "undefined") {
       for (const [key, val] of Object.entries(dat)) {
-        let add = parseInt(params["address"]);
-        if ((add === -1) || (val.raw[3] === add)) {
+        let add = null;
+        if ((typeof params !== 'undefined') && (typeof params['address'] !== 'undefined')) {
+          add = parseInt(params['address']);
+        }
+        if ((add === null) || (val.raw[3] === add)) {
           let dat = new Uint8Array(val.raw.slice(4));
           let spl = key.split("/");
           let obj = {
@@ -121,7 +136,7 @@
         page={pagination.page}>
         <Toolbar>
           <Tile>{title}</Tile>
-          {#if params["address"] !== "-1"}
+          {#if (typeof params !== 'undefined') && (typeof params["address"] !== 'undefined')}
             <ToolbarContent>
               <Button icon={SkipBack} on:click={(e) => back(e)}>Back</Button>
             </ToolbarContent>
@@ -143,7 +158,7 @@
           totalItems={pagination.totalItems}
           bind:page={pagination.page}
           pageSizeInputDisabled
-          pageInputDisabled
+          pageInputDisabled={(typeof params !== 'undefined') && (typeof params["address"] !== 'undefined')}
         />
       {/if}
     </Column>

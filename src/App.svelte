@@ -62,6 +62,7 @@
     "/testing/5185-H":                  wrap({ component: Test5185,       conditions: [(detail) => { return routeGuard(detail); }] }),
 		"/restricted":                      wrap({ component: Restricted,     conditions: [(detail) => { return routeGuard(detail); }] }),
 		"/welcome":                         wrap({ component: Welcome,        conditions: [(detail) => { return routeGuard(detail); }] }),
+		"/monitor":                         wrap({ component: Monitor,        conditions: [(detail) => { return routeGuard(detail); }] }),
 		"/monitor/:address":                wrap({ component: Monitor,        conditions: [(detail) => { return routeGuard(detail); }] }),
 		"/messages/:protocol/:pgn/:instance":
                                         wrap({ component: Content,        conditions: [(detail) => { return routeGuard(detail); }] }),

@@ -25,7 +25,7 @@ function decode(frm) {
   try {
     let pgn = com.getPgn(frm.id);
     let def = com.findDef(frm);
-    if (def == null) {
+    if (def === null) {
       return null;
     }
     let msg = null;
@@ -77,38 +77,20 @@ function decode(frm) {
           ptr += len;
         } else {  
           switch (fld.type) {
-            case "int8":
-              val = frm.data.readInt8(byt);
-              break;
             case "uint8":
               val = frm.data.readUInt8(byt);
-              break;
-            case "int16":
-              val = frm.data.readInt16LE(byt);
               break;
             case "uint16":
               val = frm.data.readUInt16LE(byt);
               break;
-            case "int24":
-              val = frm.data.readIntLE(byt, 3);
-              break;
             case "uint24":
               val = frm.data.readUIntLE(byt, 3);
-              break;
-            case "int32":
-              val = frm.data.readInt32LE(byt);
               break;
             case "uint32":
               val = frm.data.readUInt32LE(byt);
               break;
-            case "int48":
-              val = frm.data.readIntLE(byt, 6);
-              break;
             case "uint48":
               val = frm.data.readUIntLE(byt, 6);
-              break;
-            case "int64":
-              val = frm.data.readBigInt64LE(byt);
               break;
             case "uint64":
               val = frm.data.readBigUInt64LE(byt);
