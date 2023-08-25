@@ -71,6 +71,18 @@ function encode(msg) {
         }
       }
       if ((len != null) && (len > 0)) {
+        if (fld.multiplier != null) {
+          if (typeof mfl.value == 'bigint') {
+            if (fld.multiplier >= 1) {
+              mfl.value /= BigInt(fld.multiplier);
+            } else {
+              mfl.value *= BigInt(1 / fld.multiplier);
+            }
+            mfl.value = Number(mfl.value);
+          } else {
+            mfl.value /= fld.multiplier;
+          }
+        }
         if (fld['type'].startsWith('bit(')) {
           let cnt = Math.ceil(len / 8);
           let buf = Buffer.alloc(8);
@@ -106,18 +118,6 @@ function encode(msg) {
             raw.write(mfl.value, byt + 2, 'utf8');
           }
         } else if (!fld['type'].startsWith('bit(')) {
-          if (fld.multiplier != null) {
-            if (typeof mfl.value == 'bigint') {
-              if (fld.multiplier >= 1) {
-                mfl.value /= BigInt(fld.multiplier);
-              } else {
-                mfl.value *= BigInt(1 / fld.multiplier);
-              }
-              mfl.value = Number(mfl.value);
-            } else {
-              mfl.value /= fld.multiplier;
-            }
-          }
           switch (fld['type']) {
             case "int8":
               raw.writeInt8(Math.round(mfl.value), byt);

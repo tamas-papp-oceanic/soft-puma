@@ -38,6 +38,21 @@ function encode(msg) {
         len = com.calcLength(fld['type']);
       }
       if ((len != null) && (len > 0)) {
+        if (fld.offset !== null) {
+          mfl.value -= fld.offset;
+        }
+        if (fld.multiplier !== null) {
+          if (typeof mfl.value == 'bigint') {
+            if (fld.multiplier >= 1) {
+              mfl.value /= BigInt(fld.multiplier);
+            } else {
+              mfl.value *= BigInt(1 / fld.multiplier);
+            }
+            mfl.value = Number(mfl.value);
+          } else {
+            mfl.value /= fld.multiplier;
+          }
+        }
         if (fld['type'].startsWith('bit(')) {
           let cnt = Math.ceil(len / 8);
           let buf = Buffer.alloc(8);
@@ -52,21 +67,6 @@ function encode(msg) {
           if ((ptr % 8) !== 0) {
             ptr += (8 - (ptr % 8));
             byt = Math.floor(ptr / 8);
-          }
-          if (fld.offset !== null) {
-            mfl.value -= fld.offset;
-          }
-          if (fld.multiplier !== null) {
-            if (typeof mfl.value == 'bigint') {
-              if (fld.multiplier >= 1) {
-                mfl.value /= BigInt(fld.multiplier);
-              } else {
-                mfl.value *= BigInt(1 / fld.multiplier);
-              }
-              mfl.value = Number(mfl.value);
-            } else {
-              mfl.value /= fld.multiplier;
-            }
           }
           switch (fld['type']) {
             case "uint8":

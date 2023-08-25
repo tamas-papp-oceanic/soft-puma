@@ -1,18 +1,19 @@
 function minmax(def) {
   let res = null;
   if (def['type'] !== null) {
-    if (def['unit'] === '%') {
+    if (def.unit === '%') {
       res = { min: 0, max: 100 };
       if ((def.multiplier != null) && (def.multiplier < 1)) {
+        res.min = Math.round(res.min / def.multiplier);
         res.max = Math.round(res.max / def.multiplier);
       }
-    } else if (def['unit'] == 'deg') {
+    } else if (def.unit == 'deg') {
       res = { min: -180, max: 180 };
       if ((def.multiplier != null) && (def.multiplier < 1)) {
         res.min = Math.round(res.min / def.multiplier);
         res.max = Math.round(res.max / def.multiplier);
       }
-    } else if (def['unit'] == 'rad') {
+    } else if (def.unit == 'rad') {
       if (def['type'].startsWith('int')) {
         res = { min: -Math.PI, max: Math.PI };
       } else {
@@ -69,7 +70,7 @@ function limits(def) {
 
 function decode(def, lim) {
   let res = def.value !== null ? def.value : 0;
-  if ((def.multiplier != null) && (def.multiplier < 1)) {
+  if ((def.multiplier !== null) && (def.multiplier < 1)) {
     res = Math.round(res / def.multiplier);
   }
   if (lim != null) {
@@ -112,7 +113,7 @@ function encode(def, lim, typ, val) {
   return val;
 };
 
-function nextIncremetal(def, rat) {
+function nextIncremental(def, rat) {
   let lim = limits(def);
   let res = decode(def, lim);
   let dif = Math.round((lim.max - lim.min) * rat / 100);
@@ -120,7 +121,7 @@ function nextIncremetal(def, rat) {
   return encode(def, lim, 1, res);
 };
 
-function nextDecremetal(def, rat) {
+function nextDecremental(def, rat) {
   let lim = limits(def);
   let res = decode(def, lim);
   let dif = Math.round((lim.max - lim.min) * rat / 100);
@@ -149,4 +150,4 @@ if (def.title === "Fluid Level") {
   return encode(def, lim, 3, res);
 };
 
-export { minmax, nextIncremetal, nextDecremetal, nextNatural, nextRandom };
+export { minmax, nextIncremental, nextDecremental, nextNatural, nextRandom };

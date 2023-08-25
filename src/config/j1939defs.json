@@ -7183,7 +7183,7 @@
       },
       {
         "field": 8,
-        "title": "Engine Demand – Percent Torque",
+        "title": "Engine Demand - Percent Torque",
         "type": "uint8",
         "unit": "%",
         "multiplier": null,
@@ -65615,7 +65615,7 @@
     "fields": [
       {
         "field": 1,
-        "title": "Enable Switch – Transfer case output shaft PTO",
+        "title": "Enable Switch - Transfer case output shaft PTO",
         "type": "bit(2)",
         "unit": null,
         "multiplier": null,
@@ -65623,7 +65623,7 @@
       },
       {
         "field": 2,
-        "title": "Enable Switch – Transmission output shaft PTO",
+        "title": "Enable Switch - Transmission output shaft PTO",
         "type": "bit(2)",
         "unit": null,
         "multiplier": null,
@@ -65631,7 +65631,7 @@
       },
       {
         "field": 3,
-        "title": "Enable Switch – Transmission input shaft PTO 2",
+        "title": "Enable Switch - Transmission input shaft PTO 2",
         "type": "bit(2)",
         "unit": null,
         "multiplier": null,
@@ -65639,7 +65639,7 @@
       },
       {
         "field": 4,
-        "title": "Enable Switch – Transmission input shaft PTO 1",
+        "title": "Enable Switch - Transmission input shaft PTO 1",
         "type": "bit(2)",
         "unit": null,
         "multiplier": null,
@@ -65671,7 +65671,7 @@
       },
       {
         "field": 8,
-        "title": "Engagement Consent – Transfer case output shaft PTO",
+        "title": "Engagement Consent - Transfer case output shaft PTO",
         "type": "bit(2)",
         "unit": null,
         "multiplier": null,
@@ -65679,7 +65679,7 @@
       },
       {
         "field": 9,
-        "title": "Engagement Consent – Transmission output shaft PTO",
+        "title": "Engagement Consent - Transmission output shaft PTO",
         "type": "bit(2)",
         "unit": null,
         "multiplier": null,
@@ -65687,7 +65687,7 @@
       },
       {
         "field": 10,
-        "title": "Engagement Consent – Transmission input shaft PTO 2",
+        "title": "Engagement Consent - Transmission input shaft PTO 2",
         "type": "bit(2)",
         "unit": null,
         "multiplier": null,
@@ -65695,7 +65695,7 @@
       },
       {
         "field": 11,
-        "title": "Engagement Consent – Transmission input shaft PTO 1",
+        "title": "Engagement Consent - Transmission input shaft PTO 1",
         "type": "bit(2)",
         "unit": null,
         "multiplier": null,
@@ -65727,7 +65727,7 @@
       },
       {
         "field": 15,
-        "title": "Engagement Status – Transfer case output shaft PTO",
+        "title": "Engagement Status - Transfer case output shaft PTO",
         "type": "bit(2)",
         "unit": null,
         "multiplier": null,
@@ -65735,7 +65735,7 @@
       },
       {
         "field": 16,
-        "title": "Engagement Status – Transmission output shaft PTO",
+        "title": "Engagement Status - Transmission output shaft PTO",
         "type": "bit(2)",
         "unit": null,
         "multiplier": null,
@@ -65743,7 +65743,7 @@
       },
       {
         "field": 17,
-        "title": "Engagement Status – Transmission input shaft PTO 2",
+        "title": "Engagement Status - Transmission input shaft PTO 2",
         "type": "bit(2)",
         "unit": null,
         "multiplier": null,
@@ -65751,7 +65751,7 @@
       },
       {
         "field": 18,
-        "title": "Engagement Status – Transmission input shaft PTO 1",
+        "title": "Engagement Status - Transmission input shaft PTO 1",
         "type": "bit(2)",
         "unit": null,
         "multiplier": null,

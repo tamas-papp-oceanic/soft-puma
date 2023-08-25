@@ -12,7 +12,7 @@
   import datakinds from "../../config/datakinds.json";
   // import datatypes from "../../config/datatypes.json";
   import Notification from "../../components/Notification.svelte";
-  import { minmax, nextIncremetal, nextDecremetal, nextNatural, nextRandom } from '../../helpers/simulate.js';
+  import { minmax, nextIncremental, nextDecremental, nextNatural, nextRandom } from '../../helpers/simulate.js';
   import { device, protocol } from '../../stores/data.js';
   import { splitKey, joinKey, joinKey2 } from "../../helpers/route.js";
   import { isproprietary } from "../../stores/common.js";
@@ -470,57 +470,56 @@
     for (let i in simulator.table[idx].fields) {
       let fld = simulator.table[idx].fields[i];
       let val = (typeof fld.value === 'undefined') ? null : fld.value;
-      if (fld.dictionary == 'DD056') {
+      if (fld.dictionary === 'DD056') {
         val = (val + 1) % 253;
-      } else {
-        if (fld['type'] != null) {
-          if (fld['type'].startsWith('int') || fld['type'].startsWith('uint')) {
-            val = (val === null) ? 0 : val;
-            let ena = true;
-            if ((typeof simulator.table[idx].disabledSim !== 'undefined') &&
-              (simulator.table[idx].disabledSim.indexOf(fld.id) !== -1)) {
-              ena = false;
-            }
-            if (fld.static) {
-              ena = false;
-            }
-            if (ena) {
-              let dif = 0;
-              if (simulator.table[idx].interval !== null) {
-                if (fld.multiplier !== null) {
-                  dif = Math.round(simulator.table[idx].interval / 100);
-                } else {
-                  dif = 1;
-                }
-              }
-              let sim = (fld.simulation !== null) ? fld.simulation : simulator.simulation;
-              let rat = (fld.rate !== null) ? fld.rate : simulator.rate;
-              switch (sim) {
-              case 0:
-                val = nextIncremetal(fld, rat);
-                break;
-              case 1:
-                val = nextDecremetal(fld, rat);
-                break;
-              case 2:
-                val = nextNatural(fld, rat);
-                break;
-              case 3:
-                val = nextRandom(fld);
-                break;
-              }
-            }
-          } else if (fld['type'].startsWith('bit(')) {
-            val = (val === null) ? 0 : val;
-            if (fld.dictionary == 'DD001') {
-              let num = parseInt(fld['type'].replace('bit(', '').replace(')', ''));
-              if (Number.isInteger(num)) {
-                val = Math.pow(2, num) - 1;
-              }
-            }
-          } else if (fld['type'].startsWith('chr(') || (fld['type'] == 'str')) {
-            val = (val === null) ? '' : val;
+      } else if (fld['type'] != null) {
+        if (fld['type'].startsWith('int') || fld['type'].startsWith('uint') ||
+          (fld.unit !== null)) {
+          val = (val === null) ? 0 : val;
+          let ena = true;
+          if ((typeof simulator.table[idx].disabledSim !== 'undefined') &&
+            (simulator.table[idx].disabledSim.indexOf(fld.id) !== -1)) {
+            ena = false;
           }
+          if (fld.static) {
+            ena = false;
+          }
+          if (ena) {
+            let dif = 0;
+            if (simulator.table[idx].interval !== null) {
+              if (fld.multiplier !== null) {
+                dif = Math.round(simulator.table[idx].interval / 100);
+              } else {
+                dif = 1;
+              }
+            }
+            let sim = (fld.simulation !== null) ? fld.simulation : simulator.simulation;
+            let rat = (fld.rate !== null) ? fld.rate : simulator.rate;
+            switch (sim) {
+            case 0:
+              val = nextIncremental(fld, rat);
+              break;
+            case 1:
+              val = nextDecremental(fld, rat);
+              break;
+            case 2:
+              val = nextNatural(fld, rat);
+              break;
+            case 3:
+              val = nextRandom(fld);
+              break;
+            }
+          }
+        } else if (fld['type'].startsWith('bit(')) {
+          val = (val === null) ? 0 : val;
+          if (fld.dictionary == 'DD001') {
+            let num = parseInt(fld['type'].replace('bit(', '').replace(')', ''));
+            if (Number.isInteger(num)) {
+              val = Math.pow(2, num) - 1;
+            }
+          }
+        } else if (fld['type'].startsWith('chr(') || (fld['type'] == 'str')) {
+          val = (val === null) ? '' : val;
         }
       }
       simulator.table[idx].fields[i].value = val;

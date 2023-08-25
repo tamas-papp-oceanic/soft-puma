@@ -5,7 +5,8 @@
     Pagination, ToolbarContent, ToolbarSearch,
     Toolbar } from "carbon-components-svelte";
   import Add from "carbon-icons-svelte/lib/Add16";
-  import { splitKey } from "../../../helpers/route";
+  import { splitKey } from "../../../helpers/route.js";
+  import { protocol } from "../../../stores/data.js";
 
   export let data;
   export let style;
@@ -100,7 +101,7 @@
                 <Toolbar>
                   <ToolbarContent>
                     <Tile class="head">
-                      <h4 class="title">NMEA2000 message(s) for simulation.</h4>
+                      <h4 class="title">{$protocol.toUpperCase()} message(s) for simulation.</h4>
                       <p class="descr">(select message for add to simulaton)</p>
                     </Tile>
                     <ToolbarSearch

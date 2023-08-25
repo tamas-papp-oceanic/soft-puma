@@ -12,6 +12,7 @@
   import Pause from "carbon-icons-svelte/lib/Pause16";
   import Record from "carbon-icons-svelte/lib/Recording16";
   import Stop from "carbon-icons-svelte/lib/Stop16";
+  import { protocol } from '../../../stores/data';
 
   export let data;
   export let style;
@@ -459,7 +460,7 @@
             <Row style="min-height: 33%; max-height: 100%; width: 100%;">
               <Column style="height: 100%; display:flex; flex-flow: column nowrap; align-items: flex-start; justify-content: flex-start;">
                 <Tile class="head">
-                  <h4 class="title">NMEA2000 message(s) as part of simulation.</h4>
+                  <h4 class="title">{$protocol.toUpperCase()} message(s) as part of simulation.</h4>
                   <p class="descr">(select message for setting field values)</p>
                 </Tile>
                 {#if loading}
