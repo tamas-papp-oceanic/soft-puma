@@ -74,26 +74,22 @@ function splitKey(key) {
 };
 
 function joinKey(spl) {
-  let ret = '';
-  ret += (spl.protocol != null ? spl.protocol : '-');
-  ret += '/' + (spl.pgn != null ? spl.pgn : '-');
-  if (ret.protocol === 'nmea2000') {
+  let ret = spl.protocol + '/' + spl.pgn;
+  if (spl.protocol === 'nmea2000') {
     ret += '/' + (spl.function != null ? spl.function : '-');
     ret += '/' + (spl.manufacturer != null ? spl.manufacturer : '-');
     ret += '/' + (spl.industry != null ? spl.industry : '-');
   }
   ret += '/' + (spl.instance != null ? spl.instance : '-');
-  if (ret.protocol === 'nmea2000') {
+  if (spl.protocol === 'nmea2000') {
     ret += '/' + (spl.fluidtype != null ? spl.fluidtype : '-');
   }
   return ret;
 };
 
 function joinKey2(spl) {
-  let ret = '';
-  ret += (spl.protocol != null ? spl.protocol : '-');
-  ret += '/' + (spl.pgn != null ? spl.pgn : '-');
-  if (ret.protocol === 'nmea2000') {
+  let ret = spl.protocol + '/' + spl.pgn;
+  if (spl.protocol === 'nmea2000') {
     ret += '/' + (spl.function != null ? spl.function : '-');
     ret += '/' + (spl.manufacturer != null ? spl.manufacturer : '-');
     ret += '/' + (spl.industry != null ? spl.industry : '-');
