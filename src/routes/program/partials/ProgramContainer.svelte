@@ -32,26 +32,29 @@
     dispatch("cancel", e);
   };
 
-  for (let i = 0; i < 253; i++) {
-    insts.push({ id: i.toString(), text: i.toString() });
-  }
-
-  // Data getters
-  $: access = checkAccess('boot', 'write') && $loggedIn;
-  $: {
-    let upd = getUpdate(model);
+  function setUpdate(mod) {
+    let upd = getUpdate(mod);
     update.boot = (typeof upd['boot'] !== "undefined");
     update.main = (typeof upd['main'] !== "undefined");
-  }
-  $: {
-    let msg = message;
+  };
+  
+  function scroll() {
     let con = document.getElementsByClassName('console');
     if ((con != null) && (con.length > 0)) {
       setTimeout(() => {
         con[0].scrollTop = con[0].scrollHeight;
       }, 100);
     }
+  };
+
+  for (let i = 0; i < 253; i++) {
+    insts.push({ id: i.toString(), text: i.toString() });
   }
+
+  // Data getters
+  $: access = checkAccess('boot', 'write') && $loggedIn;
+  $: model, setUpdate(model);
+  $: message, scroll();
 </script>
 
 <div class="container" style={style}>

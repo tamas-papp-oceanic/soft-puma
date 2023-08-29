@@ -2,6 +2,7 @@
   import { onMount, onDestroy } from "svelte";
   import { Grid, Row, Column, DataTable, Toolbar, ToolbarContent, Tile,
     Button, Pagination, OverflowMenu, OverflowMenuItem } from "carbon-components-svelte";
+  import Restart from "carbon-icons-svelte/lib/Restart16";
   import SkipBack from "carbon-icons-svelte/lib/SkipBack16";
   import { push, pop } from 'svelte-spa-router'
   import { device, name, data } from "../../stores/data.js";
@@ -9,30 +10,11 @@
 
   export let params = undefined;
   
-  const headers = [{
-    key: "overflow",
-    empty: true
-  },{
-    key: "msg",
-    value: "Message",
-    sort: false,
-  },{
-    key: "ins",
-    value: "Instance",
-    sort: false,
-  },{
-    key: "cnt",
-    value: "Count",
-    sort: false,
-  },{
-    key: "int",
-    value: "Interval",
-    sort: false,
-  },{
-    key: "raw",
-    value: "Raw data",
-    sort: false,
-  }];
+  let headers = new Array({
+    key: 'wait',
+    value: 'Waiting for first record...',
+    sort: false
+  });
 
   let height;
   let rows = new Array();
@@ -61,6 +43,17 @@
 
   function content(e, row) {
     push('/messages/' + row.id);
+  };
+
+  function rest(e) {
+    pagination.page = 1;
+    rows = new Array();
+    headers = new Array({
+      key: 'wait',
+      value: 'Waiting for first record...',
+      sort: false
+    });
+    $data[$device] = {};
   };
 
   function back(e) {
@@ -116,6 +109,32 @@
     }
     rows = JSON.parse(JSON.stringify(tmp));
     pagination.totalItems = rows.length;
+    if (rows.length > 0) {
+      headers = new Array({
+        key: "overflow",
+        empty: true
+      },{
+        key: "msg",
+        value: "Message",
+        sort: false,
+      },{
+        key: "ins",
+        value: "Instance",
+        sort: false,
+      },{
+        key: "cnt",
+        value: "Count",
+        sort: false,
+      },{
+        key: "int",
+        value: "Interval",
+        sort: false,
+      },{
+        key: "raw",
+        value: "Raw data",
+        sort: false,
+      });
+    }
   };
 
   // Data getters, setters
@@ -136,11 +155,13 @@
         page={pagination.page}>
         <Toolbar>
           <Tile>{title}</Tile>
-          {#if (typeof params !== 'undefined') && (typeof params["address"] !== 'undefined')}
-            <ToolbarContent>
+          <ToolbarContent>
+            {#if (typeof params !== 'undefined') && (typeof params["address"] !== 'undefined')}
               <Button icon={SkipBack} on:click={(e) => back(e)}>Back</Button>
-            </ToolbarContent>
-          {/if}
+            {:else}
+              <Button icon={Restart} on:click={(e) => rest(e)}>Restart</Button>
+            {/if}
+          </ToolbarContent>
         </Toolbar>
         <span slot="cell" let:cell let:row let:rowIndex>
           {#if cell.key === 'overflow'}

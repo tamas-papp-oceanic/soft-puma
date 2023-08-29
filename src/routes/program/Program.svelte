@@ -20,6 +20,7 @@
   }
 
   onMount(() => {
+    window.pumaAPI.send('updates');
   });
   
   onDestroy(() => {

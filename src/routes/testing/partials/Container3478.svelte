@@ -8,10 +8,10 @@
   export let style;
 
   const dispatch = createEventDispatcher();
-  const greyImage = "/images/circle-grey.png";
-  const redImage = "/images/circle-red.png";
-  const greenImage = "/images/circle-green.png";
-  const yellowImage = "/images/circle-yellow.png";
+  const greyImage = "/images/circle-grey.webp";
+  const redImage = "/images/circle-red.webp";
+  const greenImage = "/images/circle-green.webp";
+  const yellowImage = "/images/circle-yellow.webp";
   
   let insts = new Array();
   let header = new Array();

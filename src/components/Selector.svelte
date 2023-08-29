@@ -42,7 +42,9 @@
                               <div class="product-number">{device}</div>
                               <div class="product-title">{getname(device)}</div>
                             </div>
-                            <div class="product-image"><img src={'images/' + device + '.webp'} alt={device} /></div>
+                            <div class="product-image">
+                              <img src={'images/' + device + '.webp'} alt={device} onerror="this.onerror=null; this.src='images/noimage.webp';"/>
+                            </div>
                           </div>
                         </Column>
                       {/each}
