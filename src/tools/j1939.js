@@ -49,7 +49,8 @@ function create() {
           type: typ,
           unit: fld.unit,
           multiplier: mul,
-          offset: (fld.offset != 0) ? null : fld.offset,
+          offset: (fld.offset !== 0) ? fld.offset : null,
+          dictionary: (fld.dictionary === 'DD001') ? fld.dictionary : null,
         };
         obj.fields.push(tmp);
       }

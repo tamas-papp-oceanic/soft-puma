@@ -143,7 +143,7 @@
       }
       if (((spl.protocol === 'nmea2000') && ((fld.dictionary === 'DD001') || (fld.dictionary === "DD002") ||
         (fld.dictionary === "DD003") || (fld.dictionary === "DD056"))) ||
-        ((spl.protocol === 'j1939') && (fld['type'] === 'bit(2)'))) {
+        ((spl.protocol === 'j1939') && ((fld.dictionary === 'DD001') || (fld['type'] === 'bit(2)')))) {
         if (typeof fld.value === 'undefined') {
           if ((spl.protocol === 'nmea2000') && ((fld.dictionary === "DD002") || (fld.dictionary === "DD003")) ||
             ((spl.protocol === 'j1939') && (fld['type'] === 'bit(2)'))) {
@@ -271,7 +271,7 @@
           let fld = msg.fields[j];
           if (((spl.protocol === 'nmea2000') && ((fld.dictionary === 'DD001') || (fld.dictionary === "DD002") ||
             (fld.dictionary === "DD003") || (fld.dictionary === "DD056"))) ||
-            ((spl.protocol === 'j1939') && (fld['type'] === 'bit(2)'))) {
+            ((spl.protocol === 'j1939') && ((fld.dictionary === 'DD001') || (fld['type'] === 'bit(2)')))) {
             simulator.table[i].disabledIds.push(parseInt(j));
           }
         }
