@@ -170,8 +170,8 @@ app.on('activate', function () {
 // FOR INIT ONLY
 // let tool = require('./src/tools/nmea.js');
 // tool.create();
-let tool = require('./src/tools/j1939.js');
-tool.create();
+// let tool = require('./src/tools/j1939.js');
+// tool.create();
 
 // Discovering interfaces
 async function discover() {
