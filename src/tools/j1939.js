@@ -7,6 +7,7 @@ const fs = require('fs');
 function create() {
   let j19 = '/home/tamas/go/src/git/poseidon/kratos/default/j1939.json';
   let jde = path.join(app.getAppPath(), 'src/config/j1939defs.json');
+  let jco = path.join(app.getAppPath(), 'src/config/j1939conv.json');
   try {
     let lst = new Array();
     let out = {};
@@ -49,14 +50,24 @@ function create() {
           type: typ,
           unit: fld.unit,
           multiplier: mul,
-          offset: (fld.offset !== 0) ? fld.offset : null,
+          offset: (fld.offset !== null) && (fld.offset !== 0) ? fld.offset : null,
           dictionary: (fld.dictionary === 'DD001') ? fld.dictionary : null,
         };
         obj.fields.push(tmp);
       }
+      if (pgn.function != null) {
+        key += "/" + pgn.function;
+      } else {
+        key += "/-"
+      }
       out[key] = obj;
     }
     fs.writeFileSync(jde, JSON.stringify(out, null, 2));
+    delete out;
+    out = {
+      "j1939/060416": { function: 0, field: 0 },
+    };
+    fs.writeFileSync(jco, JSON.stringify(out, null, 2));
   } catch(err) {
     console.log(err);
   }

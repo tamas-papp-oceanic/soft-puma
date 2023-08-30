@@ -145,7 +145,7 @@ function isSingle(pgn) {
     }
   } else {
     for (const [key, val] of Object.entries(nmeadefs)) {
-      if (key.startsWith('nmea2000/' + pgn)) {
+      if (key.startsWith('nmea2000/' + pgn.toString().padStart(6, '0'))) {
         return val.single;
       }
     }

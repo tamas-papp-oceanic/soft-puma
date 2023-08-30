@@ -170,9 +170,9 @@ function decode(frm, din) {
               break;
           }
           fld.state = com.getStatus(fld['type'], val);
-          if (fld.state == 'V') {
-            if  (fld.multiplier != null) {
-              if (typeof val == 'bigint') {
+          if (fld.state === 'V') {
+            if  (fld.multiplier !== null) {
+              if (typeof val === 'bigint') {
                 if (fld.multiplier >= 1) {
                   val *= BigInt(fld.multiplier);
                 } else {
@@ -184,7 +184,7 @@ function decode(frm, din) {
               }
               val = Math.round(val * 100000) / 100000;
             }
-            if  (fld.offset != null) {
+            if  (fld.offset !== null) {
               val += offset;
             }
           }

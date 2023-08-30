@@ -8,6 +8,7 @@
   import MimicContainer from "./partials/MimicContainer.svelte";
   import nmeaconv from "../../config/nmeaconv.json";
   import nmeadefs from "../../config/nmeadefs.json";
+  import j1939conv from "../../config/j1939conv.json";
   import j1939defs from "../../config/j1939defs.json";
   import datakinds from "../../config/datakinds.json";
   // import datatypes from "../../config/datatypes.json";
@@ -250,11 +251,16 @@
       rec.fields[2].static = null;
     }
     let cnv = spl.protocol + '/' + spl.pgn;
-    if (typeof nmeaconv[cnv] !== 'undefined') {
+    if ((spl.protocol === 'nmea2000') && (typeof nmeaconv[cnv] !== 'undefined')) {
       rec.fields[nmeaconv[cnv].field].value = parseInt(spl.function);
       rec.disabledIds.push(nmeaconv[cnv].field);
       rec.disabledSim.push(nmeaconv[cnv].field);
       rec.fields[nmeaconv[cnv].field].static = null;
+    } else if ((spl.protocol === 'j1939') && (typeof j1939conv[cnv] !== 'undefined')) {
+      rec.fields[j1939conv[cnv].field].value = parseInt(spl.function);
+      rec.disabledIds.push(j1939conv[cnv].field);
+      rec.disabledSim.push(j1939conv[cnv].field);
+      rec.fields[j1939conv[cnv].field].static = null;
     }
     rec.disabledIds.sort();
     rec.disabledSim.sort();
@@ -294,8 +300,10 @@
           simulator.table[i].disabledIds.push(2);
         }
         let cnv = spl.protocol + '/' + spl.pgn;
-        if (typeof nmeaconv[cnv] !== 'undefined') {
+        if ((spl.protocol === 'nmea2000') && (typeof nmeaconv[cnv] !== 'undefined')) {
           simulator.table[i].disabledIds.push(nmeaconv[cnv].field);
+        } else if ((spl.protocol === 'j1939') && (typeof j1939conv[cnv] !== 'undefined')) {
+          simulator.table[i].disabledIds.push(j1939conv[cnv].field);
         }
       }
       simulator.table[i].disabledIds.sort();

@@ -116,40 +116,53 @@ function encode(msg) {
   }
 };
 
-function encodeDataTransfer(dat) {
+function createBAM(pgn, siz) {
+  return {
+    key: 'j1939/060416/32/-',
+    header: { pgn: 60416, src: 0xFF, dst: 0xFF },
+    fields: [
+      { field: 1, title: "RTS Group Function Code", state: 'V', value: 0x20 },
+      { field: 2, title: "Total message size, bytes", state: 'V', value: siz },
+      { field: 3, title: "Total number of frames to be transmitted", state: 'V', value: Math.ceil(siz / 7) },
+      { field: 4, title: "NMEA Reserved", state: 'V', value: 0xFF },
+      { field: 5, title: "PGN of multi-packet message", state: 'V', value: pgn },
+    ],
+  };
+};
+
+function encodeDataTransfer(frm) {
   try {
-    if (fap.data.length == 0) {
+    if (frm.data.length === 0) {
       return null;
     }
     let ret = new Array();
-    let seq = -1;
-    let frm = 0;
+    let pgn = com.getPgn(frm.id);
+    let msg = createBAM(pgn, frm.data.length);
+    let bam = encode(msg);
+    let rec = {
+      id: bam.id,
+      ext: bam.ext,
+      rtr: bam.rtr,
+      data: Buffer.alloc(8),
+    };
+    bam.data.copy(rec.data);
+    ret.push(rec);
+    let seq = 0;
     let cnt = 0;
-    let key = fap.id.toString(16).padStart(8, '0');
-    if (typeof fastbuff[key] !== 'undefined') {
-      seq = fastbuff[key];
-    }
-    seq++
-    seq &= 0b111;
-    fastbuff[key] = seq;
     let dat = Buffer.alloc(8).fill(0xFF);
-    for (let i = 0; i < fap.data.length; i++) {
-      if ((cnt % 8) == 0) {
-        dat.writeUInt8((seq << 5) + frm, (cnt % 8));
-        if (cnt == 0) {
-          cnt++
-          dat.writeUInt8(fap.data.length, (cnt % 8));
-        }
-        frm++
+    for (let i = 0; i < frm.data.length; i++) {
+      if ((cnt % 8) === 0) {
+        dat.writeUInt8(seq, (cnt % 8));
+        seq++
         cnt++
       }
-      dat.writeUInt8(fap.data[i], (cnt % 8));
+      dat.writeUInt8(frm.data[i], (cnt % 8));
       cnt++
-      if ((cnt % 8) == 0) {
+      if ((cnt % 8) === 0) {
         let rec = {
-          id: fap.id,
-          ext: fap.ext,
-          rtr: fap.rtr,
+          id: frm.id,
+          ext: frm.ext,
+          rtr: frm.rtr,
           data: Buffer.alloc(8),
         };
         dat.copy(rec.data);
@@ -157,11 +170,11 @@ function encodeDataTransfer(dat) {
         dat.fill(0xFF);
       }
     }
-    if ((cnt % 8) != 0) {
+    if ((cnt % 8) !== 0) {
       let rec = {
-        id: fap.id,
-        ext: fap.ext,
-        rtr: fap.rtr,
+        id: frm.id,
+        ext: frm.ext,
+        rtr: frm.rtr,
         data: Buffer.alloc(8),
       };
       dat.copy(rec.data);
@@ -175,5 +188,6 @@ function encodeDataTransfer(dat) {
 }
 
 module.exports = {
+  pack,
   encode,
 };

@@ -40,14 +40,15 @@ function isRoute(prf, src) {
 };
 
 // NMEA2000 key = {protocol}/{pgn}/{function}/{manufacturer}/{industry}/{instance}/{fluidtype}
-// J1939 key = {protocol}/{pgn}/{instance}
+// J1939 key = {protocol}/{pgn}/{function}/{instance}
 function splitKey(key) {
   let ret = null;
   let spl = key.split('/');
-  if (key.length <= 3) {
+  if (key.length <= 4) {
     ret = {
       protocol: null,
       pgn: null,
+      function: null,
       instance: null,
     };
   } else {
@@ -75,8 +76,8 @@ function splitKey(key) {
 
 function joinKey(spl) {
   let ret = spl.protocol + '/' + spl.pgn;
+  ret += '/' + (spl.function != null ? spl.function : '-');
   if (spl.protocol === 'nmea2000') {
-    ret += '/' + (spl.function != null ? spl.function : '-');
     ret += '/' + (spl.manufacturer != null ? spl.manufacturer : '-');
     ret += '/' + (spl.industry != null ? spl.industry : '-');
   }
@@ -89,8 +90,8 @@ function joinKey(spl) {
 
 function joinKey2(spl) {
   let ret = spl.protocol + '/' + spl.pgn;
+  ret += '/' + (spl.function != null ? spl.function : '-');
   if (spl.protocol === 'nmea2000') {
-    ret += '/' + (spl.function != null ? spl.function : '-');
     ret += '/' + (spl.manufacturer != null ? spl.manufacturer : '-');
     ret += '/' + (spl.industry != null ? spl.industry : '-');
   }

@@ -55,17 +55,26 @@ class J1939Engine {
   };
   // J1939 data creating function
   #createMsg(msg) {
-    return enc.encode(msg);
+    let frm = enc.encode(msg);
+    if (frm != null) {
+      let tmp = enc.pack(frm);
+      if (tmp != null) {
+        return tmp;
+      }
+    }
+    return null;
   };
   // J1939 message sending function
   sendMsg(msg) {
     msg.header.src = 255;
-    let frm = this.#createMsg(msg);
-    try {
-      this.#device.send(frm);
-    } catch (err) {
-      log.error(err);
-      return false;
+    let frs = this.#createMsg(msg);
+    for (let i in frs) {
+      try {
+        this.#device.send(frs[i]);
+      } catch (err) {
+        log.error(err);
+        return false;
+      }
     }
     return true;
   };

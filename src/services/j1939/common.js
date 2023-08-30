@@ -13,12 +13,17 @@ const fs = require('fs');
 const log = require('electron-log');
 
 let j1939defs = {};
+let j1939conv = {};
 
 function init() {
   let jde = path.join(app.getAppPath(), 'src/config/j1939defs.json');
+  let jco = path.join(app.getAppPath(), 'src/config/j1939conv.json');
   try {
     if (fs.existsSync(jde)) {
       j1939defs = JSON.parse(fs.readFileSync(jde, 'utf8'));
+    }
+    if (fs.existsSync(jco)) {
+      j1939conv = JSON.parse(fs.readFileSync(jco, 'utf8'));
     }
   } catch(err) {
     log.error(err);
@@ -65,7 +70,7 @@ function getDst(par) {
 // Makes PGN value
 function makePgn(par) {
   let pgn = par.pgn;
-	if (((pgn >> 8) & 0xFF) < 0xF0) {
+  if (((pgn >> 8) & 0xFF) < 0xF0) {
     pgn |= (par.dst & 0xFF);
 	}
   return (pgn << 8) | ((par.pri & 0x07) << 26) | (par.src & 0xFF);
@@ -86,6 +91,12 @@ function findDef(frm) {
 function getKey(frm) {
   let pgn = getPgn(frm.id);
   let key = "j1939/" + pgn.toString().padStart(6, '0');
+  let cnv = j1939conv[key];
+  if ((typeof cnv !== 'undefined') && (typeof cnv.function !== 'undefined')) {
+    key += "/" + frm.data[cnv.function];
+  } else {
+    key += "/-";
+  }
   return key;
 };
 
@@ -108,7 +119,7 @@ function isProprietary(pgn) {
 
 function isSingle(pgn) {
   for (const [key, val] of Object.entries(j1939defs)) {
-    if (key.startsWith('j1939/' + pgn)) {
+    if (key.startsWith('j1939/' + pgn.toString().padStart(6, '0'))) {
       return val.single;
     }
   }
