@@ -130,7 +130,7 @@
         rec.fields[i].simulation = null;
       }
       if (typeof fld.limits === 'undefined') {
-        rec.fields[i].limits = minmax(rec.fields[i]);
+        rec.fields[i].limits = minmax(spl.protocol, rec.fields[i]);
       }
       if (typeof fld.ranges === 'undefined') {
         rec.fields[i].ranges = null;
@@ -176,14 +176,17 @@
         if (fld['type'].startsWith('int') || fld['type'].startsWith('uint')) {
           if (typeof fld.value === 'undefined') {
             rec.fields[i].value = 0;
+            rec.fields[i].sival = 0;
           }
         } else if (fld['type'].startsWith('float')) {
           if (typeof fld.value === 'undefined') {
             rec.fields[i].value = 0.0;
+            rec.fields[i].sival = 0;
           }
         } else if (fld['type'].startsWith('bit(')) {
           if (typeof fld.value === 'undefined') {
             rec.fields[i].value = 0;
+            rec.fields[i].sival = 0;
           }
         } else if (fld['type'].startsWith('chr(')) {
           if (typeof fld.value === 'undefined') {
@@ -202,6 +205,7 @@
       } else {
         if (typeof fld.value === 'undefined') {
           rec.fields[i].value = null;
+          rec.fields[i].sival = null;
         }
       }
       if ((fld.dictionary !== null) && (typeof datakinds[fld.dictionary] !== 'undefined')) {
@@ -399,7 +403,15 @@
       reml('simfile');
       running = false;
     });
-    window.pumaAPI.send('simfile-write', ['Select simulator file', 'simulator.json', JSON.parse(JSON.stringify(simulator))]);
+    let snd = JSON.parse(JSON.stringify(simulator))
+    for (let i in snd.table) {
+      for (let j in snd.table[i].fields) {
+        if (typeof snd.table[i].fields[j].sival !== 'undefined') {
+          delete snd.table[i].fields[j].sival;
+        }
+      }
+    }
+    window.pumaAPI.send('simfile-write', ['Select simulator file', 'simulator.json', snd]);
   };
 
   function clrTab(e) {
@@ -470,11 +482,14 @@
     for (let i in simulator.table[idx].fields) {
       let fld = simulator.table[idx].fields[i];
       let val = (typeof fld.value === 'undefined') ? null : fld.value;
-      if (fld.dictionary === 'DD056') {
+      if ((spl.protocol === 'nmea2000') && (fld.dictionary === 'DD056')) {
         val = (val + 1) % 253;
       } else if (fld['type'] != null) {
         if (fld['type'].startsWith('int') || fld['type'].startsWith('uint') ||
           (fld.unit !== null)) {
+          if ((typeof fld.sival === 'undefined') || (fld.sival === null)) {
+            simulator.table[idx].fields[i].sival = 0;
+          }
           val = (val === null) ? 0 : val;
           let ena = true;
           if ((typeof simulator.table[idx].disabledSim !== 'undefined') &&
@@ -485,29 +500,26 @@
             ena = false;
           }
           if (ena) {
-            let dif = 0;
-            if (simulator.table[idx].interval !== null) {
-              if (fld.multiplier !== null) {
-                dif = Math.round(simulator.table[idx].interval / 100);
-              } else {
-                dif = 1;
-              }
-            }
             let sim = (fld.simulation !== null) ? fld.simulation : simulator.simulation;
             let rat = (fld.rate !== null) ? fld.rate : simulator.rate;
+            let res = null;
             switch (sim) {
             case 0:
-              val = nextIncremental(fld, rat);
+              res = nextIncremental(fld, rat);
               break;
             case 1:
-              val = nextDecremental(fld, rat);
+              res = nextDecremental(fld, rat);
               break;
             case 2:
-              val = nextNatural(fld, rat);
+              res = nextNatural(fld, rat);
               break;
             case 3:
-              val = nextRandom(fld);
+              res = nextRandom(fld);
               break;
+            }
+            if (res !== null) {
+              val = res.value;
+              simulator.table[idx].fields[i].sival = res.sival;
             }
           }
         } else if (fld['type'].startsWith('bit(')) {

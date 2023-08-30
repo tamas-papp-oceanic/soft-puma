@@ -21,6 +21,8 @@ const devices = {
   '4601':      { id: 0x09, conf: true,  fluid: false, prog: false, address: null,       test: false, group: 'modules',  title: '4-20mA Fluid Pressure Module' },
   '4530':      { id: 0x0E, conf: false, fluid: false, prog: false, address: null,       test: false, group: 'modules',  title: 'Cabin Temperature & Humidity Module' },
   '4900':      { id: 0x14, conf: false, fluid: false, prog: false, address: null,       test: false, group: 'adaptors', title: 'AC Input Module' },
+  '5250-F':    { id: 0x34, conf: false, fluid: true,  prog: true,  address: null,       test: false, group: 'adaptors', title: 'Deck Gauge (Fuel)' },
+  '5250-W':    { id: 0x34, conf: false, fluid: true,  prog: true,  address: null,       test: false, group: 'adaptors', title: 'Deck Gauge (Water)' },
   '5720':      { id: 0x16, conf: true,  fluid: false, prog: true,  address: 0x08004000, test: false, group: 'adaptors', title: 'Fluid Flow Adapter' },
   '5906':      { id: 0x18, conf: false, fluid: false, prog: false, address: null,       test: false, group: 'adaptors', title: '6 Channel Load Controller' },
   '5985':      { id: 0x1A, conf: false, fluid: false, prog: false, address: null,       test: false, group: 'adaptors', title: 'CAN to DMX512 Convertor' },

@@ -394,26 +394,45 @@
       }
     }
     rows1 = JSON.parse(JSON.stringify(arr));
+    if (rows1.length === 0) {
+      selection1 = null;
+      selection2 = null;
+      selectedIds1 = new Array();
+      selectedIds2 = new Array();
+    }
   };
 
   function filter() {
     let arr = new Array();
     if (selection1 !== null) {
+      let fnd = false;
       for (let i in data.table) {
-        if (data.table[i].id == selection1.id) {
+        if (data.table[i].id === selection1.id) {
           selection1 = data.table[i];
+          fnd = true;
           break;
         }
       }
-      arr = JSON.parse(JSON.stringify(selection1.fields));
+      if (fnd) {
+        arr = JSON.parse(JSON.stringify(selection1.fields));
+      } else {
+        selection1 = null;
+        selectedIds1 = new Array();
+      }
     }
     rows2 = JSON.parse(JSON.stringify(arr));
     if (selection2 !== null) {
+      let fnd = false;
       for (let i in rows2) {
-        if (rows2[i].id == selection2.id) {
+        if (rows2[i].id === selection2.id) {
           selection2 = rows2[i];
+          fnd = true;
           break;
         }
+      }
+      if (!fnd) {
+        selection2 = null;
+        selectedIds2 = new Array();
       }
     }
   }
@@ -704,9 +723,9 @@
                   <Column>
                     <div class="buttons">
                       <Button disabled={running} iconDescription="Load table" icon={Open} on:click={load} />
-                      <Button disabled={(rows1.length == 0) || running} iconDescription="Save table" icon={Save} on:click={save} />
-                      <Button disabled={(selectedIds1.length == 0) || running} iconDescription="Delete message" icon={Delete} on:click={delRow} />
-                      <Button disabled={(rows1.length == 0) || running} iconDescription="Clear table" icon={Empty} on:click={clrTab} />
+                      <Button disabled={(rows1.length === 0) || running} iconDescription="Save table" icon={Save} on:click={save} />
+                      <Button disabled={(selectedIds1.length === 0) || running} iconDescription="Delete message" icon={Delete} on:click={delRow} />
+                      <Button disabled={(rows1.length === 0) || running} iconDescription="Clear table" icon={Empty} on:click={clrTab} />
                       <Button disabled={capturing || running} iconDescription="Start capturing" icon={Record} on:click={capStart} />
                       <Button disabled={!capturing} iconDescription="Stop capturing" icon={Stop} on:click={capStop} />
                     </div>
@@ -754,8 +773,8 @@
                 <Row>
                   <Column>
                     <div class="buttons">
-                      <Button disabled={(selectedIds1.length == 0) || running} iconDescription="Send message" icon={Send} on:click={send} />
-                      <Button disabled={(rows1.length == 0) || running || !repeat} iconDescription="Start simulation" icon={Start} on:click={simStart} />
+                      <Button disabled={(selectedIds1.length === 0) || running} iconDescription="Send message" icon={Send} on:click={send} />
+                      <Button disabled={(rows1.length === 0) || running || !repeat} iconDescription="Start simulation" icon={Start} on:click={simStart} />
                       <Button disabled={!running}  iconDescription="Stop simulation" icon={Pause} on:click={simStop} />
                     </div>
                   </Column>

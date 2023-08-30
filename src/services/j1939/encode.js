@@ -1,6 +1,15 @@
 const log = require('electron-log');
 const com = require('./common.js');
 
+function pack(frm) {
+  let pgn = com.getPgn(frm.id);
+  if (com.isSingle(pgn)) {
+    return [frm];
+  } else {
+    return encodeDataTransfer(frm);
+  }
+};
+
 // Convert message to can frame
 function encode(msg) {
   try {
@@ -38,9 +47,6 @@ function encode(msg) {
         len = com.calcLength(fld['type']);
       }
       if ((len != null) && (len > 0)) {
-        if (fld.offset !== null) {
-          mfl.value -= fld.offset;
-        }
         if (fld.multiplier !== null) {
           if (typeof mfl.value == 'bigint') {
             if (fld.multiplier >= 1) {
@@ -52,6 +58,9 @@ function encode(msg) {
           } else {
             mfl.value /= fld.multiplier;
           }
+        }
+        if (fld.offset !== null) {
+          mfl.value -= fld.offset;
         }
         if (fld['type'].startsWith('bit(')) {
           let cnt = Math.ceil(len / 8);
@@ -100,9 +109,6 @@ function encode(msg) {
       data: Buffer.alloc(dlc),
     };
     raw.copy(frm.data, 0, 0, dlc);
-    if (msg.header.pgn === 0) {
-      console.log(frm)
-    }
     return frm;
   } catch (err) {
     log.error("ERROR", err);
@@ -110,6 +116,63 @@ function encode(msg) {
   }
 };
 
+function encodeDataTransfer(dat) {
+  try {
+    if (fap.data.length == 0) {
+      return null;
+    }
+    let ret = new Array();
+    let seq = -1;
+    let frm = 0;
+    let cnt = 0;
+    let key = fap.id.toString(16).padStart(8, '0');
+    if (typeof fastbuff[key] !== 'undefined') {
+      seq = fastbuff[key];
+    }
+    seq++
+    seq &= 0b111;
+    fastbuff[key] = seq;
+    let dat = Buffer.alloc(8).fill(0xFF);
+    for (let i = 0; i < fap.data.length; i++) {
+      if ((cnt % 8) == 0) {
+        dat.writeUInt8((seq << 5) + frm, (cnt % 8));
+        if (cnt == 0) {
+          cnt++
+          dat.writeUInt8(fap.data.length, (cnt % 8));
+        }
+        frm++
+        cnt++
+      }
+      dat.writeUInt8(fap.data[i], (cnt % 8));
+      cnt++
+      if ((cnt % 8) == 0) {
+        let rec = {
+          id: fap.id,
+          ext: fap.ext,
+          rtr: fap.rtr,
+          data: Buffer.alloc(8),
+        };
+        dat.copy(rec.data);
+        ret.push(rec);
+        dat.fill(0xFF);
+      }
+    }
+    if ((cnt % 8) != 0) {
+      let rec = {
+        id: fap.id,
+        ext: fap.ext,
+        rtr: fap.rtr,
+        data: Buffer.alloc(8),
+      };
+      dat.copy(rec.data);
+      ret.push(rec);
+    }
+    return ret;
+  } catch (err) {
+    log.error("ERROR", err);
+    return null;
+  }
+}
 
 module.exports = {
   encode,

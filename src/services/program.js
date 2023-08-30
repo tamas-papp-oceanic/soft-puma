@@ -124,7 +124,7 @@ async function downUpdates(url, func) {
 async function downFile(url, file, func) {
   return new Promise((resolve, reject) => {
     let dwn = app.getPath("downloads");
-    console.log(dwn);
+    // console.log(dwn);
     dwl(url + '/download?file=' + file, dwn).then((res) => {
       let msg = 'Download successful: ' + file;
       log.info(msg);

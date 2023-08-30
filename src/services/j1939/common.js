@@ -106,6 +106,15 @@ function isProprietary(pgn) {
   return false;
 }
 
+function isSingle(pgn) {
+  for (const [key, val] of Object.entries(j1939defs)) {
+    if (key.startsWith('j1939/' + pgn)) {
+      return val.single;
+    }
+  }
+  return true;
+};
+
 // Returns with field length
 function calcLength(typ, val) {
   let len = null;
@@ -174,6 +183,7 @@ module.exports = {
   getKey,
   getDef,
   isProprietary,
+  isSingle,
   calcLength,
   getStatus,
   getFld,
