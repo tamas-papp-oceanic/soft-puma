@@ -325,9 +325,11 @@
   };
 
   function tabChg(e) {
-    capStop(e);
-    simStop(e);
     tab = e.detail;
+    if (tab == 0) {
+      capStop(e);
+      simStop(e);
+    }
   };
 
   function addRow(e) {

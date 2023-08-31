@@ -35,6 +35,9 @@ function encode(def, val) {
       val /= def.multiplier;
     }
   }
+  if (def['type'].startsWith('bit(') || def['type'].startsWith('uint') || def['type'].startsWith('int')) {
+    val = Math.round(val);
+  }
   return val;
 };
 

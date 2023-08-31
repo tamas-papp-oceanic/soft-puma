@@ -172,6 +172,9 @@
       for (let i in data.table) {
         if (data.table[i].id == selection1.id) {
           data.table[i].fields[selection2.id].value = parseFloat(e.detail);
+          if (typeof data.table[i].fields[selection2.id].sival !== 'undefined') {
+            data.table[i].fields[selection2.id].sival = parseFloat(e.detail);
+          }
           if (typeof data.table[i].fields[selection2.id].instance !== 'undefined') {
             data.table[i].instance = parseInt(e.detail);
           } else if (typeof data.table[i].fields[selection2.id].fluid !== 'undefined') {

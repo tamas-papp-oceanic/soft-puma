@@ -5,8 +5,6 @@ function minmax(def) {
   if (def['type'] !== null) {
     if (def.unit === '%') {
       res = { min: 0, max: 100 };
-    } else if (def.unit == 'deg') {
-      res = { min: -180, max: 180 };
     } else if (def.unit == 'rad') {
       if (def['type'].startsWith('int')) {
         res = { min: -parseFloat(Math.PI.toFixed(5)), max: parseFloat(Math.PI.toFixed(5)) };
@@ -89,10 +87,7 @@ function limit(lim, typ, val) {
 function adjust(def, val) {
   if (def['type'].startsWith('bit(') || def['type'].startsWith('int') || def['type'].startsWith('uint')) {
     let tmp = encode(def, val);
-    if (tmp !== Math.round(tmp)) {
-      tmp = Math.round(tmp);
-      val = decode(def, tmp);
-    }    
+    val = decode(def, tmp);
   }
   return parseFloat(val.toFixed(5));
 };
