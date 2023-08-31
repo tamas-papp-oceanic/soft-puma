@@ -1,5 +1,6 @@
 const log = require('electron-log');
 const com = require('./common.js');
+const con = require('../convert.js');
 
 function pack(frm) {
   let pgn = com.getPgn(frm.id);
@@ -12,7 +13,7 @@ function pack(frm) {
 
 // Convert message to can frame
 function encode(msg) {
-  try {
+  // try {
     if ((typeof msg.header === 'undefined') || (typeof msg.fields === 'undefined')) {
       return null;
     }
@@ -47,21 +48,7 @@ function encode(msg) {
         len = com.calcLength(fld['type']);
       }
       if ((len != null) && (len > 0)) {
-        if (fld.multiplier !== null) {
-          if (typeof mfl.value == 'bigint') {
-            if (fld.multiplier >= 1) {
-              mfl.value /= BigInt(fld.multiplier);
-            } else {
-              mfl.value *= BigInt(1 / fld.multiplier);
-            }
-            mfl.value = Number(mfl.value);
-          } else {
-            mfl.value /= fld.multiplier;
-          }
-        }
-        if (fld.offset !== null) {
-          mfl.value -= fld.offset;
-        }
+        mfl.value = con.encode(fld, mfl.value);
         if (fld['type'].startsWith('bit(')) {
           let cnt = Math.ceil(len / 8);
           let buf = Buffer.alloc(8);
@@ -77,25 +64,30 @@ function encode(msg) {
             ptr += (8 - (ptr % 8));
             byt = Math.floor(ptr / 8);
           }
-          switch (fld['type']) {
-            case "uint8":
-              raw.writeUInt8(Math.round(mfl.value), byt);
-              break;
-            case "uint16":
-              raw.writeUInt16LE(Math.round(mfl.value), byt);
-              break;
-            case "uint24":
-              raw.writeUIntLE(Math.round(mfl.value), byt, 3);
-              break;
-            case "uint32":
-              raw.writeUInt32LE(Math.round(mfl.value), byt);
-              break;
-            case "uint48":
-              raw.writeUIntLE(Math.round(mfl.value), byt, 6);
-              break;
-            case "uint64":
-              raw.writeBigUInt64LE(BigInt(Math.round(mfl.value)), byt);
-              break;
+          try {
+            switch (fld['type']) {
+              case "uint8":
+                raw.writeUInt8(Math.round(mfl.value), byt);
+                break;
+              case "uint16":
+                raw.writeUInt16LE(Math.round(mfl.value), byt);
+                break;
+              case "uint24":
+                raw.writeUIntLE(Math.round(mfl.value), byt, 3);
+                break;
+              case "uint32":
+                raw.writeUInt32LE(Math.round(mfl.value), byt);
+                break;
+              case "uint48":
+                raw.writeUIntLE(Math.round(mfl.value), byt, 6);
+                break;
+              case "uint64":
+                raw.writeBigUInt64LE(BigInt(Math.round(mfl.value)), byt);
+                break;
+            }
+          } catch (err) {
+            log.error("ERROR", err, msg.header.pgn, fld.field, mfl.value)
+            return null;
           }
         }
         ptr += len;
@@ -110,10 +102,10 @@ function encode(msg) {
     };
     raw.copy(frm.data, 0, 0, dlc);
     return frm;
-  } catch (err) {
-    log.error("ERROR", err);
-    return null;
-  }
+  // } catch (err) {
+  //   log.error("ERROR", err);
+  //   return null;
+  // }
 };
 
 function createBAM(pgn, siz) {

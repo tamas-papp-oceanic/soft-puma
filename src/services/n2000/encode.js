@@ -1,5 +1,6 @@
 const log = require('electron-log');
 const com = require('./common.js');
+const con = require('../convert.js');
 
 let fastbuff = {};
 
@@ -71,18 +72,7 @@ function encode(msg) {
         }
       }
       if ((len != null) && (len > 0)) {
-        if (fld.multiplier != null) {
-          if (typeof mfl.value == 'bigint') {
-            if (fld.multiplier >= 1) {
-              mfl.value /= BigInt(fld.multiplier);
-            } else {
-              mfl.value *= BigInt(1 / fld.multiplier);
-            }
-            mfl.value = Number(mfl.value);
-          } else {
-            mfl.value /= fld.multiplier;
-          }
-        }
+        mfl.value = con.encode(fld, mfl.value);
         if (fld['type'].startsWith('bit(')) {
           let cnt = Math.ceil(len / 8);
           let buf = Buffer.alloc(8);

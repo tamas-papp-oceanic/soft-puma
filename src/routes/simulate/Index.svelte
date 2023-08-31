@@ -131,7 +131,7 @@
         rec.fields[i].simulation = null;
       }
       if (typeof fld.limits === 'undefined') {
-        rec.fields[i].limits = minmax(spl.protocol, rec.fields[i]);
+        rec.fields[i].limits = minmax(rec.fields[i]);
       }
       if (typeof fld.ranges === 'undefined') {
         rec.fields[i].ranges = null;

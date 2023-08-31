@@ -1,6 +1,7 @@
 const cry = require('crypto');
 const log = require('electron-log');
 const com = require('./common.js');
+const con = require('../convert.js');
 
 let datrbuff = {};
 
@@ -100,21 +101,8 @@ function decode(frm) {
               break;
           }
           fld.state = com.getStatus(fld['type'], val);
-          if ((fld.state == 'V') && (fld.multiplier != null)) {
-            if (typeof val == 'bigint') {
-              if (fld.multiplier >= 1) {
-                val *= BigInt(fld.multiplier);
-              } else {
-                val /= BigInt(1 / fld.multiplier);
-              }
-              val = Number(val);
-            } else {
-              val *= fld.multiplier;
-            }
-            val = Math.round(val * 100000) / 100000;
-          }
-          if ((fld.state == 'V') && (fld.offset !== null)) {
-            val += fld.offset;
+          if (fld.state == 'V') {
+            val = con.decode(fld, val);
           }
         }
         fld.value = val;

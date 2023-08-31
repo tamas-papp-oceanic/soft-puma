@@ -99,10 +99,8 @@
       if (data.table[i].id === selection1.id) {
         if (e.detail) {
           if (selection2.limits !== null) {
-            let mul = selection2.multiplier;
-            let rgs = { min: selection2.limits.min * (mul != null ? mul : 1), max: selection2.limits.max * (mul != null ? mul : 1) };
-            selection2.ranges = rgs;
-            data.table[i].fields[selection2.id].ranges = rgs;
+            selection2.ranges = selection2.limits;
+            data.table[i].fields[selection2.id].ranges = selection2.limits;
             setTimeout(() => {
               document.getElementById('min').focus();
             }, 100);
