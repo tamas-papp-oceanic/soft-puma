@@ -117,6 +117,17 @@ function createBAM(pgn, siz) {
   };
 };
 
+function createDTR() {
+  return {
+    key: 'j1939/060160/-/-',
+    header: { pgn: 60160, src: 0xFF, dst: 0xFF },
+    fields: [
+      { field: 1, title: "Sequence number of multi-packet frame", state: 'V', value: 0xFF },
+      { field: 2, title: "Multi-packet packetized data", state: 'V', value: 0xFFFFFFFFFFFFFF },
+    ],
+  };
+};
+
 function encodeDataTransfer(frm) {
   try {
     if (frm.data.length === 0) {
@@ -134,6 +145,8 @@ function encodeDataTransfer(frm) {
     };
     bam.data.copy(rec.data);
     ret.push(rec);
+    msg = createDTR();
+    let dtr = encode(msg);
     let seq = 0;
     let cnt = 0;
     let dat = Buffer.alloc(8).fill(0xFF);
@@ -147,9 +160,9 @@ function encodeDataTransfer(frm) {
       cnt++
       if ((cnt % 8) === 0) {
         let rec = {
-          id: frm.id,
-          ext: frm.ext,
-          rtr: frm.rtr,
+          id: dtr.id,
+          ext: dtr.ext,
+          rtr: dtr.rtr,
           data: Buffer.alloc(8),
         };
         dat.copy(rec.data);
@@ -159,9 +172,9 @@ function encodeDataTransfer(frm) {
     }
     if ((cnt % 8) !== 0) {
       let rec = {
-        id: frm.id,
-        ext: frm.ext,
-        rtr: frm.rtr,
+        id: dtr.id,
+        ext: dtr.ext,
+        rtr: dtr.rtr,
         data: Buffer.alloc(8),
       };
       dat.copy(rec.data);
