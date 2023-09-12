@@ -15,99 +15,99 @@ function pack(frm) {
 
 // Convert message to can frame
 function encode(msg) {
-  try {
-    if ((typeof msg.header === 'undefined') || (typeof msg.fields === 'undefined')) {
+  if ((typeof msg.header === 'undefined') || (typeof msg.fields === 'undefined')) {
+    return null;
+  }
+  let spl = msg.key.split('/');
+  let def = com.getDef(spl.splice(0, spl.length - 2).join('/'));
+  if (def == null) {
+    return null;
+  }
+  if (msg.header.pgn == 126208) {
+    def = proc126208(def, msg);
+  } else {
+    def = extend(def, msg);
+  }
+  if (def == null) {
+    return null;
+  }
+  msg.header.pri = def.priority;
+  let ptr = 0;
+  for (let i in def.fields) {
+    let fld = def.fields[i];
+    let mfl = com.getFld(fld.field, msg.fields);
+    let len = null;
+    if (fld['type'] !== null) {
+      if ((fld['type'] == 'chr(x)') || (fld['type'] == 'str')) {
+        len = com.calcLength(fld['type'], mfl != null ? mfl.value.length : 0);
+      } else if (fld['type'].startsWith('chr(') && (typeof mfl.value.type !== 'undefined') &&
+        (mfl.value.type == 'Buffer')) {
+        len = com.calcLength(fld['type'], mfl != null ? mfl.value.data.length : 0);
+      } else {
+        len = com.calcLength(fld['type']);
+      }
+    }
+    if (len != null) {
+      ptr += len;
+    }
+  }
+  let raw = Buffer.alloc(Math.ceil(ptr / 8));
+  ptr = 0;
+  for (let i in def.fields) {
+    let fld = def.fields[i];
+    let mfl = com.getFld(fld.field, msg.fields);
+    if (mfl == null) {
       return null;
     }
-    let spl = msg.key.split('/');
-    let def = com.getDef(spl.splice(0, spl.length - 2).join('/'));
-    if (def == null) {
-      return null;
+    let byt = Math.floor(ptr / 8);
+    let len = null;
+    if (fld['type'] !== null) {
+      if ((fld['type'] == 'chr(x)') || (fld['type'] == 'str')) {
+        len = com.calcLength(fld['type'], mfl != null ? mfl.value.length : 0);
+      } else if (fld['type'].startsWith('chr(') && (typeof mfl.value.type !== 'undefined') && (mfl.value.type == 'Buffer'))  {
+        len = com.calcLength(fld['type'], mfl != null ? mfl.value.data.length : 0);
+      } else {
+        len = com.calcLength(fld['type']);
+      }
     }
-    if (msg.header.pgn == 126208) {
-      def = proc126208(def, msg);
-    } else {
-      def = extend(def, msg);
-    }
-    if (def == null) {
-      return null;
-    }
-    msg.header.pri = def.priority;
-    let ptr = 0;
-    for (let i in def.fields) {
-      let fld = def.fields[i];
-      let mfl = com.getFld(fld.field, msg.fields);
-      let len = null;
-      if (fld['type'] !== null) {
-        if ((fld['type'] == 'chr(x)') || (fld['type'] == 'str')) {
-          len = com.calcLength(fld['type'], mfl != null ? mfl.value.length : 0);
-        } else if (fld['type'].startsWith('chr(') && (typeof mfl.value.type !== 'undefined') &&
-          (mfl.value.type == 'Buffer')) {
-          len = com.calcLength(fld['type'], mfl != null ? mfl.value.data.length : 0);
-        } else {
-          len = com.calcLength(fld['type']);
+    if ((len != null) && (len > 0)) {
+      mfl.value = con.encode(fld, mfl.value);
+      if (fld['type'].startsWith('bit(')) {
+        let cnt = Math.ceil(len / 8);
+        let buf = Buffer.alloc(8);
+        raw.copy(buf, 0, byt, byt + cnt);
+        let dat = buf.readBigUInt64LE(0);
+        let msk = (BigInt(1) << BigInt(len)) - BigInt(1);
+        let off = BigInt(ptr) - BigInt(byt * 8);
+        dat |= ((BigInt(mfl.value) & msk) << off);
+        buf.writeBigUInt64LE(dat);
+        buf.copy(raw, byt);
+      } else {
+        if ((ptr % 8) !== 0) {
+          ptr += (8 - (ptr % 8));
+          byt = Math.floor(ptr / 8);
         }
       }
-      if (len != null) {
-        ptr += len;
-      }
-    }
-    let raw = Buffer.alloc(Math.ceil(ptr / 8));
-    ptr = 0;
-    for (let i in def.fields) {
-      let fld = def.fields[i];
-      let mfl = com.getFld(fld.field, msg.fields);
-      if (mfl == null) {
-        return null;
-      }
-      let byt = Math.floor(ptr / 8);
-      let len = null;
-      if (fld['type'] !== null) {
-        if ((fld['type'] == 'chr(x)') || (fld['type'] == 'str')) {
-          len = com.calcLength(fld['type'], mfl != null ? mfl.value.length : 0);
-        } else if (fld['type'].startsWith('chr(') && (typeof mfl.value.type !== 'undefined') && (mfl.value.type == 'Buffer'))  {
-          len = com.calcLength(fld['type'], mfl != null ? mfl.value.data.length : 0);
-        } else {
-          len = com.calcLength(fld['type']);
+      if (fld['type'] == 'chr(x)') {
+        raw.writeUInt8(Math.ceil((len - 1) / 8), byt,);
+        if (len > 8) {
+          raw.write(mfl.value, byt + 1, 'utf8');
         }
-      }
-      if ((len != null) && (len > 0)) {
-        mfl.value = con.encode(fld, mfl.value);
-        if (fld['type'].startsWith('bit(')) {
-          let cnt = Math.ceil(len / 8);
-          let buf = Buffer.alloc(8);
-          raw.copy(buf, 0, byt, byt + cnt);
-          let dat = buf.readBigUInt64LE(0);
-          let msk = (BigInt(1) << BigInt(len)) - BigInt(1);
-          let off = BigInt(ptr) - BigInt(byt * 8);
-          dat |= ((BigInt(mfl.value) & msk) << off);
-          buf.writeBigUInt64LE(dat);
+      } else if (fld['type'].startsWith('chr(')) {
+        if (typeof mfl.value === 'string') {
+          raw.write(mfl.value.padEnd(Math.ceil(len / 8), ' '), byt, 'utf8');
+        } else if ((typeof mfl.value.type !== 'undefined') && (mfl.value.type == 'Buffer')) {
+          let buf = Buffer.from(mfl.value.data);
           buf.copy(raw, byt);
-        } else {
-          if ((ptr % 8) !== 0) {
-            ptr += (8 - (ptr % 8));
-            byt = Math.floor(ptr / 8);
-          }
         }
-        if (fld['type'] == 'chr(x)') {
-          raw.writeUInt8(Math.ceil((len - 1) / 8), byt,);
-          if (len > 8) {
-            raw.write(mfl.value, byt + 1, 'utf8');
-          }
-        } else if (fld['type'].startsWith('chr(')) {
-          if (typeof mfl.value === 'string') {
-            raw.write(mfl.value.padEnd(Math.ceil(len / 8), ' '), byt, 'utf8');
-          } else if ((typeof mfl.value.type !== 'undefined') && (mfl.value.type == 'Buffer')) {
-            let buf = Buffer.from(mfl.value.data);
-            buf.copy(raw, byt);
-          }
-        } else if (fld['type'] == 'str') {
-          raw.writeUInt8(Math.ceil((len - 2) / 8), byt);
-          raw.writeUInt8(0, byt + 1);
-          if (len > 16) {
-            raw.write(mfl.value, byt + 2, 'utf8');
-          }
-        } else if (!fld['type'].startsWith('bit(')) {
+      } else if (fld['type'] == 'str') {
+        raw.writeUInt8(Math.ceil((len - 2) / 8), byt);
+        raw.writeUInt8(0, byt + 1);
+        if (len > 16) {
+          raw.write(mfl.value, byt + 2, 'utf8');
+        }
+      } else if (!fld['type'].startsWith('bit(')) {
+        try {
           switch (fld['type']) {
             case "int8":
               raw.writeInt8(Math.round(mfl.value), byt);
@@ -152,23 +152,23 @@ function encode(msg) {
               raw.writeDoubleLE(mfl.value, byt);
               break;
           }
+        } catch (err) {
+          log.error("Encode error:", msg.header.pgn, mfl.field, mfl.value);
+          return null;
         }
-        ptr += len;
       }
+      ptr += len;
     }
-    let dlc = Math.ceil(ptr / 8);
-    let frm = {
-      id: com.makePgn(msg.header),
-      ext: true,
-      rtr: false,
-      data: Buffer.alloc(dlc),
-    };
-    raw.copy(frm.data, 0, 0, dlc);
-    return frm;
-  } catch (err) {
-    log.error("ERROR", err);
-    return null;
   }
+  let dlc = Math.ceil(ptr / 8);
+  let frm = {
+    id: com.makePgn(msg.header),
+    ext: true,
+    rtr: false,
+    data: Buffer.alloc(dlc),
+  };
+  raw.copy(frm.data, 0, 0, dlc);
+  return frm;
 };
 
 function encodeFastPacket(fap) {
