@@ -1833,18 +1833,23 @@ ipcMain.on('app-quit', (e, ...args) => {
     timer = null;
   }
   log.info('Stopping devices...');
-  for (const [key, val] of Object.entries(devices)) {
-    if (val.type == 'serial') {
-      log.info('Closing Serial (' + key + ')...');
-    } else if (val.type == 'can') {
-      log.info('Stopping CAN (' + key + ')...');
+  if ((mainWindow != null) && (typeof mainWindow.webContents !== 'undefined')) {
+    mainWindow.webContents.send('sim-stop');
+  }
+  setTimeout(() => {
+    for (const [key, val] of Object.entries(devices)) {
+      if (val.type == 'serial') {
+        log.info('Closing Serial (' + key + ')...');
+      } else if (val.type == 'can') {
+        log.info('Stopping CAN (' + key + ')...');
+      }
+      val.device.stop();
     }
-    val.device.stop();
-  }
-  log.info('Destroying devices...');
-  for (const [key, val] of Object.entries(devices)) {
-    val.engine.destroy();
-  }
-  log.info('Quit...')
-  app.quit();
+    log.info('Destroying devices...');
+    for (const [key, val] of Object.entries(devices)) {
+      val.engine.destroy();
+    }
+    log.info('Quit...')
+    app.quit();
+  }, 1000);
 });

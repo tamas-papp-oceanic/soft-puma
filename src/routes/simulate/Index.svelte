@@ -76,10 +76,14 @@
         mimMsg(msg.key);
       }
     });
+    window.pumaAPI.recv('sim-stop', (e, args) => {
+      simStop(e);
+    });
     loading = false;
   });
 
   onDestroy((e) => {
+    window.pumaAPI.reml('sim-stop');
     window.pumaAPI.reml('n2k-digi-ctrl-data');
     simulator.mimic = false;
     setMimic(e);
