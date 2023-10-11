@@ -321,11 +321,9 @@ function n2000Proc(dev, frm) {
         mainWindow.webContents.send('n2k-prod', [dev, msg]);
         break;
       case 127501:
-        mainWindow.webContents.send('n2k-data', [dev, msg]);
         mainWindow.webContents.send('n2k-digi-stat-data', [dev, msg]);
         break;
       case 127502:
-        mainWindow.webContents.send('n2k-data', [dev, msg]);
         mainWindow.webContents.send('n2k-digi-ctrl-data', [dev, msg]);
         break;
       case 130982:
@@ -365,12 +363,12 @@ function n2000Proc(dev, frm) {
         }
         break;
       default:
-        mainWindow.webContents.send('n2k-data', [dev, msg]);
         if (simCapt) {
           mainWindow.webContents.send('capt-data', [dev, msg]);
         }
         break;
       }
+      mainWindow.webContents.send('n2k-data', [dev, msg]);
     }
   }
 }
@@ -382,12 +380,12 @@ function j1939Proc(dev, frm) {
     if (msg != null) {
       switch (msg.header.pgn) {
       default:
-        mainWindow.webContents.send('j1939-data', [dev, msg]);
         if (simCapt) {
           mainWindow.webContents.send('capt-data', [dev, msg]);
         }
         break;
       }
+      mainWindow.webContents.send('j1939-data', [dev, msg]);
     }
   }
 }
