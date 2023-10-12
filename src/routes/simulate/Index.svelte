@@ -125,31 +125,31 @@
         }
       }
       let fld = rec.fields[i];
-      if (typeof fld.id === 'undefined') {
+      if (!fld.hasOwnProperty("id")) {
         rec.fields[i].id = parseInt(i);
       }
-      if (typeof fld.static === 'undefined') {
+      if (!fld.hasOwnProperty("static")) {
         rec.fields[i].static = false;
       }
-      if (typeof fld.simulation === 'undefined') {
+      if (!fld.hasOwnProperty("simulation")) {
         rec.fields[i].simulation = null;
       }
-      if (typeof fld.limits === 'undefined') {
+      if (!fld.hasOwnProperty("limits")) {
         rec.fields[i].limits = minmax(rec.fields[i]);
       }
-      if (typeof fld.ranges === 'undefined') {
+      if (!fld.hasOwnProperty("ranges")) {
         rec.fields[i].ranges = null;
       }
-      if (typeof fld.chrnum === 'undefined') {
+      if (!fld.hasOwnProperty("chrnum")) {
         rec.fields[i].chrnum = null;
       }
-      if (typeof fld.rate === 'undefined') {
+      if (!fld.hasOwnProperty("rate")) {
         rec.fields[i].rate = null;
       }
       if (((spl.protocol === 'nmea2000') && ((fld.dictionary === 'DD001') || (fld.dictionary === "DD002") ||
         (fld.dictionary === "DD003") || (fld.dictionary === "DD056"))) ||
         ((spl.protocol === 'j1939') && ((fld.dictionary === 'DD001') || (fld['type'] === 'bit(2)')))) {
-        if (typeof fld.value === 'undefined') {
+        if (!fld.hasOwnProperty("value")) {
           if ((spl.protocol === 'nmea2000') && ((fld.dictionary === "DD002") || (fld.dictionary === "DD003")) ||
             ((spl.protocol === 'j1939') && (fld['type'] === 'bit(2)'))) {
             rec.fields[i].value = 3;
@@ -160,69 +160,71 @@
         rec.disabledIds.push(parseInt(i));
         rec.disabledSim.push(parseInt(i));
         rec.fields[i].static = null;
-      } else if (typeof fld.instance !== 'undefined') {
+      } else if (fld.hasOwnProperty("instance")) {
         rec.disabledSim.push(parseInt(i));
         rec.fields[i].static = null;
-        if (typeof rec.instance !== 'undefined') {
+        if (rec.hasOwnProperty("instance")) {
           rec.fields[i].value = rec.instance;
-        } else if (typeof fld.value === 'undefined') {
+        } else if (!fld.hasOwnProperty("value")) {
           rec.fields[i].value = 0;
         }
-      } else if (typeof fld.fluid !== 'undefined') {
+      } else if (fld.hasOwnProperty("fluid")) {
         rec.fluid = fld.fluid;
         rec.disabledSim.push(parseInt(i));
         rec.fields[i].static = null;
-        if (typeof rec.fluidtype !== 'undefined') {
+        if (rec.hasOwnProperty("fluidtype")) {
           rec.fields[i].value = rec.fluidtype;
-        } else if (typeof fld.value === 'undefined') {
+        } else if (!fld.hasOwnProperty("value")) {
           rec.fields[i].value = 0;
         }
       } else if (fld['type'] !== null) {
         if (fld['type'].startsWith('int') || fld['type'].startsWith('uint')) {
-          if (typeof fld.value === 'undefined') {
+          if (!fld.hasOwnProperty("value")) {
             rec.fields[i].value = 0;
             rec.fields[i].sival = 0;
           }
         } else if (fld['type'].startsWith('float')) {
-          if (typeof fld.value === 'undefined') {
+          if (!fld.hasOwnProperty("value")) {
             rec.fields[i].value = 0.0;
             rec.fields[i].sival = 0;
           }
         } else if (fld['type'].startsWith('bit(')) {
-          if (typeof fld.value === 'undefined') {
+          if (!fld.hasOwnProperty("value")) {
             rec.fields[i].value = 0;
             rec.fields[i].sival = 0;
           }
         } else if (fld['type'].startsWith('chr(')) {
-          if (typeof fld.value === 'undefined') {
+          if (!fld.hasOwnProperty("value")) {
             rec.fields[i].value = '';
           }
           let num = parseInt(fld['type'].replace('chr(', '').replace(')', ''));
           rec.fields[i].chrnum = num;
           rec.fields[i].static = null;
         } else if (fld['type'] == 'str') {
-          if (typeof fld.value === 'undefined') {
+          if (!fld.hasOwnProperty("value")) {
             rec.fields[i].value = '';
           }
           rec.fields[i].chrnum = 250;
           rec.fields[i].static = null;
         }
       } else {
-        if (typeof fld.value === 'undefined') {
+        if (!fld.hasOwnProperty("value")) {
           rec.fields[i].value = null;
           rec.fields[i].sival = null;
         }
       }
-      if ((fld.dictionary !== null) && (typeof datakinds[fld.dictionary] !== 'undefined')) {
-        if (typeof datakinds[fld.dictionary].Values !== 'undefined') {
+      if ((fld.dictionary !== null) && datakinds.hasOwnProperty(fld.dictionary)) {
+        if (datakinds[fld.dictionary].hasOwnProperty("Values")) {
           if ((fld.dictionary !== "DD002") && (fld.dictionary !== "DD003")) {
             rec.fields[i].choices = new Array();
             for (const [key, val] of Object.entries(datakinds[fld.dictionary].Values)) {
               rec.fields[i].choices.push({ id: parseInt(key), text: val });
             }
-            rec.fields[i].value = rec.fields[i].choices[0].id;
+            if (!fld.hasOwnProperty("value")) {
+              rec.fields[i].value = rec.fields[i].choices[0].id;
+            }
           }
-        } else if (typeof datakinds[fld.dictionary].Positions !== 'undefined') {
+        } else if (datakinds[fld.dictionary].hasOwnProperty("Positions")) {
           rec.fields[i].bits = datakinds[fld.dictionary].Bits;
           rec.fields[i].positions = new Array();
           for (const [key, val] of Object.entries(datakinds[fld.dictionary].Positions)) {
@@ -233,7 +235,7 @@
         }          
         rec.fields[i].static = null;
       }
-      if (typeof rec.repeat !== 'undefined') {
+      if (rec.hasOwnProperty("repeat")) {
         for (let j in rec.repeat) {
           if ((rec.fields[i].field === rec.repeat[j].field) || 
             (rec.fields[i].field >= rec.repeat[0].start)) {
@@ -376,11 +378,14 @@
           notify = true;
         }
       } else {
-        if (typeof res.simulation === 'undefied') {
+        if (!res.hasOwnProperty("simulation")) {
           res.simulation = 0;
         }
-        if (typeof res.rate === 'undefied') {
+        if (!res.hasOwnProperty("rate")) {
           res.rate = 0.2;
+        }
+        if (!res.hasOwnProperty("mimic")) {
+          res.mimic = false;
         }
         for (let i in res.table) {
           let row = prepFields(res.table[i], res.table[i].key);
@@ -420,7 +425,7 @@
     let snd = JSON.parse(JSON.stringify(simulator))
     for (let i in snd.table) {
       for (let j in snd.table[i].fields) {
-        if (typeof snd.table[i].fields[j].sival !== 'undefined') {
+        if (snd.table[i].fields[j].hasOwnProperty("sival")) {
           delete snd.table[i].fields[j].sival;
         }
       }
