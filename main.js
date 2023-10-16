@@ -848,7 +848,7 @@ function bootToProgram(eng, typ, ins, func) {
 // Starts volume file reading
 ipcMain.on('volfile-read', (e, args) => {
   const [title, name] = args;
-  readFile(title, name).then((res) => {
+  readFile(mainWindow, title, name).then((res) => {
     if ((typeof res.fluid !== 'undefined') && (typeof res.instance !== 'undefined') &&
       (typeof res.table !== 'undefined') && (typeof res.mode !== 'undefined')) {
       if ((mainWindow != null) && (typeof mainWindow.webContents !== 'undefined')) {
@@ -870,7 +870,7 @@ ipcMain.on('volfile-read', (e, args) => {
 // Starts volume file writing
 ipcMain.on('volfile-write', (e, args) => {
   const [title, name, data] = args;
-  writeFile(title, name, data).then((res) => {
+  writeFile(mainWindow, title, name, data).then((res) => {
     if ((mainWindow != null) && (typeof mainWindow.webContents !== 'undefined')) {
       mainWindow.webContents.send('volfile-done', res);
     }
@@ -1766,7 +1766,7 @@ ipcMain.on('sim-data', (e, args) => {
 // Reads simulator file content
 ipcMain.on('simfile-read', (e, args) => {
   const [title, name] = args;
-  readFile(title, name).then((res) => {
+  readFile(mainWindow, title, name).then((res) => {
     if ((typeof res.simulation !== 'undefined') && (typeof res.table !== 'undefined')) {
       if ((mainWindow != null) && (typeof mainWindow.webContents !== 'undefined')) {
         mainWindow.webContents.send('simfile-done', res);
@@ -1786,7 +1786,7 @@ ipcMain.on('simfile-read', (e, args) => {
 // Saves file content
 ipcMain.on('simfile-write', (e, args) => {
   const [title, name, data] = args;
-  writeFile(title, name, data).then((res) => {
+  writeFile(mainWindow, title, name, data).then((res) => {
     if ((mainWindow != null) && (typeof mainWindow.webContents !== 'undefined')) {
       mainWindow.webContents.send('simfile-done', res);
     }
