@@ -13,7 +13,7 @@
   const yellowImage = "/images/circle-yellow.webp";
 
   const head = new Array(
-    { key: 'device', value: 'Device', sort: false, width: '5%' },
+    { key: 'device', value: 'Device', sort: false, width: '10%' },
     { key: 'instance', value: 'Instance', sort: false, width: '10%' },
     { key: 'title', value: 'Title', sort: false, width: '30%' },
     { key: 'status', value: 'Status', sort: false },
@@ -43,7 +43,7 @@
     <div class="tilecont">
       <Grid fullWidth noGutter>
         <Row style="height: inherit;">
-          <Column sm={16} md={16} lg={16} style="height: 100%; display:flex; flex-flow: column nowrap; align-items: flex-start; justify-content: space-between;">
+          <Column sm={13} md={13} lg={13} style="height: 100%; display:flex; flex-flow: column nowrap; align-items: flex-start; justify-content: space-between;">
             <Row style="height: 100%; width: 100%;">
               <Column style="height: 100%; display:flex; flex-flow: column nowrap; align-items: flex-start; justify-content: flex-start;">
                 <DataTable
@@ -61,8 +61,13 @@
                   </Toolbar>
                   <svelte:fragment slot="cell" let:row let:rowIndex let:cell>
                     {#if (cell.key === "status")}
-                      {#each new Array(28) as _, i}
+                      {#each new Array(14) as _, i}
                         <img src={cell.value[i] === 0 ? redImage : cell.value[i] === 1 ? greenImage : cell.value[i] === 2 ? yellowImage : greyImage}
+                          alt style="width: 1rem; margin-right: 0.25rem;" />
+                      {/each}
+                      <br />
+                      {#each new Array(14) as _, i}
+                        <img src={cell.value[i + 14] === 0 ? redImage : cell.value[i + 14] === 1 ? greenImage : cell.value[i + 14] === 2 ? yellowImage : greyImage}
                           alt style="width: 1rem; margin-right: 0.25rem;" />
                       {/each}
                     {:else}
