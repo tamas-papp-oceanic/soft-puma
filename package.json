@@ -12,6 +12,7 @@
       "public/**/*",
       "src/config/*",
       "src/services/*",
+      "src/services/*/*",
       "main.js",
       "preload.js"
     ],
@@ -54,7 +55,8 @@
     "electron": "wait-on http://localhost:5000 && electron .",
     "electron-dev": "concurrently \"yarn run dev\" \"yarn run electron\"",
     "preelectron-pack": "yarn run build",
-    "electron-pack": "electron-builder"
+    "electron-pack": "electron-builder",
+    "electron-pack-win": "electron-builder --win"
   },
   "devDependencies": {
     "@electron/rebuild": "^3.2.13",
