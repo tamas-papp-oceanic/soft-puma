@@ -232,7 +232,7 @@ function encodeFastPacket(fap) {
     log.error("ERROR", err);
     return null;
   }
-}
+};
 
 function extend(def, msg) {
   try {
@@ -310,90 +310,69 @@ function extend(def, msg) {
     log.error("ERROR", err);
     return null;
   }
-
-}
-
-const fun126208 = {
-  0: { title: 'Request', repeat: 5, field: 6 },
-  1: { title: 'Command', repeat: 5, field: 6 },
-  2: { title: 'Acknowledge', repeat: 5, field: 6 },
-  3: { title: 'Read Fields', repeat: 8, field: 9 },
-  4: { title: 'Read Fields Reply', repeat: 9, field: 10 },
-  5: { title: 'Write Fields', repeat: 8, field: 9 },
-  6: { title: 'Write Fields Reply', repeat: 9, field: 10 },
-}
+};
 
 function proc126208(def, msg) {
   try {
-
-console.log(def.repeat)
-
-    delete def.repeat;
-    let fld = com.getFld(1, msg.fields);
-    if (fld == null) {
-      return null;
-    }
-    let fun = fun126208[fld.value];
-    if (typeof fun === 'undefined') {
-      return null;
-    }
-    let rep = fun.repeat;
-    let fst = fun.field;
     fld = com.getFld(2, msg.fields);
     if (fld == null) {
       return null;
     }
-    let pg2 = fld.value;
-    fld = com.getFld(rep, msg.fields);
-    if (fld == null) {
-      return null;
-    }
-    let cnt = fld.value;
-    if ((cnt != null) && (cnt != 0xFF)) {
-      let qry = { id: (pg2 << 8) };
-      let fu2 = null;
-      let key = 'nmea2000/' + pg2.toString().padStart(6, '0');
-      let cnv = com.findCnv(key);
-      if ((typeof cnv !== 'undefined') && (typeof cnv.function !== 'undefined')) {
-        fu2 = cnv.function
-      }
-      if (fu2 != null) {
-        key += '/' + fu2;
-      } else {
-        key += '/-';
-      }
-      key += '/-/-';
-      let de2 = com.getDef(key);
-      if (de2 == null) {
+    let pgn = fld.value;
+    for (let j in def.repeat) {
+      let rep = def.repeat[j].repeatField;
+      let fst = def.repeat[j].startField;
+      fld = com.getFld(rep, msg.fields);
+      if (fld == null) {
         return null;
       }
-      // Definitions with repeat field(s) aren't supported
-      if ((pg2 != 126464) && (typeof de2.repeat !== 'undefined')) {
-          return null;
-      }
-      // Template fields          
-      let tpl = com.getFld(fst, def.fields);
-      if (tpl != null) {
-        let tmp = new Array();
-        for (let i = 0; i < def.fields.length; i++) {
-          if (def.fields[i].field < fst) {
-            tmp.push(JSON.parse(JSON.stringify(def.fields[i])));
-          }
+      let cnt = fld.value;
+      if ((cnt != null) && (cnt != 0xFF)) {
+        let qry = { id: (pgn << 8) };
+        let fu2 = null;
+        let key = 'nmea2000/' + pgn.toString().padStart(6, '0');
+        let cnv = com.findCnv(key);
+        if ((typeof cnv !== 'undefined') && (typeof cnv.function !== 'undefined')) {
+          fu2 = cnv.function
         }
-        delete def.fields;
-        def.fields = tmp;
-        // Looping through the parameters
-        for (let i = 0; i < cnt; i++) {
-          // Get field number
-          let fln = msg.fields[i].field;
-          // Get requested field
-          let fld = com.getFld(fln, de2.fields);
-          if (fld != null) {
-            let flt = JSON.parse(JSON.stringify(tpl));
-            flt.field = fst + i;
-            flt.title = 'Result (' + fln + ')';
-            flt.type = 'bit(4)';
-            def.fields.push(flt);
+        if (fu2 != null) {
+          key += '/' + fu2;
+        } else {
+          key += '/-';
+        }
+        key += '/-/-';
+        let de2 = com.getDef(key);
+        if (de2 == null) {
+          return null;
+        }
+        // Definitions with repeat field(s) aren't supported
+        if ((pgn != 126464) && (typeof de2.repeat !== 'undefined')) {
+            return null;
+        }
+        // Template fields          
+        let tpl = com.getFld(fst, def.fields);
+        if (tpl != null) {
+          let tmp = new Array();
+          for (let i = 0; i < def.fields.length; i++) {
+            if (def.fields[i].field < fst) {
+              tmp.push(JSON.parse(JSON.stringify(def.fields[i])));
+            }
+          }
+          delete def.fields;
+          def.fields = tmp;
+          // Looping through the parameters
+          for (let i = 0; i < cnt; i++) {
+            // Get field number
+            let fln = msg.fields[i].field;
+            // Get requested field
+            let fld = com.getFld(fln, de2.fields);
+            if (fld != null) {
+              let flt = JSON.parse(JSON.stringify(tpl));
+              flt.field = fst + i;
+              flt.title = 'Result (' + fln + ')';
+              flt.type = 'bit(4)';
+              def.fields.push(flt);
+            }
           }
         }
       }
@@ -403,7 +382,7 @@ console.log(def.repeat)
     log.error("ERROR", err);
     return null;
   }
-}
+};
 
 module.exports = {
   pack,
