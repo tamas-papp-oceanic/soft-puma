@@ -35,25 +35,20 @@ function create() {
         priority: pgn.priority,
         interval: pgn.interval,
       };
-      if (typeof pgn.repeatField !== 'undefined') {
-        obj.repeat = [{
-          field: pgn.repeatField,
-          start: pgn.startField,
-          count: pgn.fieldCount,
-        }];
-      } else if (typeof pgn.repeatField1 !== 'undefined') {
-        obj.repeat = [{
-          field: pgn.repeatField1,
-          start: pgn.startField1,
-          count: pgn.fieldCount1,
-        }];
-      }
-      if (typeof pgn.repeatField2 !== 'undefined') {
-        obj.repeat.push({
-          field: pgn.repeatField2,
-          start: pgn.startField2,
-          count: pgn.fieldCount2,
-        });
+      if (pgn.hasOwnProperty("repeat")) {
+        obj.repeat = pgn.repeat;
+      } else if (pgn.hasOwnProperty("repeatField")) {
+        let tmp = {repeatField: pgn.repeatField};
+        if (pgn.hasOwnProperty("startField")) {
+          tmp.startField = pgn.startField;
+        }
+        if (pgn.hasOwnProperty("fieldCount"))  {
+          tmp.fieldCount = pgn.fieldCount;
+        }
+        if (pgn.hasOwnProperty("binaryField"))  {
+          tmp.binaryField = pgn.binaryField;
+        }
+        obj.repeat = new Array(tmp);
       }
       obj.fields = new Array();
       for (let j in pgn.fields) {

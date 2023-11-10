@@ -56,6 +56,11 @@ function encode(msg) {
   for (let i in def.fields) {
     let fld = def.fields[i];
     let mfl = com.getFld(fld.field, msg.fields);
+
+    if (msg.header.pgn == 126208) {
+      console.log(mfl)
+    }
+    
     if (mfl == null) {
       return null;
     }
@@ -247,10 +252,11 @@ function extend(def, msg) {
     } else if (typeof def.repeat !== 'undefined') {
       let max = null;
       for (let i in def.repeat) {
+        let rep = def.repeat[i];
         for (let j in def.fields) {
           let fld = def.fields[j];
           let len = 0;
-          if (fld.field < def.repeat[i].field) {
+          if (fld.field < rep.repeatField) {
             if (fld.field > max) {
               max = fld.field;
             }
@@ -271,13 +277,26 @@ function extend(def, msg) {
       }
       for (let i in def.repeat) {
         let rep = def.repeat[i];
-        if ((rep.value > 0) && (rep.value <= 252)) {
-          for (let j = 0; j < rep.value; j++) {
+        if (rep.hasOwnProperty("startField") && rep.hasOwnProperty("fieldCount")) {
+          if ((rep.value > 0) && (rep.value <= 252)) {
+            for (let j = 0; j < rep.value; j++) {
+              for (let k in def.fields) {
+                let fld = def.fields[k];
+                if ((fld.field >= rep.startField) && (fld.field < (rep.startField + rep.fieldCount))) {
+                  fld.field = ++max;
+                  tmp.push(fld);
+                }
+              }
+            }
+          }
+        } else if (rep.hasOwnProperty("binaryField")) {
+          if ((rep.value > 0) && (rep.value <= 252)) {
             for (let k in def.fields) {
               let fld = def.fields[k];
-              if ((fld.field >= rep.start) && (fld.field < (rep.start + rep.count))) {
-                fld.field = ++max;
-                tmp.push(fld);
+              if (fld.field === rep.binaryField) {
+                def.fields[k].bitSize = rep.value;
+                tmp.push(def.fields[k]);
+                break;
               }
             }
           }
@@ -306,6 +325,9 @@ const fun126208 = {
 
 function proc126208(def, msg) {
   try {
+
+console.log(def.repeat)
+
     delete def.repeat;
     let fld = com.getFld(1, msg.fields);
     if (fld == null) {

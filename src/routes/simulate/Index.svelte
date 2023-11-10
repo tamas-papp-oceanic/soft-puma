@@ -105,7 +105,19 @@
       let tmp = JSON.parse(JSON.stringify(rec.fields));
       rec.fields = new Array();
       for (let i in tmp) {
-        if (tmp[i].field < rec.repeat[0].start) {
+        let add = false;
+        for (let j in rec.repeat) {
+          let rep = rec.repeat[j];
+          if ((parseInt(j) === 0) && (tmp[i].field < rep.repeatField)) {
+            add = true;
+            break;
+          }
+          if (tmp[i].field == rep.repeatField) {
+            add = true;
+            break;
+          }
+        }
+        if (add) {
           rec.fields.push(tmp[i]);
         }
       }
@@ -237,8 +249,10 @@
       }
       if (rec.hasOwnProperty("repeat")) {
         for (let j in rec.repeat) {
-          if ((rec.fields[i].field === rec.repeat[j].field) || 
-            (rec.fields[i].field >= rec.repeat[0].start)) {
+          if ((rec.fields[i].field === rec.repeat[j].repeatField) || 
+            (rec.hasOwnProperty("startField") && (rec.fields[i].field >= rec.repeat[0].startField)) ||
+            (rec.hasOwnProperty("binaryField") && (rec.fields[i].field === rec.repeat[0].binaryField))
+          ) {
             rec.disabledIds.push(parseInt(i));
             rec.disabledSim.push(parseInt(i));
             rec.fields[i].static = null;
@@ -293,8 +307,12 @@
         }
         if (typeof simulator.table[i].repeat !== 'undefined') {
           for (let k in simulator.table[i].repeat) {
-            if ((simulator.table[i].fields[j].field === simulator.table[i].repeat[k].field) || 
-            (simulator.table[i].fields[j].field >= simulator.table[i].repeat[0].start)) {
+            if ((simulator.table[i].fields[j].field === simulator.table[i].repeat[k].repeatField) || 
+            (simulator.table[i].repeat[0].hasOwnProperty("startField") &&
+            (simulator.table[i].fields[j].field >= simulator.table[i].repeat[0].startField)) ||
+            (simulator.table[i].repeat[0].hasOwnProperty("binaryField") &&
+            (simulator.table[i].fields[j].field === simulator.table[i].repeat[0].binaryField))
+          ) {
               simulator.table[i].disabledIds.push(parseInt(j));
             }
           }
