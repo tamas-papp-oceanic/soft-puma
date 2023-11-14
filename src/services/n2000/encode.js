@@ -23,10 +23,9 @@ function encode(msg) {
   if (def == null) {
     return null;
   }
+  def = extend(def, msg);
   if (msg.header.pgn == 126208) {
     def = proc126208(def, msg);
-  } else {
-    def = extend(def, msg);
   }
   if (def == null) {
     return null;
@@ -56,11 +55,6 @@ function encode(msg) {
   for (let i in def.fields) {
     let fld = def.fields[i];
     let mfl = com.getFld(fld.field, msg.fields);
-
-    if (msg.header.pgn == 126208) {
-      console.log(mfl)
-    }
-    
     if (mfl == null) {
       return null;
     }
@@ -249,22 +243,27 @@ function extend(def, msg) {
       }
       delete def.fields;
       def.fields = tmp;
-    } else if (typeof def.repeat !== 'undefined') {
+    } else if (def.hasOwnProperty("repeat")) {
       let max = null;
       for (let i in def.repeat) {
         let rep = def.repeat[i];
         for (let j in def.fields) {
-          let fld = def.fields[j];
-          let len = 0;
+          let fld = JSON.parse(JSON.stringify(def.fields[j]));
           if (fld.field < rep.repeatField) {
             if (fld.field > max) {
               max = fld.field;
             }
           } else {
             let mfl = com.getFld(fld.field, msg.fields);
-            def.repeat[i].value = mfl != null ? mfl.value : 0;
-            max = fld.field;
-            break;
+            if (rep.hasOwnProperty("startField") && rep.hasOwnProperty("fieldCount")) {
+              def.repeat[i].value = mfl != null ? mfl.value : 0;
+              max = fld.field;
+              break;
+            } else if (rep.hasOwnProperty("binaryField")) {
+              def.repeat[i].bitSize = mfl != null ? mfl.value : 0;
+              max = fld.field;
+              break;
+            }
           }
         }
       }
@@ -281,7 +280,7 @@ function extend(def, msg) {
           if ((rep.value > 0) && (rep.value <= 252)) {
             for (let j = 0; j < rep.value; j++) {
               for (let k in def.fields) {
-                let fld = def.fields[k];
+                let fld = JSON.parse(JSON.stringify(def.fields[k]));
                 if ((fld.field >= rep.startField) && (fld.field < (rep.startField + rep.fieldCount))) {
                   fld.field = ++max;
                   tmp.push(fld);
@@ -292,10 +291,10 @@ function extend(def, msg) {
         } else if (rep.hasOwnProperty("binaryField")) {
           if ((rep.value > 0) && (rep.value <= 252)) {
             for (let k in def.fields) {
-              let fld = def.fields[k];
+              let fld = JSON.parse(JSON.stringify(def.fields[k]));
               if (fld.field === rep.binaryField) {
-                def.fields[k].bitSize = rep.value;
-                tmp.push(def.fields[k]);
+                fld.bitSize = rep.bitSize;
+                tmp.push(fld);
                 break;
               }
             }
@@ -319,24 +318,18 @@ function proc126208(def, msg) {
       return null;
     }
     let pgn = fld.value;
-    for (let j in def.repeat) {
-      let rep = def.repeat[j].repeatField;
-      let fst = def.repeat[j].startField;
-      fld = com.getFld(rep, msg.fields);
-      if (fld == null) {
-        return null;
-      }
-      let cnt = fld.value;
-      if ((cnt != null) && (cnt != 0xFF)) {
-        let qry = { id: (pgn << 8) };
-        let fu2 = null;
-        let key = 'nmea2000/' + pgn.toString().padStart(6, '0');
+    for (let i in def.repeat) {
+      let rep = def.repeat[i];
+      let cnt = rep.value;
+      if (cnt > 0) {
+        let fun = null;
+        let key = "nmea2000/" + pgn.toString().padStart(6, "0");
         let cnv = com.findCnv(key);
-        if ((typeof cnv !== 'undefined') && (typeof cnv.function !== 'undefined')) {
-          fu2 = cnv.function
+        if ((typeof cnv !== "undefined") && cnv.hasOwnProperty("function")) {
+          fun = cnv.function
         }
-        if (fu2 != null) {
-          key += '/' + fu2;
+        if (fun != null) {
+          key += '/' + fun;
         } else {
           key += '/-';
         }
@@ -346,29 +339,24 @@ function proc126208(def, msg) {
           return null;
         }
         // Definitions with repeat field(s) aren't supported
-        if ((pgn != 126464) && (typeof de2.repeat !== 'undefined')) {
-            return null;
+        if ((pgn != 126464) || (typeof de2.repeat !== 'undefined')) {
+          return null;
         }
         // Template fields          
-        let tpl = com.getFld(fst, def.fields);
+        let tpl = com.getFld(rep.startField, def.fields);
+
+
+
         if (tpl != null) {
-          let tmp = new Array();
-          for (let i = 0; i < def.fields.length; i++) {
-            if (def.fields[i].field < fst) {
-              tmp.push(JSON.parse(JSON.stringify(def.fields[i])));
-            }
-          }
-          delete def.fields;
-          def.fields = tmp;
           // Looping through the parameters
-          for (let i = 0; i < cnt; i++) {
+          for (let j = 0; j < cnt; j++) {
             // Get field number
-            let fln = msg.fields[i].field;
+            let fln = msg.fields[j].field;
             // Get requested field
             let fld = com.getFld(fln, de2.fields);
             if (fld != null) {
               let flt = JSON.parse(JSON.stringify(tpl));
-              flt.field = fst + i;
+              flt.field = rep.startField + j;
               flt.title = 'Result (' + fln + ')';
               flt.type = 'bit(4)';
               def.fields.push(flt);
@@ -377,6 +365,10 @@ function proc126208(def, msg) {
         }
       }
     }
+
+
+console.log(def)
+
     return JSON.parse(JSON.stringify(def));
   } catch (err) {
     log.error("ERROR", err);
