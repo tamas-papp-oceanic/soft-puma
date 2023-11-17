@@ -23,7 +23,7 @@ const crc32 = require('buffer-crc32');
 
 // Leopard URL
 // const authURL = 'http://puma.osukl.com:80';
-const authURL = 'http://localhost:8080';
+const authURL = 'http://127.0.0.1:8080';
 
 const pub = new EventEmitter();
 
@@ -72,7 +72,7 @@ function createWindow() {
   if (isDev) {
     // This block of code is intended for development purpose only.
     // Delete this entire block of code when you are ready to package the application.
-    mainWindow.loadURL('http://localhost:5000/');
+    mainWindow.loadURL('http://127.0.0.1:5000/');
   } else {
     // Uncomment the following line of code when app is ready to be packaged.
     loadURL(mainWindow);
