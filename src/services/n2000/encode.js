@@ -244,24 +244,26 @@ function extend(def, msg) {
       delete def.fields;
       def.fields = tmp;
     } else if (def.hasOwnProperty("repeat")) {
-      let max = null;
+      let flc = null;
       for (let i in def.repeat) {
         let rep = def.repeat[i];
         for (let j in def.fields) {
           let fld = JSON.parse(JSON.stringify(def.fields[j]));
-          if (fld.field < rep.repeatField) {
-            if (fld.field > max) {
-              max = fld.field;
+          if ((rep.hasOwnProperty("startField") && (fld.field < rep.startField)) ||
+            (rep.hasOwnProperty("binaryField") && (fld.field < rep.binaryField))
+          ) {
+            if (fld.field > flc) {
+              flc = fld.field;
             }
           } else {
             let mfl = com.getFld(fld.field, msg.fields);
             if (rep.hasOwnProperty("startField") && rep.hasOwnProperty("fieldCount")) {
               def.repeat[i].value = mfl != null ? mfl.value : 0;
-              max = fld.field;
+              flc = fld.field;
               break;
             } else if (rep.hasOwnProperty("binaryField")) {
               def.repeat[i].bitSize = mfl != null ? mfl.value : 0;
-              max = fld.field;
+              flc = fld.field;
               break;
             }
           }
@@ -270,7 +272,7 @@ function extend(def, msg) {
       let tmp = new Array();
       for (let i in def.fields) {
         let fld = def.fields[i];
-        if (fld.field <= max) {
+        if (fld.field < flc) {
           tmp.push(fld);
         }
       }
@@ -282,7 +284,7 @@ function extend(def, msg) {
               for (let k in def.fields) {
                 let fld = JSON.parse(JSON.stringify(def.fields[k]));
                 if ((fld.field >= rep.startField) && (fld.field < (rep.startField + rep.fieldCount))) {
-                  fld.field = ++max;
+                  fld.field = ++flc;
                   tmp.push(fld);
                 }
               }

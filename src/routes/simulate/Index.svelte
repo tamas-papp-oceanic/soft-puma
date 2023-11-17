@@ -101,24 +101,34 @@
     if (!rec.hasOwnProperty("disabledSim")) {
       rec.disabledSim = new Array();
     }
-    if (rec.hasOwnProperty("repeat")) {
+    if (pgn == "126464") {
       let tmp = JSON.parse(JSON.stringify(rec.fields));
       rec.fields = new Array();
       for (let i in tmp) {
-        let add = false;
-        for (let j in rec.repeat) {
-          let rep = rec.repeat[j];
-          if ((j == 0) && (tmp[i].field < rep.repeatField)) {
-            add = true;
-            break;
-          }
-          if (tmp[i].field == rep.repeatField) {
-            add = true;
-            break;
-          }
+        let fld = tmp[i];
+        if (fld.field < 3) {
+          rec.fields.push(fld)
         }
-        if (add) {
-          rec.fields.push(tmp[i]);
+      }
+    }
+    if (rec.hasOwnProperty("repeat")) {
+      let flc = 0;
+      for (let i in rec.repeat) {
+        let rep = rec.repeat[i];
+        if ((rep.hasOwnProperty("startField") && (rep.startField > flc)) ||
+          (rep.hasOwnProperty("binaryField") && (rep.binaryField > flc))
+        ) {
+          flc = rep.startField;
+        }
+      }
+      if (flc > 0) {
+        let tmp = JSON.parse(JSON.stringify(rec.fields));
+        rec.fields = new Array();
+        for (let i in tmp) {
+          let fld = tmp[i];
+          if (fld.field < flc) {
+            rec.fields.push(fld);
+          }
         }
       }
     }
