@@ -5841,7 +5841,7 @@
   },
   "nmea2000/128007/-/-/-": {
     "title": "Thruster Information",
-    "single": true,
+    "single": false,
     "priority": 7,
     "interval": null,
     "fields": [
@@ -5901,22 +5901,6 @@
         "unit": null,
         "multiplier": null,
         "dictionary": "DD475"
-      },
-      {
-        "field": 8,
-        "title": "Command Timeout",
-        "type": "uint8",
-        "unit": "sec",
-        "multiplier": 0.001,
-        "dictionary": "DD233"
-      },
-      {
-        "field": 9,
-        "title": "Azimuth Control",
-        "type": "int16",
-        "unit": "rad",
-        "multiplier": 0.0001,
-        "dictionary": "DD486"
       }
     ]
   },
