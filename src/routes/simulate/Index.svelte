@@ -115,10 +115,10 @@
       let flc = 0;
       for (let i in rec.repeat) {
         let rep = rec.repeat[i];
-        if ((rep.hasOwnProperty("startField") && (rep.startField > flc)) ||
-          (rep.hasOwnProperty("binaryField") && (rep.binaryField > flc))
-        ) {
+        if (rep.hasOwnProperty("startField") && (rep.startField > flc)) {
           flc = rep.startField;
+        } else if (rep.hasOwnProperty("binaryField") && (rep.binaryField > flc)) {
+          flc = rep.binaryField;
         }
       }
       if (flc > 0) {
