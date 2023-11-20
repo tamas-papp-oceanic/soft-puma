@@ -3393,7 +3393,7 @@
       },
       {
         "field": 5,
-        "title": "Maximum Continuous Motoro Power",
+        "title": "Maximum Continuous Motor Power",
         "type": "uint16",
         "unit": "W",
         "multiplier": 10,
@@ -3410,7 +3410,7 @@
       {
         "field": 7,
         "title": "Maximum Motor Temperature Rating",
-        "type": "unit16",
+        "type": "uint16",
         "unit": "K",
         "multiplier": 0.01,
         "dictionary": "DD043"
@@ -3418,7 +3418,7 @@
       {
         "field": 8,
         "title": "Rated Motor Speed",
-        "type": "unit16",
+        "type": "uint16",
         "unit": "RPM",
         "multiplier": 0.25,
         "dictionary": "DD129"
@@ -3426,7 +3426,7 @@
       {
         "field": 9,
         "title": "Maximum Controller Temperature Rating",
-        "type": "unit16",
+        "type": "uint16",
         "unit": "K",
         "multiplier": 0.01,
         "dictionary": "DD043"
@@ -3434,7 +3434,7 @@
       {
         "field": 10,
         "title": "Motor Shaft Torque Rating",
-        "type": "unit16",
+        "type": "uint16",
         "unit": "Nm",
         "multiplier": 0.1,
         "dictionary": "DD521"
@@ -3442,7 +3442,7 @@
       {
         "field": 11,
         "title": "Motor DC-Voltage Derating Threshold",
-        "type": "unit16",
+        "type": "uint16",
         "unit": "V",
         "multiplier": 0.1,
         "dictionary": "DD347"
@@ -3450,7 +3450,7 @@
       {
         "field": 12,
         "title": "Motor DC-Voltage Cut Off Threshold",
-        "type": "unit16",
+        "type": "uint16",
         "unit": "V",
         "multiplier": 0.1,
         "dictionary": "DD347"
@@ -3458,7 +3458,7 @@
       {
         "field": 13,
         "title": "Drive/Motor Hours",
-        "type": "unit32",
+        "type": "uint32",
         "unit": "sec",
         "multiplier": null,
         "dictionary": "DD132"
@@ -3539,7 +3539,7 @@
       {
         "field": 9,
         "title": "Usable Battery Energy",
-        "type": "unit16",
+        "type": "uint16",
         "unit": "kWh",
         "multiplier": 0.1,
         "dictionary": "DD537"
@@ -3547,7 +3547,7 @@
       {
         "field": 10,
         "title": "State of Health",
-        "type": "unit8",
+        "type": "uint8",
         "unit": "%",
         "multiplier": 0.5,
         "dictionary": "DD485"
@@ -3555,7 +3555,7 @@
       {
         "field": 11,
         "title": "Battery Cycle Counter",
-        "type": "unit16",
+        "type": "uint16",
         "unit": null,
         "multiplier": null,
         "dictionary": "DD008"
@@ -3587,7 +3587,7 @@
       {
         "field": 15,
         "title": "Maximum Charge (SOC) Threshold",
-        "type": "unit8",
+        "type": "uint8",
         "unit": "%",
         "multiplier": 0.5,
         "dictionary": "DD485"
@@ -3595,7 +3595,7 @@
       {
         "field": 16,
         "title": "Minimum Charge (SOC) Threshold",
-        "type": "unit8",
+        "type": "uint8",
         "unit": "%",
         "multiplier": 0.5,
         "dictionary": "DD485"
@@ -6832,7 +6832,7 @@
       {
         "field": 4,
         "title": "Controller Voltage",
-        "type": "unit8",
+        "type": "uint8",
         "unit": "V",
         "multiplier": 0.2,
         "dictionary": "DD490"
@@ -6840,7 +6840,7 @@
       {
         "field": 5,
         "title": "Motor Current",
-        "type": "unit8",
+        "type": "uint8",
         "unit": "A",
         "multiplier": null,
         "dictionary": "DD491"
@@ -6848,7 +6848,7 @@
       {
         "field": 6,
         "title": "Total Motor Time",
-        "type": "unit16",
+        "type": "uint16",
         "unit": "min",
         "multiplier": null,
         "dictionary": "DD268"
@@ -6897,7 +6897,7 @@
       {
         "field": 4,
         "title": "Maximum Sevice Travel",
-        "type": "unit8",
+        "type": "uint8",
         "unit": "V",
         "multiplier": 0.2,
         "dictionary": "DD490"
@@ -13193,7 +13193,7 @@
       {
         "field": 10,
         "title": "Destination ID\"1\"",
-        "type": "unit32",
+        "type": "uint32",
         "unit": null,
         "multiplier": null,
         "dictionary": "DD010"
@@ -13217,7 +13217,7 @@
       {
         "field": 13,
         "title": "Destination ID\"n\"",
-        "type": "unit32",
+        "type": "uint32",
         "unit": null,
         "multiplier": null,
         "dictionary": "DD010"
@@ -16244,7 +16244,7 @@
       {
         "field": 2,
         "title": "Total Number of Devices",
-        "type": "unit16",
+        "type": "uint16",
         "unit": null,
         "multiplier": null,
         "dictionary": "DD007"
@@ -16252,7 +16252,7 @@
       {
         "field": 3,
         "title": "Number of Devices",
-        "type": "unit16",
+        "type": "uint16",
         "unit": null,
         "multiplier": null,
         "dictionary": "DD007"
@@ -16292,7 +16292,7 @@
       {
         "field": 2,
         "title": "Colour Count",
-        "type": "unit8",
+        "type": "uint8",
         "unit": null,
         "multiplier": null,
         "dictionary": "DD005"
@@ -16300,7 +16300,7 @@
       {
         "field": 3,
         "title": "Colour Index",
-        "type": "unit8",
+        "type": "uint8",
         "unit": null,
         "multiplier": null,
         "dictionary": "DD005"
