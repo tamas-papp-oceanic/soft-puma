@@ -144,7 +144,11 @@ app.whenReady().then(async () => {
   createWindow();
   setTimeout(() => {
     autoUpdater.autoDownload = false;
-    autoUpdater.checkForUpdates();
+    autoUpdater.checkForUpdates().then((res) => {
+      // console.log(res);
+    }).catch((err) => {
+      // console.log(err);
+    });
   }, 10000);
 });
 
