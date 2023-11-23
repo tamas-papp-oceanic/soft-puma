@@ -5315,7 +5315,7 @@
   dependencies:
     "randombytes" "^2.1.0"
 
-"serialport@^10.4.0":
+"serialport@10.4.0":
   "integrity" "sha512-PszPM5SnFMgSXom60PkKS2A9nMlNbHkuoyRBlzdSWw9rmgOn258+V0dYbWMrETJMM+TJV32vqBzjg5MmmUMwMw=="
   "resolved" "https://registry.npmjs.org/serialport/-/serialport-10.4.0.tgz"
   "version" "10.4.0"
@@ -5399,7 +5399,7 @@
   "resolved" "https://registry.npmjs.org/smart-buffer/-/smart-buffer-4.2.0.tgz"
   "version" "4.2.0"
 
-"socketcan@^3.0.0":
+"socketcan@3.0.0":
   "integrity" "sha512-jKs6S4DSDvvE8TEa2+de8pJdULiyRo1tiS3l2xcx9PYnDmBqyQPZLFx/4lDfzFdMKagRduwmKTOoW4mYoyvJ2g=="
   "resolved" "https://registry.npmjs.org/socketcan/-/socketcan-3.0.0.tgz"
   "version" "3.0.0"
