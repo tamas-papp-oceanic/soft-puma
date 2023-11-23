@@ -1,5 +1,5 @@
 <script>
-  import Router from 'svelte-spa-router';
+	import Router from 'svelte-spa-router';
 	import { push } from 'svelte-spa-router'
 	import { wrap } from 'svelte-spa-router/wrap';
 	import { ComposedModal, ModalHeader, ModalBody, ModalFooter,
@@ -27,20 +27,20 @@
 	import Test3478 from './routes/testing/3478.svelte';
 	import Test4410 from './routes/testing/4410.svelte';
 	import Test5185 from './routes/testing/5185.svelte';
-  import Restricted from './routes/Restricted.svelte';
-  import Details from './routes/devices/Details.svelte';
-  import { update, updmsg, download, progress } from './stores/update.js';
+	import Restricted from './routes/Restricted.svelte';
+	import Details from './routes/devices/Details.svelte';
+	import { update, updmsg, download, progress } from './stores/update.js';
 	import { allRoutes, updates } from './stores/data.js';
-  import { compareVersions } from 'compare-versions';
+	import { compareVersions } from 'compare-versions';
 	import { routeGuard } from './helpers/guard.js';
 
 	export let version;
 	export let appName;
 
-  const routes = {
-    "/":                                wrap({ component: Devices,        conditions: [(detail) => { return routeGuard(detail); }] }),
+	const routes = {
+		"/":                                wrap({ component: Devices,        conditions: [(detail) => { return routeGuard(detail); }] }),
 		"/login":                           wrap({ component: Login,          conditions: [(detail) => { return routeGuard(detail); }] }),
-    "/advanced":                        wrap({ component: NotFound,       conditions: [(detail) => { return true;               }] }),
+		"/advanced":                        wrap({ component: NotFound,       conditions: [(detail) => { return true;               }] }),
 		"/configure":                       wrap({ component: Configure,      conditions: [(detail) => { return routeGuard(detail); }] }),
 		"/configure/3271/:instance/:fluid": wrap({ component: ConfigureFluid, conditions: [(detail) => { return routeGuard(detail); }] }),
 		"/configure/3281/:instance/:fluid": wrap({ component: ConfigureFluid, conditions: [(detail) => { return routeGuard(detail); }] }),
@@ -54,45 +54,45 @@
 		"/configure/5720/:instance":        wrap({ component: Configure5720,  conditions: [(detail) => { return routeGuard(detail); }] }),
 		"/program":                         wrap({ component: Program,        conditions: [(detail) => { return routeGuard(detail); }] }),
 		"/program/:device/:instance":       wrap({ component: ProgramDevice,  conditions: [(detail) => { return routeGuard(detail); }] }),
-    "/simulate":                        wrap({ component: Simulate,       conditions: [(detail) => { return routeGuard(detail); }] }),
+		"/simulate":                        wrap({ component: Simulate,       conditions: [(detail) => { return routeGuard(detail); }] }),
 		"/testing":                         wrap({ component: Testing,        conditions: [(detail) => { return routeGuard(detail); }] }),
-    "/testing/3478/:instance":          wrap({ component: Test3478,       conditions: [(detail) => { return routeGuard(detail); }] }),
+		"/testing/3478/:instance":          wrap({ component: Test3478,       conditions: [(detail) => { return routeGuard(detail); }] }),
 		"/testing/4410/:instance":          wrap({ component: Test4410,       conditions: [(detail) => { return routeGuard(detail); }] }),
 		"/testing/5185":                    wrap({ component: Test5185,       conditions: [(detail) => { return routeGuard(detail); }] }),
-    "/testing/5185-H":                  wrap({ component: Test5185,       conditions: [(detail) => { return routeGuard(detail); }] }),
-		"/restricted":                      wrap({ component: Restricted,     conditions: [(detail) => { return routeGuard(detail); }] }),
+		"/testing/5185-H":                  wrap({ component: Test5185,       conditions: [(detail) => { return routeGuard(detail); }] }),
+		"/restricted":                      wrap({ component: Restricted,     conditions: [(detail) => { return true;               }] }),
 		"/welcome":                         wrap({ component: Welcome,        conditions: [(detail) => { return routeGuard(detail); }] }),
 		"/monitor":                         wrap({ component: Monitor,        conditions: [(detail) => { return routeGuard(detail); }] }),
 		"/monitor/:address":                wrap({ component: Monitor,        conditions: [(detail) => { return routeGuard(detail); }] }),
 		"/messages/:protocol/:pgn/:instance":
-                                        wrap({ component: Content,        conditions: [(detail) => { return routeGuard(detail); }] }),
-    "/messages/:protocol/:pgn/:function/:manufacturer/:industry/:instance/:type":
-                                        wrap({ component: Content,        conditions: [(detail) => { return routeGuard(detail); }] }),
+																				wrap({ component: Content,        conditions: [(detail) => { return routeGuard(detail); }] }),
+		"/messages/:protocol/:pgn/:function/:manufacturer/:industry/:instance/:type":
+																				wrap({ component: Content,        conditions: [(detail) => { return routeGuard(detail); }] }),
 		"/details/:protocol/:pgn/:function/:manufacturer/:industry/:instance/:type":
-                                        wrap({ component: Details,        conditions: [(detail) => { return routeGuard(detail); }] }),
+																				wrap({ component: Details,        conditions: [(detail) => { return routeGuard(detail); }] }),
 		"*":                                wrap({ component: NotFound,       conditions: [(detail) => { return true;               }] }),
 	};
 
 	let prc;
-  let val;
+	let val;
 	let max;
 	let txt;
 	let started = false;
 
-  // Updater available hook
-  window.pumaAPI.recv('upd-available', (e, val) => {
-    $update = true;
-    $updmsg = val;
-  });
+	// Updater available hook
+	window.pumaAPI.recv('upd-available', (e, val) => {
+		$update = true;
+		$updmsg = val;
+	});
 
 	// Updater download hook
-  window.pumaAPI.recv('upd-download', (e, val) => {
+	window.pumaAPI.recv('upd-download', (e, val) => {
 		$download = val;
-  });
+	});
 
 	// Updater progress hook
-  window.pumaAPI.recv('upd-progress', (e, val) => {
-    // {
+	window.pumaAPI.recv('upd-progress', (e, val) => {
+		// {
 		//   total: 103826908,
 		//   delta: 2132100,
 		//   transferred: 6227698,
@@ -100,62 +100,62 @@
 		//   bytesPerSecond: 2075899
 		// }
 		$progress = val;
-  });
+	});
 
 	// Updates download hook
-  window.pumaAPI.recv('updates', (e, val) => {
-    let res = JSON.parse(JSON.stringify(val));
-    for (const [key1, val1] of Object.entries(res)) {
-      for (const [key2, val2] of Object.entries(val1)) {
-        val2.sort((a, b) => {
-          return -compareVersions(a.version, b.version);
-        })
-      }
-    }
-    $updates = JSON.parse(JSON.stringify(res));
-  });
+	window.pumaAPI.recv('updates', (e, val) => {
+		let res = JSON.parse(JSON.stringify(val));
+		for (const [key1, val1] of Object.entries(res)) {
+			for (const [key2, val2] of Object.entries(val1)) {
+				val2.sort((a, b) => {
+					return -compareVersions(a.version, b.version);
+				})
+			}
+		}
+		$updates = JSON.parse(JSON.stringify(res));
+	});
 
-  function _start(e) {
+	function _start(e) {
 		started = true;
 		window.pumaAPI.send('upd-start');
 	};
 
-  function _restrict(e) {
-    push('/restricted');
-  };
+	function _restrict(e) {
+		push('/restricted');
+	};
 
-  function _cancel(e) {
+	function _cancel(e) {
 		window.pumaAPI.send('upd-cancel');
 		$download = false;
 		$progress = {};
 		started = false;
 	};
 
-  $allRoutes = new Array();
-  for (const [key, val] of Object.entries(routes)) {
-    let rou = null;
-    switch (key) {
-    case '/':
-      rou = "/analyse";
-      break;
-    case '/login':
-    case '/restricted':
-    case '/welcome':
-    case '*':
-      break;
-    default:
-      rou = key;
-    }
-    if (rou != null) {
-      $allRoutes.push(rou);
-    }
-  }
+	$allRoutes = new Array();
+	for (const [key, val] of Object.entries(routes)) {
+		let rou = null;
+		switch (key) {
+		case '/':
+			rou = "/analyse";
+			break;
+		case '/login':
+		case '/restricted':
+		case '/welcome':
+		case '*':
+			break;
+		default:
+			rou = key;
+		}
+		if (rou != null) {
+			$allRoutes.push(rou);
+		}
+	}
 
-  $: prc = $progress && $progress.percent ? $progress.percent : 0;
+	$: prc = $progress && $progress.percent ? $progress.percent : 0;
 	$: max = $progress && $progress.total ? $progress.total / (1024 * 1024) : 100;
 	$: val = $progress && $progress.transferred ? $progress.transferred / (1024 * 1024) : 0;
 	$: txt = val > 0 ? val.toFixed(0) + "MB of " + max.toFixed(0) + "MB" : "Press start";
-  $: if (val === max) { txt = "Done" };
+	$: if (val === max) { txt = "Done" };
 </script>
 
 <svelte:head>

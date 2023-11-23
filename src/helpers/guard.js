@@ -15,7 +15,7 @@ function routeGuard(det) {
   let loc = 'dummy';
   let usr = get(userData);
   try {
-    if (typeof usr.department !== 'undefined') {
+    if ((usr !== null) && usr.hasOwnProperty("department")) {
       dep = usr.department;
     }
     if (typeof det.location !== 'undefined') {
@@ -45,7 +45,6 @@ function routeGuard(det) {
   switch (loc) { 
   case 'messages':
   case 'monitor':
-  case 'restricted':
   case 'simulate':
     return true;
   }
