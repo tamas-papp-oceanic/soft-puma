@@ -1,133 +1,185 @@
 {
-   "10": {
-      "130": "Diagnostic",
-      "140": "Bus Traffic Logger"
-   },
-   "20": {
-      "110": "Alarm Enunciator",
-      "130": "Emergency Position Indicating Radio Beacon (EPIRB)",
-      "135": "Man Overboard",
-      "140": "Voyage Data Recorder",
-      "150": "Camera"
-   },
-   "25": {
-      "130": "PC Gateway",
-      "131": "NMEA 2000 to Analog Gateway",
-      "132": "Analog to NMEA 2000 Gateway",
-      "135": "NMEA 0183 Gateway",
-      "140": "Router",
-      "150": "Bridge",
-      "160": "Repeater"
-   },
-   "30": {
-      "130": "Binary Event Monitor",
-      "140": "Load Controller",
-      "141": "AC/DC Input",
-      "150": "Function Controller"
-   },
-   "35": {
-      "140": "Engine",
-      "141": "DC Generator/Alternator",
-      "142": "Solar Panel (Solar Array)",
-      "143": "Wind Generator (DC)",
-      "144": "Fuel Cell",
-      "145": "Network Power Supply",
-      "151": "AC Generator",
-      "152": "AC Bus",
-      "153": "AC Mains (Utility/Shore)",
-      "154": "AC Output",
-      "160": "Power Converter-Battery Charger",
-      "161": "Power Converter-Battery Charger+Inverter",
-      "162": "Power Converter-Inverter",
-      "163": "Power Converter-DC",
-      "170": "Battery",
-      "180": "Engine Gateway"
-   },
-   "40": {
-      "130": "Follow-up Controller",
-      "140": "Mode Controller",
-      "150": "Autopilot",
-      "155": "Rudder",
-      "160": "Heading Sensors",
-      "170": "Trim (Tabs)",
-      "180": "Attitude (Pitch, Roll, Yaw) Control"
-   },
-   "50": {
-      "130": "Engineroom Monitoring",
-      "140": "Engine",
-      "141": "DC Generator/Alternator",
-      "150": "Engine Controller",
-      "151": "AC Generator",
-      "155": "Motor",
-      "160": "Engine Gateway",
-      "165": "Transmission",
-      "170": "Throttle/Shift Control",
-      "180": "Actuator",
-      "190": "Gauge Interface",
-      "200": "Gauge Large",
-      "210": "Gauge Small"
-   },
-   "60": {
-      "130": "Bottom Depth",
-      "135": "Bottom Depth/Speed",
-      "140": "Ownship Attitude",
-      "145": "Ownship Position (GNSS)",
-      "150": "Ownship Position (Loran C)",
-      "155": "Speed",
-      "160": "Turn Rate Indicator",
-      "170": "Integrated Navigation",
-      "175": "Integrated Navigation System",
-      "190": "Navigation Management",
-      "195": "Automatic Identification System (AIS)",
-      "200": "Radar",
-      "201": "Infrared Imaging",
-      "205": "ECDIS",
-      "210": "ECS",
-      "220": "Direction Finder",
-      "230": "Voyage Status"
-   },
-   "70": {
-      "130": "EPIRB",
-      "140": "AIS",
-      "150": "DSC",
-      "160": "Data Receiver/Transceiver",
-      "170": "Satellite",
-      "180": "Radio-telephone (MF/HF)",
-      "190": "Radiotelephone"
-   },
-   "75": {
-      "130": "Temperature",
-      "140": "Pressure",
-      "150": "Fluid Level",
-      "160": "Flow",
-      "170": "Humidity"
-   },
-   "80": {
-      "130": "Time/Date Systems",
-      "140": "VDR",
-      "150": "Integrated Instrumentation",
-      "160": "General Purpose Displays",
-      "170": "General Sensor Box",
-      "180": "Weather Instruments",
-      "190": "Transducer/General",
-      "200": "NMEA 0183 Converter"
-   },
-   "85": {
-      "130": "Atmospheric",
-      "160": "Aquatic"
-   },
-   "90": {
-      "130": "HVAC"
-   },
-   "100": {
-      "130": "Scale (Catch)"
-   },
-   "120": {
-      "130": "Display",
-      "140": "Alarm Enunciator"
-   },
-   "125": {
-      "130": "Multimedia Player",
-      "140": "Multimedia Controller"
-   }
+	"10": {
+		"120": "NMEA 2000 Certification Tool",
+		"121": "NMEA OneNet Certification Tool",
+		"122": "NMEA OneNet Gateway Certification Tool NMEA Side",
+		"123": "NMEA OneNet Gateway Certification Tool OneNet Side",
+		"130": "Diagnostic",
+		"140": "Bus Traffic Logger"
+	},
+	"20": {
+		"110": "Alarm Enunciator",
+		"130": "Emergency Position Indicating Radio Beacon (EPIRB)",
+		"135": "Man Overboard",
+		"140": "Voyage Data Recorder",
+		"150": "Camera"
+	},
+	"25": {
+		"130": "PC Gateway",
+		"131": "NMEA 2000 to Analog Gateway",
+		"132": "Analog to NMEA 2000 Gateway",
+		"135": "NMEA 0183 Gateway",
+		"136": "NMEA Network Gateway",
+		"137": "NMEA 2000 Wireless Gateway",
+		"138": "Digital to NMEA 2000 Gateway",
+		"139": "MODBUS to NMEA 2000 or NMEA200 to MODBUS Gateway",
+		"140": "Router",
+		"150": "Bridge",
+		"160": "Repeater"
+	},
+	"30": {
+		"130": "Binary Event Monitor",
+		"140": "Load Controller",
+		"141": "AC/DC Input",
+		"150": "Function Controller"
+	},
+	"35": {
+		"140": "Engine",
+		"141": "DC Generator/Alternator",
+		"142": "Solar Panel (Solar Array)",
+		"143": "Wind Generator (DC)",
+		"144": "Fuel Cell",
+		"145": "Network Power Supply",
+		"151": "AC Generator",
+		"152": "AC Bus",
+		"153": "AC Mains (Utility/Shore)",
+		"154": "AC Output",
+		"160": "Power Converter-Battery Charger",
+		"161": "Power Converter-Battery Charger+Inverter",
+		"162": "Power Converter-Inverter",
+		"163": "Power Converter-DC",
+		"170": "Battery",
+		"180": "Engine Gateway",
+		"201": "Filters"
+	},
+	"40": {
+		"130": "Follow-up Controller",
+		"140": "Mode Controller",
+		"150": "Autopilot",
+		"155": "Rudder",
+		"160": "Heading Sensors",
+		"170": "Trim (Tabs)",
+		"180": "Attitude (Pitch, Roll, Yaw) Control",
+		"190": "Transom Lift Sensor",
+		"195": "Transom Lift Controller"
+	},
+	"50": {
+		"130": "Engineroom Monitoring",
+		"140": "Engine",
+		"141": "DC Generator/Alternator",
+		"145": "Thruster Engine",
+		"147": "Thruster Motor",
+		"150": "Engine Controller",
+		"151": "AC Generator",
+		"155": "Motor",
+		"160": "Engine Gateway",
+		"165": "Transmission",
+		"170": "Throttle/Shift Control",
+		"180": "Actuator",
+		"190": "Gauge Interface",
+		"200": "Gauge Large",
+		"201": "Filters",
+		"210": "Gauge Small"
+	},
+	"60": {
+		"130": "Bottom Depth",
+		"134": "Speed/Temp",
+		"135": "Bottom Depth/Speed",
+		"136": "Depth/Speed/Temp",
+		"140": "Ownship Attitude",
+		"145": "Ownship Position (GNSS)",
+		"150": "Ownship Position (Loran C)",
+		"155": "Speed",
+		"160": "Turn Rate Indicator",
+		"170": "Integrated Navigation",
+		"175": "Integrated Navigation System",
+		"190": "Navigation Management",
+		"195": "Automatic Identification System (AIS)",
+		"196": "AIS Shore Based Systems",
+		"200": "Radar",
+		"201": "Infrared Imaging",
+		"205": "ECDIS",
+		"210": "ECS",
+		"220": "Direction Finder",
+		"230": "Voyage Status"
+	},
+	"65": {
+		"130": "Class A Mobile",
+		"132": "Class B SO (Self Organizing)",
+		"134": "Class B CS (Carrier Sense)",
+		"136": "SAR Airborne",
+		"140": "AIS Man Overboard (MOB)",
+		"142": "AIS Personal Locator Beacon (PLB)",
+		"144": "AIS Search and Rescue Transponder (SART)",
+		"146": "AIS EPIRB",
+		"150": "Aid to Navigation (AtoN) Type 1",
+		"152": "Aid to Navigation (AtoN) Type 2",
+		"154": "Aid to Navigation (AtoN) Type 3",
+		"156": "Mobile Aid to Navigation (AtoN)",
+		"160": "AIS Base Station",
+		"162": "AIS Repeater",
+		"164": "Limited Base Station",
+		"170": "AIS VHF Data Exchange System (VDES) ASM"
+	},
+	"66": {
+		"130": "AIS Receive Only",
+		"140": "Transmits Only Specific Information"
+	},
+	"70": {
+		"130": "EPIRB",
+		"140": "AIS",
+		"150": "DSC",
+		"160": "Data Receiver/Transceiver",
+		"170": "Satellite",
+		"171": "Cellular Data Network",
+		"180": "Radio-telephone (MF/HF)",
+		"190": "Radiotelephone",
+		"192": "Remote Radio MKD"
+	},
+	"75": {
+		"130": "Temperature",
+		"140": "Pressure",
+		"150": "Fluid Level",
+		"160": "Flow",
+		"170": "Humidity"
+	},
+	"80": {
+		"130": "Time/Date Systems",
+		"140": "VDR",
+		"150": "Integrated Instrumentation",
+		"160": "General Purpose Displays",
+		"170": "General Sensor Box",
+		"180": "Weather Instruments",
+		"190": "Transducer/General",
+		"200": "NMEA 0183 Converter"
+	},
+	"85": {
+		"130": "Atmospheric",
+		"160": "Aquatic"
+	},
+	"90": {
+		"130": "HVAC"
+	},
+	"100": {
+		"110": "Anchor Windlass",
+		"130": "Scale (Catch)",
+		"140": "Elevator Controller"
+	},
+	"110": {
+		"130": "Button Interface",
+		"135": "Switch Interface",
+		"140": "Analog Interface"
+	},
+	"120": {
+		"130": "Display",
+		"135": "Display Interface",
+		"140": "Alarm Enunciator"
+	},
+	"125": {
+		"130": "Multimedia Player",
+		"140": "Multimedia Controller"
+	},
+	"126": {
+		"130": "Lighting Controller"
+	}
 }

@@ -8,12 +8,16 @@
    "40": "Steering and Control Surfaces",
    "50": "Propulsion",
    "60": "Navigation",
+   "65": "Automatic Identification System as Defined by International Standards",
+   "66": "Automatic Identification System not Fully Defined by International Standards",
    "70": "Communication",
    "75": "Sensor Communication Interface",
    "80": "Instrumentation/General Systems",
    "85": "External Environment",
    "90": "Internal Environment",
    "100": "Deck, Cargo and Fishing Equipment",
+   "110": "Human Interface Device",
    "120": "Display",
-   "125": "Entertainment"
+   "125": "Entertainment",
+   "126": "Lighting"
 }
