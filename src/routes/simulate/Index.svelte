@@ -303,7 +303,7 @@
       rec.fields[2].static = null;
     }
     let cnv = spl.protocol + '/' + spl.pgn;
-    if ((spl.protocol === 'nmea2000') && (typeof nmeaconv[cnv] !== 'undefined')) {
+    if ((spl.protocol === 'nmea2000') && nmeaconv.hasOwnProperty(cnv)) {
       rec.fields[nmeaconv[cnv].field].value = parseInt(spl.function);
       if (!rec.disabledIds.includes(nmeaconv[cnv].field)) {
         rec.disabledIds.push(nmeaconv[cnv].field);
@@ -312,7 +312,7 @@
         rec.disabledSim.push(nmeaconv[cnv].field);
       }
       rec.fields[nmeaconv[cnv].field].static = null;
-    } else if ((spl.protocol === 'j1939') && (typeof j1939conv[cnv] !== 'undefined')) {
+    } else if ((spl.protocol === 'j1939') && j1939conv.hasOwnProperty(cnv)) {
       rec.fields[j1939conv[cnv].field].value = parseInt(spl.function);
       if (!rec.disabledIds.includes(j1939conv[cnv].field)) {
         rec.disabledIds.push(j1939conv[cnv].field);
@@ -371,11 +371,11 @@
           }
         }
         let cnv = spl.protocol + '/' + spl.pgn;
-        if ((spl.protocol === 'nmea2000') && (typeof nmeaconv[cnv] !== 'undefined')) {
+        if ((spl.protocol === 'nmea2000') && nmeaconv.hasOwnProperty(cnv)) {
           if (!simulator.table[i].disabledIds.includes(nmeaconv[cnv].field)) {
             simulator.table[i].disabledIds.push(nmeaconv[cnv].field);
           }
-        } else if ((spl.protocol === 'j1939') && (typeof j1939conv[cnv] !== 'undefined')) {
+        } else if ((spl.protocol === 'j1939') && j1939conv.hasOwnProperty(cnv)) {
           if (!simulator.table[i].disabledIds.includes(j1939conv[cnv].field)) {
             simulator.table[i].disabledIds.push(j1939conv[cnv].field);
           }
@@ -392,7 +392,7 @@
 
   function getValue(rec, pro) {
     for (let i in rec.fields) {
-      if (typeof rec.fields[i][pro] !== 'undefined') {
+      if (rec.fields[i].hasOwnProperty(pro)) {
         return rec.fields[i].value;
       }
     }
@@ -569,18 +569,18 @@
     let pgn = parseInt(spl.pgn);
     for (let i in simulator.table[idx].fields) {
       let fld = simulator.table[idx].fields[i];
-      let val = (typeof fld.value === 'undefined') ? null : fld.value;
+      let val = (!fld.hasOwnProperty("value")) ? null : fld.value;
       if ((spl.protocol === 'nmea2000') && (fld.dictionary === 'DD056')) {
         val = (val + 1) % 253;
       } else if (fld['type'] != null) {
         if (fld['type'].startsWith('int') || fld['type'].startsWith('uint') ||
           (fld.unit !== null)) {
-          if ((typeof fld.sival === 'undefined') || (fld.sival === null)) {
+          if ((!fld.hasOwnProperty("sival")) || (fld.sival === null)) {
             simulator.table[idx].fields[i].sival = 0;
           }
           val = (val === null) ? 0 : val;
           let ena = true;
-          if ((typeof simulator.table[idx].disabledSim !== 'undefined') &&
+          if ((simulator.table[idx].hasOwnProperty("disabledSim")) &&
             (simulator.table[idx].disabledSim.indexOf(fld.id) !== -1)) {
             ena = false;
           }
@@ -630,13 +630,13 @@
       fields: simulator.table[idx].fields,
     }
     for (let i in msg.fields) {
-      if (typeof msg.fields[i].instance !== 'undefined') {
+      if (msg.fields[i].hasOwnProperty("instance")) {
         msg.fields[i].value = simulator.table[idx].instance;
         break;
       }
     }
     for (let i in msg.fields) {
-      if (typeof msg.fields[i].fluid !== 'undefined') {
+      if (msg.fields[i].hasOwnProperty("fluid")) {
         msg.fields[i].value = simulator.table[idx].fluidtype;
         break;
       }
@@ -702,7 +702,7 @@
     running = true;
     setDisabled(true);
     for (let i in simulator.table) {
-      if ((typeof simulator.table[i].interval !== 'undefined') && (simulator.table[i].interval != null)) {
+      if ((simulator.table[i].hasOwnProperty("interval")) && (simulator.table[i].interval != null)) {
         simulator.table[i].timer = setInterval((i) => { simMsg(i); }, simulator.table[i].interval, i);
       }
     }
@@ -711,7 +711,7 @@
   function simStop(e) {
     setDisabled(false);
     for (let i in simulator.table) {
-      if ((typeof simulator.table[i].timer !== 'undefined') && (simulator.table[i].timer != null)) {
+      if ((simulator.table[i].hasOwnProperty("timer")) && (simulator.table[i].timer != null)) {
         clearInterval(simulator.table[i].timer);
         simulator.table[i].timer = null;
       }
