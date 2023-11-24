@@ -10,7 +10,7 @@
   import nmeadefs from "../../config/nmeadefs.json";
   import j1939conv from "../../config/j1939conv.json";
   import j1939defs from "../../config/j1939defs.json";
-  import datakinds from "../../config/datakinds.json";
+  import dictionary from "../../config/dictionary.json";
   // import datatypes from "../../config/datatypes.json";
   import Notification from "../../components/Notification.svelte";
   import { minmax, nextIncremental, nextDecremental, nextNatural, nextRandom } from '../../helpers/simulate.js';
@@ -243,21 +243,21 @@
           rec.fields[i].sival = null;
         }
       }
-      if ((fld.dictionary !== null) && datakinds.hasOwnProperty(fld.dictionary)) {
-        if (datakinds[fld.dictionary].hasOwnProperty("Values")) {
+      if ((fld.dictionary !== null) && dictionary.hasOwnProperty(fld.dictionary)) {
+        if (dictionary[fld.dictionary].hasOwnProperty("Values")) {
           if ((fld.dictionary !== "DD002") && (fld.dictionary !== "DD003")) {
             rec.fields[i].choices = new Array();
-            for (const [key, val] of Object.entries(datakinds[fld.dictionary].Values)) {
+            for (const [key, val] of Object.entries(dictionary[fld.dictionary].Values)) {
               rec.fields[i].choices.push({ id: parseInt(key), text: val });
             }
             if (!fld.hasOwnProperty("value")) {
               rec.fields[i].value = rec.fields[i].choices[0].id;
             }
           }
-        } else if (datakinds[fld.dictionary].hasOwnProperty("Positions")) {
-          rec.fields[i].bits = datakinds[fld.dictionary].Bits;
+        } else if (dictionary[fld.dictionary].hasOwnProperty("Positions")) {
+          rec.fields[i].bits = dictionary[fld.dictionary].Bits;
           rec.fields[i].positions = new Array();
-          for (const [key, val] of Object.entries(datakinds[fld.dictionary].Positions)) {
+          for (const [key, val] of Object.entries(dictionary[fld.dictionary].Positions)) {
             let bit = rec.fields[i].value & Math.pow(2, parseInt(key));
             rec.fields[i].positions.push({ id: parseInt(key), text: val, value: (bit !== 0) });
           }

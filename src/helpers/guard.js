@@ -18,7 +18,7 @@ function routeGuard(det) {
     if ((usr !== null) && usr.hasOwnProperty("department")) {
       dep = usr.department;
     }
-    if (typeof det.location !== 'undefined') {
+    if (det.hasOwnProperty("location")) {
       let logged = get(loggedIn);
       switch (det.location) { 
       case '/':

@@ -346,9 +346,6 @@ function proc126208(def, msg) {
         }
         // Template fields          
         let tpl = com.getFld(rep.startField, def.fields);
-
-
-
         if (tpl != null) {
           // Looping through the parameters
           for (let j = 0; j < cnt; j++) {
@@ -367,10 +364,6 @@ function proc126208(def, msg) {
         }
       }
     }
-
-
-console.log(def)
-
     return JSON.parse(JSON.stringify(def));
   } catch (err) {
     log.error("ERROR", err);
