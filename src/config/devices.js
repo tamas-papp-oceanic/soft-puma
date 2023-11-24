@@ -12,7 +12,7 @@ const devices = {
   '3410':      { id: 0x0D, conf: true,  fluid: false, prog: false, address: null,       test: false, group: 'sensors',  title: 'DC Monitor' },
   '3420':      { id: 0x08, conf: true,  fluid: false, prog: true,  address: null,       test: false, group: 'sensors',  title: 'AC Monitor' },
   '3478':      { id: 0x05, conf: false, fluid: false, prog: true,  address: null,       test: true,  group: 'modules',  title: '8 Channel Relay Output Module' },
-  '3501':      { id: 0x33, conf: true,  fluid: true,  prog: true,  address: null,       test: false, group: 'adaptors', title: 'Tank Voume Computer' },
+  '3501':      { id: 0x33, conf: true,  fluid: true,  prog: true,  address: null,       test: false, group: 'adaptors', title: 'Tank Volume Computer' },
   '4272':      { id: 0x0A, conf: false, fluid: false, prog: false, address: null,       test: false, group: 'sensors',  title: 'Hydrostatic Tank Level Sender' },
   '4291':      { id: 0x0F, conf: true,  fluid: true,  prog: true,  address: null,       test: false, group: 'adaptors', title: '4-20mA Tank level Adaptor' },
   '4410':      { id: 0x18, conf: false, fluid: false, prog: true,  address: null,       test: true,  group: 'modules',  title: '16 Channel Switch Input Module' },
