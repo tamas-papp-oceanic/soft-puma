@@ -113,8 +113,8 @@
     }
     if (rec.hasOwnProperty("repeat")) {
       let flc = 0;
-      for (let i in rec.repeat) {
-        let rep = rec.repeat[i];
+      if (Array.isArray(rec.repeat) && (rec.repeat.length > 0)) {
+        let rep = rec.repeat[0];
         if (rep.hasOwnProperty("startField") && (rep.startField > flc)) {
           flc = rep.startField;
         } else if (rep.hasOwnProperty("binaryField") && (rep.binaryField > flc)) {
@@ -268,18 +268,20 @@
         rec.fields[i].static = null;
       }
       if (rec.hasOwnProperty("repeat")) {
-        for (let j in rec.repeat) {
-          let rep = rec.repeat[j];
-          if ((rec.fields[i].field === rep.repeatField) ||
-            (rep.hasOwnProperty("startField") && (rec.fields[i].field >= rep.startField)) ||
-            (rep.hasOwnProperty("binaryField") && (rec.fields[i].field === rep.binaryField))) {
-            if (!rec.disabledIds.includes(parseInt(i))) {
-              rec.disabledIds.push(parseInt(i));
+        if (Array.isArray(rec.repeat)) {
+          for (let j in rec.repeat) {
+            let rep = rec.repeat[j];
+            if ((rec.fields[i].field === rep.repeatField) ||
+              (rep.hasOwnProperty("startField") && (rec.fields[i].field >= rep.startField)) ||
+              (rep.hasOwnProperty("binaryField") && (rec.fields[i].field >= rep.binaryField))) {
+              if (!rec.disabledIds.includes(parseInt(i))) {
+                rec.disabledIds.push(parseInt(i));
+              }
+              if (!rec.disabledSim.includes(parseInt(i))) {
+                rec.disabledSim.push(parseInt(i));
+              }
+              rec.fields[i].static = null;
             }
-            if (!rec.disabledSim.includes(parseInt(i))) {
-              rec.disabledSim.push(parseInt(i));
-            }
-            rec.fields[i].static = null;
           }
         }
       }
@@ -335,10 +337,10 @@
       let spl = splitKey(msg.key);
       let pgn = parseInt(spl.pgn);
       for (let j in msg.fields) {
+        let fld = msg.fields[j];
         if (val) {
           simulator.table[i].disabledIds.push(parseInt(j));
         } else {
-          let fld = msg.fields[j];
           if (((spl.protocol === 'nmea2000') && ((fld.dictionary === 'DD001') || (fld.dictionary === "DD002") ||
             (fld.dictionary === "DD003") || (fld.dictionary === "DD056"))) ||
             ((spl.protocol === 'j1939') && ((fld.dictionary === 'DD001') || (fld['type'] === 'bit(2)')))) {
@@ -348,14 +350,15 @@
           }
         }
         if (simulator.table[i].hasOwnProperty("repeat")) {
-          for (let k in simulator.table[i].repeat) {
-            if ((simulator.table[i].fields[j].field == simulator.table[i].repeat[0].repeatField) ||
-              (simulator.table[i].repeat[0].hasOwnProperty("startField") &&
-              (simulator.table[i].fields[j].field >= simulator.table[i].repeat[0].startField)) ||
-              (simulator.table[i].repeat[0].hasOwnProperty("binaryField") &&
-              (simulator.table[i].fields[j].field === simulator.table[i].repeat[0].binaryField))) {
-              if (!simulator.table[i].disabledIds.includes(parseInt(j))) {
-                simulator.table[i].disabledIds.push(parseInt(j));
+          if (Array.isArray(simulator.table[i].repeat)) {
+            for (let j in simulator.table[i].repeat) {
+              let rep = simulator.table[i].repeat[j];
+              if ((fld.field == rep.repeatField) ||
+                (rep.hasOwnProperty("startField") && (fld.field >= rep.startField)) ||
+                (rep.hasOwnProperty("binaryField") && (fld.field >= rep.binaryField))) {
+                if (!simulator.table[i].disabledIds.includes(parseInt(j))) {
+                  simulator.table[i].disabledIds.push(parseInt(j));
+                }
               }
             }
           }
