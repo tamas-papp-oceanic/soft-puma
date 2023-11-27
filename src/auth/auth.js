@@ -1,12 +1,7 @@
-import { get, writable } from "svelte/store";
+import { get } from "svelte/store";
 import jwt_decode from "jwt-decode";
-import { userData, accessToken, refreshToken, loggedIn, lastLogin, permissions } from '../stores/user.js';
-
-const authURL = writable('');
-
-window.pumaAPI.recv('auth-url', (e, val) => {
-  authURL.set(val);
-});
+import { authURL, userData, accessToken, refreshToken, loggedIn, lastLogin,
+  permissions } from '../stores/user.js';
 
 async function refreshLogin() {
   try {
@@ -40,57 +35,74 @@ async function refreshLogin() {
 }
 
 async function getPerms() {
-  let res = await afetch(get(authURL) + '/roles', {method: 'GET'});
-  if (res.status == 200) {
-    let perms = await res.json();
-    let permsObject= {};
-    for (let i = 0; i < perms.length; i++) {
-      if(typeof permsObject[perms[i][1]] === 'undefined') {
-        permsObject[perms[i][1]] = {};
+  try {
+    let res = await afetch(get(authURL) + '/roles', {method: 'GET'});
+    if (res.status == 200) {
+      let perms = await res.json();
+      let permsObject= {};
+      for (let i = 0; i < perms.length; i++) {
+        if(typeof permsObject[perms[i][1]] === 'undefined') {
+          permsObject[perms[i][1]] = {};
+        }
+        permsObject[perms[i][1]][perms[i][2]] = true;
       }
-      permsObject[perms[i][1]][perms[i][2]] = true;
+      permissions.set(permsObject);
     }
-    permissions.set(permsObject);
+  } catch(err) {
+    console.log(err);
   }
 }
 
 async function login(username, password) {
-  const res = await fetch(get(authURL) + '/login', {
-    method: 'POST',
-    body: JSON.stringify({
-      username,
-      password
-    })
-  });
-  if (res.status == 200) {
-    const json = await res.json();
-    accessToken.set(json.access_token);
-    refreshToken.set(json.refresh_token);
-    let dec = jwt_decode(json.access_token);
-    userData.set(dec);
-    loggedIn.set(true);
-    lastLogin.set(new Date());
-    await getPerms();
-    console.log("Login Success");
-    return true;
+  try {
+    const res = await fetch(get(authURL) + '/login', {
+      method: 'POST',
+      body: JSON.stringify({
+        username,
+        password
+      })
+    });
+    if (res.status == 200) {
+      const json = await res.json();
+      accessToken.set(json.access_token);
+      refreshToken.set(json.refresh_token);
+      let dec = jwt_decode(json.access_token);
+      dec.pass_phrase = window.customCrypto.createHash256(password);
+      userData.set(dec);
+      loggedIn.set(true);
+      lastLogin.set(new Date());
+      await getPerms();
+      console.log("Login Success");
+      return true;
+    }
+    console.log("Login failed");
+    return false;
+  } catch(err) {
+    console.log("Login failed", err);
+    return err;
   }
-  console.log("Login failed");
-  return false;
 }
 
 async function logout() {
-  const res = await afetch(get(authURL) + '/logout', {method: 'POST'})
-  if (res.status == 200) {
-    permissions.set({});
-    userData.set({});
-    accessToken.set("");
-    refreshToken.set("");
+  try {
+    const res = await afetch(get(authURL) + '/logout', {method: 'POST'})
+    if (res.status == 200) {
+      permissions.set({});
+      userData.set({});
+      accessToken.set("");
+      refreshToken.set("");
+      loggedIn.set(false);
+      console.log("Logout Success");
+      return true;
+    }
+    console.log("Logout failed");
     loggedIn.set(false);
-    console.log("Logout Success");
-    return true;
+    return false;
+  } catch(err) {
+    console.log("Logout failed", err);
+    loggedIn.set(false);
+    return err;
   }
-  console.log("Logout failed");
-  return false;
 }
 
 async function afetch(url, options) {
@@ -133,7 +145,6 @@ async function checkAccess(route, type) {
 }
 
 export {
-  authURL,
   refreshLogin,
   login,
   logout,

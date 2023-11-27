@@ -1,5 +1,10 @@
 import { writable } from 'svelte/store';
 
+const authURL = writable('');
+window.pumaAPI.recv('auth-url', (e, val) => {
+  authURL.set(val);
+});
+
 const user = JSON.parse(localStorage.getItem('userData'));
 const userData = writable(user);
 userData.subscribe((val) =>{
@@ -36,4 +41,4 @@ lastLogin.subscribe((val) =>{
   localStorage.setItem('lastLogin', JSON.stringify(val));
 });
 
-export { userData, accessToken, refreshToken, loggedIn, lastLogin, permissions }
+export { authURL, userData, accessToken, refreshToken, loggedIn, lastLogin, permissions }

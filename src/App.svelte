@@ -28,13 +28,13 @@
 	import Test4410 from './routes/testing/4410.svelte';
 	import Test5185 from './routes/testing/5185.svelte';
 	import Restricted from './routes/Restricted.svelte';
+	import LoginRequired from './routes/LoginRequired.svelte';
 	import Details from './routes/devices/Details.svelte';
 	import { update, updmsg, download, progress } from './stores/update.js';
 	import { allRoutes, updates } from './stores/data.js';
-	import { lastLogin } from './stores/user.js';
+	import { loggedIn, lastLogin } from './stores/user.js';
 	import { compareVersions } from 'compare-versions';
 	import { routeGuard } from './helpers/guard.js';
-	import { refreshLogin } from './auth/auth.js';
 
 	export let version;
 	export let appName;
@@ -80,23 +80,18 @@
 	let max;
 	let txt;
 	let started = false;
+  let rea = false;
 
 	// Check login hook
 	window.pumaAPI.recv('check-login', (e) => {
-    let chk = false;
-    if ($lastLogin === false) {
-      chk = true;
+    if ($lastLogin === null) {
+      rea = true;
     } else {
       let dif = Math.abs(new Date() - $lastLogin);
       dif = Math.ceil(dif / (1000 * 60 * 60 * 24));
       if (dif > 60) {
-        chk = true;
+        rea = true;
       }
-    }
-    if (chk) {
-      refreshLogin().catch((err) => {
-        console.log(err);
-      });
     }
   });
 
@@ -198,6 +193,9 @@
 			on:click:button--secondary={(e) => _cancel(e)}
 		/>
 	</ComposedModal>
+  {#if rea}
+    <LoginRequired bind:notify={rea} />
+  {/if}
 </main>
 
 <style lang="scss" global>

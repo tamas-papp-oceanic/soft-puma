@@ -12,8 +12,8 @@
  */
 import { get } from 'svelte/store';
 import { _scriptData, _steps, _actions, _events, _current } from '../../../stores/tests.js';
-import { userData } from '../../../stores/user.js';
-import { authURL, afetch } from '../../../auth/auth.js';
+import { authURL, userData } from '../../../stores/user.js';
+import { afetch } from '../../../auth/auth.js';
 import { device } from '../../../stores/data.js';
 
 let timer = null;
