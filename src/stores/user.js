@@ -30,4 +30,10 @@ loggedIn.subscribe((val) =>{
   localStorage.setItem('loggedIn', JSON.stringify(val));
 });
 
-export { userData, accessToken, refreshToken, loggedIn, permissions }
+const last = JSON.parse(localStorage.getItem('lastLogin'));
+const lastLogin = writable(last);
+lastLogin.subscribe((val) =>{
+  localStorage.setItem('lastLogin', JSON.stringify(val));
+});
+
+export { userData, accessToken, refreshToken, loggedIn, lastLogin, permissions }

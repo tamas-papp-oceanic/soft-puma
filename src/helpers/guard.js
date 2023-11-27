@@ -3,38 +3,41 @@
 // Skippng implementation for funtionality first
 
 import { get } from "svelte/store";
-import { userData } from '../stores/user.js';
-import { loggedIn } from '../stores/user.js';
+import { userData, loggedIn } from '../stores/user.js';
 import guard from '../config/guard.json';
   
 // function routeGuard
 // accepts detail.route and returns true if authorised or false if unauthorised
-
 function routeGuard(det) {
-  let dep = 'Guest';
-  let loc = 'dummy';
+  let prm = 'Basic';
+  let loc = "";
   let usr = get(userData);
   try {
-    if ((usr !== null) && usr.hasOwnProperty("department")) {
-      dep = usr.department;
+    if ((usr !== null) && usr.hasOwnProperty("permission")) {
+      prm = usr.permission;
     }
     if (det.hasOwnProperty("location")) {
       let logged = get(loggedIn);
-      switch (det.location) { 
-      case '/':
+      if (det.location == "/") {
         loc = "analyse";
-        break;
-      case '/details':
-        return false;
-      case '/login':
-        return !logged;
-      case '/welcome':
-        return logged;
-      default:
+      } else {
         let spl = det.location.split('/');
         if (spl.length > 1) {
-          loc = det.location.split('/')[1];
+          loc = spl[1];
         }
+      }
+      switch (loc) { 
+      case 'messages':
+      case 'monitor':
+        loc = "analyse";
+        break;
+      case 'details':
+        return false;
+      case 'login':
+        return !logged;
+      case 'welcome':
+        return logged;
+      default:
         break;
       }
     }
@@ -42,13 +45,7 @@ function routeGuard(det) {
     // console.log(err)
     return false;
   }
-  switch (loc) { 
-  case 'messages':
-  case 'monitor':
-  case 'simulate':
-    return true;
-  }
-  return guard[dep][loc];
+  return guard[prm][loc];
 }
 
 export { routeGuard }

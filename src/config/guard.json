@@ -1,39 +1,52 @@
 {
-  "Engineering": {
-    "serial": true,
+  "Admin": {
     "advanced": true,
-    "program": true,
-    "configure": true,
-    "simulate": true,
     "analyse": true,
+    "configure": true,
+    "manage": true,
+    "program": true,
+    "serial": true,
+    "simulate": true,
     "testing": true
   },
-  "Production": {
-    "serial": true,
-    "advanced": false,
-    "program": true,
-    "configure": true,
-    "simulate": true,
+  "Oceanic": {
+    "advanced": true,
     "analyse": true,
+    "configure": true,
+    "manage": false,
+    "program": true,
+    "serial": true,
+    "simulate": true,
+    "testing": true
+  },
+  "Reseller": {
+    "advanced": false,
+    "analyse": true,
+    "configure": true,
+    "manage": false,
+    "program": false,
+    "serial": false,
+    "simulate": true,
     "testing": true
   },
   "Customer": {
-    "serial": false,
     "advanced": false,
-    "program": true,
-    "configure": true,
-    "simulate": true,
     "analyse": true,
+    "configure": true,
+    "manage": false,
+    "program": false,
+    "serial": false,
+    "simulate": true,
     "testing": false
   },
-  "Guest": {
-    "serial": false,
+  "Basic": {
     "advanced": false,
-    "program": false,
-    "configure": true,
-    "simulate": false,
     "analyse": true,
-    "testing": false,
-    "dummy": false
+    "configure": true,
+    "manage": false,
+    "program": false,
+    "serial": false,
+    "simulate": false,
+    "testing": false
   }
 }

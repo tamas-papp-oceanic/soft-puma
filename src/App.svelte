@@ -31,8 +31,10 @@
 	import Details from './routes/devices/Details.svelte';
 	import { update, updmsg, download, progress } from './stores/update.js';
 	import { allRoutes, updates } from './stores/data.js';
+	import { lastLogin } from './stores/user.js';
 	import { compareVersions } from 'compare-versions';
 	import { routeGuard } from './helpers/guard.js';
+	import { refreshLogin } from './auth/auth.js';
 
 	export let version;
 	export let appName;
@@ -79,7 +81,26 @@
 	let txt;
 	let started = false;
 
-	// Updater available hook
+	// Check login hook
+	window.pumaAPI.recv('check-login', (e) => {
+    let chk = false;
+    if ($lastLogin === false) {
+      chk = true;
+    } else {
+      let dif = Math.abs(new Date() - $lastLogin);
+      dif = Math.ceil(dif / (1000 * 60 * 60 * 24));
+      if (dif > 60) {
+        chk = true;
+      }
+    }
+    if (chk) {
+      refreshLogin().catch((err) => {
+        console.log(err);
+      });
+    }
+  });
+
+  // Updater available hook
 	window.pumaAPI.recv('upd-available', (e, val) => {
 		$update = true;
 		$updmsg = val;

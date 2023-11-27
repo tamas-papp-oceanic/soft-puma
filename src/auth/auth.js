@@ -1,6 +1,6 @@
 import { get, writable } from "svelte/store";
 import jwt_decode from "jwt-decode";
-import { userData, accessToken, refreshToken, loggedIn, permissions } from '../stores/user.js';
+import { userData, accessToken, refreshToken, loggedIn, lastLogin, permissions } from '../stores/user.js';
 
 const authURL = writable('');
 
@@ -9,26 +9,33 @@ window.pumaAPI.recv('auth-url', (e, val) => {
 });
 
 async function refreshLogin() {
-  let token = get(refreshToken);
-  let res = await fetch(get(authURL) + '/refresh', {
-    method: 'POST',
-    body: JSON.stringify({
-      'refresh_token': token,
-    }),
-  });
-  if (res.status == 201) {
-    const json = await res.json();
-    accessToken.set(json.access_token);
-    refreshToken.set(json.refresh_token);
-    let dec = jwt_decode(json.access_token);
-    userData.set(dec);
-    loggedIn.set(true);
-    console.log("Refresh Success");
-    return true;
-  } else {
+  try {
+    let token = get(refreshToken);
+    let res = await fetch(get(authURL) + '/refresh', {
+      method: 'POST',
+      body: JSON.stringify({
+        'refresh_token': token,
+      }),
+    });
+    if (res.status == 201) {
+      const json = await res.json();
+      accessToken.set(json.access_token);
+      refreshToken.set(json.refresh_token);
+      let dec = jwt_decode(json.access_token);
+      userData.set(dec);
+      loggedIn.set(true);
+      lastLogin.set(new Date());
+      console.log("Refresh Success");
+      return true;
+    } else {
+      loggedIn.set(false);
+      console.log("Refresh failed");
+      return false;
+    }
+  } catch(err) {
     loggedIn.set(false);
-    console.log("Refresh failed");
-    return false;
+    console.log("Refresh failed", err);
+    return err;
   }
 }
 
@@ -62,6 +69,7 @@ async function login(username, password) {
     let dec = jwt_decode(json.access_token);
     userData.set(dec);
     loggedIn.set(true);
+    lastLogin.set(new Date());
     await getPerms();
     console.log("Login Success");
     return true;
@@ -96,7 +104,6 @@ async function afetch(url, options) {
     options["headers"] = {'Authorization': bearer, "Content-Type":"application/json" }
   }
   try {
-    let lin = get(loggedIn);
     const res = await fetch(url, options);
     if (lin && (res.status == 401)) {
       // refreshLogin will set LoggedIn to false if it fails, so we only do one loop
@@ -118,8 +125,8 @@ async function afetch(url, options) {
 async function checkAccess(route, type) {
   await getPerms();
   let prm = get(permissions);
-  if ((prm != null) && (typeof prm[route] !== 'undefined') &&
-    (typeof prm[route][type] !== 'undefined')) {
+  if ((prm != null) && prm.hasOwnProperty("route") &&
+    prm[route].hasOwnProperty("type")) {
     return prm[route][type];
   }
   return false;
@@ -127,6 +134,7 @@ async function checkAccess(route, type) {
 
 export {
   authURL,
+  refreshLogin,
   login,
   logout,
   afetch,

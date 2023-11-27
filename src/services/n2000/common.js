@@ -22,6 +22,7 @@ const log = require('electron-log');
 
 let nmeadefs = {};
 let nmeaconv = {};
+// let repeats = {};
 
 function init() {
   let nde = path.join(app.getAppPath(), 'src/config/nmeadefs.json');
@@ -30,6 +31,31 @@ function init() {
     if (fs.existsSync(nde)) {
       nmeadefs = JSON.parse(fs.readFileSync(nde, 'utf8'));
     }
+    // for (const [key, val] of Object.entries(nmeadefs)) {
+    //   if (val.hasOwnProperty("repeat")) {
+    //     for (let i in val.repeat) {
+    //       let rep = {};
+    //       let fls = new Array();
+    //       for (let j in val.fields) {
+    //         if (val.fields[j].field == val.repeat[i].repeatField) {
+    //           rep = val.fields[j];
+    //         } else if (val.repeat[i].hasOwnProperty("startField") &&
+    //           val.repeat[i].hasOwnProperty("fieldCount") &&
+    //           (val.fields[j].field >= val.repeat[i].startField) &&
+    //           (val.fields[j].field < val.repeat[i].startField + val.repeat[i].fieldCount)) {
+    //           fls.push(val.fields[j]);
+    //         } else if (val.repeat[i].hasOwnProperty("binaryField") &&
+    //           (val.fields[j].field == val.repeat[i].binaryField)) {
+    //           fls.push(val.fields[j]);
+    //         }
+    //       }
+    //       if (!repeats.hasOwnProperty(key)) {
+    //         repeats[key] = new Array();
+    //       }
+    //       repeats[key].push({"repeat": rep, "fields": fls});
+    //     }
+    //   }
+    // }
     if (fs.existsSync(nco)) {
       nmeaconv = JSON.parse(fs.readFileSync(nco, 'utf8'));
     }
@@ -92,7 +118,7 @@ function findCnv(key) {
 // Returns with PGN definition
 function findDef(frm) {
   let key = getKey(frm);
-  if (typeof nmeadefs[key] !== 'undefined') {
+  if (nmeadefs.hasOwnProperty(key)) {
     let out = JSON.parse(JSON.stringify(nmeadefs[key]));
     out.key = key;
     return out;
@@ -121,7 +147,7 @@ function getKey(frm) {
 
 // Returns with PGN definition
 function getDef(key) {
-  if (typeof nmeadefs[key] !== 'undefined') {
+  if (nmeadefs.hasOwnProperty(key)) {
     return JSON.parse(JSON.stringify(nmeadefs[key]));
   }
   return null;

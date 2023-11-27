@@ -79,7 +79,7 @@ function makePgn(par) {
 // Returns with PGN definition
 function findDef(frm) {
   let key = getKey(frm);
-  if (typeof j1939defs[key] !== 'undefined') {
+  if (j1939defs.hasOwnProperty(key)) {
     let out = JSON.parse(JSON.stringify(j1939defs[key]));
     out.key = key;
     return out;
@@ -102,7 +102,7 @@ function getKey(frm) {
 
 // Returns with PGN definition
 function getDef(key) {
-  if (typeof j1939defs[key] !== 'undefined') {
+  if (j1939defs.hasOwnProperty(key)) {
     return JSON.parse(JSON.stringify(j1939defs[key]));
   }
   return null;

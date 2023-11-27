@@ -96,6 +96,7 @@ function createWindow() {
   mainWindow.once('ready-to-show', () => {
     if ((mainWindow != null) && (typeof mainWindow.webContents !== 'undefined')) {
       mainWindow.webContents.send('auth-url', authURL);
+      mainWindow.webContents.send('check-login');
     }
     mainWindow.show();
   });
