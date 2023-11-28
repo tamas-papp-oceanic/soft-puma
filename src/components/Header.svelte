@@ -11,19 +11,21 @@
   import { loggedIn } from '../stores/user.js';
   import { devices, device, protocol, data, name } from '../stores/data.js';
 	import { update, updmsg, download } from '../stores/update.js';
+  import { routeGuard } from '../helpers/guard.js';
   
   export let company;
   export let product;
   export let version;
   
   const menu = [
-    { id: '0', text: 'Devices', path: '/', selected: false, enabled: true, protocols: ['0'] },
-    { id: '1', text: 'Monitor', path: '/monitor', selected: false, enabled: true, protocols: ['0', '1'] },
-    { id: '2', text: 'Configure', path: '/configure', selected: false, enabled: true, protocols: ['0'] },
-    { id: '3', text: 'Testing', path: '/testing', selected: false, enabled: true, protocols: ['0'] },
-    { id: '4', text: 'Update', path: '/program', selected: false, enabled: true, protocols: ['0'] },
-    { id: '5', text: 'Simulate', path: '/simulate', selected: false, enabled: true, protocols: ['0', '1'] },
-    { id: '6', text: 'Advanced', path: '/advanced', selected: false, enabled: true, protocols: ['0', '1'] },
+    { id: '0', text: 'Devices', location: '/', selected: false, enabled: true, protocols: ['0'] },
+    { id: '1', text: 'Monitor', location: '/monitor', selected: false, enabled: true, protocols: ['0', '1'] },
+    { id: '2', text: 'Configure', location: '/configure', selected: false, enabled: true, protocols: ['0'] },
+    { id: '3', text: 'Testing', location: '/testing', selected: false, enabled: true, protocols: ['0'] },
+    { id: '4', text: 'Update', location: '/program', selected: false, enabled: true, protocols: ['0'] },
+    { id: '5', text: 'Simulate', location: '/simulate', selected: false, enabled: true, protocols: ['0', '1'] },
+    { id: '6', text: 'Profile', location: '/profile', selected: false, enabled: true },
+    { id: '7', text: 'Manage', location: '/manage', selected: false, enabled: true },
   ];
   const proItems = [
     { id: '0', text: 'nmea2000' },
@@ -44,9 +46,9 @@
   // Initially select "Devices" menu
   _select(null, selected.menu);
 
-  function mark(rou) {
+  function mark(loc) {
     for (let i in menu) {
-      menu[i].selected = (menu[i].path == rou);
+      menu[i].selected = (menu[i].location == loc);
     }
   };
 
@@ -60,7 +62,10 @@
 
   function enable(pro) {
     for (let i in menu) {
-      menu[i].enabled = (menu[i].protocols.indexOf(pro) !== -1);
+      menu[i].enabled = routeGuard({location: menu[i].location});
+      if (menu[i].enabled && menu[i].hasOwnProperty("protocols")) {
+        menu[i].enabled = (menu[i].protocols.indexOf(pro) !== -1);
+      }
       if (menu[i].id === selected.menu.id) {
         if (!menu[i].enabled) {
           _select(null, first());
@@ -73,8 +78,8 @@
 
   function _select(e, itm) {
     selected.menu = itm;
-    mark(itm.path);
-    push(itm.path);
+    mark(itm.location);
+    push(itm.location);
   };
 
   function __exit(e) {

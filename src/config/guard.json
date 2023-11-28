@@ -1,49 +1,49 @@
 {
   "Admin": {
-    "advanced": true,
     "analyse": true,
     "configure": true,
     "manage": true,
+    "profile": true,
     "program": true,
     "serial": true,
     "simulate": true,
     "testing": true
   },
   "Oceanic": {
-    "advanced": true,
     "analyse": true,
     "configure": true,
     "manage": false,
+    "profile": true,
     "program": true,
     "serial": true,
     "simulate": true,
     "testing": true
   },
   "Reseller": {
-    "advanced": false,
     "analyse": true,
     "configure": true,
     "manage": false,
+    "profile": true,
     "program": false,
     "serial": false,
     "simulate": true,
     "testing": true
   },
   "Customer": {
-    "advanced": false,
     "analyse": true,
     "configure": true,
     "manage": false,
+    "profile": true,
     "program": false,
     "serial": false,
     "simulate": true,
     "testing": false
   },
   "Basic": {
-    "advanced": false,
     "analyse": true,
     "configure": true,
     "manage": false,
+    "profile": true,
     "program": false,
     "serial": false,
     "simulate": false,

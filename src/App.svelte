@@ -41,8 +41,6 @@
 
 	const routes = {
 		"/":                                wrap({ component: Devices,        conditions: [(detail) => { return routeGuard(detail); }] }),
-		"/login":                           wrap({ component: Login,          conditions: [(detail) => { return routeGuard(detail); }] }),
-		"/advanced":                        wrap({ component: NotFound,       conditions: [(detail) => { return true;               }] }),
 		"/configure":                       wrap({ component: Configure,      conditions: [(detail) => { return routeGuard(detail); }] }),
 		"/configure/3271/:instance/:fluid": wrap({ component: ConfigureFluid, conditions: [(detail) => { return routeGuard(detail); }] }),
 		"/configure/3281/:instance/:fluid": wrap({ component: ConfigureFluid, conditions: [(detail) => { return routeGuard(detail); }] }),
@@ -54,24 +52,27 @@
 		"/configure/4521/:instance":        wrap({ component: Configure4521,  conditions: [(detail) => { return routeGuard(detail); }] }),
 		"/configure/4601/:instance":        wrap({ component: Configure4601,  conditions: [(detail) => { return routeGuard(detail); }] }),
 		"/configure/5720/:instance":        wrap({ component: Configure5720,  conditions: [(detail) => { return routeGuard(detail); }] }),
+		"/details/:protocol/:pgn/:function/:manufacturer/:industry/:instance/:type":
+																				wrap({ component: Details,        conditions: [(detail) => { return routeGuard(detail); }] }),
+    "/login":                           wrap({ component: Login,          conditions: [(detail) => { return routeGuard(detail); }] }),
+    "/manage":                          wrap({ component: NotFound,       conditions: [(detail) => { return routeGuard(detail); }] }),
+		"/messages/:protocol/:pgn/:instance":
+																				wrap({ component: Content,        conditions: [(detail) => { return routeGuard(detail); }] }),
+		"/messages/:protocol/:pgn/:function/:manufacturer/:industry/:instance/:type":
+																				wrap({ component: Content,        conditions: [(detail) => { return routeGuard(detail); }] }),
+    "/monitor":                         wrap({ component: Monitor,        conditions: [(detail) => { return routeGuard(detail); }] }),
+		"/monitor/:address":                wrap({ component: Monitor,        conditions: [(detail) => { return routeGuard(detail); }] }),
+    "/profile":                         wrap({ component: NotFound,       conditions: [(detail) => { return routeGuard(detail); }] }),
 		"/program":                         wrap({ component: Program,        conditions: [(detail) => { return routeGuard(detail); }] }),
 		"/program/:device/:instance":       wrap({ component: ProgramDevice,  conditions: [(detail) => { return routeGuard(detail); }] }),
+		"/restricted":                      wrap({ component: Restricted,     conditions: [(detail) => { return true;               }] }),
 		"/simulate":                        wrap({ component: Simulate,       conditions: [(detail) => { return routeGuard(detail); }] }),
 		"/testing":                         wrap({ component: Testing,        conditions: [(detail) => { return routeGuard(detail); }] }),
 		"/testing/3478/:instance":          wrap({ component: Test3478,       conditions: [(detail) => { return routeGuard(detail); }] }),
 		"/testing/4410/:instance":          wrap({ component: Test4410,       conditions: [(detail) => { return routeGuard(detail); }] }),
 		"/testing/5185":                    wrap({ component: Test5185,       conditions: [(detail) => { return routeGuard(detail); }] }),
 		"/testing/5185-H":                  wrap({ component: Test5185,       conditions: [(detail) => { return routeGuard(detail); }] }),
-		"/restricted":                      wrap({ component: Restricted,     conditions: [(detail) => { return true;               }] }),
 		"/welcome":                         wrap({ component: Welcome,        conditions: [(detail) => { return routeGuard(detail); }] }),
-		"/monitor":                         wrap({ component: Monitor,        conditions: [(detail) => { return routeGuard(detail); }] }),
-		"/monitor/:address":                wrap({ component: Monitor,        conditions: [(detail) => { return routeGuard(detail); }] }),
-		"/messages/:protocol/:pgn/:instance":
-																				wrap({ component: Content,        conditions: [(detail) => { return routeGuard(detail); }] }),
-		"/messages/:protocol/:pgn/:function/:manufacturer/:industry/:instance/:type":
-																				wrap({ component: Content,        conditions: [(detail) => { return routeGuard(detail); }] }),
-		"/details/:protocol/:pgn/:function/:manufacturer/:industry/:instance/:type":
-																				wrap({ component: Details,        conditions: [(detail) => { return routeGuard(detail); }] }),
 		"*":                                wrap({ component: NotFound,       conditions: [(detail) => { return true;               }] }),
 	};
 
