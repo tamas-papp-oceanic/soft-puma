@@ -40,6 +40,8 @@ log.transports.console.level = 'info';
 log.transports.file.maxSize = 10 * 1024 * 1024;
 log.transports.file.level = 'info';
 
+console.log(app.getPath('userData'));
+
 if (os.platform() == 'linux') {
   Can = require('./src/services/can.js');
 } else if (os.platform() == 'win32') {
@@ -56,7 +58,6 @@ function createWindow() {
     useContentSize: true,
     webPreferences: {
       nodeIntegration: true,
-      enableRemoteModule: true,
       contextIsolation: true,
       preload: path.join(isDev ? process.cwd() : __dirname, 'preload.js'),
     },

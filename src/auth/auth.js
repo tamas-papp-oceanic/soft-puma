@@ -20,7 +20,7 @@ async function refreshLogin() {
       userData.set(dec);
       loggedIn.set(true);
       lastLogin.set(new Date());
-      console.log("Refresh Success");
+      // console.log("Refresh Success");
       return true;
     } else {
       loggedIn.set(false);
@@ -67,12 +67,11 @@ async function login(username, password) {
       accessToken.set(json.access_token);
       refreshToken.set(json.refresh_token);
       let dec = jwt_decode(json.access_token);
-      dec.pass_phrase = window.customCrypto.createHash256(password);
       userData.set(dec);
       loggedIn.set(true);
       lastLogin.set(new Date());
       await getPerms();
-      console.log("Login Success");
+      // console.log("Login Success");
       return true;
     }
     console.log("Login failed");
@@ -92,7 +91,7 @@ async function logout() {
       accessToken.set("");
       refreshToken.set("");
       loggedIn.set(false);
-      console.log("Logout Success");
+      // console.log("Logout Success");
       return true;
     }
     console.log("Logout failed");

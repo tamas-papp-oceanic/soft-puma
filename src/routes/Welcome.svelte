@@ -7,7 +7,7 @@
   <Row>
     <Column sm={4} md={4} lg={8}>
       <h3>Welcome {$userData.first_name} {$userData.last_name}</h3>
-      <h4>Access Level: {$userData.department}</h4>
+      <h4>Access Level: {$userData.permission}</h4>
     </Column>
   </Row>
 </Grid>

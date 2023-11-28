@@ -1,15 +1,16 @@
 <script>
   import { push } from 'svelte-spa-router'
   import { Header, HeaderNav, HeaderNavItem, HeaderUtilities, HeaderGlobalAction,
-    ComposedModal, ModalHeader, ModalFooter, TooltipDefinition, Dropdown } from "carbon-components-svelte";
-  import { logout } from '../auth/auth.js'
-  import { loggedIn } from '../stores/user.js';
-  import { devices, device, protocol, data, name } from '../stores/data.js';
-	import { update, updmsg, download } from '../stores/update.js';
+    ComposedModal, ModalHeader, ModalBody, ModalFooter, TooltipDefinition,
+    Dropdown } from "carbon-components-svelte";
   import Update20 from "carbon-icons-svelte/lib/UpdateNow20";
   import Login20 from "carbon-icons-svelte/lib/Login20";
   import Logout20 from "carbon-icons-svelte/lib/Logout20";
   import Close20 from "carbon-icons-svelte/lib/Close20";
+  import { logout } from '../auth/auth.js'
+  import { loggedIn } from '../stores/user.js';
+  import { devices, device, protocol, data, name } from '../stores/data.js';
+	import { update, updmsg, download } from '../stores/update.js';
   
   export let company;
   export let product;
@@ -30,7 +31,8 @@
   ];
 
   let devItems = new Array();
-  let open = false;
+  let extry = false;
+  let lotry = false;
   let platform = product + " v" + version;
   let re = /(\/[A-z]+)/;
   let selected = {
@@ -40,7 +42,7 @@
   }
 
   // Initially select "Devices" menu
-  select(null, selected.menu);
+  _select(null, selected.menu);
 
   function mark(rou) {
     for (let i in menu) {
@@ -61,7 +63,7 @@
       menu[i].enabled = (menu[i].protocols.indexOf(pro) !== -1);
       if (menu[i].id === selected.menu.id) {
         if (!menu[i].enabled) {
-          select(null, first());
+          _select(null, first());
         } else {
           selected.menu = menu[i];
         }
@@ -69,34 +71,40 @@
     }
   };
 
-  function select(e, itm) {
+  function _select(e, itm) {
     selected.menu = itm;
     mark(itm.path);
     push(itm.path);
   };
 
-  function login(e) {
+  function __exit(e) {
+    extry = true;
+  };  
+
+  function __logout(e) {
+    lotry = true;
+  };
+
+  function _login(e) {
     push("/login");
   };
 
   async function _logout(e) {
+    lotry = false;
     const res = await logout();
     if (res == true) {
       push("/login");
     }
   };
 
-  function close(e) {
-    open = false;
+  function _exit(e) {
+    extry = false;
     window.pumaAPI.send('app-quit');
   };  
 
-  function show(e) {
-    open = true;
-  };  
-
-  function cancel(e) {
-    open = false;
+  function _cancel(e) {
+    extry = false;
+    lotry = false;
   };
   
   function _update(e) {
@@ -175,7 +183,7 @@
     <HeaderNav>
       {#each menu as item}
         {#if item.enabled}
-          <HeaderNavItem bind:isSelected={item.selected} on:click={(e) => { select(e, item) }} text={item.text} />
+          <HeaderNavItem bind:isSelected={item.selected} on:click={(e) => _select(e, item)} text={item.text} />
         {/if}
       {/each}
     </HeaderNav>
@@ -187,24 +195,35 @@
       {/if}
       {#if !$loggedIn}
         <TooltipDefinition direction="bottom" align="center" tooltipText="Login">
-          <HeaderGlobalAction on:click={(e) => login(e)} aria-label="Login" icon={Login20} />
+          <HeaderGlobalAction on:click={(e) => _login(e)} aria-label="Login" icon={Login20} />
         </TooltipDefinition>
       {:else}
         <TooltipDefinition direction="bottom" align="center" tooltipText="Logout">
-          <HeaderGlobalAction on:click={(e) => _logout(e)} aria-label="Logout" icon={Logout20} />
+          <HeaderGlobalAction on:click={(e) => __logout(e)} aria-label="Logout" icon={Logout20} />
         </TooltipDefinition>
       {/if}
       <TooltipDefinition direction="bottom" align="center" tooltipText="Exit">
-        <HeaderGlobalAction on:click={(e) => show(e)} aria-label="Exit" icon={Close20} />
+        <HeaderGlobalAction on:click={(e) => __exit(e)} aria-label="Exit" icon={Close20} />
       </TooltipDefinition>
     </HeaderUtilities>
   </Header>
-  <ComposedModal open={open} on:submit={(e) => close(e)} on:close={(e) => cancel(e)} size="xs">
+  <ComposedModal open={extry} on:submit={(e) => _exit(e)} on:close={(e) => _cancel(e)} size="xs">
     <ModalHeader title="Confirm exit" />
     <ModalFooter
       primaryButtonText="Proceed"
       secondaryButtons={[{ text: "Cancel" }]}
-      on:click:button--secondary={(e) => cancel(e)}
+      on:click:button--secondary={(e) => _cancel(e)}
+    />
+  </ComposedModal>
+  <ComposedModal open={lotry} on:submit={(e) => _logout(e)} on:close={(e) => _cancel(e)} size="xs">
+    <ModalHeader title="Are you sure you want to log out?" />
+    <ModalBody>
+      <span>You will require an internet connection to log back in.</span>
+    </ModalBody>
+    <ModalFooter
+      primaryButtonText="Proceed"
+      secondaryButtons={[{ text: "Cancel" }]}
+      on:click:button--secondary={(e) => _cancel(e)}
     />
   </ComposedModal>
 </div>
