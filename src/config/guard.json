@@ -43,7 +43,7 @@
     "analyse": true,
     "configure": true,
     "manage": false,
-    "profile": true,
+    "profile": false,
     "program": false,
     "serial": false,
     "simulate": false,

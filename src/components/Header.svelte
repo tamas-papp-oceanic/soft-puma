@@ -2,13 +2,15 @@
   import { push } from 'svelte-spa-router'
   import { Header, HeaderNav, HeaderNavItem, HeaderUtilities, HeaderGlobalAction,
     ComposedModal, ModalHeader, ModalBody, ModalFooter, TooltipDefinition,
-    Dropdown } from "carbon-components-svelte";
-  import Update20 from "carbon-icons-svelte/lib/UpdateNow20";
-  import Login20 from "carbon-icons-svelte/lib/Login20";
-  import Logout20 from "carbon-icons-svelte/lib/Logout20";
-  import Close20 from "carbon-icons-svelte/lib/Close20";
+    TooltipIcon, Dropdown } from "carbon-components-svelte";
+  import Manage from "carbon-icons-svelte/lib/UserAdmin20";
+  import Profile from "carbon-icons-svelte/lib/UserProfile20";
+  import Update from "carbon-icons-svelte/lib/UpdateNow20";
+  import Login from "carbon-icons-svelte/lib/Login20";
+  import Logout from "carbon-icons-svelte/lib/Logout20";
+  import Close from "carbon-icons-svelte/lib/Close20";
   import { logout } from '../auth/auth.js'
-  import { loggedIn } from '../stores/user.js';
+  import { loggedIn, userData } from '../stores/user.js';
   import { devices, device, protocol, data, name } from '../stores/data.js';
 	import { update, updmsg, download } from '../stores/update.js';
   import { routeGuard } from '../helpers/guard.js';
@@ -18,14 +20,14 @@
   export let version;
   
   const menu = [
-    { id: '0', text: 'Devices', location: '/', selected: false, enabled: true, protocols: ['0'] },
-    { id: '1', text: 'Monitor', location: '/monitor', selected: false, enabled: true, protocols: ['0', '1'] },
-    { id: '2', text: 'Configure', location: '/configure', selected: false, enabled: true, protocols: ['0'] },
-    { id: '3', text: 'Testing', location: '/testing', selected: false, enabled: true, protocols: ['0'] },
-    { id: '4', text: 'Update', location: '/program', selected: false, enabled: true, protocols: ['0'] },
-    { id: '5', text: 'Simulate', location: '/simulate', selected: false, enabled: true, protocols: ['0', '1'] },
-    { id: '6', text: 'Profile', location: '/profile', selected: false, enabled: true },
-    { id: '7', text: 'Manage', location: '/manage', selected: false, enabled: true },
+    { id: '0', location: '/', selected: false, enabled: true, text: 'Devices', protocols: ['0'] },
+    { id: '1', location: '/monitor', selected: false, enabled: true, text: 'Monitor', protocols: ['0', '1'] },
+    { id: '2', location: '/configure', selected: false, enabled: true, text: 'Configure', protocols: ['0'] },
+    { id: '3', location: '/testing', selected: false, enabled: true, text: 'Testing', protocols: ['0'] },
+    { id: '4', location: '/program', selected: false, enabled: true, text: 'Update', protocols: ['0'] },
+    { id: '5', location: '/simulate', selected: false, enabled: true, text: 'Simulate', protocols: ['0', '1'] },
+    { id: '6', location: '/profile', selected: false, enabled: true, text: 'User profile', icon: Profile },
+    { id: '7', location: '/manage', selected: false, enabled: true, text: 'User management', icon: Manage },
   ];
   const proItems = [
     { id: '0', text: 'nmea2000' },
@@ -116,6 +118,10 @@
     $download = true;
   };
 
+  function _action(e, loc) {
+    push(loc);
+  };
+
   function devSelect(e) {
     if ($device !== e.detail.selectedItem.text) {
       $device = e.detail.selectedItem.text;
@@ -162,53 +168,64 @@
   };
 
   $: $devices, getDevices($devices);
-  $: platform = product + " v" + version
+  $: $userData, $loggedIn, enable(selected.protocol);
 </script>
 
 <div>
   <Header company={company} platformName={platform}>
     <HeaderNav>
-      <Dropdown
-        style=" grid-gap: 0 0.25rem;"
-        titleText="Interface:"
-        type="inline"
-        size="xl"
-        bind:selectedId={selected.device}
-        items={devItems}
-        on:select={(e) => devSelect(e)} />
-      <Dropdown
-        style="grid-gap: 0 0.25rem;"
-        hideLabel
-        type="inline"
-        size="xl"
-        bind:selectedId={selected.protocol}
-        items={proItems}
-        on:select={(e) => proSelect(e)} />
+      <TooltipDefinition direction="bottom" align="center" tooltipText="Select Interface">
+        <Dropdown
+          style=" grid-gap: 0 0.25rem;"
+          hideLabel
+          type="inline"
+          size="xl"
+          bind:selectedId={selected.device}
+          items={devItems}
+          on:select={(e) => devSelect(e)} />
+      </TooltipDefinition>
+      <TooltipDefinition direction="bottom" align="center" tooltipText="Select protocol">
+        <Dropdown
+          style="grid-gap: 0 0.25rem;"
+          hideLabel
+          type="inline"
+          size="xl"
+          bind:selectedId={selected.protocol}
+          items={proItems}
+          on:select={(e) => proSelect(e)} />
+      </TooltipDefinition>
     </HeaderNav>
     <HeaderNav>
       {#each menu as item}
-        {#if item.enabled}
+        {#if item.hasOwnProperty('text') && !item.hasOwnProperty('icon') && item.enabled}
           <HeaderNavItem bind:isSelected={item.selected} on:click={(e) => _select(e, item)} text={item.text} />
         {/if}
       {/each}
     </HeaderNav>
     <HeaderUtilities>
+      {#each menu as item}
+        {#if item.hasOwnProperty('text') && item.hasOwnProperty('icon') && item.enabled}
+          <TooltipDefinition direction="bottom" align="center" tooltipText={item.text}>
+            <HeaderGlobalAction on:click={(e) => _action(e, item.location)} icon={item.icon} />
+          </TooltipDefinition>
+        {/if}
+      {/each}
       {#if $update}
         <TooltipDefinition direction="bottom" align="center" tooltipText={"Update available: v" + $updmsg + "\nClick to install."}>
-          <HeaderGlobalAction on:click={(e) => _update(e)} aria-label="Update available" icon={Update20} />
+          <HeaderGlobalAction on:click={(e) => _update(e)} icon={Update} />
         </TooltipDefinition>
       {/if}
       {#if !$loggedIn}
         <TooltipDefinition direction="bottom" align="center" tooltipText="Login">
-          <HeaderGlobalAction on:click={(e) => _login(e)} aria-label="Login" icon={Login20} />
+          <HeaderGlobalAction on:click={(e) => _login(e)} icon={Login} />
         </TooltipDefinition>
       {:else}
         <TooltipDefinition direction="bottom" align="center" tooltipText="Logout">
-          <HeaderGlobalAction on:click={(e) => __logout(e)} aria-label="Logout" icon={Logout20} />
+          <HeaderGlobalAction on:click={(e) => __logout(e)} icon={Logout} />
         </TooltipDefinition>
       {/if}
       <TooltipDefinition direction="bottom" align="center" tooltipText="Exit">
-        <HeaderGlobalAction on:click={(e) => __exit(e)} aria-label="Exit" icon={Close20} />
+        <HeaderGlobalAction on:click={(e) => __exit(e)} icon={Close} />
       </TooltipDefinition>
     </HeaderUtilities>
   </Header>

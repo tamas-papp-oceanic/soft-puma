@@ -84,7 +84,7 @@ async function login(username, password) {
 
 async function logout() {
   try {
-    const res = await afetch(get(authURL) + '/logout', {method: 'POST'})
+    const res = await afetch(get(authURL) + '/logout', {method: 'POST'});
     if (res.status == 200) {
       permissions.set({});
       userData.set({});
@@ -94,12 +94,12 @@ async function logout() {
       // console.log("Logout Success");
       return true;
     }
-    console.log("Logout failed");
     loggedIn.set(false);
+    console.log("Logout failed");
     return false;
   } catch(err) {
-    console.log("Logout failed", err);
     loggedIn.set(false);
+    console.log("Logout failed", err);
     return err;
   }
 }
