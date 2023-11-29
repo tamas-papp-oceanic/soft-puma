@@ -131,6 +131,32 @@ async function afetch(url, options) {
     return {status: 500};
   }
 }
+async function update(username, password, newpass, email) {
+  try {
+    const res = await afetch(get(authURL) + '/update', {
+      method: 'POST',
+      body: JSON.stringify({
+        username,
+        password,
+        newpass,
+        email
+      })
+    });
+    if (res.status == 200) {
+      const json = await res.json();
+      let dec = jwt_decode(json.access_token);
+      userData.set(dec);
+      // console.log("Update Success");
+      return true;
+    }
+    console.log("Update failed");
+    return false;
+  } catch(err) {
+    console.log("Update failed", err);
+    return err;
+  }
+}
+
 // route refers to a API route
 // type = read write or delete
 async function checkAccess(route, type) {
@@ -148,5 +174,6 @@ export {
   login,
   logout,
   afetch,
+  update,
   checkAccess,
 }

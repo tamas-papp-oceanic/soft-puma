@@ -11,6 +11,8 @@
 	import Devices from './routes/devices/Index.svelte';
 	import Monitor from './routes/devices/Monitor.svelte';
 	import Content from './routes/devices/Content.svelte';
+	import Profile from './routes/Profile.svelte';
+	import Manage from './routes/Manage.svelte';
 	// import Details from './routes/Details.svelte';
 	import Configure from './routes/configure/Index.svelte';
 	import Configure3410 from './routes/configure/3410.svelte';
@@ -55,14 +57,14 @@
 		"/details/:protocol/:pgn/:function/:manufacturer/:industry/:instance/:type":
 																				wrap({ component: Details,        conditions: [(detail) => { return routeGuard(detail); }] }),
     "/login":                           wrap({ component: Login,          conditions: [(detail) => { return routeGuard(detail); }] }),
-    "/manage":                          wrap({ component: NotFound,       conditions: [(detail) => { return routeGuard(detail); }] }),
+    "/manage":                          wrap({ component: Manage,         conditions: [(detail) => { return routeGuard(detail); }] }),
 		"/messages/:protocol/:pgn/:instance":
 																				wrap({ component: Content,        conditions: [(detail) => { return routeGuard(detail); }] }),
 		"/messages/:protocol/:pgn/:function/:manufacturer/:industry/:instance/:type":
 																				wrap({ component: Content,        conditions: [(detail) => { return routeGuard(detail); }] }),
     "/monitor":                         wrap({ component: Monitor,        conditions: [(detail) => { return routeGuard(detail); }] }),
 		"/monitor/:address":                wrap({ component: Monitor,        conditions: [(detail) => { return routeGuard(detail); }] }),
-    "/profile":                         wrap({ component: NotFound,       conditions: [(detail) => { return routeGuard(detail); }] }),
+    "/profile":                         wrap({ component: Profile,        conditions: [(detail) => { return routeGuard(detail); }] }),
 		"/program":                         wrap({ component: Program,        conditions: [(detail) => { return routeGuard(detail); }] }),
 		"/program/:device/:instance":       wrap({ component: ProgramDevice,  conditions: [(detail) => { return routeGuard(detail); }] }),
 		"/restricted":                      wrap({ component: Restricted,     conditions: [(detail) => { return true;               }] }),
