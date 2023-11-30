@@ -3,8 +3,8 @@
   import { push } from 'svelte-spa-router'
   import { Grid, Row, Column, ToastNotification, TextInput, PasswordInput, Button,
     ComposedModal, ModalHeader, ModalBody, ModalFooter } from "carbon-components-svelte";
-  import { update } from '../auth/auth.js'
-  import { userData } from '../stores/user.js'
+  import { afetch } from '../auth/auth.js'
+  import { authURL, userData } from '../stores/user.js'
   
   let username = $userData.hasOwnProperty('user_name') ? $userData.user_name : '???';
   let password = null;
@@ -44,12 +44,21 @@
         return;
       }
     }
-    const res = await update(username, password, newpass, email);
-    if (res != true) {
+    const res = await afetch($authURL + '/update', {
+      method: 'POST',
+      body: JSON.stringify({
+        username,
+        firstname,
+        surname,
+        email,
+        permission,
+      }),
+    });
+    if (res.ok) {
+      push("/");
+    } else {
       errtext = 'Update failed, please try again.'
       error = true;
-    } else {
-      push("/");
     }
   };
   
