@@ -5,6 +5,8 @@ window.pumaAPI.once('auth-url', (e, val) => {
   authURL.set(val);
 });
 
+window.pumaAPI.send('auth-url');
+
 const user = JSON.parse(localStorage.getItem('userData'));
 const userData = writable(user);
 userData.subscribe((val) => {

@@ -40,8 +40,6 @@ log.transports.console.level = 'info';
 log.transports.file.maxSize = 10 * 1024 * 1024;
 log.transports.file.level = 'info';
 
-console.log(app.getPath('userData'));
-
 if (os.platform() == 'linux') {
   Can = require('./src/services/can.js');
 } else if (os.platform() == 'win32') {
@@ -408,6 +406,13 @@ discover();
 timer = setInterval(() => {
   discover();
 }, 10000);
+
+// Refresh authURL
+ipcMain.on('auth-url', (e, ...args) => {
+  if ((mainWindow != null) && (typeof mainWindow.webContents !== 'undefined')) {
+    mainWindow.webContents.send('auth-url', authURL);
+  }
+});
 
 // Load configurations
 ipcMain.on('can-ready', (e, ...args) => {

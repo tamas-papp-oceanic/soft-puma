@@ -6,4 +6,3 @@ contextBridge.exposeInMainWorld('pumaAPI', {
   send: (chn, data) => ipcRenderer.send(chn, data),
   reml: (chn) => ipcRenderer.removeAllListeners(chn),
 });
-

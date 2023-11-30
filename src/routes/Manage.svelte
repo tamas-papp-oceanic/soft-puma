@@ -6,11 +6,12 @@
   import UpdateNow from "carbon-icons-svelte/lib/UpdateNow20";
   import { afetch } from '../auth/auth.js'
   import { authURL } from '../stores/user.js'
+  import { construct_svelte_component } from 'svelte/internal';
   
   const headers = new Array(
     { key: 'username', value: 'User name', sort: false },
     { key: 'firstname', value: 'First name', sort: false },
-    { key: 'surname', value: 'Last name', sort: false },
+    { key: 'surname', value: 'Sirname', sort: false },
     { key: 'permission', value: 'Permission', sort: false },
   );
 
@@ -50,6 +51,24 @@
     return (txt && !!txt.match(/^(([^<>()[\]\\.,;:\s@"]+(\.[^<>()[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/)) || 'Please enter a valid email'
   };
 
+  async function _getuser(nam) {
+    username = nam;
+    firstname = null;
+    surname = null;
+    email = null;
+    permission = 'Basic';
+    const res = await afetch($authURL + '/user?username=' + nam, {method: 'GET'});
+    if (res.ok) {
+      let usr = await res.json();
+      firstname = usr.firstname;
+      surname = usr.surname;
+      email = usr.email;
+      permission = usr.permission;
+    } else {
+      console.log("Read users failed");
+    }
+  };
+
   async function _getusers() {
     rows = new Array();
     const res = await afetch($authURL + '/users', {method: 'GET'});
@@ -64,13 +83,13 @@
   };
 
   function _reread(e) {
-    if (e !== null) {
+    if (typeof e !== 'undefined') {
       e.preventDefault();
     }
     promise = _getusers();
   };
 
-  function _select(nam) {
+  function _findname(nam) {
     for (let i in rows) {
       if (rows[i].username == nam) {
         return new Array(rows[i].id);
@@ -79,8 +98,31 @@
     return new Array();
   };
 
+  function _findid(id) {
+    for (let i in rows) {
+      if (rows[i].id == id) {
+        return rows[i];
+      }
+    }
+    return null;
+  };
+
+  function _select(e) {
+    if (typeof e !== 'undefined') {
+      e.preventDefault();
+    }
+    let det = _findid(selected);
+    if (det !== null) {
+      username = det.username;
+      firstname = det.firstname;
+      surname = det.surname;
+      email = det.email;
+      permission = det.permission;
+    }
+  };
+
   function _create(e) {
-    if (e !== null) {
+    if (typeof e !== 'undefined') {
       e.preventDefault();
     }
     action = 'create';
@@ -91,14 +133,14 @@
   };
 
   function _reset(e) {
-    if (e !== null) {
+    if (typeof e !== 'undefined') {
       e.preventDefault();
     }
     action = 'reset';
   };
 
   function _modify(e) {
-    if (e !== null) {
+    if (typeof e !== 'undefined') {
       e.preventDefault();
     }
     action = 'modify';
@@ -108,30 +150,32 @@
   };
 
   function _suspend(e) {
-    if (e !== null) {
+    if (typeof e !== 'undefined') {
       e.preventDefault();
     }
     action = 'suspend';
   };
 
   function _delete(e) {
-    if (e !== null) {
+    if (typeof e !== 'undefined') {
       e.preventDefault();
     }
     action = 'delete';
   };
   
   async function _submit(e) {
-    if (e !== null) {
+    if (typeof e !== 'undefined') {
       e.preventDefault();
     }
-    let val = _email(email);
-    if (typeof val === 'string') {
-      errtext = val;
-      error = true;
-      return;
-    } else {
-      error = false;
+    if (typeof email !== 'undefined') {
+      let val = _email(email);
+      if (typeof val === 'string') {
+        errtext = val;
+        error = true;
+        return;
+      } else {
+        error = false;
+      }
     }
     const res = await afetch($authURL + '/' + action, {
       method: 'POST',
@@ -146,7 +190,7 @@
     if (res.ok) {
       if (action == 'create') {
         setTimeout(() => {
-          selected = _select(username);
+          selected = _findname(username);
         }, 500);
       }
       _clract();
@@ -158,7 +202,7 @@
   };
   
   function _cancel(e) {
-    if (e !== null) {
+    if (typeof e !== 'undefined') {
       e.preventDefault();
     }
     error = false;
@@ -182,7 +226,7 @@
   };
 
   function _action(e) {
-    if (e !== null) {
+    if (typeof e !== 'undefined') {
       e.preventDefault();
     }
     switch (action) {
@@ -195,7 +239,7 @@
   };
 
   function _clract(e) {
-    if (e !== null) {
+    if (typeof e !== 'undefined') {
       e.preventDefault();
     }
     action = null;
@@ -224,7 +268,7 @@
             <DataTableSkeleton showHeader={false} showToolbar={false} {headers} size="compact" rows={pagination.pageSize} />
           {:then rows}
             <DataTable id="users" zebra size="compact" sortable radio bind:selectedRowIds={selected} {headers} {rows}
-              pageSize={pagination.pageSize} page={pagination.page}>
+              pageSize={pagination.pageSize} page={pagination.page} on:click:row--select={(e) => _select(e)}>
               <span slot="cell" let:cell let:row>{cell.value}</span>
             </DataTable>
             {#if pagination.totalItems > pagination.pageSize}
@@ -272,12 +316,12 @@
         </Row>
         <Row padding>
           <Column>
-            <TextInput disabled={!['create', 'modify'].includes(action)} bind:value={surname} labelText="Last name" placeholder="Enter last name..." required />
+            <TextInput disabled={!['create', 'modify'].includes(action)} bind:value={surname} labelText="Sirname" placeholder="Enter sirname..." required />
           </Column>
         </Row>
         <Row>
           <Column>
-            <TextInput disabled={!['create', 'modify'].includes(action)} bind:value={email} labelText="Email" placeholder="Enter email address..." required />
+            <TextInput disabled={!['create', 'modify'].includes(action)} bind:value={email} labelText="Email" placeholder="Enter email address..." />
           </Column>
         </Row>
         <Row padding>
