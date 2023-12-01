@@ -2,20 +2,20 @@
   import { onMount } from 'svelte'
   import { Grid, Row, Column, ToastNotification, TextInput, ButtonSet,
     Button, Dropdown, ComposedModal, ModalHeader, ModalBody, ModalFooter,
-    DataTable, DataTableSkeleton, Form, Pagination } from "carbon-components-svelte";
+    DataTable, DataTableSkeleton, Form, Pagination, TooltipDefinition } from "carbon-components-svelte";
   import UpdateNow from "carbon-icons-svelte/lib/UpdateNow20";
   import { afetch } from '../auth/auth.js'
   import { authURL } from '../stores/user.js'
-  import { construct_svelte_component } from 'svelte/internal';
   
   const headers = new Array(
     { key: 'username', value: 'User name', sort: false },
     { key: 'firstname', value: 'First name', sort: false },
-    { key: 'surname', value: 'Sirname', sort: false },
+    { key: 'surname', value: 'Surname', sort: false },
     { key: 'permission', value: 'Permission', sort: false },
   );
 
   const permissions = new Array(
+    { id: 'Suspend', text: 'Suspended account' },
     { id: 'Basic', text: 'Basic account' },
     { id: 'Customer', text: 'Verified customer' },
     { id: 'Reseller', text: 'Authorised reseller' },
@@ -25,6 +25,7 @@
 
   let rows = new Array();
   let selected = new Array();
+  let id = null;
   let username = null;
   let firstname = null;
   let surname = null;
@@ -34,7 +35,7 @@
   let errtext = '';
   let action = null;
   let pagination = {
-    pageSize: 20,
+    pageSize: 10,
     page: 1,
     totalItems: 0,
   };
@@ -60,6 +61,7 @@
     const res = await afetch($authURL + '/user?username=' + nam, {method: 'GET'});
     if (res.ok) {
       let usr = await res.json();
+      id = usr.id;
       firstname = usr.firstname;
       surname = usr.surname;
       email = usr.email;
@@ -83,22 +85,19 @@
   };
 
   function _reread(e) {
-    if (typeof e !== 'undefined') {
-      e.preventDefault();
-    }
     promise = _getusers();
   };
 
-  function _findname(nam) {
+  function _byname(nam) {
     for (let i in rows) {
       if (rows[i].username == nam) {
-        return new Array(rows[i].id);
+        return new Array(rows[i].id.toString());
       }
     }
     return new Array();
   };
 
-  function _findid(id) {
+  function _byid(id) {
     for (let i in rows) {
       if (rows[i].id == id) {
         return rows[i];
@@ -108,78 +107,67 @@
   };
 
   function _select(e) {
-    if (typeof e !== 'undefined') {
-      e.preventDefault();
+    let fnd = false;
+    if (selected.length > 0) {
+      let det = _byid(selected[0]);
+      if (det !== null) {
+        fnd = true;
+        id = det.id;
+        username = det.username;
+        firstname = det.firstname;
+        surname = det.surname;
+        email = det.email;
+        permission = det.permission;
+      }
     }
-    let det = _findid(selected);
-    if (det !== null) {
-      username = det.username;
-      firstname = det.firstname;
-      surname = det.surname;
-      email = det.email;
-      permission = det.permission;
+    if (!fnd) {
+      id = null;
+      username = null;
+      firstname = null;
+      surname = null;
+      email = null;
+      permission = 'Basic';
     }
   };
 
   function _create(e) {
-    if (typeof e !== 'undefined') {
-      e.preventDefault();
-    }
+    selected = new Array();
     action = 'create';
-    permission = 'Basic';
+    _select();
     setTimeout(() => {
       document.getElementById("username").focus();
     }, 500)
   };
 
   function _reset(e) {
-    if (typeof e !== 'undefined') {
-      e.preventDefault();
-    }
     action = 'reset';
   };
 
   function _modify(e) {
-    if (typeof e !== 'undefined') {
-      e.preventDefault();
-    }
     action = 'modify';
     setTimeout(() => {
       document.getElementById("firstname").focus();
     }, 500)
   };
 
-  function _suspend(e) {
-    if (typeof e !== 'undefined') {
-      e.preventDefault();
-    }
-    action = 'suspend';
-  };
-
   function _delete(e) {
-    if (typeof e !== 'undefined') {
-      e.preventDefault();
-    }
     action = 'delete';
   };
   
   async function _submit(e) {
-    if (typeof e !== 'undefined') {
-      e.preventDefault();
-    }
-    if (typeof email !== 'undefined') {
+    error = false;
+    if ((typeof email !== 'undefined') && (email !== null)) {
       let val = _email(email);
       if (typeof val === 'string') {
         errtext = val;
         error = true;
         return;
-      } else {
-        error = false;
       }
     }
     const res = await afetch($authURL + '/' + action, {
       method: 'POST',
       body: JSON.stringify({
+        id,
         username,
         firstname,
         surname,
@@ -190,7 +178,8 @@
     if (res.ok) {
       if (action == 'create') {
         setTimeout(() => {
-          selected = _findname(username);
+          selected = _byname(username);
+          _select();
         }, 500);
       }
       _clract();
@@ -202,46 +191,26 @@
   };
   
   function _cancel(e) {
-    if (typeof e !== 'undefined') {
-      e.preventDefault();
-    }
     error = false;
-    switch (action) {
-      case 'create':
-        username = null;
-        firstname = null;
-        surname = null;
-        email = null;
-        permission = 'Basic';
-        break;
-      case 'modify':
-        username = selected.Username;
-        firstname = selected.Firstname;
-        surname = selected.Lastname;
-        email = selected.Email;
-        permission = selected.Permission;
-        break;
-    }
     _clract();
+    _select();
   };
 
   function _action(e) {
-    if (typeof e !== 'undefined') {
-      e.preventDefault();
-    }
     switch (action) {
-      case 'suspend':
-        break;
       case 'delete':
+
+
+
+
+
+
         break;
     }
     _clract();
   };
 
   function _clract(e) {
-    if (typeof e !== 'undefined') {
-      e.preventDefault();
-    }
     action = null;
   };
 </script>
@@ -262,12 +231,12 @@
           <hr>
         </Column>
       </Row>
-      <Row padding>
+      <Row>
         <Column>
           {#await promise}
-            <DataTableSkeleton showHeader={false} showToolbar={false} {headers} size="compact" rows={pagination.pageSize} />
+            <DataTableSkeleton showHeader={false} showToolbar={false} {headers} rows={pagination.pageSize} />
           {:then rows}
-            <DataTable id="users" zebra size="compact" sortable radio bind:selectedRowIds={selected} {headers} {rows}
+            <DataTable id="users" zebra sortable radio bind:selectedRowIds={selected} {headers} {rows}
               pageSize={pagination.pageSize} page={pagination.page} on:click:row--select={(e) => _select(e)}>
               <span slot="cell" let:cell let:row>{cell.value}</span>
             </DataTable>
@@ -294,13 +263,14 @@
       </Row>
     </Column>
     <Column sm={1} md={1} lg={2}>
-      <ButtonSet stacked style="padding: 0.2rem;">
-        <Button disabled={action !== null} style="margin: 0.2rem 0" on:click={(e) => _create(e)}>Create</Button>
-        <Button disabled={(action !== null) || (selected.length == 0)} style="margin: 0.2rem 0" on:click={(e) => _modify(e)}>Modify</Button>
-        <Button disabled={(action !== null) || (selected.length == 0)} style="margin: 0.2rem 0" on:click={(e) => _reset(e)}>Reset password</Button>
-        <Button disabled={(action !== null) || (selected.length == 0)} style="margin: 0.2rem 0" on:click={(e) => _suspend(e)}>Suspend</Button>
-        <Button disabled={(action !== null) || (selected.length == 0)} style="margin: 0.2rem 0" on:click={(e) => _delete(e)}>Delete</Button>
-      </ButtonSet>
+      <Row>
+        <ButtonSet stacked>
+          <Button disabled={action !== null} style="margin: 0 0 0.2rem 0" on:click={(e) => _create(e)}>Create</Button>
+          <Button disabled={(action !== null) || (selected.length == 0)} style="margin: 0.2rem 0" on:click={(e) => _modify(e)}>Modify</Button>
+          <Button disabled={(action !== null) || (selected.length == 0)} style="margin: 0.2rem 0" on:click={(e) => _delete(e)}>Delete</Button>
+          <Button disabled={(action !== null) || (selected.length == 0)} style="margin: 0.2rem 0 0 0" on:click={(e) => _reset(e)}>Reset</Button>
+        </ButtonSet>
+      </Row>
     </Column>
     <Column sm={3} md={3} lg={6}>
       <Form on:submit={(e) => _submit(e)}>
@@ -316,7 +286,7 @@
         </Row>
         <Row padding>
           <Column>
-            <TextInput disabled={!['create', 'modify'].includes(action)} bind:value={surname} labelText="Sirname" placeholder="Enter sirname..." required />
+            <TextInput disabled={!['create', 'modify'].includes(action)} bind:value={surname} labelText="Surname" placeholder="Enter surname..." required />
           </Column>
         </Row>
         <Row>

@@ -107,7 +107,7 @@
           <TextInput readonly bind:value={username} labelText="User name" placeholder="Enter user name..." required />
         </Column>
         <Column>
-          <PasswordInput id="password" invalid={(password === null)} bind:value={password} type="password" labelText="Current password" invalidText="Specify current password!" placeholder="Enter current password..." required />
+          <PasswordInput id="password" bind:value={password} type="password" labelText="Current password" placeholder="Enter current password..." required />
         </Column>
       </Row>
       <Row>
@@ -115,12 +115,12 @@
           <PasswordInput bind:value={newpass} type="password" labelText="New password" placeholder="Enter new password..." required />
         </Column>
         <Column>
-          <PasswordInput warn={(newpass !== null) && (rptpass != newpass)} bind:value={rptpass} type="password" labelText="Repeat password" warnText="Differs from new password!" placeholder="Repeat new password..." required />
+          <PasswordInput warn={(newpass !== null) && (rptpass != newpass)} bind:value={rptpass} type="password" labelText="Repeat password" warnText="Differs from new password!" placeholder="Repeat new password..." />
         </Column>
       </Row>
       <Row padding>
         <Column>
-          <TextInput bind:value={email} labelText="Email" placeholder="Enter email address..." required />
+          <TextInput bind:value={email} labelText="Email" placeholder="Enter email address..." />
         </Column>
       </Row>
       <Row>
