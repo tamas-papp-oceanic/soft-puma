@@ -31,8 +31,10 @@
   let surname = null;
   let email = null;
   let permission = 'Basic';
-  let error = false;
-  let errtext = '';
+  let notify = false;
+  let nfykind = '';
+  let nfytitle = '';
+  let nfytext = '';
   let action = null;
   let pagination = {
     pageSize: 10,
@@ -89,9 +91,11 @@
   };
 
   function _byname(nam) {
+    ret = new Array();
     for (let i in rows) {
       if (rows[i].username == nam) {
-        return new Array(rows[i].id.toString());
+        ret.push(rows[i].id);
+        return ret;
       }
     }
     return new Array();
@@ -155,12 +159,14 @@
   };
   
   async function _submit(e) {
-    error = false;
-    if ((typeof email !== 'undefined') && (email !== null)) {
+    notify = false;
+    nfytitle = action[0] + action.slice(1) + " user"
+    if ((typeof email === 'string') && (email !== '')) {
       let val = _email(email);
       if (typeof val === 'string') {
-        errtext = val;
-        error = true;
+        nfykind = "error"
+        nfytext = val;
+        notify = true;
         return;
       }
     }
@@ -176,6 +182,9 @@
       }),
     });
     if (res.ok) {
+      nfykind = "info"
+      nfytext = 'Result: ' + await res.json();
+      notify = true;
       if (action == 'create') {
         setTimeout(() => {
           selected = _byname(username);
@@ -185,26 +194,55 @@
       _clract();
       _reread();
     } else {
-      errtext = 'Update failed, please try again.'
-      error = true;
+      nfykind = "error"
+      nfytext = 'Result: ' + await res.json();
+      notify = true;
     }
   };
   
   function _cancel(e) {
-    error = false;
+    notify = false;
     _clract();
     _select();
   };
 
-  function _action(e) {
+  async function _action(e) {
     switch (action) {
       case 'delete':
-
-
-
-
-
-
+        notify = false;
+        nfytitle = "Delete user"
+        const res1 = await afetch($authURL + '/delete?id=' + id, {method: 'POST'});
+        if (res1.ok) {
+          nfykind = "info"
+          nfytext = 'Result: ' + await res1.json();
+          notify = true;
+          selected = new Array();
+          _select();
+          _clract();
+          _reread();
+        } else {
+          nfykind = "error"
+          nfytext = 'Result: ' + await res1.json();
+          notify = true;
+        }
+        break;
+      case 'reset':
+        notify = false;
+        nfytitle = "Reset password"
+        const res2 = await afetch($authURL + '/reset?id=' + id, {method: 'POST'});
+        if (res2.ok) {
+          nfykind = "info"
+          nfytext = 'Result: ' + await res2.json();
+          notify = true;
+          selected = new Array();
+          _select();
+          _clract();
+          _reread();
+        } else {
+          nfykind = "error"
+          nfytext = 'Result: ' + await res2.json();
+          notify = true;
+        }
         break;
     }
     _clract();
@@ -222,10 +260,11 @@
         <Column>
           <Row>
             <Column>
-              <h3>User profiles</h3>
+              <h4>User profiles</h4>
+              <p class="descr">(select from users to manage account)</p>
             </Column>
             <Column style="text-align: end;">
-              <Button on:click={(e) => _reread(e)} on="Refresh" icon={UpdateNow} />
+              <Button on:click={(e) => _reread(e)} iconDescription="Refresh" icon={UpdateNow} />
             </Column>
           </Row>
           <hr>
@@ -274,47 +313,49 @@
     </Column>
     <Column sm={3} md={3} lg={6}>
       <Form on:submit={(e) => _submit(e)}>
-        <Row padding>
+        <Row>
           <Column>
             <TextInput id="username" disabled={!['create'].includes(action)} bind:value={username} labelText="User name" placeholder="Enter user name..." required />
           </Column>
         </Row>
-        <Row>
+        <Row padding>
           <Column>
             <TextInput id="firstname" disabled={!['create', 'modify'].includes(action)} bind:value={firstname} labelText="First name" placeholder="Enter first name..." required />
           </Column>
         </Row>
-        <Row padding>
+        <Row>
           <Column>
             <TextInput disabled={!['create', 'modify'].includes(action)} bind:value={surname} labelText="Surname" placeholder="Enter surname..." required />
           </Column>
         </Row>
-        <Row>
+        <Row padding>
           <Column>
             <TextInput disabled={!['create', 'modify'].includes(action)} bind:value={email} labelText="Email" placeholder="Enter email address..." />
           </Column>
         </Row>
-        <Row padding>
+        <Row>
           <Column>
             <Dropdown disabled={!['create', 'modify'].includes(action)} bind:selectedId={permission} titleText="Permission" items={permissions} required/>
           </Column>
         </Row>
-        <Row>
+        <Row padding>
           <Column>
             <Button disabled={!['create', 'modify'].includes(action)} type="submit">Submit</Button>
             <Button disabled={!['create', 'modify'].includes(action)} kind="secondary" on:click={(e) => _cancel(e)}>Cancel</Button>
           </Column>
         </Row>
       </Form>
-      {#if error}
+      {#if notify}
         <Row>
           <ToastNotification
             lowContrast=false
             fullWidth
-            kind="error"
-            title="Error"
-            subtitle={errtext}
+            kind={nfykind}
+            title={nfytitle}
+            subtitle={nfytext}
             hideCloseButton
+            timeout = "2500"
+            on:close = {(e) => (notify = false)}
           />
         </Row>
       {/if}
@@ -334,3 +375,10 @@
     on:click:button--secondary={(e) => _clract(e)}
   />
 </ComposedModal>
+
+<style class="css">
+  .descr {
+    font-size: 0.8rem;
+    color: #c6c6c6;
+  }
+</style>

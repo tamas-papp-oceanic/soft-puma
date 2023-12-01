@@ -48,5 +48,15 @@
     "serial": false,
     "simulate": false,
     "testing": false
+  },
+  "Suspend": {
+    "analyse": false,
+    "configure": false,
+    "manage": false,
+    "profile": false,
+    "program": false,
+    "serial": false,
+    "simulate": false,
+    "testing": false
   }
 }

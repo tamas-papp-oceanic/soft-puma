@@ -97,15 +97,17 @@
     <Column sm={4} md={4} lg={8}>
       <Row>
         <Column>
-          <h3>User profile information</h3>
-          <small>To change current password fill up new password and repeat fields</small>
+          <h4>User profile information</h4>
+          <p class="descr">(to change current password fill up new password and repeat fields)</p>
           <hr>
         </Column>
       </Row>
-      <Row padding>
+      <Row>
         <Column>
           <TextInput readonly bind:value={username} labelText="User name" placeholder="Enter user name..." required />
         </Column>
+      </Row>
+      <Row padding>
         <Column>
           <PasswordInput id="password" bind:value={password} type="password" labelText="Current password" placeholder="Enter current password..." required />
         </Column>
@@ -114,16 +116,18 @@
         <Column>
           <PasswordInput bind:value={newpass} type="password" labelText="New password" placeholder="Enter new password..." required />
         </Column>
+      </Row>
+      <Row padding>
         <Column>
           <PasswordInput warn={(newpass !== null) && (rptpass != newpass)} bind:value={rptpass} type="password" labelText="Repeat password" warnText="Differs from new password!" placeholder="Repeat new password..." />
         </Column>
       </Row>
-      <Row padding>
+      <Row>
         <Column>
           <TextInput bind:value={email} labelText="Email" placeholder="Enter email address..." />
         </Column>
       </Row>
-      <Row>
+      <Row padding>
         <Column>
           <Button on:click={(e) => _submit(e)} type="submit">Submit</Button>
           <Button kind="secondary" on:click={(e) => _quit(e)}>Cancel</Button>
@@ -159,3 +163,10 @@
     on:click:button--secondary={(e) => _cancel(e)}
   />
 </ComposedModal>
+
+<style class="css">
+  .descr {
+    font-size: 0.8rem;
+    color: #c6c6c6;
+  }
+</style>
