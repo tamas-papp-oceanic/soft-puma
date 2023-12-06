@@ -2,10 +2,11 @@
   import { onMount } from 'svelte'
   import { push } from 'svelte-spa-router'
   import { Form, Grid, Row, Column, ToastNotification, TextInput, PasswordInput, Button,
-    ComposedModal, ModalHeader, ModalBody, ModalFooter } from "carbon-components-svelte";
+    ButtonSet, ComposedModal, ModalHeader, ModalBody, ModalFooter } from "carbon-components-svelte";
   import { afetch } from '../auth/auth.js'
   import { authURL, userData } from '../stores/user.js'
   
+  let userid = $userData.hasOwnProperty('user_id') ? $userData.user_id : '???';
   let username = $userData.hasOwnProperty('user_name') ? $userData.user_name : '???';
   let password = null;
   let newpass = null;
@@ -38,15 +39,19 @@
         return;
       }
     }
+    let dat = {
+      id: parseInt(userid),
+      username,
+    };
+    if (newpass !== null) {
+      dat.password = newpass;
+    }
+    if (email !== null) {
+      dat.email = email;
+    }
     const res = await afetch($authURL + '/update', {
       method: 'POST',
-      body: JSON.stringify({
-        username,
-        firstname,
-        surname,
-        email,
-        permission,
-      }),
+      body: JSON.stringify(dat),
     });
     if (res.ok) {
       push("/");
@@ -85,11 +90,11 @@
   }
 </script>
 
-<Form>
+<Form on:submit={(e) => _submit(e)}>
   <Grid>
     <Row>
-      <Column sm={0} md={2} lg={4} />
-      <Column sm={4} md={4} lg={8}>
+      <Column />
+      <Column sm={3} md={3} lg={6}>
         <Row>
           <Column>
             <h4>User profile information</h4>
@@ -99,7 +104,7 @@
         </Row>
         <Row>
           <Column>
-            <TextInput readonly bind:value={username} labelText="User name" placeholder="Enter user name..." required />
+            <TextInput disabled bind:value={username} labelText="User name" placeholder="Enter user name..." required />
           </Column>
         </Row>
         <Row padding>
@@ -123,16 +128,16 @@
           </Column>
         </Row>
         <Row padding>
-          <Column>
-            <Button on:click={(e) => _submit(e)} type="submit">Submit</Button>
+          <Column style="display:flex;align-items:flex-start;">
+            <Button type="submit">Submit</Button>
             <Button kind="secondary" on:click={(e) => _quit(e)}>Cancel</Button>
           </Column>
-          <Column style="text-align: end;">
+          <Column style="text-align:end;">
             <Button kind="tertiary" on:click={(e) => _delete(e)}>Delete</Button>
           </Column>
         </Row>
       </Column>
-      <Column sm={0} md={2} lg={4} />
+      <Column />
     </Row>
     {#if error}
       <Row>
