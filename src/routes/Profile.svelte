@@ -39,19 +39,13 @@
         return;
       }
     }
-    let dat = {
-      id: parseInt(userid),
-      username,
-    };
-    if (newpass !== null) {
-      dat.password = newpass;
-    }
-    if (email !== null) {
-      dat.email = email;
-    }
     const res = await afetch($authURL + '/update', {
       method: 'POST',
-      body: JSON.stringify(dat),
+      body: JSON.stringify({
+        id: parseInt(userid),
+        password: newpass,
+        email,
+      }),
     });
     if (res.ok) {
       push("/");
