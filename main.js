@@ -928,7 +928,9 @@ ipcMain.on('voltable-read', (e, args) => {
   if ((typeof dev === 'string') && (typeof devices[dev] !== 'undefined')) {
     let eng = devices[dev].engine;
     let res = eng.send065289(fluid, instance, 0x02);
+    res |= eng.send065289(fluid, instance, 0x05);
     res |= eng.send130825(fluid, instance, 0x02);
+    res |= eng.send130825(fluid, instance, 0x05);
     if ((mainWindow != null) && (typeof mainWindow.webContents !== 'undefined')) {
       mainWindow.webContents.send('voltable-done', res);
     }

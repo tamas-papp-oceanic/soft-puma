@@ -40,13 +40,18 @@
               // Stored Volumetric Data
               if ((msg.fields[3].value == data.instance) && (msg.fields[4].value == data.fluid)) {
                 data.table = new Array();
-                data.capacity = msg.fields[7].value * 1000; // m3 -> L
-                let arr = Array.from(msg.fields[6].value, (x) => x.charCodeAt(0));
-                for (let i in arr) {
-                  data.table.push({
-                    'id': i.toString(), 'perlvl': i, 'pervol': arr[i],
-                    'volume': Math.round(arr[i] * data.capacity) / 100,
-                  });
+                data.capacity = 0;
+                if (msg.fields[7].state == 'V') {
+                  data.capacity = msg.fields[7].value * 1000; // m3 -> L
+                }
+                if (msg.fields[6].state == 'V') {
+                  let arr = Array.from(msg.fields[6].value, (x) => x.charCodeAt(0));
+                  for (let i in arr) {
+                    data.table.push({
+                      'id': i.toString(), 'perlvl': i, 'pervol': arr[i],
+                      'volume': Math.round(arr[i] * data.capacity) / 100,
+                    });
+                  }
                 }
                 stop('voltable');
                 running = false;
@@ -215,7 +220,6 @@
     }, timeout);
     data.capacity = null;
     data.table = new Array();
-    data.mode = null;
     // Receives volume table result
     window.pumaAPI.recv('voltable-done', (e, res) => {
       if (!res) {

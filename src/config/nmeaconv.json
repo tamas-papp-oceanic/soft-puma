@@ -20,8 +20,8 @@
     "field": 3
   },
   "nmea2000/130825": {
-    "function": 5,
-    "field": 5
+    "function": 3,
+    "field": 6
   },
   "nmea2000/131011": {
     "function": 4,

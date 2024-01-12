@@ -30,6 +30,12 @@ function unpack(frm) {
 function decode(frm, din) {
   try {
     let pgn = com.getPgn(frm.id);
+    // if ((pgn == 130825) && (frm.data[0] == 0xA1)) {
+    //   frm.data[1] = 0x98;
+    // }
+    if (com.isProprietary(pgn) && (frm.data[0] == 0xA1)) {
+      frm.data[1] = 0x98;
+    }
     let def = com.findDef(frm);
     if (def == null) {
       return null;
@@ -117,7 +123,6 @@ function decode(frm, din) {
           let buf = Buffer.alloc(Math.ceil(len / 8));
           frm.data.copy(buf, 0, byt);
           val = buf.toString('utf8');
-          ptr += len;
         } else if (fld['type'] == 'str') {
           let asc = frm.data.readUInt8(byt + 1);
           if (len > 16) {

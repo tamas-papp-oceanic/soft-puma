@@ -84,7 +84,7 @@
           if (fld.dictionary != "DD001") {
             tmp.push({
               key: 'fld' + fld.field,
-              value: fld.title,
+              value: fld.title + (fld.unit != null ? ' (' + fld.unit + ')' : ''),
               sort: false,
             });
           }
