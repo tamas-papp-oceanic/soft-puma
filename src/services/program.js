@@ -11,7 +11,7 @@ const log = require('electron-log');
 const dwl = require('download');
 const path = require('path');
 const cp = require('child_process');
-const http = require('http');
+const https = require('https');
 
 function erase(func) {
   return new Promise((resolve, reject) => {
@@ -103,7 +103,7 @@ async function writeBoot(url, file, func) {
 
 async function downUpdates(url, func) {
   return new Promise((resolve, reject) => {
-    http.get(url + '/updates', (res) => {
+    https.get(url + '/updates', (res) => {
       if ((res.statusCode >= 200) && (res.statusCode <= 299)) {
         let data = [];
         res.on('data', (chunk) => {

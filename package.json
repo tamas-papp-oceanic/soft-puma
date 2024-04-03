@@ -1,6 +1,6 @@
 {
   "name": "puma",
-  "version": "1.0.18",
+  "version": "1.0.19",
   "private": true,
   "main": "main.js",
   "description": "Oceanic System's Device Settings & Diagnostic Application",
@@ -21,7 +21,7 @@
       "category": "Utility",
       "publish": {
         "provider": "generic",
-        "url": "http://puma.osukl.com:80/release/x86_64"
+        "url": "https://updates.osukl.com/leopard/release/x86_64"
       }
     },
     "mac": {},
@@ -34,7 +34,7 @@
       ],
       "publish": {
         "provider": "generic",
-        "url": "http://puma.osukl.com:80/release/win64"
+        "url": "https://updates.osukl.com/leopard/release/win64"
       }
     },
     "appImage": {
