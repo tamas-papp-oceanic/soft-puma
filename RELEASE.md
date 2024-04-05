@@ -6,7 +6,11 @@
 In terminal window puma folder:
 
 npm install
-npm run electron-pack
+node_modules/.bin/electron-rebuild
+npm run build
+
+npm run electron-pack (for linux)
+npm run electron-pack-win (for windows)
 ```
 ## Deploying generated files
 
@@ -29,7 +33,7 @@ The generated files:
   dist/Puma Setup x.x.x.exe
   dist/Puma Setup x.x.x.exe.blockmap
 
-They should be uploaded into the "puma.osukl.com" server's release folder:
+They should be uploaded into the "updates.osukl.com/leopard" server's release folder:
 
   /usr/share/leopard/release/win64
 
