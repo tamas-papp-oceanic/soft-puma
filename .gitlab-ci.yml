@@ -1,0 +1,40 @@
+image: electronuserland/builder:16
+stages:
+  - prepare
+  - build
+
+prepare-job:
+  stage: prepare
+  script:
+    - export VERSION=$(node -p "require('./package.json').version")
+    - echo "VERSION=$VERSION" >> deploy.env
+  artifacts:
+    reports:
+      dotenv: deploy.env
+  only:
+    - master
+
+variables:
+  VERSION: "$VERSION"
+
+build-job:
+  stage: build
+  needs:
+    - job: prepare-job
+      artifacts: true
+  before_script:
+    - npm install
+    - node_modules/.bin/electron-rebuild
+  script:
+    - npm run electron-pack
+  after_script:
+    - cd $CI_PROJECT_DIR/dist
+    - chmod +x $CI_PROJECT_NAME
+    - tar -czf ../$CI_PROJECT_NAME-linux-$CI_COMMIT_REF_SLUG-$VERSION.tar.gz -C . $CI_PROJECT_NAME latest-linux.yml
+  artifacts:
+    paths:
+      - $CI_PROJECT_DIR/*.tar.gz
+    when: on_success
+    expire_in: 24 hrs
+  only:
+    - master

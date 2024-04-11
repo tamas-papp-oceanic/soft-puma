@@ -68,7 +68,6 @@
     "concurrently": "^6.0.2",
     "electron": "^19.0.0",
     "electron-builder": "^22.14.13",
-    "electron-rebuild": "^3.2.7",
     "node-sass": "^6.0.0",
     "postcss": "^8.2.15",
     "rebuild": "^0.1.2",
