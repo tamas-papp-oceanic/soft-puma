@@ -24,6 +24,7 @@
 	import Configure5720 from './routes/configure/5720.svelte';
 	import Program from './routes/program/Index.svelte';
 	import ProgramDevice from './routes/program/Program.svelte';
+	import Serial from './routes/serial/Serial.svelte';
 	import Simulate from './routes/simulate/Index.svelte';
 	import Testing from './routes/testing/Index.svelte';
 	import Test3478 from './routes/testing/3478.svelte';
@@ -68,6 +69,7 @@
 		"/program":                         wrap({ component: Program,        conditions: [(detail) => { return routeGuard(detail); }] }),
 		"/program/:device/:instance":       wrap({ component: ProgramDevice,  conditions: [(detail) => { return routeGuard(detail); }] }),
 		"/restricted":                      wrap({ component: Restricted,     conditions: [(detail) => { return true;               }] }),
+		"/serial":                          wrap({ component: Serial,         conditions: [(detail) => { return routeGuard(detail); }] }),
 		"/simulate":                        wrap({ component: Simulate,       conditions: [(detail) => { return routeGuard(detail); }] }),
 		"/testing":                         wrap({ component: Testing,        conditions: [(detail) => { return routeGuard(detail); }] }),
 		"/testing/3478/:instance":          wrap({ component: Test3478,       conditions: [(detail) => { return routeGuard(detail); }] }),

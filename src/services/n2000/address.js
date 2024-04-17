@@ -11,7 +11,6 @@ class Address {
   #savaddr;   // Saved address
   #timeout;   // Random timeout
   #send;      // Send callback method
-  #timers;    // Product Information timers
   #names;     // Name records
   #asm;       // Address State Machine
   #s0;        // State 0
@@ -46,7 +45,6 @@ class Address {
     this.#savaddr = 0;
     this.#timeout = null;
     this.#send = null;
-    this.#timers = {};
     this.#names = {};
     // Define final state machine
     this.#asm = new StateMachine('ASM', context);
@@ -225,16 +223,6 @@ class Address {
     let nam = msg.raw.toString('hex', 4);
     let key = nam.substring(0, 8) + nam.substring(10);
     let ins = parseInt(nam.substring(8, 10));
-    if (typeof this.#timers[key] !== 'undefined') {
-      clearTimeout(this.#timers[key]);
-      delete this.#timers[key];
-    }
-    if (typeof this.#names[key] === 'undefined') {
-      this.#timers[key] = setTimeout((key, src) => {
-        this.send059904(126996, src);
-        delete this.#timers[key];
-      }, 2000, key, msg.header.src);
-    }
     this.#names[key] = { src: msg.header.src, ins: ins };
     switch (this.#asm.currentState.name) {
       case 'WaitForContention':

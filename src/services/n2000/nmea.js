@@ -262,6 +262,7 @@ class NMEAEngine {
   send065280(serial) {
     // This PGN should be 061184 (addressable)
     if (this.#addrMngr.state == 'Valid') {
+      let ser = ((parseInt(serial) & 0xFF0000) >> 16) + (parseInt(serial) & 0xFF00) + ((parseInt(serial) & 0xFF) << 16);
       let msg = {
       key: 'nmea2000/065280/-/161/4/-/-',
         header: { pgn: 65280, src: this.#addrMngr.address, dst: 0xFF },
@@ -270,8 +271,7 @@ class NMEAEngine {
           { field: 2,title: 'NMEA Reserved', state: 'V', value: 0b11 },
           { field: 3,title: 'Industry Group', state: 'V', value: this.#addrMngr.name[9] },
           { field: 4,title: 'Security Code', state: 'V', value: 0xBC },
-          { field: 5,title: 'Serial Number', state: 'V', value: serial },
-          { field: 6,title: 'NMEA Reserved', state: 'V', value: 0b111 },
+          { field: 5,title: 'Serial Number', state: 'V', value: ser },
         ],
       };
       return this.sendMsg(msg);

@@ -18105,18 +18105,10 @@
       {
         "field": 5,
         "title": "Serial Number",
-        "type": "bit(21)",
+        "type": "bit(24)",
         "unit": null,
         "multiplier": null,
         "dictionary": "DD999"
-      },
-      {
-        "field": 6,
-        "title": "NMEA Reserved",
-        "type": "bit(3)",
-        "unit": null,
-        "multiplier": null,
-        "dictionary": "DD001"
       }
     ]
   },

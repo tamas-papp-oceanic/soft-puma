@@ -1,5 +1,5 @@
 // Modules to control application life and create native browser window
-const { app, BrowserWindow, ipcMain } = require('electron');
+const { app, BrowserWindow, Tray, Menu, ipcMain } = require('electron');
 const { autoUpdater, CancellationToken } = require('electron-updater');
 const isDev = require('electron-is-dev');
 const os = require('os');
@@ -16,13 +16,12 @@ const J1939Engine = require('./src/services/j1939/j1939.js');
 const bwipjs = require('bwip-js');
 const PDFDocument = require('pdfkit');
 const prt = 'HP-LaserJet-Pro-M404-M405';
-const { writeBoot, downFile, downUpdates, upFile } = require('./src/services/program.js')
+const { writeBoot, downFile, downUpdates } = require('./src/services/program.js')
 const { readFile, writeFile } = require('./src/services/files.js');
 const EventEmitter = require('node:events');
 const crc32 = require('buffer-crc32');
 
 // Leopard URL
-// const authURL = 'http://puma.osukl.com:80';
 const authURL = 'https://updates.osukl.com/leopard';
 
 const pub = new EventEmitter();
@@ -35,6 +34,7 @@ let timer = null;
 let Can = null;
 let cancelToken;
 let simCapt = false;
+let tray = null;
 
 log.transports.console.level = 'info';
 log.transports.file.maxSize = 10 * 1024 * 1024;
@@ -49,11 +49,11 @@ if (os.platform() == 'linux') {
 function createWindow() {
   // Create the browser window.
   mainWindow = new BrowserWindow({
-    width: 1200,
-    height: 720,
+    minWidth: 1200,
+    minHeight: 720,
     frame: false,
-    minWidth: 720,
     useContentSize: true,
+    skipTaskbar: true,
     webPreferences: {
       nodeIntegration: true,
       contextIsolation: true,
@@ -83,7 +83,7 @@ function createWindow() {
     mainWindow.webContents.openDevTools();
   }
 
-  mainWindow.on('closed', function () {
+  mainWindow.on('closed', () => {
     // Dereference the window object, usually you would store windows
     // in an array if your app supports multi windows, this is the time
     // when you should delete the corresponding element.
@@ -99,7 +99,45 @@ function createWindow() {
     }
     mainWindow.show();
   });
-}
+
+  mainWindow.on('show', () => {
+    const ctxMenu = Menu.buildFromTemplate([
+      { label: 'Hide', click: () => { mainWindow.minimize(); } },
+      {
+        label: mainWindow.maximized ? 'Normal' : 'Full',
+        click: () => { mainWindow.maximized ? mainWindow.unmaximize() : mainWindow.maximize(); }
+      },
+      { label: 'Quit', click: () => { close(); }},
+    ]);
+    tray.setContextMenu(ctxMenu);
+  });
+
+  mainWindow.on('minimize', () => {
+    const ctxMenu = Menu.buildFromTemplate([
+      { label: 'Show', click: () => { mainWindow.show(); } },
+      { label: 'Quit', click: () => { close(); }},
+    ]);
+    tray.setContextMenu(ctxMenu);
+  });
+
+  mainWindow.on('maximize', () => {
+    const ctxMenu = Menu.buildFromTemplate([
+      { label: 'Hide', click: () => { mainWindow.minimize(); } },
+      { label: 'Normal', click: () => { mainWindow.unmaximize(); } },
+      { label: 'Quit', click: () => { close(); }},
+    ]);
+    tray.setContextMenu(ctxMenu);
+  });
+
+  mainWindow.on('unmaximize', () => {
+    const ctxMenu = Menu.buildFromTemplate([
+      { label: 'Hide', click: () => { mainWindow.minimize(); } },
+      { label: 'Full', click: () => { mainWindow.maximize(); } },
+      { label: 'Quit', click: () => { close(); }},
+    ]);
+    tray.setContextMenu(ctxMenu);
+  });
+};
 
 autoUpdater.logger = log;
 autoUpdater.disableWebInstaller = true;
@@ -137,16 +175,24 @@ autoUpdater.on('update-downloaded', (info) => {
   mainWindow.webContents.send('upd-download', false);
 });
 
+
 // This method will be called when Electron has finished
 // initialization and is ready to create browser windows.
 // Some APIs can only be used after this event occurs.
 app.whenReady().then(async () => {
-  createWindow();
-  app.on('activate', function () {
-    if (BrowserWindow.getAllWindows().length === 0) {
-      createWindow();
-    }
-  });
+
+  tray = new Tray(path.join(isDev ? process.cwd() : __dirname, 'public/favicon.png'));
+
+  const ctxMenu = Menu.buildFromTemplate([
+    { label: 'Hide', click: () => { mainWindow.minimize(); } },
+    { label: 'Full', click: () => { mainWindow.maximize(); } },
+    { label: 'Quit', click: () => { close(); }},
+  ]);
+
+  tray.setContextMenu(ctxMenu)
+  tray.setToolTip('Puma application.')
+  tray.setTitle('Puma application.')
+
   setTimeout(() => {
     autoUpdater.autoDownload = false;
     autoUpdater.checkForUpdates().then((res) => {
@@ -158,11 +204,24 @@ app.whenReady().then(async () => {
 });
 
 // Quit when all windows are closed.
-app.on('window-all-closed', function () {
+app.on('ready', () => {
+  createWindow();
+});
+
+// Quit when all windows are closed.
+app.on('window-all-closed', () => {
   // On macOS it is common for applications and their menu bar
   // to stay active until the user quits explicitly with Cmd + Q
   if (process.platform !== 'darwin') {
     app.quit();
+  }
+});
+
+app.on('activate', () => {
+  // On OS X it's common to re-create a window in the app when the
+  // dock icon is clicked and there are no other windows open.
+  if (BrowserWindow.getAllWindows().length === 0) {
+    createWindow();
   }
 });
 
@@ -259,7 +318,21 @@ async function discover() {
     });
     resolve(true);
   });
-}
+};
+
+function scan() {
+  if ((mainWindow != null) && (typeof mainWindow.webContents !== 'undefined')) {
+    mainWindow.webContents.send('n2k-clear');
+  }
+  for (const [key, val] of Object.entries(devices)) {
+    if (val.protocol === 'nmea2000') {
+      // Clear name records
+      val.engine.clearNames();
+      // Send ISO Request for Address Claim
+      val.engine.send059904(60928, 0xFF);
+    }
+  }
+};
 
 // NMEA2000 processing
 function n2000Proc(dev, frm) {
@@ -271,6 +344,7 @@ function n2000Proc(dev, frm) {
       switch (msg.header.pgn) {
       case 60928:
         mainWindow.webContents.send('n2k-name', [dev, msg]);
+        mainWindow.webContents.send('ser-name', [dev, msg]);
         break;
       case 65289:
       case 130825:
@@ -321,6 +395,7 @@ function n2000Proc(dev, frm) {
         break;
       case 126996:
         mainWindow.webContents.send('n2k-prod', [dev, msg]);
+        mainWindow.webContents.send('ser-prod', [dev, msg]);
         break;
       case 127501:
         mainWindow.webContents.send('n2k-digi-stat-data', [dev, msg]);
@@ -392,6 +467,34 @@ function j1939Proc(dev, frm) {
   }
 }
 
+// Closes the application
+function close() {
+  if (timer != null) {
+    clearInterval(timer);
+    timer = null;
+  }
+  log.info('Stopping devices...');
+  if ((mainWindow != null) && (typeof mainWindow.webContents !== 'undefined')) {
+    mainWindow.webContents.send('sim-stop');
+  }
+  setTimeout(() => {
+    for (const [key, val] of Object.entries(devices)) {
+      if (val.type == 'serial') {
+        log.info('Closing Serial (' + key + ')...');
+      } else if (val.type == 'can') {
+        log.info('Stopping CAN (' + key + ')...');
+      }
+      val.device.stop();
+    }
+    log.info('Destroying devices...');
+    for (const [key, val] of Object.entries(devices)) {
+      val.engine.destroy();
+    }
+    log.info('Quit...')
+    app.quit();
+  }, 1000);
+};
+
 // Initialize NMEA2000 translator
 nmeaCom.init();
 // Initialize J1939 translator
@@ -399,7 +502,13 @@ j1939Com.init();
 
 // Start discovery loop
 log.info('Discovering interfaces...')
-discover();
+discover().then((res) => {
+  if (res) {
+    setTimeout(() => {
+      scan();
+    }, 2500);
+  }
+});
 
 timer = setInterval(() => {
   discover();
@@ -481,17 +590,18 @@ ipcMain.on('n2k-data', (e, ...args) => {
 
 // Processing bus scan request
 ipcMain.on('bus-scan', (e) => {
-  if ((mainWindow != null) && (typeof mainWindow.webContents !== 'undefined')) {
-    mainWindow.webContents.send('n2k-clear');
-  }
-  for (const [key, val] of Object.entries(devices)) {
-    if (val.protocol === 'nmea2000') {
-      // Clear name records
-      val.engine.clearNames();
-      // Send ISO Request for Address Claim
-      val.engine.send059904(60928, 0xFF);
-    }
-  }
+  // if ((mainWindow != null) && (typeof mainWindow.webContents !== 'undefined')) {
+  //   mainWindow.webContents.send('n2k-clear');
+  // }
+  // for (const [key, val] of Object.entries(devices)) {
+  //   if (val.protocol === 'nmea2000') {
+  //     // Clear name records
+  //     val.engine.clearNames();
+  //     // Send ISO Request for Address Claim
+  //     val.engine.send059904(60928, 0xFF);
+  //   }
+  // }
+  scan();
 });
 
 ipcMain.on('ser-num', (e, args) => {
@@ -1808,6 +1918,54 @@ ipcMain.on('simfile-write', (e, args) => {
   });
 });
 
+// Sends ISO request for product info
+// ipcMain.on('pro-read', (e, args) => {
+//   const [dev] = args;
+//   if ((typeof dev === 'string') && (typeof devices[dev] !== 'undefined')) {
+//     let eng = devices[dev].engine;
+//     let res = eng.send059904(60928, 0xFF);
+//     setTimeout((res) => {
+//       res |=  eng.send059904(126996, 0xFF);
+//       setTimeout((res) => {
+//         if ((mainWindow != null) && (typeof mainWindow.webContents !== 'undefined')) {
+//           mainWindow.webContents.send('pro-done', res);
+//         }
+//       }, 750, res);
+//     }, 250, res);
+//   } else {
+//     console.log("No device selected!");
+//   }
+// });
+
+// Sends ISO request for product info
+ipcMain.on('pro-read', (e, args) => {
+  const [dev, dst] = args;
+  if ((typeof dev === 'string') && (typeof devices[dev] !== 'undefined')) {
+    let eng = devices[dev].engine;
+    let res =  eng.send059904(126996, dst);
+    if ((mainWindow != null) && (typeof mainWindow.webContents !== 'undefined')) {
+      mainWindow.webContents.send('pro-done', res);
+    }
+  } else {
+    console.log("No device selected!");
+  }
+});
+
+// Sends set serial number proprietary PGN
+ipcMain.on('ser-write', (e, args) => {
+  const [dev, serial] = args;
+  if ((typeof dev === 'string') && (typeof devices[dev] !== 'undefined')) {
+    let eng = devices[dev].engine;
+    // Send Proprietary Set serial PGN
+    let res = eng.send065280(serial);
+    if ((mainWindow != null) && (typeof mainWindow.webContents !== 'undefined')) {
+      mainWindow.webContents.send('ser-done', res);
+    }
+  } else {
+    console.log("No device selected!");
+  }
+});
+
 // Starts NMEA capturing
 ipcMain.on('capt-start', (e, args) => {
   const [dev] = args;
@@ -1833,32 +1991,4 @@ ipcMain.on('dev-stop', (e, ...args) => {
   for (const [key, val] of Object.entries(devices)) {
     val.device.stop();  
   }
-});
-
-// Closes the application
-ipcMain.on('app-quit', (e, ...args) => {
-  if (timer != null) {
-    clearInterval(timer);
-    timer = null;
-  }
-  log.info('Stopping devices...');
-  if ((mainWindow != null) && (typeof mainWindow.webContents !== 'undefined')) {
-    mainWindow.webContents.send('sim-stop');
-  }
-  setTimeout(() => {
-    for (const [key, val] of Object.entries(devices)) {
-      if (val.type == 'serial') {
-        log.info('Closing Serial (' + key + ')...');
-      } else if (val.type == 'can') {
-        log.info('Stopping CAN (' + key + ')...');
-      }
-      val.device.stop();
-    }
-    log.info('Destroying devices...');
-    for (const [key, val] of Object.entries(devices)) {
-      val.engine.destroy();
-    }
-    log.info('Quit...')
-    app.quit();
-  }, 1000);
 });

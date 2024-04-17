@@ -76,6 +76,10 @@
     push('/monitor/' + row.id);
   }
 
+  function serial(e, row) {
+    push('/serial');
+  }
+
   function test(e, row) {
     try {
       let nam = $name[$device][row.id];
@@ -208,10 +212,21 @@
         <span slot="cell" let:cell let:row let:rowIndex>
           {#if cell.key === 'overflow'}
             <OverflowMenu direction={rowIndex < (pagination.pageSize / 2) ? "bottom" : "top"}>
-              <OverflowMenuItem text="Configure" disabled={!isRoute('/configure', row.id)} on:click={(e) => conf(e, row)} />
-              <OverflowMenuItem text="Monitor" disabled={!isRoute('/monitor')} on:click={(e) => monitor(e, row)} />
-              <OverflowMenuItem text="Testing" disabled={!isRoute('/testing', row.id)} on:click={(e) => test(e, row)} />
-              <OverflowMenuItem text="Update" disabled={!isRoute('/program') || !isUpdate(row.id)} on:click={(e) => update(e, row)} />
+              {#if isRoute('/monitor')}
+                <OverflowMenuItem text="Monitor" on:click={(e) => monitor(e, row)} />
+              {/if}
+              {#if isRoute('/configure', row.id)}
+                <OverflowMenuItem text="Configure" on:click={(e) => conf(e, row)} />
+              {/if}
+              {#if isRoute('/serial')}
+                <OverflowMenuItem text="Serial" on:click={(e) => serial(e, row)} />
+              {/if}
+              {#if isRoute('/testing', row.id)}
+                <OverflowMenuItem text="Testing" on:click={(e) => test(e, row)} />
+              {/if}
+              {#if isRoute('/program') && isUpdate(row.id)}
+                <OverflowMenuItem text="Update" on:click={(e) => update(e, row)} />
+              {/if}
             </OverflowMenu>
           {:else}
             {cell.value}

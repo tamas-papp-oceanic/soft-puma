@@ -148,6 +148,7 @@ window.pumaAPI.recv('n2k-name', (e, args) => {
     }
     dat[dev][src] = nam;
     name.set(dat);
+    window.pumaAPI.send('pro-read', [dev, src]);
   }
 });
 // NMEA product info message

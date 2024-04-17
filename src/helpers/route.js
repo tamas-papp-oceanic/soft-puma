@@ -11,6 +11,7 @@ function isRoute(prf, src) {
     case '/messages':
     case '/monitor':
     case '/program':
+    case '/serial':
     case '/simulate':
       break;
     default:
