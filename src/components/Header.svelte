@@ -47,12 +47,7 @@
   let selected = {
     device: '0',
     protocol: '0',
-    menu: menu[0],
-    drop: null,
   };
-
-  // Initially select "Devices" menu
-  _select(null, selected.menu);
 
   function mark(loc) {
     for (let i in menu) {
@@ -77,13 +72,6 @@
       if (menu[i].enabled && menu[i].hasOwnProperty("protocols")) {
         menu[i].enabled = (menu[i].protocols.indexOf(pro) !== -1);
       }
-      if (menu[i].id === selected.menu.id) {
-        if (!menu[i].enabled) {
-          _select(null, first());
-        } else {
-          selected.menu = menu[i];
-        }
-      }
     }
     for (let i in drop) {
       drop[i].enabled = routeGuard({location: drop[i].location});
@@ -94,12 +82,6 @@
   };
 
   function _select(e, itm) {
-    if (typeof menu.find((elm) => elm.text == itm.text) !== "undefined") {
-      selected.menu = itm;
-      selected.drop = null;
-    } else if (typeof drop.find((elm) => elm.text == itm.text) !== "undefined") {
-      selected.drop = itm;
-    }
     push(itm.location);
   };
 
@@ -222,7 +204,7 @@
         {/if}
       {/each}
       {#if $loggedIn}
-        <HeaderNavMenu text={selected.drop !== null ? selected.drop.text : "User area"}>
+        <HeaderNavMenu text={drop.filter((elm) => { return elm.selected; }).length > 0 ? drop.filter((elm) => { return elm.selected; })[0].text : "User area"}>
           {#each drop as item}
             {#if item.hasOwnProperty('text') && item.enabled}
               <HeaderNavItem bind:isSelected={item.selected} on:click={(e) => _select(e, item)} text={item.text} />
