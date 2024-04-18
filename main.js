@@ -1992,3 +1992,8 @@ ipcMain.on('dev-stop', (e, ...args) => {
     val.device.stop();  
   }
 });
+
+// Closes the application
+ipcMain.on('app-quit', (e, ...args) => {
+  close();
+});

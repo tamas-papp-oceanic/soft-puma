@@ -1,19 +1,20 @@
 <script>
-  import { push } from 'svelte-spa-router'
+  import { push, location } from 'svelte-spa-router'
   import { Header, HeaderNav, HeaderNavItem, HeaderUtilities, HeaderGlobalAction,
-    HeaderAction, HeaderPanelLinks, HeaderPanelLink, ComposedModal, ModalHeader,
-    ModalBody, ModalFooter, TooltipDefinition, TooltipIcon, Dropdown } from "carbon-components-svelte";
+    ComposedModal, ModalHeader, ModalBody, ModalFooter, TooltipDefinition,
+    Dropdown, HeaderNavMenu } from "carbon-components-svelte";
   import Manage from "carbon-icons-svelte/lib/UserAdmin20";
   import Profile from "carbon-icons-svelte/lib/UserProfile20";
   import Update from "carbon-icons-svelte/lib/UpdateNow20";
   import Login from "carbon-icons-svelte/lib/Login20";
   import Logout from "carbon-icons-svelte/lib/Logout20";
+  import Close from "carbon-icons-svelte/lib/Close20";
   import { logout } from '../auth/auth.js'
   import { loggedIn, userData } from '../stores/user.js';
   import { devices, device, protocol, data, name } from '../stores/data.js';
 	import { update, updmsg, download } from '../stores/update.js';
   import { routeGuard } from '../helpers/guard.js';
-  
+
   export let company;
   export let product;
   export let version;
@@ -22,15 +23,16 @@
     { id: '0', location: '/', selected: false, enabled: true, text: 'Devices', protocols: ['0', '1'] },
     { id: '1', location: '/monitor', selected: false, enabled: true, text: 'Monitor', protocols: ['0', '1'] },
     { id: '2', location: '/simulate', selected: false, enabled: true, text: 'Simulate', protocols: ['0', '1'] },
-    { id: '3', location: '/configure', selected: false, enabled: true, text: 'Configure', protocols: ['0'] },
-    { id: '4', location: '/serial', selected: false, enabled: true, text: 'Set serial number', protocols: ['0'] },
-    { id: '5', location: '/program', selected: false, enabled: true, text: 'Product update', protocols: ['0'] },
-    { id: '6', location: '/testing', selected: false, enabled: true, text: 'Testing', protocols: ['0'] },
-    { id: '7', location: '/profile', selected: false, enabled: true, text: 'User profile', icon: Profile },
-    { id: '8', location: '/manage', selected: false, enabled: true, text: 'User management', icon: Manage },
+    { id: '3', location: '/profile', selected: false, enabled: true, text: 'User profile', icon: Profile },
+    { id: '4', location: '/manage', selected: false, enabled: true, text: 'User management', icon: Manage },
   ];
-
-  const apps = ['4', '5', '6'];
+  
+  const drop = [
+    { id: '0', location: '/configure', selected: false, enabled: true, text: 'Configure', protocols: ['0'] },
+    { id: '1', location: '/program', selected: false, enabled: true, text: 'Product update', protocols: ['0'] },
+    { id: '2', location: '/serial', selected: false, enabled: true, text: 'Set serial number', protocols: ['0'] },
+    { id: '3', location: '/testing', selected: false, enabled: true, text: 'Testing', protocols: ['0'] },
+  ];
 
   const proItems = [
     { id: '0', text: 'nmea2000' },
@@ -39,14 +41,15 @@
 
   let devItems = new Array();
   let lotry = false;
+  let extry = false;
   let platform = product + " v" + version;
   let re = /(\/[A-z]+)/;
   let selected = {
-    menu: menu[0],
     device: '0',
     protocol: '0',
-  }
-  let isOpen = false;
+    menu: menu[0],
+    drop: null,
+  };
 
   // Initially select "Devices" menu
   _select(null, selected.menu);
@@ -54,6 +57,9 @@
   function mark(loc) {
     for (let i in menu) {
       menu[i].selected = (menu[i].location == loc);
+    }
+    for (let i in drop) {
+      drop[i].selected = (drop[i].location == loc);
     }
   };
 
@@ -79,20 +85,31 @@
         }
       }
     }
+    for (let i in drop) {
+      drop[i].enabled = routeGuard({location: drop[i].location});
+      if (drop[i].enabled && drop[i].hasOwnProperty("protocols")) {
+        drop[i].enabled = (drop[i].protocols.indexOf(pro) !== -1);
+      }
+    }
   };
 
   function _select(e, itm) {
-    selected.menu = itm;
-    if (!apps.includes(itm.id)) {
-      mark(itm.location);
+    if (typeof menu.find((elm) => elm.text == itm.text) !== "undefined") {
+      selected.menu = itm;
+      selected.drop = null;
+    } else if (typeof drop.find((elm) => elm.text == itm.text) !== "undefined") {
+      selected.drop = itm;
     }
     push(itm.location);
-    isOpen = false;
   };
 
   function __logout(e) {
     lotry = true;
   };
+
+  function __exit(e) {
+    extry = true;
+  };  
 
   function _login(e) {
     push("/login");
@@ -106,7 +123,13 @@
     }
   };
 
+  function _exit(e) {
+    extry = false;
+    window.pumaAPI.send('app-quit');
+  };  
+
   function _cancel(e) {
+    extry = false;
     lotry = false;
   };
   
@@ -163,6 +186,7 @@
     }
   };
 
+  $: $location, mark($location);
   $: $devices, getDevices($devices);
   $: $userData, $loggedIn, enable(selected.protocol);
 </script>
@@ -193,10 +217,19 @@
     </HeaderNav>
     <HeaderNav>
       {#each menu as item}
-        {#if item.hasOwnProperty('text') && !item.hasOwnProperty('icon') && item.enabled && !apps.includes(item.id)}
+        {#if item.hasOwnProperty('text') && !item.hasOwnProperty('icon') && item.enabled}
           <HeaderNavItem bind:isSelected={item.selected} on:click={(e) => _select(e, item)} text={item.text} />
         {/if}
       {/each}
+      {#if $loggedIn}
+        <HeaderNavMenu text={selected.drop !== null ? selected.drop.text : "User area"}>
+          {#each drop as item}
+            {#if item.hasOwnProperty('text') && item.enabled}
+              <HeaderNavItem bind:isSelected={item.selected} on:click={(e) => _select(e, item)} text={item.text} />
+            {/if}
+          {/each}
+        </HeaderNavMenu>
+      {/if}
     </HeaderNav>
     <HeaderUtilities>
       {#each menu as item}
@@ -220,16 +253,8 @@
           <HeaderGlobalAction on:click={(e) => __logout(e)} icon={Logout} />
         </TooltipDefinition>
       {/if}
-      <TooltipDefinition direction="bottom" align="end" tooltipText="User area">
-        <HeaderAction bind:isOpen transition={{duration: 200}}>
-          <HeaderPanelLinks>
-            {#each menu as item}
-              {#if item.hasOwnProperty('text') && !item.hasOwnProperty('icon') && item.enabled && apps.includes(item.id)}
-                <HeaderPanelLink on:click={(e) => _select(e, item)} style="text-align: start;">{item.text}</HeaderPanelLink>
-              {/if}
-            {/each}
-          </HeaderPanelLinks>
-        </HeaderAction>
+      <TooltipDefinition direction="bottom" align="end" tooltipText="Exit">
+        <HeaderGlobalAction on:click={(e) => __exit(e)} icon={Close} />
       </TooltipDefinition>
     </HeaderUtilities>
   </Header>
@@ -238,6 +263,14 @@
     <ModalBody>
       <span>You will require an internet connection to log back in.</span>
     </ModalBody>
+    <ModalFooter
+      primaryButtonText="Proceed"
+      secondaryButtons={[{ text: "Cancel" }]}
+      on:click:button--secondary={(e) => _cancel(e)}
+    />
+  </ComposedModal>
+  <ComposedModal open={extry} on:submit={(e) => _exit(e)} on:close={(e) => _cancel(e)} size="xs">
+    <ModalHeader title="Confirm exit" />
     <ModalFooter
       primaryButtonText="Proceed"
       secondaryButtons={[{ text: "Cancel" }]}

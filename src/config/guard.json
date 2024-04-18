@@ -46,7 +46,7 @@
     "profile": false,
     "program": false,
     "serial": false,
-    "simulate": false,
+    "simulate": true,
     "testing": false
   },
   "Suspend": {
