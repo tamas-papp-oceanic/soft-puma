@@ -1,6 +1,6 @@
 {
   "name": "puma",
-  "version": "1.0.19",
+  "version": "1.0.20",
   "private": true,
   "main": "main.js",
   "description": "Oceanic System's Device Settings & Diagnostic Application",

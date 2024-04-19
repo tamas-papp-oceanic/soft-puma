@@ -4,7 +4,7 @@
   import { checkAccess } from "../../../auth/auth.js";
   import { getUpdate } from "../../../stores/data.js";
   import { loggedIn } from "../../../stores/user.js";
-  import Download from "carbon-icons-svelte/lib/Download16";
+  import Upload from "carbon-icons-svelte/lib/Upload16";
 
   export let model;
   export let data;
@@ -80,13 +80,13 @@
                 {#if access}
                   <Row padding>
                     <Column>
-                      <Button disabled={running || !update.boot} icon={Download} on:click={(e) => loader(e)} style="width: inherit;">Boot loader</Button>
+                      <Button disabled={running || !update.boot} icon={Upload} on:click={(e) => loader(e)} style="width: inherit;">Boot loader</Button>
                     </Column>
                   </Row>
                 {/if}
                 <Row>
                   <Column>
-                    <Button disabled={running ||  !update.main} icon={Download} on:click={(e) => program(e)}>Program Update</Button>
+                    <Button disabled={running ||  !update.main} icon={Upload} on:click={(e) => program(e)}>Program Update</Button>
                   </Column>
                 </Row>
               </Column>
