@@ -3,7 +3,7 @@
   import { push } from 'svelte-spa-router'
   import { Form, Grid, Row, Column, ToastNotification, TextInput, PasswordInput, Button,
     ComposedModal, ModalHeader, ModalBody, ModalFooter } from "carbon-components-svelte";
-  import { afetch } from '../auth/auth.js'
+  import { afetch, refreshLogin } from '../auth/auth.js'
   import { authURL, userData } from '../stores/user.js'
   
   let userid = $userData.hasOwnProperty('user_id') ? $userData.user_id : '???';
@@ -48,7 +48,13 @@
       }),
     });
     if (res.ok) {
-      push("/");
+      let log = refreshLogin();
+      if (log instanceof Error) {
+        errtext = 'Update failed, please try again.'
+        error = true;
+      } else {
+        push("/");
+      }
     } else {
       errtext = 'Update failed, please try again.'
       error = true;
