@@ -2,7 +2,7 @@
   import { onMount } from 'svelte'
   import { push } from 'svelte-spa-router'
   import { Form, Grid, Row, Column, ToastNotification, TextInput, PasswordInput, Button,
-    ButtonSet, ComposedModal, ModalHeader, ModalBody, ModalFooter } from "carbon-components-svelte";
+    ComposedModal, ModalHeader, ModalBody, ModalFooter } from "carbon-components-svelte";
   import { afetch } from '../auth/auth.js'
   import { authURL, userData } from '../stores/user.js'
   
@@ -11,7 +11,7 @@
   let password = null;
   let newpass = null;
   let rptpass = null;
-  let email = null;
+  let email = $userData.hasOwnProperty('email') ? $userData.email : '???';
   let error = false;
   let errtext = '';
   let remove = false;
