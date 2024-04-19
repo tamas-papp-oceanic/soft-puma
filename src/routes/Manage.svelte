@@ -2,7 +2,7 @@
   import { onMount } from 'svelte'
   import { Grid, Row, Column, ToastNotification, TextInput, ButtonSet,
     Button, Dropdown, ComposedModal, ModalHeader, ModalBody, ModalFooter,
-    DataTable, DataTableSkeleton, Form, Pagination, TooltipDefinition } from "carbon-components-svelte";
+    DataTable, DataTableSkeleton, Form, Pagination, } from "carbon-components-svelte";
   import UpdateNow from "carbon-icons-svelte/lib/UpdateNow20";
   import { afetch } from '../auth/auth.js'
   import { authURL } from '../stores/user.js'
@@ -170,16 +170,20 @@
         return;
       }
     }
+    let tmp = {
+      id,
+      username,
+      firstname,
+      surname,
+      email,
+      permission,
+    };
+    if (action == "create") {
+      tmp.password = "puma12345";
+    }
     const res = await afetch($authURL + '/' + action, {
       method: 'POST',
-      body: JSON.stringify({
-        id,
-        username,
-        firstname,
-        surname,
-        email,
-        permission,
-      }),
+      body: JSON.stringify(tmp),
     });
     if (res.ok) {
       nfykind = "info"
