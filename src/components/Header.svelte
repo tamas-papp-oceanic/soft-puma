@@ -203,7 +203,7 @@
           <HeaderNavItem bind:isSelected={item.selected} on:click={(e) => _select(e, item)} text={item.text} />
         {/if}
       {/each}
-      {#if $loggedIn}
+      {#if $loggedIn && (drop.filter((elm) => { return elm.selected; }).length > 0) }
         <HeaderNavMenu text={drop.filter((elm) => { return elm.selected; }).length > 0 ? drop.filter((elm) => { return elm.selected; })[0].text : "User area"}>
           {#each drop as item}
             {#if item.hasOwnProperty('text') && item.enabled}

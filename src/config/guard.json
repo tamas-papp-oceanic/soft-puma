@@ -41,7 +41,7 @@
   },
   "Basic": {
     "analyse": true,
-    "configure": true,
+    "configure": false,
     "manage": false,
     "profile": false,
     "program": false,
