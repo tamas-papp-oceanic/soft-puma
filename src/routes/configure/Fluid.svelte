@@ -11,7 +11,7 @@
   export let params;
 
   const model = $location.split('/')[2];
-  const timeout = 2000;
+  const timeout = 5000;
   let timer = null;
   let data = {
     fluid: params.fluid,

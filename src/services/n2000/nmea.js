@@ -135,6 +135,15 @@ class NMEAEngine {
     }
     return null;
   };
+  // Synchronous sleep in ms
+  #sleep(dur) {
+    const sta = Date.now();
+    let cur = null;
+    do {
+      cur = Date.now();
+    } while (cur - sta < dur);
+  }
+
   // NMEA message sending function
   sendMsg(msg) {
     msg.header.src = this.#addrMngr.address;
@@ -146,6 +155,8 @@ class NMEAEngine {
         log.error(err);
         return false;
       }
+      // Sleep 25ms
+      this.#sleep(25);
     }
     return true;
   };
