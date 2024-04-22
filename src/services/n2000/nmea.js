@@ -155,7 +155,7 @@ class NMEAEngine {
         log.error(err);
         return false;
       }
-      if (i < frs.length) {
+      if (i < (frs.length - 1)) {
         // Sleep 25ms
         this.#sleep(25);
       }
