@@ -590,17 +590,6 @@ ipcMain.on('n2k-data', (e, ...args) => {
 
 // Processing bus scan request
 ipcMain.on('bus-scan', (e) => {
-  // if ((mainWindow != null) && (typeof mainWindow.webContents !== 'undefined')) {
-  //   mainWindow.webContents.send('n2k-clear');
-  // }
-  // for (const [key, val] of Object.entries(devices)) {
-  //   if (val.protocol === 'nmea2000') {
-  //     // Clear name records
-  //     val.engine.clearNames();
-  //     // Send ISO Request for Address Claim
-  //     val.engine.send059904(60928, 0xFF);
-  //   }
-  // }
   scan();
 });
 
@@ -1919,28 +1908,9 @@ ipcMain.on('simfile-write', (e, args) => {
 });
 
 // Sends ISO request for product info
-// ipcMain.on('pro-read', (e, args) => {
-//   const [dev] = args;
-//   if ((typeof dev === 'string') && (typeof devices[dev] !== 'undefined')) {
-//     let eng = devices[dev].engine;
-//     let res = eng.send059904(60928, 0xFF);
-//     setTimeout((res) => {
-//       res |=  eng.send059904(126996, 0xFF);
-//       setTimeout((res) => {
-//         if ((mainWindow != null) && (typeof mainWindow.webContents !== 'undefined')) {
-//           mainWindow.webContents.send('pro-done', res);
-//         }
-//       }, 750, res);
-//     }, 250, res);
-//   } else {
-//     console.log("No device selected!");
-//   }
-// });
-
-// Sends ISO request for product info
 ipcMain.on('pro-read', (e, args) => {
   const [dev, dst] = args;
-  if ((typeof dev === 'string') && (typeof devices[dev] !== 'undefined')) {
+  if (typeof devices[dev] !== 'undefined') {
     let eng = devices[dev].engine;
     let res =  eng.send059904(126996, dst);
     if ((mainWindow != null) && (typeof mainWindow.webContents !== 'undefined')) {
