@@ -91,13 +91,13 @@
                 </Row>
               </Column>
               <Column></Column>
-              <Column sm={11} md={11} lg={11}>
-                  <Row padding>
+              <Column sm={11} md={11} lg={11} style="height: 100%;">
+                <Row padding>
                   <Column>Console</Column>
                 </Row>
-                <Row style="height: 80%;">
-                  <Column>
-                    <Tile style="height: 100%; white-space: pre !important; border: 1px solid gray; overflow-y: auto">{message}</Tile>
+                <Row style="height: 80%; overflow-y: auto; border: 1px solid gray; display: block;">
+                  <Column style="height: 100%;">
+                    <Tile style="white-space: pre !important;">{message}</Tile>
                   </Column>
                 </Row>
               </Column>

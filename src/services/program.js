@@ -75,7 +75,7 @@ async function writeBoot(url, file, func) {
     let dwn = app.getPath("downloads");
     dwl(url + '/download?file=' + file, dwn).then((res) => {
       log.info('Download successful:', file);
-      dwn = path.join(dwn, file);
+      dwn = path.join(dwn, path.basename(file));
       erase(func).then((res) => {
         if (res) {
           upload(dwn, func).then((res) => {

@@ -24,6 +24,13 @@
     { id: '6', text: 'Altimiter Setting' },
     { id: '7', text: 'Oil Pressure' },
     { id: '8', text: 'Fuel Pressure' },
+    { id: '9', text: 'Custom #130' },
+    { id: '10', text: 'Custom #131' },
+    { id: '11', text: 'Custom #132' },
+    { id: '12', text: 'Custom #133' },
+    { id: '13', text: 'Custom #134' },
+    { id: '14', text: 'Custom #135' },
+    { id: '15', text: 'Custom #136' },
   );
   const press_rngs = new Array(
     { id: '0', text: '3 PSI' },
@@ -36,24 +43,30 @@
     { id: '7', text: '1000 PSI' },
     { id: '8', text: '3000 PSI' },
     { id: '9', text: '5000 PSI' },
+    { id: '10', text: 'Unused' },
+    { id: '11', text: 'Unused' },
+    { id: '12', text: 'Unused' },
+    { id: '13', text: 'Unused' },
+    { id: '14', text: 'Unused' },
     { id: '15', text: '1 BAR' },
   );
   const press_dmps = new Array(
     { id: '0', text: 'Off' },
-    { id: '1', text: '0' },
-    { id: '2', text: '1' },
-    { id: '3', text: '2' },
-    { id: '4', text: '3' },
-    { id: '5', text: '4' },
-    { id: '6', text: '5' },
-    { id: '7', text: '6' },
-    { id: '8', text: '7' },
-    { id: '9', text: '8' },
-    { id: '10', text: '9' },
-    { id: '11', text: '10' },
-    { id: '12', text: '15' },
-    { id: '13', text: '20' },
-    { id: '14', text: '25' },
+    { id: '1', text: '1' },
+    { id: '2', text: '2' },
+    { id: '3', text: '3' },
+    { id: '4', text: '4' },
+    { id: '5', text: '5' },
+    { id: '6', text: '6' },
+    { id: '7', text: '7' },
+    { id: '8', text: '8' },
+    { id: '9', text: '9' },
+    { id: '10', text: '10' },
+    { id: '11', text: '15' },
+    { id: '12', text: '20' },
+    { id: '13', text: '25' },
+    { id: '14', text: 'Unused' },
+    { id: '15', text: 'Unused' },
   );
     
   let inst1 = new Array();
@@ -172,7 +185,7 @@
                     {#if running}
                       <DropdownSkeleton />
                     {:else}
-                      <Dropdown disabled titleText="Pressure range" size="sm" bind:selectedId={press_rng} items={press_rngs} />
+                      <Dropdown disabled={!isValid} titleText="Pressure range" size="sm" bind:selectedId={press_rng} items={press_rngs} />
                     {/if}
                   </Column>
                 </Row>

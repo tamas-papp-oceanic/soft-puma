@@ -157,7 +157,7 @@ class NMEAEngine {
       }
       if (i < (frs.length - 1)) {
         // Sleep 25ms
-        this.#sleep(25);
+        this.#sleep(10);
       }
     }
     return true;
