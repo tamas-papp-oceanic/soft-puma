@@ -25,7 +25,7 @@ const devices = {
   '4410':      { id: 0x18, conf: false, fluid: false, prog: true,  test: true,  group: 'modules',  title: '16 Channel Switch Input Module' },
   '4510':      { id: 0x04, conf: true,  fluid: false, prog: false, test: false, group: 'sensors',  title: 'EGT Sender' },
   '4521':      { id: 0x06, conf: true,  fluid: false, prog: false, test: false, group: 'modules',  title: '4 Channel Temperature Module' },
-  '4601':      { id: 0x09, conf: true,  fluid: false, prog: true,  test: false, group: 'modules',  title: '4-20mA Pressure Adaptor' },
+  '4601':      { id: 0x09, conf: true,  fluid: false, prog: true,  test: false, group: 'adaptors', title: '4-20mA Pressure Adaptor' },
   '4530':      { id: 0x0E, conf: false, fluid: false, prog: false, test: false, group: 'modules',  title: 'Cabin Temperature & Humidity Module' },
   '4900':      { id: 0x14, conf: false, fluid: false, prog: false, test: false, group: 'adaptors', title: 'AC Input Module' },
   '5250-F':    { id: 0x34, conf: false, fluid: true,  prog: true,  test: false, group: 'adaptors', title: 'Deck Gauge (Fuel)' },
