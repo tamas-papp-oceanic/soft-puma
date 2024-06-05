@@ -4,6 +4,7 @@
   import { checkAccess } from "../../../auth/auth.js";
   import { getUpdate } from "../../../stores/data.js";
   import { loggedIn } from "../../../stores/user.js";
+  import { getvars } from "../../../config/devices.js";
   import Upload from "carbon-icons-svelte/lib/Upload16";
 
   export let model;
@@ -13,9 +14,11 @@
   export let running;
 
   const dispatch = createEventDispatcher();
+
   let access = false;
   let update = { boot: false, main: false };
   let insts = new Array();
+  let vars = new Array();
 
   function select(e) {
   };
@@ -33,7 +36,15 @@
   };
 
   function setUpdate(mod) {
-    let upd = getUpdate(mod);
+    vars = getvars(mod);
+    if (vars.length > 0) {
+      if (data.variant == null) {
+        data.variant = vars[0].id;
+      }
+    } else {
+      data.variant = null;
+    }
+    let upd = getUpdate(mod, data.variant);
     update.boot = (typeof upd['boot'] !== "undefined");
     update.main = (typeof upd['main'] !== "undefined");
   };
@@ -51,9 +62,11 @@
     insts.push({ id: i.toString(), text: i.toString() });
   }
 
+  model = model;
+
   // Data getters
   $: access = checkAccess('boot', 'write') && $loggedIn;
-  $: model, setUpdate(model);
+  $: model, data, setUpdate(model);
   $: message, scroll();
 </script>
 
@@ -68,30 +81,35 @@
           <Grid fullWidth noGutter>
             <Row style="height: inherit;">
               <Column></Column>
-              <Column>
+              <Column sm={5} md={5} lg={5}>
                 <Row padding>
                   <Column>Device selector</Column>
                 </Row>
                 <Row>
-                  <Column>
+                  <Column sm={6} md={6} lg={6}>
                     <Dropdown titleText="Device Instance" size="sm" bind:selectedId={data.instance} items={insts} on:select={(e) => select(e)}/>
                   </Column>
                 </Row>
-                {#if access}
+                {#if vars.length != 0}
                   <Row padding>
                     <Column>
-                      <Button disabled={running || !update.boot} icon={Upload} on:click={(e) => loader(e)} style="width: inherit;">Boot loader</Button>
+                      <Dropdown disabled={running || (vars.length == 0)} titleText="Variants" size="sm" bind:selectedId={data.variant} items={vars} on:select={(e) => select(e)}/>
                     </Column>
                   </Row>
                 {/if}
-                <Row>
-                  <Column>
-                    <Button disabled={running ||  !update.main} icon={Upload} on:click={(e) => program(e)}>Program Update</Button>
+                <Row padding={vars.length == 0}>
+                  <Column sm={10} md={10} lg={10}>
+                    <Button disabled={running || !access || !update.boot} icon={Upload} on:click={(e) => loader(e)} style="width: inherit;">Boot loader</Button>
+                  </Column>
+                </Row>
+                <Row padding={vars.length != 0}>
+                  <Column sm={10} md={10} lg={10}>
+                    <Button disabled={running ||  !update.main} icon={Upload} on:click={(e) => program(e)} style="width: inherit;">Program Update</Button>
                   </Column>
                 </Row>
               </Column>
               <Column></Column>
-              <Column sm={11} md={11} lg={11} style="height: 100%;">
+              <Column sm={9} md={9} lg={9} style="height: 100%;">
                 <Row padding>
                   <Column>Console</Column>
                 </Row>

@@ -17,6 +17,7 @@
   let running = false;
   let data = {
     instance: params.instance,
+    variant: null,
   }
 
   onMount(() => {
@@ -57,7 +58,7 @@
       stop('boot');
       running = false;
     });
-    let upd = getUpdate(model);
+    let upd = getUpdate(model, data.variant);
     if ((typeof upd['boot'] !== "undefined") && (typeof upd['boot']['location'] !== "undefined")) {
       window.pumaAPI.send('boot-start', upd['boot']['location']);
     }
@@ -79,7 +80,7 @@
       stop('prog');
       running = false;
     });
-    let upd = getUpdate(model);
+    let upd = getUpdate(model, data.variant);
     let dev = getdev(model);
     if ((typeof upd['main'] !== 'undefined') && (typeof upd['main']['location'] !== 'undefined') && (dev != null)) {
       window.pumaAPI.send('prog-start', [$device, upd['main']['location'], dev.id, instance, dev.address]);

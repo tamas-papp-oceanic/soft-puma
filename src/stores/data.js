@@ -378,13 +378,22 @@ export function deleteData(src) {
   data.set(dat);
 };
 // Get model's last update
-export function getUpdate(mod) {
+export function getUpdate(mod, vrt) {
   let ret = {};
   let ups = get(updates);
   let upd = ups[mod];
   if (typeof upd !== "undefined") {
     for (const [key, val] of Object.entries(upd)) {
-      ret[key] = val[0];
+      if ((vrt == null) || !val[0].hasOwnProperty("variant") || (val[0].hasOwnProperty("variant") && (val[0].variant == "*"))) {
+        ret[key] = val[0];
+      } else if (vrt != null) {
+        for (let i in val) {
+          if (val[i].hasOwnProperty("variant") && (val[i].variant == vrt)) {
+            ret[key] = val[vrt];
+            break;
+          }
+        }
+      }
     }
   }
   return ret;

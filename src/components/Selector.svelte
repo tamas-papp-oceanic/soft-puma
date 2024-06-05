@@ -1,7 +1,7 @@
 <script>
   import { createEventDispatcher } from "svelte";
   import { Row, Grid, Column, Tabs, Tab, TabContent } from "carbon-components-svelte";
-  import { getname } from '../config/devices.js'
+  import { getname, getimage } from '../config/devices.js'
 
   export let devices;
   export let tab;
@@ -43,7 +43,7 @@
                               <div class="product-title">{getname(device)}</div>
                             </div>
                             <div class="product-image">
-                              <img src={'images/' + device + '.webp'} alt={device} onerror="this.onerror=null; this.src='images/noimage.webp';"/>
+                              <img src={'images/' + getimage(device)} alt={device} onerror="this.onerror=null; this.src='images/noimage.webp';"/>
                             </div>
                           </div>
                         </Column>
