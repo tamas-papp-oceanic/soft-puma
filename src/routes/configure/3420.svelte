@@ -3,7 +3,8 @@
   import { Row, Grid, Column } from "carbon-components-svelte";
   import { location, pop } from "svelte-spa-router";
   import Container3420 from './partials/Container3420.svelte';
-  import { device } from '../../stores/data';
+  import { device } from '../../stores/data.js';
+  import { getfield } from '../../stores/common.js';
   import { getname } from '../../config/devices.js';
   import Notification from "../../components/Notification.svelte";
 
@@ -26,22 +27,25 @@
   let subttl = null;
 
   onMount(() => {
-    window.pumaAPI.recv('n2k-ac-data', (e, args) => {
+    window.pumaAPI.recv('n2k-ac-cfg-data', (e, args) => {
       const [ dev, msg ] = args;
       if (getfield(5, msg.fields).value == data.instance) {
         let fld = getfield(7, msg.fields);
-        switch (getfield(6, msg.fields).value) {
-          case 0:
-            // Circuit Type (1 = Single Phase, 2 = Double Phase, 3 = Three Phase, 4 = Split Phase)
-            data.circuit = (fld != null ) && (fld.state == 'V') ? fld.value.toString() : null;
-            break;
-          case 1:
-            // Device Instance
-            data.instance = (fld != null ) && (fld.state == 'V') ? fld.value.toString() : null;
-            break;
+        if ((fld != null) && (typeof fld.state !== 'undefined') && (typeof fld.value !== 'undefined')) {
+          let val = fld.value & 0xFF;
+          switch (getfield(6, msg.fields).value) {
+            case 0:
+              // Circuit Type (1 = Single Phase, 2 = Double Phase, 3 = Three Phase, 4 = Split Phase)
+              data.circuit = (fld.state == 'V') ? val.toString() : null;
+              break;
+            case 1:
+              // Device Instance
+              data.instance = (fld.state == 'V') ? val.toString() : null;
+              break;
+          }    
+          data.isValid = true;
         }
-        data.isValid = true;
-      }
+      }        
     });
   });
   
