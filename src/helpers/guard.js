@@ -23,12 +23,11 @@ function routeGuard(det) {
   }
   let logged = get(loggedIn);
   switch (loc) { 
+    case 'details':
     case 'messages':
     case 'monitor':
       loc = "analyse";
       break;
-    case 'details':
-      return false;
     case 'login':
       return !logged;
     case 'welcome':

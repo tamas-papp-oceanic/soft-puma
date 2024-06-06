@@ -57,7 +57,7 @@
   };
 
   function details(e, row) {
-    push('/details/'+ row.key);
+    push('/details?data='+ JSON.stringify(row.dat));
   };
 
   function back(e) {
@@ -103,6 +103,7 @@
       let obj = {
         id: lst.id,
         cnt: lst.cnt,
+        dat: Object.assign({ key: key }, lst),
       };
       for (let i in lst.fields) {
         let fld = lst.fields[i];
@@ -125,6 +126,7 @@
             overflow: '',
             id: lst.id,
             cnt: lst.cnt,
+            dat: Object.assign({ key: key }, lst),
           };
           for (let i in lst.fields) {
             let fld = lst.fields[i];
@@ -135,6 +137,7 @@
         let obj = {
           id: dat.id,
           cnt: dat.cnt,
+          dat: Object.assign({ key: key }, dat),
         };
         for (let i in dat.fields) {
           let fld = dat.fields[i];

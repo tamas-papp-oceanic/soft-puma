@@ -476,6 +476,11 @@
   "resolved" "https://registry.npmjs.org/@types/pug/-/pug-2.0.6.tgz"
   "version" "2.0.6"
 
+"@types/qs@^6.9.15":
+  "integrity" "sha512-uXHQKES6DQKKCLh441Xv/dwxOq1TVS3JPUMlEqoEglvlhR6Mxnlew/Xq/LRVHpLyk7iK3zODe1qYHIMltO7XGg=="
+  "resolved" "https://registry.npmjs.org/@types/qs/-/qs-6.9.15.tgz"
+  "version" "6.9.15"
+
 "@types/resolve@1.17.1":
   "integrity" "sha512-yy7HuzQhj0dhGpD8RLXSZWEkLsV9ibvxvi6EiJ3bkqLAO1RGo0WbkWQiwpRlSFymTJRz0d3k5LM3kkx8ArDbLw=="
   "resolved" "https://registry.npmjs.org/@types/resolve/-/resolve-1.17.1.tgz"

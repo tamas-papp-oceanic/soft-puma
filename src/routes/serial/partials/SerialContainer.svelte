@@ -108,7 +108,6 @@
                 </Row>
                 <Row>
                   <Column>
-
                     {#if running}
                       <DataTableSkeleton size="compact" showHeader={false} showToolbar={false} {headers} rows={15} />
                     {:else}

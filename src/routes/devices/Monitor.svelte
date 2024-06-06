@@ -41,7 +41,11 @@
       .join('') + (buffer.length > 20 ? '...' : '');
   } 
 
-  function content(e, row) {
+  function details(e, row) {
+    push('/details?data='+ JSON.stringify(row.dat));
+  };
+
+  function trace(e, row) {
     push('/messages/' + row.id);
   };
 
@@ -93,6 +97,7 @@
             int: val.int,
             key: (parseInt(spl[1]) * 10) + ((typeof val.header.ins !== 'undefined') ? parseInt(val.header.ins) : 0),
             raw: buf2hex(dat),
+            dat: Object.assign({ key: key }, val),
           };
           tmp.push(obj);
         }
@@ -166,7 +171,8 @@
         <span slot="cell" let:cell let:row let:rowIndex>
           {#if cell.key === 'overflow'}
             <OverflowMenu direction={rowIndex < (pagination.pageSize / 2) ? "bottom" : "top"}>
-              <OverflowMenuItem text="Content" disabled={!isRoute('/messages')} on:click={(e) => content(e, row)} />
+              <OverflowMenuItem text="Details" disabled={!isRoute('/details')} on:click={(e) => details(e, row)} />
+              <OverflowMenuItem text="Trace" disabled={!isRoute('/messages')} on:click={(e) => trace(e, row)} />
             </OverflowMenu>
           {:else}
             {cell.value}

@@ -10,7 +10,8 @@
 	import Header from './components/Header.svelte';
 	import Devices from './routes/devices/Index.svelte';
 	import Monitor from './routes/devices/Monitor.svelte';
-	import Content from './routes/devices/Content.svelte';
+	import Details from './routes/devices/Details.svelte';
+	import Trace from './routes/devices/Trace.svelte';
 	import Profile from './routes/Profile.svelte';
 	import Manage from './routes/Manage.svelte';
 	// import Details from './routes/Details.svelte';
@@ -32,7 +33,6 @@
 	import Test5185 from './routes/testing/5185.svelte';
 	import Restricted from './routes/Restricted.svelte';
 	import LoginRequired from './routes/LoginRequired.svelte';
-	import Details from './routes/devices/Details.svelte';
 	import { update, updmsg, download, progress } from './stores/update.js';
 	import { allRoutes, updates } from './stores/data.js';
 	import { loggedIn, lastLogin } from './stores/user.js';
@@ -55,14 +55,13 @@
 		"/configure/4521/:instance":        wrap({ component: Configure4521,  conditions: [(detail) => { return routeGuard(detail); }] }),
 		"/configure/4601/:instance":        wrap({ component: Configure4601,  conditions: [(detail) => { return routeGuard(detail); }] }),
 		"/configure/5720/:instance":        wrap({ component: Configure5720,  conditions: [(detail) => { return routeGuard(detail); }] }),
-		"/details/:protocol/:pgn/:function/:manufacturer/:industry/:instance/:type":
-																				wrap({ component: Details,        conditions: [(detail) => { return routeGuard(detail); }] }),
+		"/details": 	                      wrap({ component: Details,        conditions: [(detail) => { return routeGuard(detail); }] }),
     "/login":                           wrap({ component: Login,          conditions: [(detail) => { return routeGuard(detail); }] }),
     "/manage":                          wrap({ component: Manage,         conditions: [(detail) => { return routeGuard(detail); }] }),
 		"/messages/:protocol/:pgn/:instance":
-																				wrap({ component: Content,        conditions: [(detail) => { return routeGuard(detail); }] }),
+																				wrap({ component: Trace,          conditions: [(detail) => { return routeGuard(detail); }] }),
 		"/messages/:protocol/:pgn/:function/:manufacturer/:industry/:instance/:type":
-																				wrap({ component: Content,        conditions: [(detail) => { return routeGuard(detail); }] }),
+																				wrap({ component: Trace,          conditions: [(detail) => { return routeGuard(detail); }] }),
     "/monitor":                         wrap({ component: Monitor,        conditions: [(detail) => { return routeGuard(detail); }] }),
 		"/monitor/:address":                wrap({ component: Monitor,        conditions: [(detail) => { return routeGuard(detail); }] }),
     "/profile":                         wrap({ component: Profile,        conditions: [(detail) => { return routeGuard(detail); }] }),
