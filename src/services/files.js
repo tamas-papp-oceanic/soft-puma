@@ -1,11 +1,12 @@
 const { dialog } = require("electron");
 const fs = require("fs");
 const path = require("path");
+const os = require("os");
 
 async function readFile(window, title, name) {
   return new Promise((resolve, reject) => {
-    let fp = dialog.showOpenDialogSync(window, { title: title, defaultPath: path.join(process.env.HOME, "Downloads", name),
-      filters: [{ name: "JSON file", extensions: ["json"] }], properties: ["openFile"]});
+    let fp = dialog.showOpenDialogSync(window, { title: title, defaultPath: path.join(os.homedir(), "Downloads", name),
+        filters: [{ name: "JSON file", extensions: ["json"] }], properties: ["openFile"]});
     if (typeof fp !== "undefined") {
       let data = fs.readFileSync(fp[0], { encoding: "UTF8"} );
       try {
@@ -21,8 +22,8 @@ async function readFile(window, title, name) {
 
 async function writeFile(window, title, name, data) {
   return new Promise((resolve, reject) => {
-    let fp = dialog.showSaveDialogSync(window, { title: title, defaultPath: path.join(process.env.HOME, "Downloads", name),
-      filters: [{ name: "JSON file", extensions: ["json"] }], properties: ["showOverwriteConfirmation"]});
+    let fp = dialog.showSaveDialogSync(window, { title: title, defaultPath: path.join(os.homedir(), "Downloads", name),
+        filters: [{ name: "JSON file", extensions: ["json"] }], properties: ["showOverwriteConfirmation"]});
     if (typeof fp !== "undefined") {
       try {
         let dat = JSON.stringify(data);
