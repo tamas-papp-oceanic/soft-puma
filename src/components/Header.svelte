@@ -1,4 +1,5 @@
 <script>
+  import { onMount, onDestroy } from 'svelte'
   import { push, location } from 'svelte-spa-router'
   import { Header, HeaderNav, HeaderNavItem, HeaderUtilities, HeaderGlobalAction,
     ComposedModal, ModalHeader, ModalBody, ModalFooter, TooltipDefinition,
@@ -9,6 +10,9 @@
   import Login from "carbon-icons-svelte/lib/Login20";
   import Logout from "carbon-icons-svelte/lib/Logout20";
   import Close from "carbon-icons-svelte/lib/Close20";
+  import Full from "../../public/images/full.svelte";
+  import Norm from "../../public/images/norm.svelte";
+  import Min from "../../public/images/min.svelte";
   import { logout } from '../auth/auth.js'
   import { loggedIn, userData } from '../stores/user.js';
   import { devices, device, protocol, data, name } from '../stores/data.js';
@@ -42,12 +46,27 @@
   let devItems = new Array();
   let lotry = false;
   let extry = false;
+  let status = "normal";
   let platform = product + " v" + version;
   let re = /(\/[A-z]+)/;
   let selected = {
     device: '0',
     protocol: '0',
   };
+
+  onMount((e) => {
+    window.pumaAPI.recv('window-state', (e, arg) => {
+      status = arg;
+    });
+  });
+
+  onDestroy((e) => {
+    window.pumaAPI.reml('window-state');
+    simulator.mimic = false;
+    setMimic(e);
+    capStop(e);
+    simStop(e);
+  });
 
   function mark(loc) {
     for (let i in menu) {
@@ -89,6 +108,10 @@
     lotry = true;
   };
 
+  function _adjust(e, sta) {
+    window.pumaAPI.send('adjust', sta);
+  };
+  
   function __exit(e) {
     extry = true;
   };  
@@ -235,8 +258,20 @@
           <HeaderGlobalAction on:click={(e) => __logout(e)} icon={Logout} />
         </TooltipDefinition>
       {/if}
+      <TooltipDefinition direction="bottom" align="center" tooltipText="Minimize">
+        <HeaderGlobalAction on:click={(e) => _adjust(e, "min")} icon={Min} />
+      </TooltipDefinition>
+      {#if status == "max"}
+        <TooltipDefinition direction="bottom" align="end" tooltipText="Restore">
+          <HeaderGlobalAction on:click={(e) => _adjust(e, "normal")} icon={Norm} />
+        </TooltipDefinition>
+      {:else}
+        <TooltipDefinition direction="bottom" align="end" tooltipText="Maximize">
+          <HeaderGlobalAction on:click={(e) => _adjust(e, "max")} icon={Full} />
+        </TooltipDefinition>
+      {/if}
       <TooltipDefinition direction="bottom" align="end" tooltipText="Exit">
-        <HeaderGlobalAction on:click={(e) => __exit(e)} icon={Close} />
+        <HeaderGlobalAction class="close" on:click={(e) => __exit(e)} icon={Close} />
       </TooltipDefinition>
     </HeaderUtilities>
   </Header>
@@ -273,6 +308,9 @@
   }
   .active {
     background-color: #262626;
+  }
+  .close {
+    background-color: brown;
   }
   .bx--table-sort.bx--table-sort--active, .bx--table-sort:hover {
     background: #4e4e4e;

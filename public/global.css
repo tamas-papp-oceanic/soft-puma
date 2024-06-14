@@ -81,6 +81,14 @@ button:focus {
   padding: 1rem 0 !important;
 }
 
+.bx--modal-close {
+  background: brown !important;
+}
+
+.bx--header__global .bx--header__action:focus {
+  border: none !important;
+}
+
 /* width */
 ::-webkit-scrollbar {
   width: 16px;

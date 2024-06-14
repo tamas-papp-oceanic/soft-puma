@@ -101,41 +101,50 @@ function createWindow() {
   });
 
   mainWindow.on('show', () => {
-    const ctxMenu = Menu.buildFromTemplate([
-      { label: 'Hide', click: () => { mainWindow.minimize(); } },
-      {
-        label: mainWindow.maximized ? 'Normal' : 'Full',
-        click: () => { mainWindow.maximized ? mainWindow.unmaximize() : mainWindow.maximize(); }
-      },
-      { label: 'Quit', click: () => { close(); }},
-    ]);
-    tray.setContextMenu(ctxMenu);
+    // const ctxMenu = Menu.buildFromTemplate([
+    //   { label: 'Hide', click: () => { mainWindow.minimize(); } },
+    //   {
+    //     label: mainWindow.maximized ? 'Normal' : 'Full',
+    //     click: () => { mainWindow.maximized ? mainWindow.unmaximize() : mainWindow.maximize(); }
+    //   },
+    //   { label: 'Quit', click: () => { close(); }},
+    // ]);
+    // tray.setContextMenu(ctxMenu);
   });
 
   mainWindow.on('minimize', () => {
-    const ctxMenu = Menu.buildFromTemplate([
-      { label: 'Show', click: () => { mainWindow.show(); } },
-      { label: 'Quit', click: () => { close(); }},
-    ]);
-    tray.setContextMenu(ctxMenu);
+    // const ctxMenu = Menu.buildFromTemplate([
+    //   { label: 'Show', click: () => { mainWindow.show(); } },
+    //   { label: 'Quit', click: () => { close(); }},
+    // ]);
+    // tray.setContextMenu(ctxMenu);
+    if ((mainWindow != null) && (typeof mainWindow.webContents !== 'undefined')) {
+      mainWindow.webContents.send('window-state', "min");
+    }
   });
 
   mainWindow.on('maximize', () => {
-    const ctxMenu = Menu.buildFromTemplate([
-      { label: 'Hide', click: () => { mainWindow.minimize(); } },
-      { label: 'Normal', click: () => { mainWindow.unmaximize(); } },
-      { label: 'Quit', click: () => { close(); }},
-    ]);
-    tray.setContextMenu(ctxMenu);
+    // const ctxMenu = Menu.buildFromTemplate([
+    //   { label: 'Hide', click: () => { mainWindow.minimize(); } },
+    //   { label: 'Normal', click: () => { mainWindow.unmaximize(); } },
+    //   { label: 'Quit', click: () => { close(); }},
+    // ]);
+    // tray.setContextMenu(ctxMenu);
+    if ((mainWindow != null) && (typeof mainWindow.webContents !== 'undefined')) {
+      mainWindow.webContents.send('window-state', "max");
+    }
   });
 
   mainWindow.on('unmaximize', () => {
-    const ctxMenu = Menu.buildFromTemplate([
-      { label: 'Hide', click: () => { mainWindow.minimize(); } },
-      { label: 'Full', click: () => { mainWindow.maximize(); } },
-      { label: 'Quit', click: () => { close(); }},
-    ]);
-    tray.setContextMenu(ctxMenu);
+    // const ctxMenu = Menu.buildFromTemplate([
+    //   { label: 'Hide', click: () => { mainWindow.minimize(); } },
+    //   { label: 'Full', click: () => { mainWindow.maximize(); } },
+    //   { label: 'Quit', click: () => { close(); }},
+    // ]);
+    // tray.setContextMenu(ctxMenu);
+    if ((mainWindow != null) && (typeof mainWindow.webContents !== 'undefined')) {
+      mainWindow.webContents.send('window-state', "normal");
+    }
   });
 };
 
@@ -513,6 +522,23 @@ discover().then((res) => {
 timer = setInterval(() => {
   discover();
 }, 10000);
+
+// Adjusts window on screen
+ipcMain.on('adjust', (e, arg) => {
+  if (mainWindow != null) {
+    switch (arg) {
+      case "max":
+        mainWindow.maximize();
+        break;
+      case "normal":
+        mainWindow.unmaximize();
+        break;
+      case "min":
+        mainWindow.minimize();
+        break;
+    }
+  }
+});
 
 // Refresh authURL
 ipcMain.on('auth-url', (e, ...args) => {

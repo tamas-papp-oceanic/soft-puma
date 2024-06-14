@@ -56,7 +56,7 @@
       </Toolbar>
     </Column>
   </Row>
-  <Row>
+  <Row padding>
     <Column sm={6} md={6} lg={6}>
       <div class="wrap">
         <div class="cont">
@@ -76,7 +76,7 @@
 
 <style global>
   .wrap {
-    height: 80vh;
+    height: calc(100vh - 12em);
     overflow-x: hidden !important;
     overflow-y: auto !important;
   }
