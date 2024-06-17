@@ -100,48 +100,43 @@ function createWindow() {
     mainWindow.show();
   });
 
-  mainWindow.on('show', () => {
-    // const ctxMenu = Menu.buildFromTemplate([
-    //   { label: 'Hide', click: () => { mainWindow.minimize(); } },
-    //   {
-    //     label: mainWindow.maximized ? 'Normal' : 'Full',
-    //     click: () => { mainWindow.maximized ? mainWindow.unmaximize() : mainWindow.maximize(); }
-    //   },
-    //   { label: 'Quit', click: () => { close(); }},
-    // ]);
-    // tray.setContextMenu(ctxMenu);
-  });
-
   mainWindow.on('minimize', () => {
-    // const ctxMenu = Menu.buildFromTemplate([
-    //   { label: 'Show', click: () => { mainWindow.show(); } },
-    //   { label: 'Quit', click: () => { close(); }},
-    // ]);
-    // tray.setContextMenu(ctxMenu);
+    if (tray != null) {
+      const ctxMenu = Menu.buildFromTemplate([
+        { label: 'Show', click: () => { mainWindow.restore(); }, enabled: mainWindow.isMinimized() },
+        { label: 'Hide', click: () => { mainWindow.minimize(); }, enabled: !mainWindow.isMinimized() },
+        { label: 'Quit', click: () => { close(); }},
+      ]);
+      tray.setContextMenu(ctxMenu);
+    }
     if ((mainWindow != null) && (typeof mainWindow.webContents !== 'undefined')) {
       mainWindow.webContents.send('window-state', "min");
     }
   });
 
   mainWindow.on('maximize', () => {
-    // const ctxMenu = Menu.buildFromTemplate([
-    //   { label: 'Hide', click: () => { mainWindow.minimize(); } },
-    //   { label: 'Normal', click: () => { mainWindow.unmaximize(); } },
-    //   { label: 'Quit', click: () => { close(); }},
-    // ]);
-    // tray.setContextMenu(ctxMenu);
+    if (tray != null) {
+      const ctxMenu = Menu.buildFromTemplate([
+        { label: 'Show', click: () => { mainWindow.restore(); }, enabled: mainWindow.isMinimized() },
+        { label: 'Hide', click: () => { mainWindow.minimize(); }, enabled: !mainWindow.isMinimized() },
+        { label: 'Quit', click: () => { close(); }},
+      ]);
+      tray.setContextMenu(ctxMenu);
+    }
     if ((mainWindow != null) && (typeof mainWindow.webContents !== 'undefined')) {
       mainWindow.webContents.send('window-state', "max");
     }
   });
 
   mainWindow.on('unmaximize', () => {
-    // const ctxMenu = Menu.buildFromTemplate([
-    //   { label: 'Hide', click: () => { mainWindow.minimize(); } },
-    //   { label: 'Full', click: () => { mainWindow.maximize(); } },
-    //   { label: 'Quit', click: () => { close(); }},
-    // ]);
-    // tray.setContextMenu(ctxMenu);
+    if (tray != null) {
+      const ctxMenu = Menu.buildFromTemplate([
+        { label: 'Show', click: () => { mainWindow.restore(); }, enabled: mainWindow.isMinimized() },
+        { label: 'Hide', click: () => { mainWindow.minimize(); }, enabled: !mainWindow.isMinimized() },
+        { label: 'Quit', click: () => { close(); }},
+      ]);
+      tray.setContextMenu(ctxMenu);
+    }
     if ((mainWindow != null) && (typeof mainWindow.webContents !== 'undefined')) {
       mainWindow.webContents.send('window-state', "normal");
     }
@@ -189,19 +184,16 @@ autoUpdater.on('update-downloaded', (info) => {
 // initialization and is ready to create browser windows.
 // Some APIs can only be used after this event occurs.
 app.whenReady().then(async () => {
-
-  tray = new Tray(path.join(isDev ? process.cwd() : __dirname, 'public/favicon.png'));
-
-  const ctxMenu = Menu.buildFromTemplate([
-    { label: 'Hide', click: () => { mainWindow.minimize(); } },
-    { label: 'Full', click: () => { mainWindow.maximize(); } },
-    { label: 'Quit', click: () => { close(); }},
-  ]);
-
-  tray.setContextMenu(ctxMenu)
-  tray.setToolTip('Puma application.')
-  tray.setTitle('Puma application.')
-
+  if (os.platform() == 'win32') {
+    tray = new Tray(path.join(isDev ? process.cwd() : __dirname, 'public/favicon.png'));
+    tray.setToolTip('Puma application.');
+    const ctxMenu = Menu.buildFromTemplate([
+      { label: 'Show', click: () => { mainWindow.restore(); }, enabled: mainWindow.isMinimized() },
+      { label: 'Hide', click: () => { mainWindow.minimize(); }, enabled: !mainWindow.isMinimized() },
+      { label: 'Quit', click: () => { close(); }},
+    ]);
+    tray.setContextMenu(ctxMenu);
+  }
   setTimeout(() => {
     autoUpdater.autoDownload = false;
     autoUpdater.checkForUpdates().then((res) => {
@@ -219,6 +211,9 @@ app.on('ready', () => {
 
 // Quit when all windows are closed.
 app.on('window-all-closed', () => {
+  if (tray != null) {
+    tray.destroy();
+  }
   // On macOS it is common for applications and their menu bar
   // to stay active until the user quits explicitly with Cmd + Q
   if (process.platform !== 'darwin') {

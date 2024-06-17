@@ -309,7 +309,7 @@
   .active {
     background-color: #262626;
   }
-  .close {
+  .close:hover {
     background-color: brown;
   }
   .bx--table-sort.bx--table-sort--active, .bx--table-sort:hover {

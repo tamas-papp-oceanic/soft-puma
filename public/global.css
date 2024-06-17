@@ -81,7 +81,7 @@ button:focus {
   padding: 1rem 0 !important;
 }
 
-.bx--modal-close {
+.bx--modal-close:hover {
   background: brown !important;
 }
 
