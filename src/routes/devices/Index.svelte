@@ -55,14 +55,16 @@
         prf += '/:fluid';
       }
       let dat = $data[$device];
-      for (let i in dat) {
-        if (dat[i].header.src == parseInt(row.id)) {
-          if (typeof dat[i].header.typ !== 'undefined') {
-            if (dat[i].header.pgn == 127505) {
-              prf = prf.replace(':fluid', dat[i].header.typ.toString());
+      for (const [src, rec] of Object.entries(dat)) {
+        for (const [key, val] of Object.entries(rec)) {
+          if (val.header.src == parseInt(row.id)) {
+            if (typeof val.header.typ !== 'undefined') {
+              if (val.header.pgn == 127505) {
+                prf = prf.replace(':fluid', val.header.typ.toString());
+              }
             }
+            break;
           }
-          break;
         }
       }
       prf = prf.replace(':instance', '0').replace(':fluid', '0');
@@ -85,17 +87,19 @@
       let nam = $name[$device][row.id];
       let prf = '/testing/' + nam.modelVersion + '/:instance';
       let dat = $data[$device];
-      for (let i in dat) {
-        if (dat[i].header.src == parseInt(row.id)) {
-          if (dat[i].header.din == parseInt(row.instance)) {
-            prf = prf.replace(':instance', row.instance);
-          }
-          if (typeof dat[i].header.typ !== 'undefined') {
-            if (dat[i].header.pgn == 127505) {
-              prf = prf.replace(':fluid', dat[i].header.typ.toString());
+      for (const [src, rec] of Object.entries(dat)) {
+        for (const [key, val] of Object.entries(rec)) {
+          if (val.header.src == parseInt(row.id)) {
+            if (val.header.ins == parseInt(row.instance)) {
+              prf = prf.replace(':instance', row.instance);
             }
+            if (typeof val.header.typ !== 'undefined') {
+              if (val.header.pgn == 127505) {
+                prf = prf.replace(':fluid', val.header.typ.toString());
+              }
+            }
+            break;
           }
-          break;
         }
       }
       prf = prf.replace(':instance', '0');
@@ -110,12 +114,14 @@
       let nam = $name[$device][row.id];
       let prf = '/program/' + nam.modelVersion + '/:instance';
       let dat = $data[$device];
-      for (let i in dat) {
-        if (dat[i].header.src == parseInt(row.id)) {
-          if (dat[i].header.din == parseInt(row.instance)) {
-            prf = prf.replace(':instance', row.instance);
+      for (const [src, rec] of Object.entries(dat)) {
+        for (const [key, val] of Object.entries(rec)) {
+          if (val.header.src == parseInt(row.id)) {
+            if (val.header.ins == parseInt(row.instance)) {
+              prf = prf.replace(':instance', row.instance);
+            }
+            break;
           }
-          break;
         }
       }
       prf = prf.replace(':instance', '0');

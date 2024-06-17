@@ -9,7 +9,7 @@
   import { isRoute } from "../../helpers/route.js";
 
   export let params = undefined;
-  
+
   let headers = new Array({
     key: 'wait',
     value: 'Waiting for first record...',
@@ -81,25 +81,27 @@
   function setData(dat) {
     let tmp = new Array();
     if (typeof dat !== "undefined") {
-      for (const [key, val] of Object.entries(dat)) {
-        let add = null;
-        if ((typeof params !== 'undefined') && (typeof params['address'] !== 'undefined')) {
-          add = parseInt(params['address']);
-        }
-        if ((add === null) || (val.raw[3] === add)) {
-          let dat = new Uint8Array(val.raw.slice(4));
-          let spl = key.split("/");
-          let obj = {
-            id: key,
-            msg: spl[1] + ' - ' + val.title,
-            ins: (typeof val.header.ins !== 'undefined') ? val.header.ins : '-',
-            cnt: val.cnt,
-            int: val.int,
-            key: (parseInt(spl[1]) * 10) + ((typeof val.header.ins !== 'undefined') ? parseInt(val.header.ins) : 0),
-            raw: buf2hex(dat),
-            dat: Object.assign({ key: key }, val),
-          };
-          tmp.push(obj);
+      for (const [src, rec] of Object.entries(dat)) {
+        for (const [key, val] of Object.entries(rec)) {
+          let add = null;
+          if ((typeof params !== 'undefined') && (typeof params['address'] !== 'undefined')) {
+            add = parseInt(params['address']);
+          }
+          if ((add === null) || (val.raw[3] === add)) {
+            let dat = new Uint8Array(val.raw.slice(4));
+            let spl = key.split("/");
+            let obj = {
+              id: key,
+              msg: spl[1] + ' - ' + val.title,
+              ins: (typeof val.header.ins !== 'undefined') ? val.header.ins : '-',
+              cnt: val.cnt,
+              int: val.int,
+              key: (parseInt(spl[1]) * 10) + ((typeof val.header.ins !== 'undefined') ? parseInt(val.header.ins) : 0),
+              raw: buf2hex(dat),
+              dat: Object.assign({ key: key }, val),
+            };
+            tmp.push(obj);
+          }
         }
       }
       tmp.sort((a, b) => {

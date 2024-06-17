@@ -122,6 +122,11 @@ function decode(frm, din) {
         } else if (fld['type'].startsWith('chr(')) {
           let buf = Buffer.alloc(Math.ceil(len / 8));
           frm.data.copy(buf, 0, byt);
+          for (let i = 0; i < buf.length; i++) {
+            if (buf[i] == 0xFF) {
+              buf[i] = 0;
+            }
+          }
           val = buf.toString('utf8');
         } else if (fld['type'] == 'str') {
           let asc = frm.data.readUInt8(byt + 1);
@@ -192,9 +197,6 @@ function decode(frm, din) {
         msg.fields.push(fld);
         ptr += len;
       }
-    }
-    if (din != null) {
-      msg.header.din = din;
     }
     if (ins != null) {
       msg.header.ins = ins;

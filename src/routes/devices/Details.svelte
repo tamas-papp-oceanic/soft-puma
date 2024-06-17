@@ -11,8 +11,8 @@
   );
   const hds2 = new Array(
     { key: "field", value: "Field#" },
-    { key: "title", value: "Title" },
-    { key: "value", value: "Value" },
+    { key: "title", value: "Title", width: "50%" },
+    { key: "value", value: "Value", width: "30%" },
     { key: "unit", value: "Unit" },
   );
 
@@ -64,7 +64,7 @@
         </div>
       </div>
     </Column>
-    <Column>
+    <Column sm={10} md={10} lg={10}>
       <div class="wrap">
         <div class="cont">
           <DataTable headers={hds2} rows={rws2} size="compact" />

@@ -219,6 +219,7 @@ window.pumaAPI.recv('n2k-prod', (e, args) => {
 // NMEA2000 other messages
 window.pumaAPI.recv('n2k-data', (e, args) => {
   const [ dev, msg ] = args;
+  let src = msg.header.src;
   if (typeof msg.key !== 'undefined') {
     let key = msg.key;
     delete msg.key;
@@ -235,15 +236,18 @@ window.pumaAPI.recv('n2k-data', (e, args) => {
     if (typeof dat[dev] === 'undefined') {
       dat[dev] = {};
     }
-    if (typeof dat[dev][key] === 'undefined') {
-      dat[dev][key] = { header: { tim: msg.header.tim }};
+    if (typeof dat[dev][src] === 'undefined') {
+      dat[dev][src] = {};
+    }
+    if (typeof dat[dev][src][key] === 'undefined') {
+      dat[dev][src][key] = { header: { tim: msg.header.tim }};
       msg.cnt = 0;
     } else {
-      msg.cnt = dat[dev][key].cnt;
+      msg.cnt = dat[dev][src][key].cnt;
     }
-    msg.int = Math.round((msg.header.tim - dat[dev][key].header.tim) * 1000);
+    msg.int = Math.round((msg.header.tim - dat[dev][src][key].header.tim) * 1000);
     msg.cnt++;
-    dat[dev][key] = msg;
+    dat[dev][src][key] = msg;
     data.set(dat);
     // Queue handling
     let flt = get(filter);
@@ -261,6 +265,7 @@ window.pumaAPI.recv('n2k-data', (e, args) => {
 // J1939 other messages
 window.pumaAPI.recv('j1939-data', (e, args) => {
   const [ dev, msg ] = args;
+  let src = msg.header.src;
   if (typeof msg.key !== 'undefined') {
     let key = msg.key;
     delete msg.key;
@@ -277,15 +282,18 @@ window.pumaAPI.recv('j1939-data', (e, args) => {
     if (typeof dat[dev] === 'undefined') {
       dat[dev] = {};
     }
-    if (typeof dat[dev][key] === 'undefined') {
-      dat[dev][key] = { header: { tim: msg.header.tim }};
+    if (typeof dat[dev][src] === 'undefined') {
+      dat[dev][src] = {};
+    }
+    if (typeof dat[dev][src][key] === 'undefined') {
+      dat[dev][src][key] = { header: { tim: msg.header.tim }};
       msg.cnt = 0;
     } else {
-      msg.cnt = dat[dev][key].cnt;
+      msg.cnt = dat[dev][src][key].cnt;
     }
-    msg.int = Math.round((msg.header.tim - dat[dev][key].header.tim) * 1000);
+    msg.int = Math.round((msg.header.tim - dat[dev][src][key].header.tim) * 1000);
     msg.cnt++;
-    dat[dev][key] = msg;
+    dat[dev][src][key] = msg;
     data.set(dat);
     // Queue handling
     let flt = get(filter);
