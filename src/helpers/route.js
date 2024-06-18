@@ -7,28 +7,36 @@ import { getdev } from '../config/devices.js';
 function isRoute(prf, src) {
   if (routeGuard({ location: prf })) {
     switch (prf) {
-    case '/details':
-    case '/messages':
-    case '/monitor':
-    case '/program':
-    case '/serial':
-    case '/simulate':
-      break;
-    default:
-      try {
-        let nms = get(name);
-        let dev = get(device);
-        let nam = nms[dev][src];
-        dev = getdev(nam.modelVersion);
-        prf += '/' + nam.modelVersion + '/:instance';
-        if ((dev != null) && dev.fluid) {
-          prf += '/:fluid';
+      case '/details':
+      case '/messages':
+      case '/monitor':
+      case '/simulate':
+        break;
+      default:
+        try {
+          let nms = get(name);
+          let dev = get(device);
+          let nam = nms[dev][src];
+          if (nam.manufacturer !== 161) {
+            return false;
+          }
+          switch (prf) {
+            case '/program':
+            case '/serial':
+              break;
+            default:
+              dev = getdev(nam.modelVersion);
+              prf += '/' + nam.modelVersion + '/:instance';
+              if ((dev != null) && dev.fluid) {
+                prf += '/:fluid';
+              }
+              break;
+          }
+        } catch (err) {
+          // console.log(err);
+          return false;
         }
-      } catch (err) {
-        // console.log(err);
-        return false;
-      }
-      break;
+        break;
     }
     let ros = get(allRoutes)
     for (let rou of ros) {

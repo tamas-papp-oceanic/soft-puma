@@ -2,10 +2,10 @@
   import { push } from 'svelte-spa-router'
   import { Grid, Row, Column, Button, DataTable, Toolbar,
     ToolbarContent, ToolbarSearch,  OverflowMenu, TooltipIcon,
-    OverflowMenuItem, Pagination, Dropdown } from "carbon-components-svelte";
+    OverflowMenuItem, Pagination } from "carbon-components-svelte";
   import Scan from "carbon-icons-svelte/lib/SearchLocate16";
   import Warning from "carbon-icons-svelte/lib/WarningAltFilled16";
-  import { name, devices, device, data, updates } from "../../stores/data.js";
+  import { name, device, data, updates } from "../../stores/data.js";
   import { compareVersions } from 'compare-versions';
   import { getdev } from '../../config/devices.js';
   import { isRoute } from '../../helpers/route.js'
@@ -46,31 +46,37 @@
     page: 1,
   };
 
-  function conf(e, row) {
+  function pref(cat, row) {
     try {
       let nam = $name[$device][row.id];
       let dev = getdev(nam.modelVersion);
-      let prf = '/configure/' + nam.modelVersion + '/' + row.instance;
+      let prf = '/' + cat + '/' + nam.modelVersion + '/:instance';
       if ((dev != null) && dev.fluid) {
         prf += '/:fluid';
       }
-      let dat = $data[$device];
-      for (const [src, rec] of Object.entries(dat)) {
+      for (const [src, rec] of Object.entries($data[$device])) {
         for (const [key, val] of Object.entries(rec)) {
           if (val.header.src == parseInt(row.id)) {
-            if (typeof val.header.typ !== 'undefined') {
-              if (val.header.pgn == 127505) {
-                prf = prf.replace(':fluid', val.header.typ.toString());
-              }
+            if ((typeof val.header.ins !== 'undefined') && (val.header.ins == parseInt(row.instance))) {
+              prf = prf.replace(':instance', row.instance);
             }
-            break;
+            if ((typeof val.header.typ !== 'undefined') && (val.header.pgn == 127505)) {
+              prf = prf.replace(':fluid', val.header.typ.toString());
+            }
           }
         }
       }
-      prf = prf.replace(':instance', '0').replace(':fluid', '0');
-      push(prf);
+      return prf.replace(':instance', '0').replace(':fluid', '0');
     } catch (err) {
-      // console.log(err);
+      console.log(err);
+      return null;
+    }
+  }
+
+  function conf(e, row) {
+    let url = pref('configure', row);
+    if (url != null) {
+      push(url);
     }
   }
   
@@ -83,51 +89,16 @@
   }
 
   function test(e, row) {
-    try {
-      let nam = $name[$device][row.id];
-      let prf = '/testing/' + nam.modelVersion + '/:instance';
-      let dat = $data[$device];
-      for (const [src, rec] of Object.entries(dat)) {
-        for (const [key, val] of Object.entries(rec)) {
-          if (val.header.src == parseInt(row.id)) {
-            if (val.header.ins == parseInt(row.instance)) {
-              prf = prf.replace(':instance', row.instance);
-            }
-            if (typeof val.header.typ !== 'undefined') {
-              if (val.header.pgn == 127505) {
-                prf = prf.replace(':fluid', val.header.typ.toString());
-              }
-            }
-            break;
-          }
-        }
-      }
-      prf = prf.replace(':instance', '0');
-      push(prf);
-    } catch (err) {
-      // console.log(err);
+    let url = pref('testing', row);
+    if (url != null) {
+      push(url);
     }
   }
   
   function update(e, row) {
-    try {
-      let nam = $name[$device][row.id];
-      let prf = '/program/' + nam.modelVersion + '/:instance';
-      let dat = $data[$device];
-      for (const [src, rec] of Object.entries(dat)) {
-        for (const [key, val] of Object.entries(rec)) {
-          if (val.header.src == parseInt(row.id)) {
-            if (val.header.ins == parseInt(row.instance)) {
-              prf = prf.replace(':instance', row.instance);
-            }
-            break;
-          }
-        }
-      }
-      prf = prf.replace(':instance', '0');
-      push(prf);
-    } catch (err) {
-      // console.log(err);
+    let url = pref('program', row);
+    if (url != null) {
+      push(url);
     }
   }
   
@@ -224,13 +195,13 @@
               {#if isRoute('/configure', row.id)}
                 <OverflowMenuItem text="Configure" on:click={(e) => conf(e, row)} />
               {/if}
-              {#if isRoute('/serial')}
+              {#if isRoute('/serial', row.id)}
                 <OverflowMenuItem text="Serial" on:click={(e) => serial(e, row)} />
               {/if}
               {#if isRoute('/testing', row.id)}
                 <OverflowMenuItem text="Testing" on:click={(e) => test(e, row)} />
               {/if}
-              {#if isRoute('/program') && isUpdate(row.id)}
+              {#if isRoute('/program', row.id) && isUpdate(row.id)}
                 <OverflowMenuItem text="Update" on:click={(e) => update(e, row)} />
               {/if}
             </OverflowMenu>
