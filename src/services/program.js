@@ -13,9 +13,11 @@ const path = require('path');
 const cp = require('child_process');
 const https = require('https');
 
+let src = process.env.hasOwnProperty('STM32_PRG_PATH') ?  process.env.STM32_PRG_PATH  : '';
+
 function erase(func) {
   return new Promise((resolve, reject) => {
-    const chd = cp.spawn('STM32_Programmer_CLI', ['-c port=jtag', '-e', 'all']);
+    const chd = cp.spawn(path.join(src, 'STM32_Programmer_CLI'), ['-c port=jtag', '-e', 'all']);
     chd.stdout.on('data', (data) => {
       let msg = data.toString().replace(/\x1B\[[0-9;]*[JKmsu]/g, '');
       func(msg);
@@ -34,7 +36,7 @@ function erase(func) {
 
 function upload(dwn, func) {
   return new Promise((resolve, reject) => {
-    const chd = cp.spawn('STM32_Programmer_CLI', ['-c port=jtag', '-w', dwn, '0x08000000', '-v']);
+    const chd = cp.spawn(path.join(src, 'STM32_Programmer_CLI'), ['-c port=jtag', '-w', dwn, '0x08000000', '-v']);
     chd.stdout.on('data', (data) => {
       let msg = data.toString().replace(/\x1B\[[0-9;]*[JKmsu]/g, '');
       func(msg);
@@ -53,7 +55,7 @@ function upload(dwn, func) {
 
 function reboot(func) {
   return new Promise((resolve, reject) => {
-    const chd = cp.spawn('STM32_Programmer_CLI', ['-c port=jtag', '-g', '0x08000000']);
+    const chd = cp.spawn(path.join(src, 'STM32_Programmer_CLI'), ['-c port=jtag', '-g', '0x08000000']);
     chd.stdout.on('data', (data) => {
       let msg = data.toString().replace(/\x1B\[[0-9;]*[JKmsu]/g, '');
       func(msg);
