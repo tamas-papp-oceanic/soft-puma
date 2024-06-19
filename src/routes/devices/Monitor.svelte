@@ -46,6 +46,7 @@
   };
 
   function trace(e, row) {
+    // /messages/pgn/address/instance
     push('/messages/' + row.id);
   };
 
@@ -83,17 +84,22 @@
     if (typeof dat !== "undefined") {
       for (const [src, rec] of Object.entries(dat)) {
         for (const [key, val] of Object.entries(rec)) {
-          let add = null;
-          if ((typeof params !== 'undefined') && (typeof params['address'] !== 'undefined')) {
-            add = parseInt(params['address']);
+          let pgn = val.header.pgn;
+          let add = val.raw[3];
+          let ins = val.header.hasOwnProperty('ins') ? val.header.ins : '-';
+          let flt = null;
+          if ((typeof params !== 'undefined') && params.hasOwnProperty('address')) {
+            flt = parseInt(params['address']);
           }
-          if ((add === null) || (val.raw[3] === add)) {
+          if ((flt === null) || (add == flt)) {
             let dat = new Uint8Array(val.raw.slice(4));
             let spl = key.split("/");
             let obj = {
-              id: key,
+              id: pgn + '/' + add + '/' + ins,
+              pgn: pgn,
+              add: add,
+              ins: ins,
               msg: spl[1] + ' - ' + val.title,
-              ins: (typeof val.header.ins !== 'undefined') ? val.header.ins : '-',
               cnt: val.cnt,
               int: val.int,
               key: (parseInt(spl[1]) * 10) + ((typeof val.header.ins !== 'undefined') ? parseInt(val.header.ins) : 0),
@@ -105,10 +111,22 @@
         }
       }
       tmp.sort((a, b) => {
-        if (a.id < b.id) {
+        if (a.pgn < b.pgn) {
           return -1;
         }
-        if (a.id > b.id) {
+        if (a.pgn > b.pgn) {
+          return 1;
+        }
+        if (a.add < b.add) {
+          return -1;
+        }
+        if (a.add > b.add) {
+          return 1;
+        }
+        if (a.ins < b.ins) {
+          return -1;
+        }
+        if (a.ins > b.ins) {
           return 1;
         }
         return 0;
@@ -123,6 +141,10 @@
       },{
         key: "msg",
         value: "Message",
+        sort: false,
+      },{
+        key: "add",
+        value: "Address",
         sort: false,
       },{
         key: "ins",

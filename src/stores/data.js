@@ -251,14 +251,17 @@ window.pumaAPI.recv('n2k-data', (e, args) => {
     data.set(dat);
     // Queue handling
     let flt = get(filter);
-    let de2 = get(device);
-    if ((flt != null) && (de2 == dev) && (key == flt)) {
-      let que = get(queue);
-      if (que.length < qlimit) {
-        msg.cnt = que.length + 1;
-        que.push(msg);
+    if (flt != null) {
+      let qky = msg.header.pgn + '/' + msg.header.src + '/' + (msg.header.hasOwnProperty('ins') ? msg.header.ins : '-');
+      let de2 = get(device);
+      if ((de2 == dev) && (qky == flt)) {
+        let que = get(queue);
+        if (que.length < qlimit) {
+          msg.cnt = que.length + 1;
+          que.push(msg);
+        }
+        queue.set(que);
       }
-      queue.set(que);
     }
   }
 });
@@ -297,14 +300,17 @@ window.pumaAPI.recv('j1939-data', (e, args) => {
     data.set(dat);
     // Queue handling
     let flt = get(filter);
-    let de2 = get(device);
-    if ((flt !== null) && (de2 === dev) && (key === flt)) {
-      let que = get(queue);
-      if (que.length < qlimit) {
-        msg.cnt = que.length + 1;
-        que.push(msg);
+    if (flt != null) {
+      let qky = msg.header.pgn + '/' + msg.header.src + '/' + (msg.header.hasOwnProperty('ins') ? msg.header.ins : '-');
+      let de2 = get(device);
+      if ((flt !== null) && (de2 === dev) && (qky === flt)) {
+        let que = get(queue);
+        if (que.length < qlimit) {
+          msg.cnt = que.length + 1;
+          que.push(msg);
+        }
+        queue.set(que);
       }
-      queue.set(que);
     }
   }
 });
@@ -318,7 +324,7 @@ export function restart() {
   queue.set(new Array());
 };
 // Stops capture
-export function stop(key) {
+export function stop() {
   filter.set(null);
 };
 // Searches for product code in name records

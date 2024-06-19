@@ -28,14 +28,8 @@
   });
 
   onMount(() => {
-    if (params.protocol === 'nmea2000') {
-      key = params.protocol + '/' + params.pgn + '/' + params.function + '/' +
-        params.manufacturer + '/' + params.industry + '/' + params.instance + '/' +
-        params.type;
-    } else {
-      key = params.protocol + '/' + params.pgn + '/' + params.instance;
-    }
-    title = 'Content of PGN' + params.pgn;
+    key = params.pgn + '/' + params.address + '/' + params.instance;
+    title = 'Trace of PGN' + params.pgn;
     start(key);
   }); 
 
@@ -67,9 +61,7 @@
   function getHeaders() {
     if (first && (key != null) && ($queue.length > 0)) {
       let dat = $queue.at(0);
-      if (title != null) {
-        title += ' - ' + dat.title;
-      }
+      title = 'Trace of PGN' + params.pgn + ' - ' + dat.title + ' ( address: ' + params.address + ' )';
       if ((typeof dat.fields !== 'undefined') && Array.isArray(dat.fields) && (dat.fields.length > 0)) {
         let tmp = new Array({
           key: "overflow",

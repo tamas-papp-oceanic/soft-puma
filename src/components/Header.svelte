@@ -22,7 +22,7 @@
   export let company;
   export let product;
   export let version;
-  
+
   const menu = [
     { id: '0', location: '/', selected: false, enabled: true, text: 'Devices', protocols: ['0', '1'] },
     { id: '1', location: '/monitor', selected: false, enabled: true, text: 'Monitor', protocols: ['0', '1'] },

@@ -35,7 +35,7 @@
 	import LoginRequired from './routes/LoginRequired.svelte';
 	import { update, updmsg, download, progress } from './stores/update.js';
 	import { allRoutes, updates } from './stores/data.js';
-	import { loggedIn, lastLogin } from './stores/user.js';
+	import { lastLogin } from './stores/user.js';
 	import { compareVersions } from 'compare-versions';
 	import { routeGuard } from './helpers/guard.js';
 
@@ -43,40 +43,37 @@
 	export let appName;
 
 	const routes = {
-		"/":                                wrap({ component: Devices,        conditions: [(detail) => { return routeGuard(detail); }] }),
-		"/configure":                       wrap({ component: Configure,      conditions: [(detail) => { return routeGuard(detail); }] }),
-		"/configure/3271/:instance/:fluid": wrap({ component: ConfigureFluid, conditions: [(detail) => { return routeGuard(detail); }] }),
-		"/configure/3281/:instance/:fluid": wrap({ component: ConfigureFluid, conditions: [(detail) => { return routeGuard(detail); }] }),
-		"/configure/3410/:instance":        wrap({ component: Configure3410,  conditions: [(detail) => { return routeGuard(detail); }] }),
-		"/configure/3420/:instance":        wrap({ component: Configure3420,  conditions: [(detail) => { return routeGuard(detail); }] }),
-		"/configure/3125/:instance/:fluid": wrap({ component: ConfigureFluid, conditions: [(detail) => { return routeGuard(detail); }] }),
-		"/configure/4291/:instance/:fluid": wrap({ component: ConfigureFluid, conditions: [(detail) => { return routeGuard(detail); }] }),
-		"/configure/4510/:instance":        wrap({ component: Configure4510,  conditions: [(detail) => { return routeGuard(detail); }] }),
-		"/configure/4521/:instance":        wrap({ component: Configure4521,  conditions: [(detail) => { return routeGuard(detail); }] }),
-		"/configure/4601/:instance":        wrap({ component: Configure4601,  conditions: [(detail) => { return routeGuard(detail); }] }),
-		"/configure/5720/:instance":        wrap({ component: Configure5720,  conditions: [(detail) => { return routeGuard(detail); }] }),
-		"/details": 	                      wrap({ component: Details,        conditions: [(detail) => { return routeGuard(detail); }] }),
-    "/login":                           wrap({ component: Login,          conditions: [(detail) => { return routeGuard(detail); }] }),
-    "/manage":                          wrap({ component: Manage,         conditions: [(detail) => { return routeGuard(detail); }] }),
-		"/messages/:protocol/:pgn/:instance":
-																				wrap({ component: Trace,          conditions: [(detail) => { return routeGuard(detail); }] }),
-		"/messages/:protocol/:pgn/:function/:manufacturer/:industry/:instance/:type":
-																				wrap({ component: Trace,          conditions: [(detail) => { return routeGuard(detail); }] }),
-    "/monitor":                         wrap({ component: Monitor,        conditions: [(detail) => { return routeGuard(detail); }] }),
-		"/monitor/:address":                wrap({ component: Monitor,        conditions: [(detail) => { return routeGuard(detail); }] }),
-    "/profile":                         wrap({ component: Profile,        conditions: [(detail) => { return routeGuard(detail); }] }),
-		"/program":                         wrap({ component: Program,        conditions: [(detail) => { return routeGuard(detail); }] }),
-		"/program/:device/:instance":       wrap({ component: ProgramDevice,  conditions: [(detail) => { return routeGuard(detail); }] }),
-		"/restricted":                      wrap({ component: Restricted,     conditions: [(detail) => { return true;               }] }),
-		"/serial":                          wrap({ component: Serial,         conditions: [(detail) => { return routeGuard(detail); }] }),
-		"/simulate":                        wrap({ component: Simulate,       conditions: [(detail) => { return routeGuard(detail); }] }),
-		"/testing":                         wrap({ component: Testing,        conditions: [(detail) => { return routeGuard(detail); }] }),
-		"/testing/3478/:instance":          wrap({ component: Test3478,       conditions: [(detail) => { return routeGuard(detail); }] }),
-		"/testing/4410/:instance":          wrap({ component: Test4410,       conditions: [(detail) => { return routeGuard(detail); }] }),
-		"/testing/5185":                    wrap({ component: Test5185,       conditions: [(detail) => { return routeGuard(detail); }] }),
-		"/testing/5185-H":                  wrap({ component: Test5185,       conditions: [(detail) => { return routeGuard(detail); }] }),
-		"/welcome":                         wrap({ component: Welcome,        conditions: [(detail) => { return routeGuard(detail); }] }),
-		"*":                                wrap({ component: NotFound,       conditions: [(detail) => { return true;               }] }),
+		"/":																  wrap({ component: Devices,				conditions: [(detail) => { return routeGuard(detail); }] }),
+		"/configure":											    wrap({ component: Configure,			conditions: [(detail) => { return routeGuard(detail); }] }),
+		"/configure/3271/:instance/:fluid":   wrap({ component: ConfigureFluid, conditions: [(detail) => { return routeGuard(detail); }] }),
+		"/configure/3281/:instance/:fluid":   wrap({ component: ConfigureFluid, conditions: [(detail) => { return routeGuard(detail); }] }),
+		"/configure/3410/:instance":				  wrap({ component: Configure3410,	conditions: [(detail) => { return routeGuard(detail); }] }),
+		"/configure/3420/:instance":				  wrap({ component: Configure3420,	conditions: [(detail) => { return routeGuard(detail); }] }),
+		"/configure/3125/:instance/:fluid":   wrap({ component: ConfigureFluid, conditions: [(detail) => { return routeGuard(detail); }] }),
+		"/configure/4291/:instance/:fluid":   wrap({ component: ConfigureFluid, conditions: [(detail) => { return routeGuard(detail); }] }),
+		"/configure/4510/:instance":				  wrap({ component: Configure4510,	conditions: [(detail) => { return routeGuard(detail); }] }),
+		"/configure/4521/:instance":				  wrap({ component: Configure4521,	conditions: [(detail) => { return routeGuard(detail); }] }),
+		"/configure/4601/:instance":				  wrap({ component: Configure4601,	conditions: [(detail) => { return routeGuard(detail); }] }),
+		"/configure/5720/:instance":				  wrap({ component: Configure5720,	conditions: [(detail) => { return routeGuard(detail); }] }),
+		"/details": 												  wrap({ component: Details,				conditions: [(detail) => { return routeGuard(detail); }] }),
+		"/login":													    wrap({ component: Login,					conditions: [(detail) => { return routeGuard(detail); }] }),
+		"/manage":													  wrap({ component: Manage,				  conditions: [(detail) => { return routeGuard(detail); }] }),
+		"/messages/:pgn/:address/:instance":  wrap({ component: Trace,					conditions: [(detail) => { return routeGuard(detail); }] }),
+		"/monitor":												    wrap({ component: Monitor,				conditions: [(detail) => { return routeGuard(detail); }] }),
+		"/monitor/:address":								  wrap({ component: Monitor,				conditions: [(detail) => { return routeGuard(detail); }] }),
+		"/profile":												    wrap({ component: Profile,				conditions: [(detail) => { return routeGuard(detail); }] }),
+		"/program":												    wrap({ component: Program,				conditions: [(detail) => { return routeGuard(detail); }] }),
+		"/program/:device/:instance":			    wrap({ component: ProgramDevice,	conditions: [(detail) => { return routeGuard(detail); }] }),
+		"/restricted":											  wrap({ component: Restricted,		  conditions: [(detail) => { return true;							 }] }),
+		"/serial":													  wrap({ component: Serial,				  conditions: [(detail) => { return routeGuard(detail); }] }),
+		"/simulate":												  wrap({ component: Simulate,			  conditions: [(detail) => { return routeGuard(detail); }] }),
+		"/testing":												    wrap({ component: Testing,				conditions: [(detail) => { return routeGuard(detail); }] }),
+		"/testing/3478/:instance":					  wrap({ component: Test3478,			  conditions: [(detail) => { return routeGuard(detail); }] }),
+		"/testing/4410/:instance":					  wrap({ component: Test4410,			  conditions: [(detail) => { return routeGuard(detail); }] }),
+		"/testing/5185":										  wrap({ component: Test5185,			  conditions: [(detail) => { return routeGuard(detail); }] }),
+		"/testing/5185-H":									  wrap({ component: Test5185,			  conditions: [(detail) => { return routeGuard(detail); }] }),
+		"/welcome":												    wrap({ component: Welcome,				conditions: [(detail) => { return routeGuard(detail); }] }),
+		"*":																  wrap({ component: NotFound,			  conditions: [(detail) => { return true;							  }] }),
 	};
 
 	let prc;
@@ -84,22 +81,22 @@
 	let max;
 	let txt;
 	let started = false;
-  let rea = false;
+	let rea = false;
 
 	// Check login hook
 	window.pumaAPI.recv('check-login', (e) => {
-    if ($lastLogin === null) {
-      rea = true;
-    } else {
-      let dif = Math.abs(new Date() - $lastLogin);
-      dif = Math.ceil(dif / (1000 * 60 * 60 * 24));
-      if (dif > 60) {
-        rea = true;
-      }
-    }
-  });
+		if ($lastLogin === null) {
+			rea = true;
+		} else {
+			let dif = Math.abs(new Date() - $lastLogin);
+			dif = Math.ceil(dif / (1000 * 60 * 60 * 24));
+			if (dif > 60) {
+				rea = true;
+			}
+		}
+	});
 
-  // Updater available hook
+	// Updater available hook
 	window.pumaAPI.recv('upd-available', (e, val) => {
 		$update = true;
 		$updmsg = val;
@@ -113,11 +110,11 @@
 	// Updater progress hook
 	window.pumaAPI.recv('upd-progress', (e, val) => {
 		// {
-		//   total: 103826908,
-		//   delta: 2132100,
-		//   transferred: 6227698,
-		//   percent: 5.99815415865028,
-		//   bytesPerSecond: 2075899
+		//	 total: 103826908,
+		//	 delta: 2132100,
+		//	 transferred: 6227698,
+		//	 percent: 5.99815415865028,
+		//	 bytesPerSecond: 2075899
 		// }
 		$progress = val;
 	});
@@ -197,9 +194,9 @@
 			on:click:button--secondary={(e) => _cancel(e)}
 		/>
 	</ComposedModal>
-  {#if rea}
-    <LoginRequired bind:notify={rea} />
-  {/if}
+	{#if rea}
+		<LoginRequired bind:notify={rea} />
+	{/if}
 </main>
 
 <style lang="scss" global>
