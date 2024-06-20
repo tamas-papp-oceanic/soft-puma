@@ -15,15 +15,15 @@
     { id: '1', text: 'Manual' },
   );
   const press_srcs = new Array(
-    { id: '0', text: 'Atmospheric Pressure' },
-    { id: '1', text: 'Water Pressure' },
-    { id: '2', text: 'Steam Pressure' },
-    { id: '3', text: 'Compressed Air Pressure' },
-    { id: '4', text: 'Hydraulic Pressure' },
-    { id: '5', text: 'Filter Pressure' },
-    { id: '6', text: 'Altimiter Setting' },
-    { id: '7', text: 'Oil Pressure' },
-    { id: '8', text: 'Fuel Pressure' },
+    { id: '0', text: 'Atmospheric' },
+    { id: '1', text: 'Water' },
+    { id: '2', text: 'Steam' },
+    { id: '3', text: 'Compressed Air' },
+    { id: '4', text: 'Hydraulic' },
+    { id: '5', text: 'Filter' },
+    { id: '6', text: 'Altimeter Setting' },
+    { id: '7', text: 'Oil' },
+    { id: '8', text: 'Fuel' },
     { id: '9', text: 'Custom #130' },
     { id: '10', text: 'Custom #131' },
     { id: '11', text: 'Custom #132' },
@@ -194,7 +194,7 @@
                     {#if running}
                       <DropdownSkeleton />
                     {:else}
-                      <Dropdown disabled={!isValid} titleText="Pressure Damping" size="sm" bind:selectedId={press_dmp} items={press_dmps} />
+                      <Dropdown disabled={!isValid} titleText="Pressure Damping (s)" size="sm" bind:selectedId={press_dmp} items={press_dmps} />
                     {/if}
                   </Column>
                 </Row>

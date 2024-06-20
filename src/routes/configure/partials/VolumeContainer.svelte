@@ -24,7 +24,7 @@
   const dispatch = createEventDispatcher();
   
   const modes = new Array(
-    { id: null, text: 'Invalid' },
+    { id: null, text: 'No data' },
     { id: '0', text: 'Level' },
     { id: '1', text: 'Volumetric' },
   );
@@ -429,7 +429,7 @@
                   <DropdownSkeleton />
                 {:else}
                   <Dropdown hideLabel titleText="Select mode" size="xl" bind:selectedId={data.mode} items={modes}
-                    invalid={data.mode == null} />
+                    warn={data.mode == null} />
                 {/if}
               </Column>
             </Row>
