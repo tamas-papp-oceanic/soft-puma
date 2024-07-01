@@ -264,6 +264,14 @@
           if (!rec.disabledSim.includes(parseInt(i))) {
             rec.disabledSim.push(parseInt(i));
           }
+        } else if (dictionary[fld.dictionary].hasOwnProperty("Selects")) {
+          rec.fields[i].selects = new Array();
+          for (const [key, val] of Object.entries(dictionary[fld.dictionary].Selects)) {
+            rec.fields[i].selects.push({ id: parseInt(key), text: val });
+          }
+          if (!fld.hasOwnProperty("select")) {
+            rec.fields[i].select = rec.fields[i].selects[0].id;
+          }
         }          
         rec.fields[i].static = null;
       }
@@ -575,6 +583,25 @@
       let val = (!fld.hasOwnProperty("value")) ? null : fld.value;
       if ((spl.protocol === 'nmea2000') && (fld.dictionary === 'DD056')) {
         val = (val + 1) % 253;
+      } else if ((spl.protocol === 'nmea2000') && fld.hasOwnProperty('select') && (fld.select == 0)) {
+        // fld.select == 0 means current date / time / etc...
+        let res = null;
+        let dat = null;
+        switch (fld.dictionary) {
+          case "DD039":
+            // Generic Date
+            res = Math.floor(new Date().getTime() / (24 * 60 * 60 * 1000));
+            val = res;
+            simulator.table[idx].fields[i].sival = res;
+            break;
+          case "DD158":
+            // Generic time of day
+            dat = new Date();
+            res = (dat.getUTCHours() * 60 * 60) + (dat.getUTCMinutes() * 60) + dat.getUTCSeconds();
+            val = res;
+            simulator.table[idx].fields[i].sival = res;
+            break;
+        }
       } else if (fld['type'] != null) {
         if (fld['type'].startsWith('int') || fld['type'].startsWith('uint') ||
           (fld.unit !== null)) {

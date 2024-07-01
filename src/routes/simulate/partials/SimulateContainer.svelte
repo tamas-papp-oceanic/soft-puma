@@ -167,6 +167,17 @@
     }
   };
 
+  function select(e) {
+    if (e.detail != null) {
+      for (let i in data.table) {
+        if (data.table[i].id == selection1.id) {
+          data.table[i].fields[selection2.id].select = parseInt(e.detail.selectedId);
+          break;
+        }
+      }
+    }
+  };
+
   function input1(e) {
     if (e.detail != null) {
       for (let i in data.table) {
@@ -568,79 +579,100 @@
                     <Grid fullWidth noGutter>
                       <Row style="height: 0.5rem; width 100%;"><Column>&nbsp;</Column></Row>
                       <Row style="width 100%;">
-                        <Column sm={5} md={5} lg={5}>
-                          <Row style="display:flex; flex-flow: row nowrap; align-items: center; justify-content: flex-start;">
-                            <Column>
-                              {#if typeof selection2.fluid !== 'undefined'}
-                                <Dropdown
-                                  id="input"
-                                  size="sm"
-                                  direction="top"
-                                  titleText={selection2.title}
-                                  selectedId={selection2.value}
-                                  items={fluts}
-                                  on:select={input0} />
-                              {:else if typeof selection2.choices !== 'undefined'}
-                                <Dropdown
-                                  id="input"
-                                  size="sm"
-                                  direction="top"
-                                  titleText={selection2.title}
-                                  selectedId={selection2.value}
-                                  items={selection2.choices}
-                                  on:select={choice} />
-                              {:else if typeof selection2.positions !== 'undefined'}
-                                <Row style="height: 2rem;">
-                                  <Column>
-                                    <Tile class="bhead">
-                                      <p class="descr">{selection2.title}</p>
-                                    </Tile>
-                                  </Column>
-                                </Row>
-                                <Row>
-                                  <Column style="display:flex; flex-flow: column nowrap; align-items: flex-start; justify-content: flex-start;">
-                                    {#each Array(4) as _, idx1}
-                                      {#if selection2.bits > (idx1 * 8)}
-                                        <Row>
-                                          <Column style="width: 100%; display:flex; flex-flow: row nowrap; align-items: flex-start; justify-content: flex-start;">
-                                            {#each selection2.positions as pos, idx2}
-                                              {#if Math.floor(idx2 / 8) == idx1}
-                                                <div class="bit">
-                                                  <Checkbox hideLabel checked={pos.value} on:check={(e) => check4(e, pos.id)} />
-                                                </div>
-                                              {/if}
-                                            {/each}
-                                          </Column>
-                                        </Row>
-                                      {/if}
-                                    {/each}
-                                  </Column>
-                                </Row>
-                              {:else if selection2['type'].startsWith('int') || selection2['type'].startsWith('uint') ||
-                                selection2['type'].startsWith('float') || selection2['type'].startsWith('bit(')}
-                                <NumberInput
-                                  id="input"
-                                  min={getlim(selection2, 'min')}
-                                  max={getlim(selection2, 'max')}
-                                  step={
-                                    (typeof selection2.multiplier !== 'undefined') && (selection2.multiplier < 1) ?
-                                    selection2.multiplier : 1
-                                  }
-                                  label={selection2.title}
-                                  invalidText={"Number must be between " + getlim(selection2, 'min') + " and " + getlim(selection2, 'max')}
-                                  value={selection2.value}
-                                  on:input={input1} />
-                              {:else if selection2['type'].startsWith('chr(') || selection2['type'].startsWith('str')}
-                                <TextInput
-                                  id="input"
-                                  disabled={running}
-                                  labelText={selection2.title}
-                                  invalidText={"Text length must be between 0 and " + selection2.chrnum}
-                                  value={selection2.value}
-                                  on:input={input2} />
-                              {/if}
-                            </Column>
-                          </Row>
+                        <Column sm={5} md={5} lg={5} style="display: flex; flex-flow: column nowrap; justify-content: space-between;">
+                          {#if (typeof selection2.fluid !== 'undefined') || (typeof selection2.choices !== 'undefined') ||
+                            (typeof selection2.positions !== 'undefined') || (typeof selection2.selects !== 'undefined')}
+                            <Row style="display:flex; flex-flow: row nowrap; align-items: center; justify-content: flex-start;">
+                              <Column>
+                                {#if typeof selection2.fluid !== 'undefined'}
+                                  <Dropdown
+                                    id="input"
+                                    size="sm"
+                                    direction="top"
+                                    titleText={selection2.title}
+                                    selectedId={selection2.value}
+                                    items={fluts}
+                                    on:select={input0} />
+                                {:else if typeof selection2.choices !== 'undefined'}
+                                  <Dropdown
+                                    id="input"
+                                    size="sm"
+                                    direction="top"
+                                    titleText={selection2.title}
+                                    selectedId={selection2.value}
+                                    items={selection2.choices}
+                                    on:select={choice} />
+                                {:else if typeof selection2.positions !== 'undefined'}
+                                  <Row style="height: 2rem;">
+                                    <Column>
+                                      <Tile class="bhead">
+                                        <p class="descr">{selection2.title}</p>
+                                      </Tile>
+                                    </Column>
+                                  </Row>
+                                  <Row>
+                                    <Column style="display:flex; flex-flow: column nowrap; align-items: flex-start; justify-content: flex-start;">
+                                      {#each Array(4) as _, idx1}
+                                        {#if selection2.bits > (idx1 * 8)}
+                                          <Row>
+                                            <Column style="width: 100%; display:flex; flex-flow: row nowrap; align-items: flex-start; justify-content: flex-start;">
+                                              {#each selection2.positions as pos, idx2}
+                                                {#if Math.floor(idx2 / 8) == idx1}
+                                                  <div class="bit">
+                                                    <Checkbox hideLabel checked={pos.value} on:check={(e) => check4(e, pos.id)} />
+                                                  </div>
+                                                {/if}
+                                              {/each}
+                                            </Column>
+                                          </Row>
+                                        {/if}
+                                      {/each}
+                                    </Column>
+                                  </Row>
+                                {:else if typeof selection2.selects !== 'undefined'}
+                                  <Dropdown
+                                    id="input"
+                                    size="sm"
+                                    direction="top"
+                                    titleText="Value Select"
+                                    selectedId={selection2.select}
+                                    items={selection2.selects}
+                                    on:select={select} />
+                                {/if}
+                              </Column>
+                            </Row>
+                          {/if}
+                          {#if ((typeof selection2.fluid === 'undefined') && (typeof selection2.choices === 'undefined') &&
+                            (typeof selection2.positions === 'undefined') && (typeof selection2.selects === 'undefined')) ||
+                            ((typeof selection2.selects !== 'undefined') && (selection2.select == 1))}
+                            <Row style="display:flex; flex-flow: row nowrap; align-items: center; justify-content: flex-start;">
+                              <Column>
+                                {#if selection2['type'].startsWith('int') || selection2['type'].startsWith('uint') ||
+                                  selection2['type'].startsWith('float') || selection2['type'].startsWith('bit(')}
+                                  <NumberInput
+                                    id="input"
+                                    min={getlim(selection2, 'min')}
+                                    max={getlim(selection2, 'max')}
+                                    step={
+                                      (typeof selection2.multiplier !== 'undefined') && (selection2.multiplier < 1) ?
+                                      selection2.multiplier : 1
+                                    }
+                                    label={selection2.title}
+                                    invalidText={"Number must be between " + getlim(selection2, 'min') + " and " + getlim(selection2, 'max')}
+                                    value={selection2.value}
+                                    on:input={input1} />
+                                {:else if selection2['type'].startsWith('chr(') || selection2['type'].startsWith('str')}
+                                  <TextInput
+                                    id="input"
+                                    disabled={running}
+                                    labelText={selection2.title}
+                                    invalidText={"Text length must be between 0 and " + selection2.chrnum}
+                                    value={selection2.value}
+                                    on:input={input2} />
+                                {/if}
+                              </Column>
+                            </Row>
+                          {/if}
                         </Column>
                         <Column>
                           <Row style="display:flex; flex-flow: row nowrap; align-items: center; justify-content: space-between;">

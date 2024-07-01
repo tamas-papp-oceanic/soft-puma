@@ -81,6 +81,14 @@
       "1": "Rising"
     }
   },
+  "DD039": {
+    "Name": "Generic date",
+    "Format": "DF41",
+    "Selects": {
+      "0": "Current Date",
+      "1": "Custom value"
+    }
+  },
   "DD046": {
     "Name": "Water Current State",
     "Format": "DF52",
@@ -382,6 +390,14 @@
       "3": "Heading Control Standalone",
       "4": "Heading Control",
       "5": "Track Control"
+    }
+  },
+  "DD158": {
+    "Name": "Generic time of day",
+    "Format": "DF06",
+    "Selects": {
+      "0": "Current Time",
+      "1": "Custom value"
     }
   },
   "DD159": {
