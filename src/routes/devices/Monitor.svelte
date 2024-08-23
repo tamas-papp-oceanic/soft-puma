@@ -42,7 +42,7 @@
   } 
 
   function details(e, row) {
-    push('/details?data='+ JSON.stringify(row.dat));
+    push('/details?data='+ JSON.stringify(row.dat).replace('%', '|||'));
   };
 
   function trace(e, row) {
