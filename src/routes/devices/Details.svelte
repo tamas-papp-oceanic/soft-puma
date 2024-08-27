@@ -16,7 +16,7 @@
     { key: "unit", value: "Unit" },
   );
 
-  let data = JSON.parse(parse($querystring).data.replace('|||', '%'));
+  let data = parse($querystring, { charset: 'utf-8' });
   let title = 'Content of message';
   let rws1 = new Array();
   let rws2 = new Array();

@@ -5,6 +5,7 @@
   import Restart from "carbon-icons-svelte/lib/Restart16";
   import SkipBack from "carbon-icons-svelte/lib/SkipBack16";
   import { push, pop } from 'svelte-spa-router'
+  import { stringify } from "qs";
   import { device, name, data } from "../../stores/data.js";
   import { isRoute } from "../../helpers/route.js";
 
@@ -27,7 +28,7 @@
 
   onMount(() => {
     window.pumaAPI.recv('set-prot', (e, pro) => {
-      // rows = new Array();
+      rows = new Array();
     });
   });
 
@@ -42,11 +43,10 @@
   } 
 
   function details(e, row) {
-    push('/details?data='+ JSON.stringify(row.dat).replace('%', '|||'));
+    push('/details?data='+ stringify(row.dat, { charset: 'utf8' }));
   };
 
   function trace(e, row) {
-    // /messages/pgn/address/instance
     push('/messages/' + row.id);
   };
 
@@ -95,7 +95,7 @@
             let dat = new Uint8Array(val.raw.slice(4));
             let spl = key.split("/");
             let obj = {
-              id: pgn + '/' + add + '/' + ins,
+              id: key + '/' + add + '/' + ins,
               pgn: pgn,
               add: add,
               ins: ins,
@@ -111,10 +111,10 @@
         }
       }
       tmp.sort((a, b) => {
-        if (a.pgn < b.pgn) {
+        if (a.id < b.id) {
           return -1;
         }
-        if (a.pgn > b.pgn) {
+        if (a.id > b.id) {
           return 1;
         }
         if (a.add < b.add) {
