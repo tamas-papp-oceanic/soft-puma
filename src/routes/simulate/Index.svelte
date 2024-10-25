@@ -1,7 +1,8 @@
 <script>
   import { onDestroy, onMount } from "svelte";
   import { Grid, Row, Column, Tabs, Tab, TabContent } from "carbon-components-svelte";
-  import { pop } from "svelte-spa-router";
+  import { pop, querystring } from "svelte-spa-router";
+  import { parse } from 'qs';
   import { v4 as uuidv4 } from "uuid";
   import MessageContainer from "./partials/MessageContainer.svelte";
   import SimulateContainer from "./partials/SimulateContainer.svelte";
@@ -37,9 +38,16 @@
   let subttl = null;
 
   onMount((e) => {
-    simulator.simulation = 0;
-    simulator.rate = 0.2;
-    simulator.mimic = false;
+    // Check if autostart with simulator file
+    let data = parse($querystring, { charset: 'utf-8' });
+    if (data.hasOwnProperty('file')) {
+      tab = 1;
+      start(data.file);
+    } else {
+      simulator.simulation = 0;
+      simulator.rate = 0.2;
+      simulator.mimic = false;
+    }
     window.pumaAPI.recv('n2k-digi-ctrl-data', (e, args) => {
       const [ dev, msg ] = args;
       if (simulator.mimic) {
@@ -440,6 +448,44 @@
         break;
       }
     }
+  };
+
+  function start(name) {
+    kind = null
+    title = null;
+    subttl = null;
+    notify = false;
+    running = true;
+    // Receives opening result
+    window.pumaAPI.recv('simfile-done', (e, res) => {
+      if (res instanceof Error) {
+        if (res.message != 'Nothing selected') {
+          kind = 'error'
+          title = 'Error';
+          subttl = res;
+          notify = true;
+        }
+      } else {
+        if (!res.hasOwnProperty("simulation")) {
+          res.simulation = 0;
+        }
+        if (!res.hasOwnProperty("rate")) {
+          res.rate = 0.2;
+        }
+        if (!res.hasOwnProperty("mimic")) {
+          res.mimic = false;
+        }
+        for (let i in res.table) {
+          let row = prepFields(res.table[i], res.table[i].key);
+          res.table[i] = JSON.parse(JSON.stringify(row));
+        }
+        simulator = JSON.parse(JSON.stringify(res));
+        simulator = simulator;
+      }
+      reml('simfile');
+      simStart();
+    });
+    window.pumaAPI.send('simfile-load', name);
   };
 
   function load(e) {

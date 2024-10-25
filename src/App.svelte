@@ -83,7 +83,12 @@
 	let started = false;
 	let rea = false;
 
-	// Check login hook
+	// Simulate hook
+	window.pumaAPI.recv('simulate', (e, val) => {
+		push('/simulate?file=' + val);
+	});
+
+  // Check login hook
 	window.pumaAPI.recv('check-login', (e) => {
 		if ($lastLogin === null) {
 			rea = true;

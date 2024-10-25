@@ -1,6 +1,6 @@
 <script>
-  import { parse } from 'qs'
-  import { pop, querystring } from 'svelte-spa-router'
+  import { pop, querystring } from 'svelte-spa-router';
+  import { parse } from 'qs';
   import { Grid, Row, Column, DataTable, Toolbar, ToolbarContent, Tile,
     Button } from "carbon-components-svelte";
   import SkipBack from "carbon-icons-svelte/lib/SkipBack16";

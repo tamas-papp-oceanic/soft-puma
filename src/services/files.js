@@ -20,6 +20,17 @@ async function readFile(window, title, name) {
   });
 };
 
+async function loadFile(name) {
+  return new Promise((resolve, reject) => {
+    let data = fs.readFileSync(name, { encoding: "UTF8"} );
+    try {
+      resolve(JSON.parse(data));
+    } catch (err) {
+      reject(err);
+    }
+  });
+};
+
 async function writeFile(window, title, name, data) {
   return new Promise((resolve, reject) => {
     let fp = dialog.showSaveDialogSync(window, { title: title, defaultPath: path.join(os.homedir(), "Downloads", name),
@@ -38,7 +49,20 @@ async function writeFile(window, title, name, data) {
   });
 };
 
+async function saveFile(name, data) {
+  return new Promise((resolve, reject) => {
+    try {
+      let dat = JSON.stringify(data);
+      fs.writeFileSync(name, dat, { encoding: "UTF8"} );
+      resolve(true);
+    } catch (err) {
+      reject(err);
+    }
+  });
+};
+
 module.exports = {
   readFile,
+  loadFile,
   writeFile,
 };

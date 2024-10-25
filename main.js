@@ -17,9 +17,15 @@ const bwipjs = require('bwip-js');
 const PDFDocument = require('pdfkit');
 const prt = 'HP-LaserJet-Pro-M404-M405';
 const { writeBoot, downFile, downUpdates } = require('./src/services/program.js')
-const { readFile, writeFile } = require('./src/services/files.js');
+const { readFile, loadFile, writeFile } = require('./src/services/files.js');
 const EventEmitter = require('node:events');
 const crc32 = require('buffer-crc32');
+const cla = require('command-line-args');
+
+// Command line parameters
+const clo = [
+  { name: 'simfile', alias: 'i', type: String, multiple: false, defaultOption: false },
+];
 
 // Leopard URL
 const authURL = 'https://updates.osukl.com/leopard';
@@ -29,6 +35,7 @@ const pub = new EventEmitter();
 // Keep a global reference of the window object, if you don't, the window will
 // be closed automatically when the JavaScript object is garbage collected.
 let mainWindow;
+let options = {};
 let devices = {};
 let timer = null;
 let Can = null;
@@ -39,6 +46,40 @@ let tray = null;
 log.transports.console.level = 'info';
 log.transports.file.maxSize = 10 * 1024 * 1024;
 log.transports.file.level = 'info';
+
+
+if (isDev) {
+  for (const [key,val] of Object.entries(process.env)) {
+    if (key.startsWith('npm_config_')) {
+      options[key.replace('npm_config_', '')] = val;
+    }
+  }
+} else {
+  try {
+    options = cla(clo, {
+      argv: process.argv.slice(1)
+    });
+  } catch(err) {
+    switch (err.name) {
+      case 'UNKNOWN_OPTION':
+        log.error('Unknown option:', err.optionName);
+        break;
+
+
+      case 'UNKNOWN_VALUE':
+        log.error('Unknown value:', err.value);
+        break;
+  
+      case 'ALREADY_SET':
+        log.error('Already set:', err.optionName);
+        break;
+  
+      case 'INVALID_DEFINITIONS':
+        log.error('Invalid definitions');
+        break;
+    }
+  }
+}
 
 if (os.platform() == 'linux') {
   Can = require('./src/services/can.js');
@@ -202,6 +243,13 @@ app.whenReady().then(async () => {
       // console.log(err);
     });
   }, 10000);
+  if (options.hasOwnProperty('simfile')) {
+    if ((mainWindow != null) && (typeof mainWindow.webContents !== 'undefined')) {
+      setTimeout(() => {
+        mainWindow.webContents.send('simulate', options['simfile']);
+      }, 5000);
+    }
+  }
 });
 
 // Quit when all windows are closed.
@@ -1898,6 +1946,25 @@ ipcMain.on('sim-data', (e, args) => {
 ipcMain.on('simfile-read', (e, args) => {
   const [title, name] = args;
   readFile(mainWindow, title, name).then((res) => {
+    if ((typeof res.simulation !== 'undefined') && (typeof res.table !== 'undefined')) {
+      if ((mainWindow != null) && (typeof mainWindow.webContents !== 'undefined')) {
+        mainWindow.webContents.send('simfile-done', res);
+      }
+    } else {
+      if ((mainWindow != null) && (typeof mainWindow.webContents !== 'undefined')) {
+        mainWindow.webContents.send('simfile-done', new Error('Invalid data structure'));
+      }
+    }
+  }).catch((err) => {
+    if ((mainWindow != null) && (typeof mainWindow.webContents !== 'undefined')) {
+      mainWindow.webContents.send('simfile-done', err);
+    }
+  });
+});
+
+// Loads simulator file content
+ipcMain.on('simfile-load', (e, arg) => {
+  loadFile(arg).then((res) => {
     if ((typeof res.simulation !== 'undefined') && (typeof res.table !== 'undefined')) {
       if ((mainWindow != null) && (typeof mainWindow.webContents !== 'undefined')) {
         mainWindow.webContents.send('simfile-done', res);
