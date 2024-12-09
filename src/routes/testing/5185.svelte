@@ -58,8 +58,7 @@
                 stv = 'UZSY-' + stv;
               }
               await setStoreValue({ variable: 'serial', value: stv });
-              let dev = get(device);
-              window.pumaAPI.send('ser-num', [dev, num]);
+              window.pumaAPI.send('ser-num', [device, num]);
             }
           }
           if (cur.inputs[i].error.active) {
