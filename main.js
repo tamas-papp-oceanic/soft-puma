@@ -664,6 +664,9 @@ ipcMain.on('bus-scan', (e) => {
 
 ipcMain.on('ser-num', (e, args) => {
   const [dev, serial] = args;
+
+console.log(dev,serial, devices)
+
   if ((typeof dev === 'string') && (typeof devices[dev] !== 'undefined')) {
     let eng = devices[dev].engine;
     // Send Proprietary Set serial PGN
