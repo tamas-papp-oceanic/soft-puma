@@ -83,7 +83,7 @@
     "6": {
       "blurb": "6. GPS test.\n\nAttach GPS antenna.",
       "testCode": 3,
-      "buttons": [ "Pass", "Fail" ],
+      "buttons": [ "Next", "Fail" ],
       "scripts": {
         "1": {
           "action": "start-test"
@@ -96,6 +96,29 @@
       "onSuccess": { "action": "add-log", "testCode": 3, "testValue": 1 }
     },
     "7": {
+      "blurb": "7. Insert update USB and click Next.",
+      "buttons": [ "Next", "Cancel" ],
+      "scripts": {
+        "1": {
+          "action": "stop-tests"
+        },
+        "2": {
+          "action": "next"
+        }
+      }
+    },
+    "8": {
+      "blurb": "8. Wait for update result.\n\nIf language selection screen is showing up click Pass.\nIf device update isn't successful click Fail.",
+      "testCode": 4,
+      "buttons": [ "Pass", "Fail" ],
+      "scripts": {
+        "1": {
+          "action": "start-update"
+        }
+      },
+      "onSuccess": { "action": "add-log", "testCode": 4, "testValue": 1 }
+    },
+    "9": {
       "blurb": "9. Test result.",
       "last": true,
       "buttons": [ "Ok" ],
