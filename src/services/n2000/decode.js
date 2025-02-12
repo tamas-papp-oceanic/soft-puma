@@ -511,35 +511,37 @@ function proc126208(def, frm) {
         def.fields = tmp;
         // Looping through the parameters
         for (let i = 0; i < cnt; i++) {
-          // Get field number
-          let fln = frm.data.readUInt8(Math.ceil(ptr / 8));
-          ptr += 8;
-          // Get requested field
-          let fld = com.getFld(fln, de2.fields);
-          if (fld != null) {
-            let fl1 = JSON.parse(JSON.stringify(tp1));
-            fl1.field = fst + (i * 2);
-            fl1.title = 'Field Number (' + fln + ')';
-            let fl2 = JSON.parse(JSON.stringify(tp2));
-            fl2.field = fst + (i * 2) + 1;
-            fl2.title = fld.title;
-            let typ = fld['type'];
-            if (fld['type'].startsWith('bit(')) {
-              let tmp = Math.ceil(parseInt(typ.replace('bit(', '').replace(')', '')) / 8) * 8;
-              typ = 'uint' + tmp;
-            }
-            fl2.type = typ;
-            def.fields.push(fl1);
-            def.fields.push(fl2);
-            let len = null;
-            if ((fld['type'] == 'chr(x)') || (fld['type'] == 'str')) {
-              len = com.calcLength(fld['type'], frm.data.readUInt8(Math.ceil((ptr + 1) / 8)));
-            } else {
-              len = com.calcLength(fld['type']);
-            }
-            if (len != null) {
-              len = Math.ceil(len / 8) * 8;
-              ptr += len;
+          if (frm.data.length > Math.ceil(ptr / 8)) {
+            // Get field number
+            let fln = frm.data.readUInt8(Math.ceil(ptr / 8));
+            ptr += 8;
+            // Get requested field
+            let fld = com.getFld(fln, de2.fields);
+            if (fld != null) {
+              let fl1 = JSON.parse(JSON.stringify(tp1));
+              fl1.field = fst + (i * 2);
+              fl1.title = 'Field Number (' + fln + ')';
+              let fl2 = JSON.parse(JSON.stringify(tp2));
+              fl2.field = fst + (i * 2) + 1;
+              fl2.title = fld.title;
+              let typ = fld['type'];
+              if (fld['type'].startsWith('bit(')) {
+                let tmp = Math.ceil(parseInt(typ.replace('bit(', '').replace(')', '')) / 8) * 8;
+                typ = 'uint' + tmp;
+              }
+              fl2.type = typ;
+              def.fields.push(fl1);
+              def.fields.push(fl2);
+              let len = null;
+              if ((fld['type'] == 'chr(x)') || (fld['type'] == 'str')) {
+                len = com.calcLength(fld['type'], frm.data.readUInt8(Math.ceil((ptr + 1) / 8)));
+              } else {
+                len = com.calcLength(fld['type']);
+              }
+              if (len != null) {
+                len = Math.ceil(len / 8) * 8;
+                ptr += len;
+              }
             }
           }
         }

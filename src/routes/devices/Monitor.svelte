@@ -43,11 +43,11 @@
   } 
 
   function details(e, row) {
-    push('/details?data='+ stringify(row.dat, { charset: 'utf8' }));
+    push('/details?'+ stringify(row.dat, { charset: 'utf8' }));
   };
 
   function trace(e, row) {
-    push('/messages/' + row.id);
+    push('/messages?'+ stringify(row.dat, { charset: 'utf8' }));
   };
 
   function rest(e) {
@@ -102,9 +102,8 @@
               msg: spl[1] + ' - ' + val.title,
               cnt: val.cnt,
               int: val.int,
-              key: (parseInt(spl[1]) * 10) + ((typeof val.header.ins !== 'undefined') ? parseInt(val.header.ins) : 0),
               raw: buf2hex(dat),
-              dat: Object.assign({ key: key }, val),
+              dat: Object.assign({ key: key, ins: ins }, val),
             };
             tmp.push(obj);
           }
@@ -209,7 +208,7 @@
           totalItems={pagination.totalItems}
           bind:page={pagination.page}
           pageSizeInputDisabled
-          pageInputDisabled={(typeof params !== 'undefined') && (typeof params["address"] !== 'undefined')}
+          pageInputDisabled={(typeof params !== 'undefined') && params.hasOwnProperty('address')}
         />
       {/if}
     </Column>

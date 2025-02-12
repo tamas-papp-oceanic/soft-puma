@@ -7,7 +7,7 @@ const fs = require('fs');
 function create() {
   let n20 = '/home/tamas/go/src/git/poseidon/kratos/default/nmea2000.json';
   let p21 = '/home/tamas/go/src/git/poseidon/kratos/default/prop2000.json';
-  let p22 = '/home/tamas/go/src/git/poseidon/kratos/templates/nike/prop2000.json';
+  let p22 = '/home/tamas/go/src/git/poseidon/kratos/templates/nike/land7/prop2000.json';
   let nde = path.join(app.getAppPath(), 'src/config/nmeadefs.json');
   let nco = path.join(app.getAppPath(), 'src/config/nmeaconv.json');
   try {
@@ -86,6 +86,7 @@ function create() {
           type: typ,
           unit: fld.unit,
           multiplier: mul,
+          offset: (fld.offset !== null) && (fld.offset !== 0) ? fld.offset : null,
           dictionary: fld.dictionary,
         };
         if (typeof fld.instance !== 'undefined') {
@@ -117,7 +118,7 @@ function create() {
       "nmea2000/126208": { function: 0, field: 0 },
       "nmea2000/126464": { function: 0, field: 0 },
       "nmea2000/126720": { function: 2, field: 3 },
-      "nmea2000/130825": { function: 3, field: 6 },
+      "nmea2000/130825": { function: 3, field: 5 },
       "nmea2000/131011": { function: 4, field: 5 },
     };
     fs.writeFileSync(nco, JSON.stringify(out, null, 2));

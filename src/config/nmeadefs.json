@@ -391,6 +391,391 @@
       }
     ]
   },
+  "nmea2000/065007/-/-/-": {
+    "title": "Utility Phase C AC Power",
+    "single": true,
+    "priority": 3,
+    "interval": 1500,
+    "fields": [
+      {
+        "field": 1,
+        "title": "Utility Phase C Real Power",
+        "type": "uint32",
+        "unit": "W",
+        "multiplier": null,
+        "offset": -2000000000,
+        "dictionary": "DD000"
+      },
+      {
+        "field": 2,
+        "title": "Utility Phase C Apparent Power",
+        "type": "uint32",
+        "unit": "VA",
+        "multiplier": null,
+        "offset": -2000000000,
+        "dictionary": "DD000"
+      }
+    ]
+  },
+  "nmea2000/065008/-/-/-": {
+    "title": "Utility Phase C AC Basic Quantities",
+    "single": true,
+    "priority": 3,
+    "interval": 1500,
+    "fields": [
+      {
+        "field": 1,
+        "title": "Utility Phase CA Line-Line AC RMS Voltage",
+        "type": "uint16",
+        "unit": "V",
+        "multiplier": null,
+        "offset": null,
+        "dictionary": "DD000"
+      },
+      {
+        "field": 2,
+        "title": "Utility Phase C Line-Neutral AC RMS Voltage",
+        "type": "uint16",
+        "unit": "V",
+        "multiplier": null,
+        "offset": null,
+        "dictionary": "DD000"
+      },
+      {
+        "field": 3,
+        "title": "Utility Phase C AC Frequency",
+        "type": "uint16",
+        "unit": "Hz",
+        "multiplier": 0.0078125,
+        "offset": null,
+        "dictionary": "DD000"
+      },
+      {
+        "field": 4,
+        "title": "Utility Phase C AC RMS Current",
+        "type": "uint16",
+        "unit": "A",
+        "multiplier": null,
+        "offset": null,
+        "dictionary": "DD000"
+      }
+    ]
+  },
+  "nmea2000/065009/-/-/-": {
+    "title": "Utility Phase B AC Reactive Power",
+    "single": true,
+    "priority": 3,
+    "interval": 1500,
+    "fields": [
+      {
+        "field": 1,
+        "title": "Utility Phase B Reactive Power",
+        "type": "uint32",
+        "unit": "VAr",
+        "multiplier": null,
+        "offset": -2000000000,
+        "dictionary": "DD000"
+      },
+      {
+        "field": 2,
+        "title": "Utility Phase B Power Factor",
+        "type": "uint16",
+        "unit": "",
+        "multiplier": 0.00006103515625,
+        "offset": -1,
+        "dictionary": "DD000"
+      },
+      {
+        "field": 3,
+        "title": "Utility Phase B Power Factor Lagging",
+        "type": "bit(2)",
+        "unit": null,
+        "multiplier": null,
+        "offset": null,
+        "dictionary": "DD000"
+      }
+    ]
+  },
+  "nmea2000/065010/-/-/-": {
+    "title": "Utility Phase B AC Power",
+    "single": true,
+    "priority": 3,
+    "interval": 1500,
+    "fields": [
+      {
+        "field": 1,
+        "title": "Utility Phase B Real Power",
+        "type": "uint32",
+        "unit": "W",
+        "multiplier": null,
+        "offset": -2000000000,
+        "dictionary": "DD000"
+      },
+      {
+        "field": 2,
+        "title": "Utility Phase B Apparent Power",
+        "type": "uint32",
+        "unit": "VA",
+        "multiplier": null,
+        "offset": -2000000000,
+        "dictionary": "DD000"
+      }
+    ]
+  },
+  "nmea2000/065011/-/-/-": {
+    "title": "Utility Phase B AC Basic Quantities",
+    "single": true,
+    "priority": 3,
+    "interval": 1500,
+    "fields": [
+      {
+        "field": 1,
+        "title": "Utility Phase BC Line-Line AC RMS Voltage",
+        "type": "uint16",
+        "unit": "V",
+        "multiplier": null,
+        "offset": null,
+        "dictionary": "DD000"
+      },
+      {
+        "field": 2,
+        "title": "Utility Phase B Line-Neutral AC RMS Voltage",
+        "type": "uint16",
+        "unit": "V",
+        "multiplier": null,
+        "offset": null,
+        "dictionary": "DD000"
+      },
+      {
+        "field": 3,
+        "title": "Utility Phase B AC Frequency",
+        "type": "uint16",
+        "unit": "Hz",
+        "multiplier": 0.0078125,
+        "offset": null,
+        "dictionary": "DD000"
+      },
+      {
+        "field": 4,
+        "title": "Utility Phase B AC RMS Current",
+        "type": "uint16",
+        "unit": "A",
+        "multiplier": null,
+        "offset": null,
+        "dictionary": "DD000"
+      }
+    ]
+  },
+  "nmea2000/065012/-/-/-": {
+    "title": "Utility Phase A AC Reactive Power",
+    "single": true,
+    "priority": 3,
+    "interval": 1500,
+    "fields": [
+      {
+        "field": 1,
+        "title": "Utility Phase A Reactive Power",
+        "type": "uint32",
+        "unit": "VAr",
+        "multiplier": null,
+        "offset": -2000000000,
+        "dictionary": "DD000"
+      },
+      {
+        "field": 2,
+        "title": "Utility Phase A Power Factor",
+        "type": "uint16",
+        "unit": "",
+        "multiplier": 0.00006103515625,
+        "offset": -1,
+        "dictionary": "DD000"
+      },
+      {
+        "field": 3,
+        "title": "Utility Phase A Power Factor Lagging",
+        "type": "bit(2)",
+        "unit": null,
+        "multiplier": null,
+        "offset": null,
+        "dictionary": "DD000"
+      }
+    ]
+  },
+  "nmea2000/065013/-/-/-": {
+    "title": "Utility Phase A AC Power",
+    "single": true,
+    "priority": 3,
+    "interval": 1500,
+    "fields": [
+      {
+        "field": 1,
+        "title": "Utility Phase A Real Power",
+        "type": "uint32",
+        "unit": "W",
+        "multiplier": null,
+        "offset": -2000000000,
+        "dictionary": "DD000"
+      },
+      {
+        "field": 2,
+        "title": "Utility Phase A Apparent Power",
+        "type": "uint32",
+        "unit": "VA",
+        "multiplier": null,
+        "offset": -2000000000,
+        "dictionary": "DD000"
+      }
+    ]
+  },
+  "nmea2000/065014/-/-/-": {
+    "title": "Utility Phase A Basic AC Quantities",
+    "single": true,
+    "priority": 3,
+    "interval": 1500,
+    "fields": [
+      {
+        "field": 1,
+        "title": "Utility Phase AB Line-Line AC RMS Voltage",
+        "type": "uint16",
+        "unit": "V",
+        "multiplier": null,
+        "offset": null,
+        "dictionary": "DD000"
+      },
+      {
+        "field": 2,
+        "title": "Utility Phase A Line-Neutral AC RMS Voltage",
+        "type": "uint16",
+        "unit": "V",
+        "multiplier": null,
+        "offset": null,
+        "dictionary": "DD000"
+      },
+      {
+        "field": 3,
+        "title": "Utility Phase A AC Frequency",
+        "type": "uint16",
+        "unit": "Hz",
+        "multiplier": 0.0078125,
+        "offset": null,
+        "dictionary": "DD000"
+      },
+      {
+        "field": 4,
+        "title": "Utility Phase A AC RMS Current",
+        "type": "uint16",
+        "unit": "A",
+        "multiplier": null,
+        "offset": null,
+        "dictionary": "DD000"
+      }
+    ]
+  },
+  "nmea2000/065015/-/-/-": {
+    "title": "Utility Total AC Reactive Power",
+    "single": true,
+    "priority": 3,
+    "interval": 1500,
+    "fields": [
+      {
+        "field": 1,
+        "title": "Utility Total Reactive Power",
+        "type": "uint32",
+        "unit": "VAr",
+        "multiplier": null,
+        "offset": -2000000000,
+        "dictionary": "DD000"
+      },
+      {
+        "field": 2,
+        "title": "Utility Overall Power Factor",
+        "type": "uint16",
+        "unit": "",
+        "multiplier": 0.00006103515625,
+        "offset": -1,
+        "dictionary": "DD000"
+      },
+      {
+        "field": 3,
+        "title": "Utility Overall Power Factor Lagging",
+        "type": "bit(2)",
+        "unit": null,
+        "multiplier": null,
+        "offset": null,
+        "dictionary": "DD000"
+      }
+    ]
+  },
+  "nmea2000/065016/-/-/-": {
+    "title": "Utility Total AC Power",
+    "single": true,
+    "priority": 3,
+    "interval": 1500,
+    "fields": [
+      {
+        "field": 1,
+        "title": "Utility Total Real Power",
+        "type": "uint32",
+        "unit": "W",
+        "multiplier": null,
+        "offset": -2000000000,
+        "dictionary": "DD000"
+      },
+      {
+        "field": 2,
+        "title": "Utility Total Apparent Power",
+        "type": "uint32",
+        "unit": "VA",
+        "multiplier": null,
+        "offset": -2000000000,
+        "dictionary": "DD000"
+      }
+    ]
+  },
+  "nmea2000/065017/-/-/-": {
+    "title": "Utility Average Basic AC Quantities",
+    "single": true,
+    "priority": 3,
+    "interval": 1500,
+    "fields": [
+      {
+        "field": 1,
+        "title": "Utility Average Line-Line AC RMS Voltage",
+        "type": "uint16",
+        "unit": "V",
+        "multiplier": null,
+        "offset": null,
+        "dictionary": "DD000"
+      },
+      {
+        "field": 2,
+        "title": "Utility Average Line-Neutral AC RMS Voltage",
+        "type": "uint16",
+        "unit": "V",
+        "multiplier": null,
+        "offset": null,
+        "dictionary": "DD000"
+      },
+      {
+        "field": 3,
+        "title": "Utility Average AC Frequency",
+        "type": "uint16",
+        "unit": "Hz",
+        "multiplier": 0.0078125,
+        "offset": null,
+        "dictionary": "DD000"
+      },
+      {
+        "field": 4,
+        "title": "Utility Average AC RMS Current",
+        "type": "uint16",
+        "unit": "A",
+        "multiplier": null,
+        "offset": null,
+        "dictionary": "DD000"
+      }
+    ]
+  },
   "nmea2000/065240/-/-/-": {
     "title": "ISO Commanded Address",
     "single": false,
@@ -20544,6 +20929,3405 @@
         "unit": null,
         "multiplier": null,
         "dictionary": "DD128"
+      }
+    ]
+  },
+  "nmea2000/061184/-/358/4": {
+    "title": "Proprietary - Victron",
+    "single": true,
+    "priority": 7,
+    "interval": null,
+    "fields": [
+      {
+        "field": 1,
+        "title": "Manufacturer Code",
+        "type": "bit(11)",
+        "unit": null,
+        "multiplier": null,
+        "dictionary": "DD172"
+      },
+      {
+        "field": 2,
+        "title": "NMEA Reserved",
+        "type": "bit(2)",
+        "unit": null,
+        "multiplier": null,
+        "dictionary": "DD001"
+      },
+      {
+        "field": 3,
+        "title": "Industry Group",
+        "type": "bit(3)",
+        "unit": null,
+        "multiplier": null,
+        "dictionary": "DD168"
+      },
+      {
+        "field": 4,
+        "title": "Code",
+        "type": "uint16",
+        "unit": null,
+        "multiplier": null,
+        "dictionary": "DD007"
+      },
+      {
+        "field": 5,
+        "title": "Data",
+        "type": "bit(32)",
+        "unit": null,
+        "multiplier": null,
+        "dictionary": "DD168"
+      }
+    ]
+  },
+  "nmea2000/061439/-/-/-": {
+    "title": "Proprietary - Victron",
+    "single": true,
+    "priority": 7,
+    "interval": null,
+    "fields": [
+      {
+        "field": 1,
+        "title": "Manufacturer Code",
+        "type": "bit(11)",
+        "unit": null,
+        "multiplier": null,
+        "dictionary": "DD172"
+      },
+      {
+        "field": 2,
+        "title": "NMEA Reserved",
+        "type": "bit(2)",
+        "unit": null,
+        "multiplier": null,
+        "dictionary": "DD001"
+      },
+      {
+        "field": 3,
+        "title": "Industry Group",
+        "type": "bit(3)",
+        "unit": null,
+        "multiplier": null,
+        "dictionary": "DD168"
+      },
+      {
+        "field": 4,
+        "title": "Code",
+        "type": "uint16",
+        "unit": null,
+        "multiplier": null,
+        "dictionary": "DD007"
+      },
+      {
+        "field": 5,
+        "title": "Data",
+        "type": "bit(32)",
+        "unit": null,
+        "multiplier": null,
+        "dictionary": "DD168"
+      }
+    ]
+  },
+  "nmea2000/065280/-/257/4": {
+    "title": "Honda Engine Status Parameters, Dynamic",
+    "single": true,
+    "priority": 3,
+    "interval": 100,
+    "fields": [
+      {
+        "field": 1,
+        "title": "Manufacturer Code",
+        "type": "bit(11)",
+        "unit": null,
+        "multiplier": null,
+        "dictionary": "DD172"
+      },
+      {
+        "field": 2,
+        "title": "NMEA Reserved",
+        "type": "bit(2)",
+        "unit": null,
+        "multiplier": null,
+        "dictionary": "DD001"
+      },
+      {
+        "field": 3,
+        "title": "Industry Group",
+        "type": "bit(3)",
+        "unit": null,
+        "multiplier": null,
+        "dictionary": "DD168"
+      },
+      {
+        "field": 4,
+        "title": "Engine Instance",
+        "type": "bit(8)",
+        "unit": null,
+        "multiplier": null,
+        "dictionary": "DD128"
+      },
+      {
+        "field": 5,
+        "title": "Lean-burn Operation",
+        "type": "bit(2)",
+        "unit": null,
+        "multiplier": null,
+        "dictionary": "DD185"
+      },
+      {
+        "field": 6,
+        "title": "NMEA Reserved",
+        "type": "bit(2)",
+        "unit": null,
+        "multiplier": null,
+        "dictionary": "DD001"
+      },
+      {
+        "field": 7,
+        "title": "NMEA Reserved",
+        "type": "bit(2)",
+        "unit": null,
+        "multiplier": null,
+        "dictionary": "DD001"
+      },
+      {
+        "field": 8,
+        "title": "Trolling Operation",
+        "type": "bit(2)",
+        "unit": null,
+        "multiplier": null,
+        "dictionary": "DD185"
+      },
+      {
+        "field": 9,
+        "title": "NMEA Reserved",
+        "type": "bit(16)",
+        "unit": null,
+        "multiplier": null,
+        "dictionary": "DD001"
+      },
+      {
+        "field": 10,
+        "title": "NMEA Reserved",
+        "type": "bit(16)",
+        "unit": null,
+        "multiplier": null,
+        "dictionary": "DD001"
+      }
+    ]
+  },
+  "nmea2000/065284/-/257/4": {
+    "title": "Display Communication Status",
+    "single": true,
+    "priority": 7,
+    "interval": 500,
+    "fields": [
+      {
+        "field": 1,
+        "title": "Manufacturer Code",
+        "type": "bit(11)",
+        "unit": null,
+        "multiplier": null,
+        "dictionary": "DD172"
+      },
+      {
+        "field": 2,
+        "title": "NMEA Reserved",
+        "type": "bit(2)",
+        "unit": null,
+        "multiplier": null,
+        "dictionary": "DD001"
+      },
+      {
+        "field": 3,
+        "title": "Industry Group",
+        "type": "bit(3)",
+        "unit": null,
+        "multiplier": null,
+        "dictionary": "DD168"
+      },
+      {
+        "field": 4,
+        "title": "Engine Instance",
+        "type": "bit(8)",
+        "unit": null,
+        "multiplier": null,
+        "dictionary": "DD128"
+      },
+      {
+        "field": 5,
+        "title": "NMEA Reserved",
+        "type": "bit(8)",
+        "unit": null,
+        "multiplier": null,
+        "dictionary": "DD001"
+      },
+      {
+        "field": 6,
+        "title": "NMEA Reserved",
+        "type": "bit(8)",
+        "unit": null,
+        "multiplier": null,
+        "dictionary": "DD001"
+      },
+      {
+        "field": 7,
+        "title": "NMEA Reserved",
+        "type": "bit(2)",
+        "unit": null,
+        "multiplier": null,
+        "dictionary": "DD001"
+      },
+      {
+        "field": 8,
+        "title": "NMEA Reserved",
+        "type": "bit(2)",
+        "unit": null,
+        "multiplier": null,
+        "dictionary": "DD001"
+      },
+      {
+        "field": 9,
+        "title": "Throttle Only Mode",
+        "type": "bit(2)",
+        "unit": null,
+        "multiplier": null,
+        "dictionary": "DD185"
+      },
+      {
+        "field": 10,
+        "title": "NMEA Reserved",
+        "type": "bit(2)",
+        "unit": null,
+        "multiplier": null,
+        "dictionary": "DD001"
+      },
+      {
+        "field": 11,
+        "title": "Second Station System Status",
+        "type": "bit(8)",
+        "unit": null,
+        "multiplier": null,
+        "dictionary": "DD221"
+      },
+      {
+        "field": 12,
+        "title": "NMEA Reserved",
+        "type": "bit(8)",
+        "unit": null,
+        "multiplier": null,
+        "dictionary": "DD001"
+      }
+    ]
+  },
+  "nmea2000/130816/-/257/4": {
+    "title": "Honda Outboard Sensor Warning Message",
+    "single": false,
+    "priority": 7,
+    "interval": 500,
+    "fields": [
+      {
+        "field": 1,
+        "title": "Manufacturer Code",
+        "type": "bit(11)",
+        "unit": null,
+        "multiplier": null,
+        "dictionary": "DD172"
+      },
+      {
+        "field": 2,
+        "title": "NMEA Reserved",
+        "type": "bit(2)",
+        "unit": null,
+        "multiplier": null,
+        "dictionary": "DD001"
+      },
+      {
+        "field": 3,
+        "title": "Industry Group",
+        "type": "bit(3)",
+        "unit": null,
+        "multiplier": null,
+        "dictionary": "DD168"
+      },
+      {
+        "field": 4,
+        "title": "Engine Instance",
+        "type": "bit(8)",
+        "unit": null,
+        "multiplier": null,
+        "dictionary": "DD128"
+      },
+      {
+        "field": 5,
+        "title": "Engine Diagnosis Status 1",
+        "type": "bit(32)",
+        "unit": null,
+        "multiplier": null,
+        "dictionary": "DD206"
+      },
+      {
+        "field": 6,
+        "title": "Engine Diagnosis Status 2",
+        "type": "bit(32)",
+        "unit": null,
+        "multiplier": null,
+        "dictionary": "DD206"
+      },
+      {
+        "field": 7,
+        "title": "Engine Diagnosis Status 3",
+        "type": "bit(32)",
+        "unit": null,
+        "multiplier": null,
+        "dictionary": "DD206"
+      },
+      {
+        "field": 8,
+        "title": "Engine Diagnosis Status 4",
+        "type": "bit(32)",
+        "unit": null,
+        "multiplier": null,
+        "dictionary": "DD206"
+      }
+    ]
+  },
+  "nmea2000/126720/1/419/4": {
+    "title": "Fusion: Get State",
+    "single": false,
+    "priority": 7,
+    "interval": null,
+    "fields": [
+      {
+        "field": 1,
+        "title": "Manufacturer Code",
+        "type": "bit(11)",
+        "unit": null,
+        "multiplier": null,
+        "dictionary": "DD172"
+      },
+      {
+        "field": 2,
+        "title": "NMEA Reserved",
+        "type": "bit(2)",
+        "unit": null,
+        "multiplier": null,
+        "dictionary": "DD001"
+      },
+      {
+        "field": 3,
+        "title": "Industry Group",
+        "type": "bit(3)",
+        "unit": null,
+        "multiplier": null,
+        "dictionary": "DD168"
+      },
+      {
+        "field": 4,
+        "title": "Message ID",
+        "type": "uint8",
+        "unit": null,
+        "multiplier": null,
+        "dictionary": "DD005"
+      },
+      {
+        "field": 5,
+        "title": "A",
+        "type": "bit(8)",
+        "unit": null,
+        "multiplier": null,
+        "dictionary": "DD001"
+      }
+    ]
+  },
+  "nmea2000/126720/2/419/4": {
+    "title": "Fusion: Set Source",
+    "single": false,
+    "priority": 7,
+    "interval": null,
+    "fields": [
+      {
+        "field": 1,
+        "title": "Manufacturer Code",
+        "type": "bit(11)",
+        "unit": null,
+        "multiplier": null,
+        "dictionary": "DD172"
+      },
+      {
+        "field": 2,
+        "title": "NMEA Reserved",
+        "type": "bit(2)",
+        "unit": null,
+        "multiplier": null,
+        "dictionary": "DD001"
+      },
+      {
+        "field": 3,
+        "title": "Industry Group",
+        "type": "bit(3)",
+        "unit": null,
+        "multiplier": null,
+        "dictionary": "DD168"
+      },
+      {
+        "field": 4,
+        "title": "Message ID",
+        "type": "uint8",
+        "unit": null,
+        "multiplier": null,
+        "dictionary": "DD005"
+      },
+      {
+        "field": 5,
+        "title": "A",
+        "type": "bit(8)",
+        "unit": null,
+        "multiplier": null,
+        "dictionary": "DD001"
+      },
+      {
+        "field": 6,
+        "title": "Source ID",
+        "type": "uint8",
+        "unit": null,
+        "multiplier": null,
+        "dictionary": "DD005"
+      }
+    ]
+  },
+  "nmea2000/126720/3/419/4": {
+    "title": "Fusion: Set Media",
+    "single": false,
+    "priority": 7,
+    "interval": null,
+    "fields": [
+      {
+        "field": 1,
+        "title": "Manufacturer Code",
+        "type": "bit(11)",
+        "unit": null,
+        "multiplier": null,
+        "dictionary": "DD172"
+      },
+      {
+        "field": 2,
+        "title": "NMEA Reserved",
+        "type": "bit(2)",
+        "unit": null,
+        "multiplier": null,
+        "dictionary": "DD001"
+      },
+      {
+        "field": 3,
+        "title": "Industry Group",
+        "type": "bit(3)",
+        "unit": null,
+        "multiplier": null,
+        "dictionary": "DD168"
+      },
+      {
+        "field": 4,
+        "title": "Message ID",
+        "type": "uint8",
+        "unit": null,
+        "multiplier": null,
+        "dictionary": "DD005"
+      },
+      {
+        "field": 5,
+        "title": "A",
+        "type": "bit(8)",
+        "unit": null,
+        "multiplier": null,
+        "dictionary": "DD001"
+      },
+      {
+        "field": 6,
+        "title": "Source ID",
+        "type": "uint8",
+        "unit": null,
+        "multiplier": null,
+        "dictionary": "DD005"
+      },
+      {
+        "field": 7,
+        "title": "Command",
+        "type": "uint8",
+        "unit": null,
+        "multiplier": null,
+        "dictionary": "DD005"
+      }
+    ]
+  },
+  "nmea2000/126720/5/419/4": {
+    "title": "Fusion: Tuner Control",
+    "single": false,
+    "priority": 7,
+    "interval": null,
+    "fields": [
+      {
+        "field": 1,
+        "title": "Manufacturer Code",
+        "type": "bit(11)",
+        "unit": null,
+        "multiplier": null,
+        "dictionary": "DD172"
+      },
+      {
+        "field": 2,
+        "title": "NMEA Reserved",
+        "type": "bit(2)",
+        "unit": null,
+        "multiplier": null,
+        "dictionary": "DD001"
+      },
+      {
+        "field": 3,
+        "title": "Industry Group",
+        "type": "bit(3)",
+        "unit": null,
+        "multiplier": null,
+        "dictionary": "DD168"
+      },
+      {
+        "field": 4,
+        "title": "Message ID",
+        "type": "uint8",
+        "unit": null,
+        "multiplier": null,
+        "dictionary": "DD005"
+      },
+      {
+        "field": 5,
+        "title": "A",
+        "type": "bit(8)",
+        "unit": null,
+        "multiplier": null,
+        "dictionary": "DD001"
+      },
+      {
+        "field": 6,
+        "title": "Source ID",
+        "type": "uint8",
+        "unit": null,
+        "multiplier": null,
+        "dictionary": "DD005"
+      },
+      {
+        "field": 7,
+        "title": "Command",
+        "type": "uint8",
+        "unit": null,
+        "multiplier": null,
+        "dictionary": "DD005"
+      },
+      {
+        "field": 8,
+        "title": "Frequency",
+        "type": "uint32",
+        "unit": null,
+        "multiplier": null,
+        "dictionary": "DD010"
+      }
+    ]
+  },
+  "nmea2000/126720/15/419/4": {
+    "title": "Fusion: Set Setting",
+    "single": false,
+    "priority": 7,
+    "interval": null,
+    "fields": [
+      {
+        "field": 1,
+        "title": "Manufacturer Code",
+        "type": "bit(11)",
+        "unit": null,
+        "multiplier": null,
+        "dictionary": "DD172"
+      },
+      {
+        "field": 2,
+        "title": "NMEA Reserved",
+        "type": "bit(2)",
+        "unit": null,
+        "multiplier": null,
+        "dictionary": "DD001"
+      },
+      {
+        "field": 3,
+        "title": "Industry Group",
+        "type": "bit(3)",
+        "unit": null,
+        "multiplier": null,
+        "dictionary": "DD168"
+      },
+      {
+        "field": 4,
+        "title": "Message ID",
+        "type": "uint8",
+        "unit": null,
+        "multiplier": null,
+        "dictionary": "DD005"
+      },
+      {
+        "field": 5,
+        "title": "A",
+        "type": "bit(8)",
+        "unit": null,
+        "multiplier": null,
+        "dictionary": "DD001"
+      },
+      {
+        "field": 6,
+        "title": "ID",
+        "type": "uint32",
+        "unit": null,
+        "multiplier": null,
+        "dictionary": "DD010"
+      },
+      {
+        "field": 7,
+        "title": "Value",
+        "type": "uint32",
+        "unit": null,
+        "multiplier": null,
+        "dictionary": "DD010"
+      }
+    ]
+  },
+  "nmea2000/126720/18/419/4": {
+    "title": "Fusion: Set Balance",
+    "single": false,
+    "priority": 7,
+    "interval": null,
+    "fields": [
+      {
+        "field": 1,
+        "title": "Manufacturer Code",
+        "type": "bit(11)",
+        "unit": null,
+        "multiplier": null,
+        "dictionary": "DD172"
+      },
+      {
+        "field": 2,
+        "title": "NMEA Reserved",
+        "type": "bit(2)",
+        "unit": null,
+        "multiplier": null,
+        "dictionary": "DD001"
+      },
+      {
+        "field": 3,
+        "title": "Industry Group",
+        "type": "bit(3)",
+        "unit": null,
+        "multiplier": null,
+        "dictionary": "DD168"
+      },
+      {
+        "field": 4,
+        "title": "Message ID",
+        "type": "uint8",
+        "unit": null,
+        "multiplier": null,
+        "dictionary": "DD005"
+      },
+      {
+        "field": 5,
+        "title": "A",
+        "type": "bit(8)",
+        "unit": null,
+        "multiplier": null,
+        "dictionary": "DD001"
+      },
+      {
+        "field": 6,
+        "title": "Zone",
+        "type": "uint8",
+        "unit": null,
+        "multiplier": null,
+        "dictionary": "DD005"
+      },
+      {
+        "field": 7,
+        "title": "Value",
+        "type": "int8",
+        "unit": null,
+        "multiplier": null,
+        "dictionary": "DD138"
+      }
+    ]
+  },
+  "nmea2000/126720/22/419/4": {
+    "title": "Fusion: Set Equalizer",
+    "single": false,
+    "priority": 7,
+    "interval": null,
+    "fields": [
+      {
+        "field": 1,
+        "title": "Manufacturer Code",
+        "type": "bit(11)",
+        "unit": null,
+        "multiplier": null,
+        "dictionary": "DD172"
+      },
+      {
+        "field": 2,
+        "title": "NMEA Reserved",
+        "type": "bit(2)",
+        "unit": null,
+        "multiplier": null,
+        "dictionary": "DD001"
+      },
+      {
+        "field": 3,
+        "title": "Industry Group",
+        "type": "bit(3)",
+        "unit": null,
+        "multiplier": null,
+        "dictionary": "DD168"
+      },
+      {
+        "field": 4,
+        "title": "Message ID",
+        "type": "uint8",
+        "unit": null,
+        "multiplier": null,
+        "dictionary": "DD005"
+      },
+      {
+        "field": 5,
+        "title": "A",
+        "type": "bit(8)",
+        "unit": null,
+        "multiplier": null,
+        "dictionary": "DD001"
+      },
+      {
+        "field": 6,
+        "title": "Zone",
+        "type": "uint8",
+        "unit": null,
+        "multiplier": null,
+        "dictionary": "DD005"
+      },
+      {
+        "field": 7,
+        "title": "Bass",
+        "type": "int8",
+        "unit": null,
+        "multiplier": null,
+        "dictionary": "DD138"
+      },
+      {
+        "field": 8,
+        "title": "Middle",
+        "type": "int8",
+        "unit": null,
+        "multiplier": null,
+        "dictionary": "DD138"
+      },
+      {
+        "field": 9,
+        "title": "Treble",
+        "type": "int8",
+        "unit": null,
+        "multiplier": null,
+        "dictionary": "DD138"
+      }
+    ]
+  },
+  "nmea2000/126720/24/419/4": {
+    "title": "Fusion: Set Volume",
+    "single": false,
+    "priority": 7,
+    "interval": null,
+    "fields": [
+      {
+        "field": 1,
+        "title": "Manufacturer Code",
+        "type": "bit(11)",
+        "unit": null,
+        "multiplier": null,
+        "dictionary": "DD172"
+      },
+      {
+        "field": 2,
+        "title": "NMEA Reserved",
+        "type": "bit(2)",
+        "unit": null,
+        "multiplier": null,
+        "dictionary": "DD001"
+      },
+      {
+        "field": 3,
+        "title": "Industry Group",
+        "type": "bit(3)",
+        "unit": null,
+        "multiplier": null,
+        "dictionary": "DD168"
+      },
+      {
+        "field": 4,
+        "title": "Message ID",
+        "type": "uint8",
+        "unit": null,
+        "multiplier": null,
+        "dictionary": "DD005"
+      },
+      {
+        "field": 5,
+        "title": "A",
+        "type": "bit(8)",
+        "unit": null,
+        "multiplier": null,
+        "dictionary": "DD001"
+      },
+      {
+        "field": 6,
+        "title": "Zone",
+        "type": "uint8",
+        "unit": null,
+        "multiplier": null,
+        "dictionary": "DD005"
+      },
+      {
+        "field": 7,
+        "title": "Value",
+        "type": "int8",
+        "unit": null,
+        "multiplier": null,
+        "dictionary": "DD138"
+      }
+    ]
+  },
+  "nmea2000/126720/25/419/4": {
+    "title": "Fusion: Set Volumes",
+    "single": false,
+    "priority": 7,
+    "interval": null,
+    "fields": [
+      {
+        "field": 1,
+        "title": "Manufacturer Code",
+        "type": "bit(11)",
+        "unit": null,
+        "multiplier": null,
+        "dictionary": "DD172"
+      },
+      {
+        "field": 2,
+        "title": "NMEA Reserved",
+        "type": "bit(2)",
+        "unit": null,
+        "multiplier": null,
+        "dictionary": "DD001"
+      },
+      {
+        "field": 3,
+        "title": "Industry Group",
+        "type": "bit(3)",
+        "unit": null,
+        "multiplier": null,
+        "dictionary": "DD168"
+      },
+      {
+        "field": 4,
+        "title": "Message ID",
+        "type": "uint8",
+        "unit": null,
+        "multiplier": null,
+        "dictionary": "DD005"
+      },
+      {
+        "field": 5,
+        "title": "A",
+        "type": "bit(8)",
+        "unit": null,
+        "multiplier": null,
+        "dictionary": "DD001"
+      },
+      {
+        "field": 6,
+        "title": "Zone 1 Volume",
+        "type": "uint8",
+        "unit": null,
+        "multiplier": null,
+        "dictionary": "DD005"
+      },
+      {
+        "field": 7,
+        "title": "Zone 2 Volume",
+        "type": "uint8",
+        "unit": null,
+        "multiplier": null,
+        "dictionary": "DD005"
+      },
+      {
+        "field": 8,
+        "title": "Zone 3 Volume",
+        "type": "uint8",
+        "unit": null,
+        "multiplier": null,
+        "dictionary": "DD005"
+      },
+      {
+        "field": 9,
+        "title": "Zone 4 Volume",
+        "type": "uint8",
+        "unit": null,
+        "multiplier": null,
+        "dictionary": "DD005"
+      }
+    ]
+  },
+  "nmea2000/126720/-/358/4": {
+    "title": "Proprietary - Victron",
+    "single": false,
+    "priority": 7,
+    "interval": null,
+    "fields": [
+      {
+        "field": 1,
+        "title": "Manufacturer Code",
+        "type": "bit(11)",
+        "unit": null,
+        "multiplier": null,
+        "dictionary": "DD172"
+      },
+      {
+        "field": 2,
+        "title": "NMEA Reserved",
+        "type": "bit(2)",
+        "unit": null,
+        "multiplier": null,
+        "dictionary": "DD001"
+      },
+      {
+        "field": 3,
+        "title": "Industry Group",
+        "type": "bit(3)",
+        "unit": null,
+        "multiplier": null,
+        "dictionary": "DD168"
+      },
+      {
+        "field": 4,
+        "title": "Code",
+        "type": "uint16",
+        "unit": null,
+        "multiplier": null,
+        "dictionary": "DD007"
+      },
+      {
+        "field": 5,
+        "title": "Data",
+        "type": "bit(32)",
+        "unit": null,
+        "multiplier": null,
+        "dictionary": "DD168"
+      }
+    ]
+  },
+  "nmea2000/130820/1/419/4": {
+    "title": "Fusion: API Version",
+    "single": false,
+    "priority": 7,
+    "interval": null,
+    "fields": [
+      {
+        "field": 1,
+        "title": "Manufacturer Code",
+        "type": "bit(11)",
+        "unit": null,
+        "multiplier": null,
+        "dictionary": "DD172"
+      },
+      {
+        "field": 2,
+        "title": "NMEA Reserved",
+        "type": "bit(2)",
+        "unit": null,
+        "multiplier": null,
+        "dictionary": "DD001"
+      },
+      {
+        "field": 3,
+        "title": "Industry Group",
+        "type": "bit(3)",
+        "unit": null,
+        "multiplier": null,
+        "dictionary": "DD168"
+      },
+      {
+        "field": 4,
+        "title": "Message ID",
+        "type": "uint8",
+        "unit": null,
+        "multiplier": null,
+        "dictionary": "DD005"
+      },
+      {
+        "field": 5,
+        "title": "A",
+        "type": "bit(8)",
+        "unit": null,
+        "multiplier": null,
+        "dictionary": "DD001"
+      },
+      {
+        "field": 6,
+        "title": "Major Version",
+        "type": "uint16",
+        "unit": null,
+        "multiplier": null,
+        "dictionary": "DD007"
+      },
+      {
+        "field": 7,
+        "title": "Minor Version",
+        "type": "uint16",
+        "unit": null,
+        "multiplier": null,
+        "dictionary": "DD007"
+      }
+    ]
+  },
+  "nmea2000/130820/2/419/4": {
+    "title": "Fusion: Source",
+    "single": false,
+    "priority": 7,
+    "interval": null,
+    "fields": [
+      {
+        "field": 1,
+        "title": "Manufacturer Code",
+        "type": "bit(11)",
+        "unit": null,
+        "multiplier": null,
+        "dictionary": "DD172"
+      },
+      {
+        "field": 2,
+        "title": "NMEA Reserved",
+        "type": "bit(2)",
+        "unit": null,
+        "multiplier": null,
+        "dictionary": "DD001"
+      },
+      {
+        "field": 3,
+        "title": "Industry Group",
+        "type": "bit(3)",
+        "unit": null,
+        "multiplier": null,
+        "dictionary": "DD168"
+      },
+      {
+        "field": 4,
+        "title": "Message ID",
+        "type": "uint8",
+        "unit": null,
+        "multiplier": null,
+        "dictionary": "DD005"
+      },
+      {
+        "field": 5,
+        "title": "A",
+        "type": "bit(8)",
+        "unit": null,
+        "multiplier": null,
+        "dictionary": "DD001"
+      },
+      {
+        "field": 6,
+        "title": "Source ID",
+        "type": "uint8",
+        "unit": null,
+        "multiplier": null,
+        "dictionary": "DD005"
+      },
+      {
+        "field": 7,
+        "title": "Current Source",
+        "type": "uint8",
+        "unit": null,
+        "multiplier": null,
+        "dictionary": "DD005"
+      },
+      {
+        "field": 8,
+        "title": "Source Type",
+        "type": "uint8",
+        "unit": null,
+        "multiplier": null,
+        "dictionary": "DD005"
+      },
+      {
+        "field": 9,
+        "title": "Flags",
+        "type": "uint8",
+        "unit": null,
+        "multiplier": null,
+        "dictionary": "DD005"
+      },
+      {
+        "field": 10,
+        "title": "Name",
+        "type": "chr(x)",
+        "unit": null,
+        "multiplier": null,
+        "dictionary": "DD005"
+      }
+    ]
+  },
+  "nmea2000/130820/3/419/4": {
+    "title": "Fusion: Source Count",
+    "single": false,
+    "priority": 7,
+    "interval": null,
+    "fields": [
+      {
+        "field": 1,
+        "title": "Manufacturer Code",
+        "type": "bit(11)",
+        "unit": null,
+        "multiplier": null,
+        "dictionary": "DD172"
+      },
+      {
+        "field": 2,
+        "title": "NMEA Reserved",
+        "type": "bit(2)",
+        "unit": null,
+        "multiplier": null,
+        "dictionary": "DD001"
+      },
+      {
+        "field": 3,
+        "title": "Industry Group",
+        "type": "bit(3)",
+        "unit": null,
+        "multiplier": null,
+        "dictionary": "DD168"
+      },
+      {
+        "field": 4,
+        "title": "Message ID",
+        "type": "uint8",
+        "unit": null,
+        "multiplier": null,
+        "dictionary": "DD005"
+      },
+      {
+        "field": 5,
+        "title": "A",
+        "type": "bit(8)",
+        "unit": null,
+        "multiplier": null,
+        "dictionary": "DD001"
+      },
+      {
+        "field": 6,
+        "title": "Number",
+        "type": "uint8",
+        "unit": null,
+        "multiplier": null,
+        "dictionary": "DD005"
+      }
+    ]
+  },
+  "nmea2000/130820/4/419/4": {
+    "title": "Fusion: Media",
+    "single": false,
+    "priority": 7,
+    "interval": null,
+    "fields": [
+      {
+        "field": 1,
+        "title": "Manufacturer Code",
+        "type": "bit(11)",
+        "unit": null,
+        "multiplier": null,
+        "dictionary": "DD172"
+      },
+      {
+        "field": 2,
+        "title": "NMEA Reserved",
+        "type": "bit(2)",
+        "unit": null,
+        "multiplier": null,
+        "dictionary": "DD001"
+      },
+      {
+        "field": 3,
+        "title": "Industry Group",
+        "type": "bit(3)",
+        "unit": null,
+        "multiplier": null,
+        "dictionary": "DD168"
+      },
+      {
+        "field": 4,
+        "title": "Message ID",
+        "type": "uint8",
+        "unit": null,
+        "multiplier": null,
+        "dictionary": "DD005"
+      },
+      {
+        "field": 5,
+        "title": "A",
+        "type": "bit(8)",
+        "unit": null,
+        "multiplier": null,
+        "dictionary": "DD001"
+      },
+      {
+        "field": 6,
+        "title": "Source ID",
+        "type": "uint8",
+        "unit": null,
+        "multiplier": null,
+        "dictionary": "DD005"
+      },
+      {
+        "field": 7,
+        "title": "Flags",
+        "type": "uint16",
+        "unit": null,
+        "multiplier": null,
+        "dictionary": "DD007"
+      },
+      {
+        "field": 8,
+        "title": "Track Number",
+        "type": "uint32",
+        "unit": null,
+        "multiplier": null,
+        "dictionary": "DD010"
+      },
+      {
+        "field": 9,
+        "title": "Total Tracks",
+        "type": "uint32",
+        "unit": null,
+        "multiplier": null,
+        "dictionary": "DD010"
+      },
+      {
+        "field": 10,
+        "title": "Length",
+        "type": "uint32",
+        "unit": null,
+        "multiplier": 0.001,
+        "dictionary": "DD010"
+      },
+      {
+        "field": 11,
+        "title": "Position",
+        "type": "uint32",
+        "unit": null,
+        "multiplier": 0.001,
+        "dictionary": "DD010"
+      }
+    ]
+  },
+  "nmea2000/130820/5/419/4": {
+    "title": "Fusion: Track Name",
+    "single": false,
+    "priority": 7,
+    "interval": null,
+    "fields": [
+      {
+        "field": 1,
+        "title": "Manufacturer Code",
+        "type": "bit(11)",
+        "unit": null,
+        "multiplier": null,
+        "dictionary": "DD172"
+      },
+      {
+        "field": 2,
+        "title": "NMEA Reserved",
+        "type": "bit(2)",
+        "unit": null,
+        "multiplier": null,
+        "dictionary": "DD001"
+      },
+      {
+        "field": 3,
+        "title": "Industry Group",
+        "type": "bit(3)",
+        "unit": null,
+        "multiplier": null,
+        "dictionary": "DD168"
+      },
+      {
+        "field": 4,
+        "title": "Message ID",
+        "type": "uint8",
+        "unit": null,
+        "multiplier": null,
+        "dictionary": "DD005"
+      },
+      {
+        "field": 5,
+        "title": "A",
+        "type": "bit(8)",
+        "unit": null,
+        "multiplier": null,
+        "dictionary": "DD001"
+      },
+      {
+        "field": 6,
+        "title": "Source ID",
+        "type": "uint8",
+        "unit": null,
+        "multiplier": null,
+        "dictionary": "DD005"
+      },
+      {
+        "field": 7,
+        "title": "Index",
+        "type": "uint32",
+        "unit": null,
+        "multiplier": null,
+        "dictionary": "DD010"
+      },
+      {
+        "field": 8,
+        "title": "Name",
+        "type": "chr(x)",
+        "unit": null,
+        "multiplier": null,
+        "dictionary": "DD192"
+      }
+    ]
+  },
+  "nmea2000/130820/6/419/4": {
+    "title": "Fusion: Artist Name",
+    "single": false,
+    "priority": 7,
+    "interval": null,
+    "fields": [
+      {
+        "field": 1,
+        "title": "Manufacturer Code",
+        "type": "bit(11)",
+        "unit": null,
+        "multiplier": null,
+        "dictionary": "DD172"
+      },
+      {
+        "field": 2,
+        "title": "NMEA Reserved",
+        "type": "bit(2)",
+        "unit": null,
+        "multiplier": null,
+        "dictionary": "DD001"
+      },
+      {
+        "field": 3,
+        "title": "Industry Group",
+        "type": "bit(3)",
+        "unit": null,
+        "multiplier": null,
+        "dictionary": "DD168"
+      },
+      {
+        "field": 4,
+        "title": "Message ID",
+        "type": "uint8",
+        "unit": null,
+        "multiplier": null,
+        "dictionary": "DD005"
+      },
+      {
+        "field": 5,
+        "title": "A",
+        "type": "bit(8)",
+        "unit": null,
+        "multiplier": null,
+        "dictionary": "DD001"
+      },
+      {
+        "field": 6,
+        "title": "Source ID",
+        "type": "uint8",
+        "unit": null,
+        "multiplier": null,
+        "dictionary": "DD005"
+      },
+      {
+        "field": 7,
+        "title": "Index",
+        "type": "uint32",
+        "unit": null,
+        "multiplier": null,
+        "dictionary": "DD010"
+      },
+      {
+        "field": 8,
+        "title": "Name",
+        "type": "chr(x)",
+        "unit": null,
+        "multiplier": null,
+        "dictionary": "DD192"
+      }
+    ]
+  },
+  "nmea2000/130820/7/419/4": {
+    "title": "Fusion: Album Name",
+    "single": false,
+    "priority": 7,
+    "interval": null,
+    "fields": [
+      {
+        "field": 1,
+        "title": "Manufacturer Code",
+        "type": "bit(11)",
+        "unit": null,
+        "multiplier": null,
+        "dictionary": "DD172"
+      },
+      {
+        "field": 2,
+        "title": "NMEA Reserved",
+        "type": "bit(2)",
+        "unit": null,
+        "multiplier": null,
+        "dictionary": "DD001"
+      },
+      {
+        "field": 3,
+        "title": "Industry Group",
+        "type": "bit(3)",
+        "unit": null,
+        "multiplier": null,
+        "dictionary": "DD168"
+      },
+      {
+        "field": 4,
+        "title": "Message ID",
+        "type": "uint8",
+        "unit": null,
+        "multiplier": null,
+        "dictionary": "DD005"
+      },
+      {
+        "field": 5,
+        "title": "A",
+        "type": "bit(8)",
+        "unit": null,
+        "multiplier": null,
+        "dictionary": "DD001"
+      },
+      {
+        "field": 6,
+        "title": "Source ID",
+        "type": "uint8",
+        "unit": null,
+        "multiplier": null,
+        "dictionary": "DD005"
+      },
+      {
+        "field": 7,
+        "title": "Index",
+        "type": "uint32",
+        "unit": null,
+        "multiplier": null,
+        "dictionary": "DD010"
+      },
+      {
+        "field": 8,
+        "title": "Album",
+        "type": "chr(x)",
+        "unit": null,
+        "multiplier": null,
+        "dictionary": "DD192"
+      }
+    ]
+  },
+  "nmea2000/130820/9/419/4": {
+    "title": "Fusion: Track Position",
+    "single": false,
+    "priority": 7,
+    "interval": null,
+    "fields": [
+      {
+        "field": 1,
+        "title": "Manufacturer Code",
+        "type": "bit(11)",
+        "unit": null,
+        "multiplier": null,
+        "dictionary": "DD172"
+      },
+      {
+        "field": 2,
+        "title": "NMEA Reserved",
+        "type": "bit(2)",
+        "unit": null,
+        "multiplier": null,
+        "dictionary": "DD001"
+      },
+      {
+        "field": 3,
+        "title": "Industry Group",
+        "type": "bit(3)",
+        "unit": null,
+        "multiplier": null,
+        "dictionary": "DD168"
+      },
+      {
+        "field": 4,
+        "title": "Message ID",
+        "type": "uint8",
+        "unit": null,
+        "multiplier": null,
+        "dictionary": "DD005"
+      },
+      {
+        "field": 5,
+        "title": "A",
+        "type": "bit(8)",
+        "unit": null,
+        "multiplier": null,
+        "dictionary": "DD001"
+      },
+      {
+        "field": 6,
+        "title": "Source ID",
+        "type": "uint8",
+        "unit": null,
+        "multiplier": null,
+        "dictionary": "DD005"
+      },
+      {
+        "field": 7,
+        "title": "Progress",
+        "type": "uint32",
+        "unit": "sec",
+        "multiplier": 0.001,
+        "dictionary": "DD010"
+      }
+    ]
+  },
+  "nmea2000/130820/11/419/4": {
+    "title": "Fusion: Tuner",
+    "single": false,
+    "priority": 7,
+    "interval": null,
+    "fields": [
+      {
+        "field": 1,
+        "title": "Manufacturer Code",
+        "type": "bit(11)",
+        "unit": null,
+        "multiplier": null,
+        "dictionary": "DD172"
+      },
+      {
+        "field": 2,
+        "title": "NMEA Reserved",
+        "type": "bit(2)",
+        "unit": null,
+        "multiplier": null,
+        "dictionary": "DD001"
+      },
+      {
+        "field": 3,
+        "title": "Industry Group",
+        "type": "bit(3)",
+        "unit": null,
+        "multiplier": null,
+        "dictionary": "DD168"
+      },
+      {
+        "field": 4,
+        "title": "Message ID",
+        "type": "uint8",
+        "unit": null,
+        "multiplier": null,
+        "dictionary": "DD005"
+      },
+      {
+        "field": 5,
+        "title": "A",
+        "type": "bit(8)",
+        "unit": null,
+        "multiplier": null,
+        "dictionary": "DD001"
+      },
+      {
+        "field": 6,
+        "title": "Source ID",
+        "type": "uint8",
+        "unit": null,
+        "multiplier": null,
+        "dictionary": "DD005"
+      },
+      {
+        "field": 7,
+        "title": "Status",
+        "type": "uint8",
+        "unit": null,
+        "multiplier": null,
+        "dictionary": "DD005"
+      },
+      {
+        "field": 8,
+        "title": "Frequency",
+        "type": "uint32",
+        "unit": "Hz",
+        "multiplier": null,
+        "dictionary": "DD010"
+      },
+      {
+        "field": 9,
+        "title": "Signal",
+        "type": "uint8",
+        "unit": null,
+        "multiplier": null,
+        "dictionary": "DD005"
+      },
+      {
+        "field": 10,
+        "title": "RDS",
+        "type": "chr(x)",
+        "unit": null,
+        "multiplier": null,
+        "dictionary": "DD192"
+      }
+    ]
+  },
+  "nmea2000/130820/12/419/4": {
+    "title": "Fusion: Marine Tuner",
+    "single": false,
+    "priority": 7,
+    "interval": null,
+    "fields": [
+      {
+        "field": 1,
+        "title": "Manufacturer Code",
+        "type": "bit(11)",
+        "unit": null,
+        "multiplier": null,
+        "dictionary": "DD172"
+      },
+      {
+        "field": 2,
+        "title": "NMEA Reserved",
+        "type": "bit(2)",
+        "unit": null,
+        "multiplier": null,
+        "dictionary": "DD001"
+      },
+      {
+        "field": 3,
+        "title": "Industry Group",
+        "type": "bit(3)",
+        "unit": null,
+        "multiplier": null,
+        "dictionary": "DD168"
+      },
+      {
+        "field": 4,
+        "title": "Message ID",
+        "type": "uint8",
+        "unit": null,
+        "multiplier": null,
+        "dictionary": "DD005"
+      },
+      {
+        "field": 5,
+        "title": "A",
+        "type": "bit(8)",
+        "unit": null,
+        "multiplier": null,
+        "dictionary": "DD001"
+      },
+      {
+        "field": 6,
+        "title": "Source ID",
+        "type": "uint8",
+        "unit": null,
+        "multiplier": null,
+        "dictionary": "DD005"
+      },
+      {
+        "field": 7,
+        "title": "Channel",
+        "type": "uint8",
+        "unit": null,
+        "multiplier": null,
+        "dictionary": "DD005"
+      },
+      {
+        "field": 8,
+        "title": "Channel Name",
+        "type": "chr(x)",
+        "unit": null,
+        "multiplier": null,
+        "dictionary": "DD172"
+      }
+    ]
+  },
+  "nmea2000/130820/13/419/4": {
+    "title": "Fusion: Marine Squelch",
+    "single": false,
+    "priority": 7,
+    "interval": null,
+    "fields": [
+      {
+        "field": 1,
+        "title": "Manufacturer Code",
+        "type": "bit(11)",
+        "unit": null,
+        "multiplier": null,
+        "dictionary": "DD172"
+      },
+      {
+        "field": 2,
+        "title": "NMEA Reserved",
+        "type": "bit(2)",
+        "unit": null,
+        "multiplier": null,
+        "dictionary": "DD001"
+      },
+      {
+        "field": 3,
+        "title": "Industry Group",
+        "type": "bit(3)",
+        "unit": null,
+        "multiplier": null,
+        "dictionary": "DD168"
+      },
+      {
+        "field": 4,
+        "title": "Message ID",
+        "type": "uint8",
+        "unit": null,
+        "multiplier": null,
+        "dictionary": "DD005"
+      },
+      {
+        "field": 5,
+        "title": "A",
+        "type": "bit(8)",
+        "unit": null,
+        "multiplier": null,
+        "dictionary": "DD001"
+      },
+      {
+        "field": 6,
+        "title": "Source ID",
+        "type": "uint8",
+        "unit": null,
+        "multiplier": null,
+        "dictionary": "DD005"
+      },
+      {
+        "field": 7,
+        "title": "Squelch",
+        "type": "uint8",
+        "unit": null,
+        "multiplier": null,
+        "dictionary": "DD005"
+      }
+    ]
+  },
+  "nmea2000/130820/14/419/4": {
+    "title": "Fusion: Scan Mode",
+    "single": false,
+    "priority": 7,
+    "interval": null,
+    "fields": [
+      {
+        "field": 1,
+        "title": "Manufacturer Code",
+        "type": "bit(11)",
+        "unit": null,
+        "multiplier": null,
+        "dictionary": "DD172"
+      },
+      {
+        "field": 2,
+        "title": "NMEA Reserved",
+        "type": "bit(2)",
+        "unit": null,
+        "multiplier": null,
+        "dictionary": "DD001"
+      },
+      {
+        "field": 3,
+        "title": "Industry Group",
+        "type": "bit(3)",
+        "unit": null,
+        "multiplier": null,
+        "dictionary": "DD168"
+      },
+      {
+        "field": 4,
+        "title": "Message ID",
+        "type": "uint8",
+        "unit": null,
+        "multiplier": null,
+        "dictionary": "DD005"
+      },
+      {
+        "field": 5,
+        "title": "A",
+        "type": "bit(8)",
+        "unit": null,
+        "multiplier": null,
+        "dictionary": "DD001"
+      },
+      {
+        "field": 6,
+        "title": "Source ID",
+        "type": "uint8",
+        "unit": null,
+        "multiplier": null,
+        "dictionary": "DD005"
+      },
+      {
+        "field": 7,
+        "title": "Scan Mode",
+        "type": "uint8",
+        "unit": null,
+        "multiplier": null,
+        "dictionary": "DD005"
+      }
+    ]
+  },
+  "nmea2000/130820/17/419/4": {
+    "title": "Fusion: Menu Item",
+    "single": false,
+    "priority": 7,
+    "interval": null,
+    "fields": [
+      {
+        "field": 1,
+        "title": "Manufacturer Code",
+        "type": "bit(11)",
+        "unit": null,
+        "multiplier": null,
+        "dictionary": "DD172"
+      },
+      {
+        "field": 2,
+        "title": "NMEA Reserved",
+        "type": "bit(2)",
+        "unit": null,
+        "multiplier": null,
+        "dictionary": "DD001"
+      },
+      {
+        "field": 3,
+        "title": "Industry Group",
+        "type": "bit(3)",
+        "unit": null,
+        "multiplier": null,
+        "dictionary": "DD168"
+      },
+      {
+        "field": 4,
+        "title": "Message ID",
+        "type": "uint8",
+        "unit": null,
+        "multiplier": null,
+        "dictionary": "DD005"
+      },
+      {
+        "field": 5,
+        "title": "A",
+        "type": "bit(8)",
+        "unit": null,
+        "multiplier": null,
+        "dictionary": "DD001"
+      },
+      {
+        "field": 6,
+        "title": "Source ID",
+        "type": "uint8",
+        "unit": null,
+        "multiplier": null,
+        "dictionary": "DD005"
+      },
+      {
+        "field": 7,
+        "title": "Item Index",
+        "type": "uint32",
+        "unit": null,
+        "multiplier": null,
+        "dictionary": "DD010"
+      },
+      {
+        "field": 8,
+        "title": "Flags",
+        "type": "uint8",
+        "unit": null,
+        "multiplier": null,
+        "dictionary": "DD005"
+      },
+      {
+        "field": 9,
+        "title": "Lock ID",
+        "type": "uint8",
+        "unit": null,
+        "multiplier": null,
+        "dictionary": "DD005"
+      },
+      {
+        "field": 10,
+        "title": "Name",
+        "type": "chr(x)",
+        "unit": null,
+        "multiplier": null,
+        "dictionary": "DD172"
+      }
+    ]
+  },
+  "nmea2000/130820/19/419/4": {
+    "title": "Fusion: Aux Gain",
+    "single": false,
+    "priority": 7,
+    "interval": null,
+    "fields": [
+      {
+        "field": 1,
+        "title": "Manufacturer Code",
+        "type": "bit(11)",
+        "unit": null,
+        "multiplier": null,
+        "dictionary": "DD172"
+      },
+      {
+        "field": 2,
+        "title": "NMEA Reserved",
+        "type": "bit(2)",
+        "unit": null,
+        "multiplier": null,
+        "dictionary": "DD001"
+      },
+      {
+        "field": 3,
+        "title": "Industry Group",
+        "type": "bit(3)",
+        "unit": null,
+        "multiplier": null,
+        "dictionary": "DD168"
+      },
+      {
+        "field": 4,
+        "title": "Message ID",
+        "type": "uint8",
+        "unit": null,
+        "multiplier": null,
+        "dictionary": "DD005"
+      },
+      {
+        "field": 5,
+        "title": "A",
+        "type": "bit(8)",
+        "unit": null,
+        "multiplier": null,
+        "dictionary": "DD001"
+      },
+      {
+        "field": 6,
+        "title": "Source ID",
+        "type": "uint8",
+        "unit": null,
+        "multiplier": null,
+        "dictionary": "DD005"
+      },
+      {
+        "field": 7,
+        "title": "Gain",
+        "type": "int8",
+        "unit": null,
+        "multiplier": null,
+        "dictionary": "DD138"
+      }
+    ]
+  },
+  "nmea2000/130820/20/419/4": {
+    "title": "Fusion: Setting",
+    "single": false,
+    "priority": 7,
+    "interval": null,
+    "fields": [
+      {
+        "field": 1,
+        "title": "Manufacturer Code",
+        "type": "bit(11)",
+        "unit": null,
+        "multiplier": null,
+        "dictionary": "DD172"
+      },
+      {
+        "field": 2,
+        "title": "NMEA Reserved",
+        "type": "bit(2)",
+        "unit": null,
+        "multiplier": null,
+        "dictionary": "DD001"
+      },
+      {
+        "field": 3,
+        "title": "Industry Group",
+        "type": "bit(3)",
+        "unit": null,
+        "multiplier": null,
+        "dictionary": "DD168"
+      },
+      {
+        "field": 4,
+        "title": "Message ID",
+        "type": "uint8",
+        "unit": null,
+        "multiplier": null,
+        "dictionary": "DD005"
+      },
+      {
+        "field": 5,
+        "title": "A",
+        "type": "bit(8)",
+        "unit": null,
+        "multiplier": null,
+        "dictionary": "DD001"
+      },
+      {
+        "field": 6,
+        "title": "Setting ID",
+        "type": "uint32",
+        "unit": null,
+        "multiplier": null,
+        "dictionary": "DD010"
+      },
+      {
+        "field": 7,
+        "title": "Value",
+        "type": "uint32",
+        "unit": null,
+        "multiplier": null,
+        "dictionary": "DD010"
+      }
+    ]
+  },
+  "nmea2000/130820/21/419/4": {
+    "title": "Fusion: Settings",
+    "single": false,
+    "priority": 7,
+    "interval": null,
+    "repeat": [
+      {
+        "repeatField": 6,
+        "startField": 7,
+        "fieldCount": 2
+      }
+    ],
+    "fields": [
+      {
+        "field": 1,
+        "title": "Manufacturer Code",
+        "type": "bit(11)",
+        "unit": null,
+        "multiplier": null,
+        "dictionary": "DD172"
+      },
+      {
+        "field": 2,
+        "title": "NMEA Reserved",
+        "type": "bit(2)",
+        "unit": null,
+        "multiplier": null,
+        "dictionary": "DD001"
+      },
+      {
+        "field": 3,
+        "title": "Industry Group",
+        "type": "bit(3)",
+        "unit": null,
+        "multiplier": null,
+        "dictionary": "DD168"
+      },
+      {
+        "field": 4,
+        "title": "Message ID",
+        "type": "uint8",
+        "unit": null,
+        "multiplier": null,
+        "dictionary": "DD005"
+      },
+      {
+        "field": 5,
+        "title": "A",
+        "type": "bit(8)",
+        "unit": null,
+        "multiplier": null,
+        "dictionary": "DD001"
+      },
+      {
+        "field": 6,
+        "title": "Count",
+        "type": "uint32",
+        "unit": null,
+        "multiplier": null,
+        "dictionary": "DD010"
+      },
+      {
+        "field": 7,
+        "title": "Setting ID",
+        "type": "uint32",
+        "unit": null,
+        "multiplier": null,
+        "dictionary": "DD010"
+      },
+      {
+        "field": 8,
+        "title": "Value",
+        "type": "uint32",
+        "unit": null,
+        "multiplier": null,
+        "dictionary": "DD010"
+      }
+    ]
+  },
+  "nmea2000/130820/23/419/4": {
+    "title": "Fusion: Mute",
+    "single": false,
+    "priority": 7,
+    "interval": null,
+    "fields": [
+      {
+        "field": 1,
+        "title": "Manufacturer Code",
+        "type": "bit(11)",
+        "unit": null,
+        "multiplier": null,
+        "dictionary": "DD172"
+      },
+      {
+        "field": 2,
+        "title": "NMEA Reserved",
+        "type": "bit(2)",
+        "unit": null,
+        "multiplier": null,
+        "dictionary": "DD001"
+      },
+      {
+        "field": 3,
+        "title": "Industry Group",
+        "type": "bit(3)",
+        "unit": null,
+        "multiplier": null,
+        "dictionary": "DD168"
+      },
+      {
+        "field": 4,
+        "title": "Message ID",
+        "type": "uint8",
+        "unit": null,
+        "multiplier": null,
+        "dictionary": "DD005"
+      },
+      {
+        "field": 5,
+        "title": "A",
+        "type": "bit(8)",
+        "unit": null,
+        "multiplier": null,
+        "dictionary": "DD001"
+      },
+      {
+        "field": 6,
+        "title": "Mute",
+        "type": "bit(8)",
+        "unit": null,
+        "multiplier": null,
+        "dictionary": "DD999"
+      }
+    ]
+  },
+  "nmea2000/130820/24/419/4": {
+    "title": "Fusion: Balance",
+    "single": false,
+    "priority": 7,
+    "interval": null,
+    "fields": [
+      {
+        "field": 1,
+        "title": "Manufacturer Code",
+        "type": "bit(11)",
+        "unit": null,
+        "multiplier": null,
+        "dictionary": "DD172"
+      },
+      {
+        "field": 2,
+        "title": "NMEA Reserved",
+        "type": "bit(2)",
+        "unit": null,
+        "multiplier": null,
+        "dictionary": "DD001"
+      },
+      {
+        "field": 3,
+        "title": "Industry Group",
+        "type": "bit(3)",
+        "unit": null,
+        "multiplier": null,
+        "dictionary": "DD168"
+      },
+      {
+        "field": 4,
+        "title": "Message ID",
+        "type": "uint8",
+        "unit": null,
+        "multiplier": null,
+        "dictionary": "DD005"
+      },
+      {
+        "field": 5,
+        "title": "A",
+        "type": "bit(8)",
+        "unit": null,
+        "multiplier": null,
+        "dictionary": "DD001"
+      },
+      {
+        "field": 6,
+        "title": "Zone",
+        "type": "uint8",
+        "unit": null,
+        "multiplier": null,
+        "dictionary": "DD005"
+      },
+      {
+        "field": 7,
+        "title": "Value",
+        "type": "uint8",
+        "unit": null,
+        "multiplier": null,
+        "dictionary": "DD005"
+      }
+    ]
+  },
+  "nmea2000/130820/25/419/4": {
+    "title": "Fusion: Low Pass Filter",
+    "single": false,
+    "priority": 7,
+    "interval": null,
+    "fields": [
+      {
+        "field": 1,
+        "title": "Manufacturer Code",
+        "type": "bit(11)",
+        "unit": null,
+        "multiplier": null,
+        "dictionary": "DD172"
+      },
+      {
+        "field": 2,
+        "title": "NMEA Reserved",
+        "type": "bit(2)",
+        "unit": null,
+        "multiplier": null,
+        "dictionary": "DD001"
+      },
+      {
+        "field": 3,
+        "title": "Industry Group",
+        "type": "bit(3)",
+        "unit": null,
+        "multiplier": null,
+        "dictionary": "DD168"
+      },
+      {
+        "field": 4,
+        "title": "Message ID",
+        "type": "uint8",
+        "unit": null,
+        "multiplier": null,
+        "dictionary": "DD005"
+      },
+      {
+        "field": 5,
+        "title": "A",
+        "type": "bit(8)",
+        "unit": null,
+        "multiplier": null,
+        "dictionary": "DD001"
+      },
+      {
+        "field": 6,
+        "title": "Zone",
+        "type": "uint8",
+        "unit": null,
+        "multiplier": null,
+        "dictionary": "DD005"
+      },
+      {
+        "field": 7,
+        "title": "Value",
+        "type": "uint8",
+        "unit": null,
+        "multiplier": null,
+        "dictionary": "DD005"
+      }
+    ]
+  },
+  "nmea2000/130820/26/419/4": {
+    "title": "Fusion: SubLevels",
+    "single": false,
+    "priority": 7,
+    "interval": null,
+    "fields": [
+      {
+        "field": 1,
+        "title": "Manufacturer Code",
+        "type": "bit(11)",
+        "unit": null,
+        "multiplier": null,
+        "dictionary": "DD172"
+      },
+      {
+        "field": 2,
+        "title": "NMEA Reserved",
+        "type": "bit(2)",
+        "unit": null,
+        "multiplier": null,
+        "dictionary": "DD001"
+      },
+      {
+        "field": 3,
+        "title": "Industry Group",
+        "type": "bit(3)",
+        "unit": null,
+        "multiplier": null,
+        "dictionary": "DD168"
+      },
+      {
+        "field": 4,
+        "title": "Message ID",
+        "type": "uint8",
+        "unit": null,
+        "multiplier": null,
+        "dictionary": "DD005"
+      },
+      {
+        "field": 5,
+        "title": "A",
+        "type": "bit(8)",
+        "unit": null,
+        "multiplier": null,
+        "dictionary": "DD001"
+      },
+      {
+        "field": 6,
+        "title": "Zone 1",
+        "type": "uint8",
+        "unit": null,
+        "multiplier": null,
+        "dictionary": "DD005"
+      },
+      {
+        "field": 7,
+        "title": "Zone 2",
+        "type": "uint8",
+        "unit": null,
+        "multiplier": null,
+        "dictionary": "DD005"
+      },
+      {
+        "field": 8,
+        "title": "Zone 3",
+        "type": "uint8",
+        "unit": null,
+        "multiplier": null,
+        "dictionary": "DD005"
+      },
+      {
+        "field": 9,
+        "title": "Zone 4",
+        "type": "uint8",
+        "unit": null,
+        "multiplier": null,
+        "dictionary": "DD005"
+      }
+    ]
+  },
+  "nmea2000/130820/27/419/4": {
+    "title": "Fusion: Equalizer",
+    "single": false,
+    "priority": 7,
+    "interval": null,
+    "fields": [
+      {
+        "field": 1,
+        "title": "Manufacturer Code",
+        "type": "bit(11)",
+        "unit": null,
+        "multiplier": null,
+        "dictionary": "DD172"
+      },
+      {
+        "field": 2,
+        "title": "NMEA Reserved",
+        "type": "bit(2)",
+        "unit": null,
+        "multiplier": null,
+        "dictionary": "DD001"
+      },
+      {
+        "field": 3,
+        "title": "Industry Group",
+        "type": "bit(3)",
+        "unit": null,
+        "multiplier": null,
+        "dictionary": "DD168"
+      },
+      {
+        "field": 4,
+        "title": "Message ID",
+        "type": "uint8",
+        "unit": null,
+        "multiplier": null,
+        "dictionary": "DD005"
+      },
+      {
+        "field": 5,
+        "title": "A",
+        "type": "bit(8)",
+        "unit": null,
+        "multiplier": null,
+        "dictionary": "DD001"
+      },
+      {
+        "field": 6,
+        "title": "Zone",
+        "type": "uint8",
+        "unit": null,
+        "multiplier": null,
+        "dictionary": "DD005"
+      },
+      {
+        "field": 7,
+        "title": "Bass",
+        "type": "int8",
+        "unit": "vol",
+        "multiplier": null,
+        "dictionary": "DD138"
+      },
+      {
+        "field": 8,
+        "title": "Middle",
+        "type": "int8",
+        "unit": "vol",
+        "multiplier": null,
+        "dictionary": "DD138"
+      },
+      {
+        "field": 9,
+        "title": "Treble",
+        "type": "int8",
+        "unit": "vol",
+        "multiplier": null,
+        "dictionary": "DD138"
+      }
+    ]
+  },
+  "nmea2000/130820/29/419/4": {
+    "title": "Fusion: Volumes",
+    "single": false,
+    "priority": 7,
+    "interval": null,
+    "fields": [
+      {
+        "field": 1,
+        "title": "Manufacturer Code",
+        "type": "bit(11)",
+        "unit": null,
+        "multiplier": null,
+        "dictionary": "DD172"
+      },
+      {
+        "field": 2,
+        "title": "NMEA Reserved",
+        "type": "bit(2)",
+        "unit": null,
+        "multiplier": null,
+        "dictionary": "DD001"
+      },
+      {
+        "field": 3,
+        "title": "Industry Group",
+        "type": "bit(3)",
+        "unit": null,
+        "multiplier": null,
+        "dictionary": "DD168"
+      },
+      {
+        "field": 4,
+        "title": "Message ID",
+        "type": "uint8",
+        "unit": null,
+        "multiplier": null,
+        "dictionary": "DD005"
+      },
+      {
+        "field": 5,
+        "title": "A",
+        "type": "bit(8)",
+        "unit": null,
+        "multiplier": null,
+        "dictionary": "DD001"
+      },
+      {
+        "field": 6,
+        "title": "Zone 1",
+        "type": "uint8",
+        "unit": "vol",
+        "multiplier": null,
+        "dictionary": "DD005"
+      },
+      {
+        "field": 7,
+        "title": "Zone 2",
+        "type": "uint8",
+        "unit": "vol",
+        "multiplier": null,
+        "dictionary": "DD005"
+      },
+      {
+        "field": 8,
+        "title": "Zone 3",
+        "type": "uint8",
+        "unit": "vol",
+        "multiplier": null,
+        "dictionary": "DD005"
+      },
+      {
+        "field": 9,
+        "title": "Zone 4",
+        "type": "uint8",
+        "unit": "vol",
+        "multiplier": null,
+        "dictionary": "DD005"
+      }
+    ]
+  },
+  "nmea2000/130820/30/419/4": {
+    "title": "Fusion: Zone Capabilities",
+    "single": false,
+    "priority": 7,
+    "interval": null,
+    "fields": [
+      {
+        "field": 1,
+        "title": "Manufacturer Code",
+        "type": "bit(11)",
+        "unit": null,
+        "multiplier": null,
+        "dictionary": "DD172"
+      },
+      {
+        "field": 2,
+        "title": "NMEA Reserved",
+        "type": "bit(2)",
+        "unit": null,
+        "multiplier": null,
+        "dictionary": "DD001"
+      },
+      {
+        "field": 3,
+        "title": "Industry Group",
+        "type": "bit(3)",
+        "unit": null,
+        "multiplier": null,
+        "dictionary": "DD168"
+      },
+      {
+        "field": 4,
+        "title": "Message ID",
+        "type": "uint8",
+        "unit": null,
+        "multiplier": null,
+        "dictionary": "DD005"
+      },
+      {
+        "field": 5,
+        "title": "A",
+        "type": "bit(8)",
+        "unit": null,
+        "multiplier": null,
+        "dictionary": "DD001"
+      },
+      {
+        "field": 6,
+        "title": "Zone 1",
+        "type": "uint16",
+        "unit": null,
+        "multiplier": null,
+        "dictionary": "DD007"
+      },
+      {
+        "field": 7,
+        "title": "Zone 2",
+        "type": "uint16",
+        "unit": null,
+        "multiplier": null,
+        "dictionary": "DD007"
+      },
+      {
+        "field": 8,
+        "title": "Zone 3",
+        "type": "uint16",
+        "unit": null,
+        "multiplier": null,
+        "dictionary": "DD007"
+      },
+      {
+        "field": 9,
+        "title": "Zone 4",
+        "type": "uint16",
+        "unit": null,
+        "multiplier": null,
+        "dictionary": "DD007"
+      },
+      {
+        "field": 10,
+        "title": "Global",
+        "type": "uint16",
+        "unit": null,
+        "multiplier": null,
+        "dictionary": "DD007"
+      }
+    ]
+  },
+  "nmea2000/130820/32/419/4": {
+    "title": "Fusion: Power State",
+    "single": false,
+    "priority": 7,
+    "interval": null,
+    "fields": [
+      {
+        "field": 1,
+        "title": "Manufacturer Code",
+        "type": "bit(11)",
+        "unit": null,
+        "multiplier": null,
+        "dictionary": "DD172"
+      },
+      {
+        "field": 2,
+        "title": "NMEA Reserved",
+        "type": "bit(2)",
+        "unit": null,
+        "multiplier": null,
+        "dictionary": "DD001"
+      },
+      {
+        "field": 3,
+        "title": "Industry Group",
+        "type": "bit(3)",
+        "unit": null,
+        "multiplier": null,
+        "dictionary": "DD168"
+      },
+      {
+        "field": 4,
+        "title": "Message ID",
+        "type": "uint8",
+        "unit": null,
+        "multiplier": null,
+        "dictionary": "DD005"
+      },
+      {
+        "field": 5,
+        "title": "A",
+        "type": "bit(8)",
+        "unit": null,
+        "multiplier": null,
+        "dictionary": "DD001"
+      },
+      {
+        "field": 6,
+        "title": "State",
+        "type": "uint8",
+        "unit": null,
+        "multiplier": null,
+        "dictionary": "DD005"
+      }
+    ]
+  },
+  "nmea2000/130820/33/419/4": {
+    "title": "Fusion: Device Name",
+    "single": false,
+    "priority": 7,
+    "interval": null,
+    "fields": [
+      {
+        "field": 1,
+        "title": "Manufacturer Code",
+        "type": "bit(11)",
+        "unit": null,
+        "multiplier": null,
+        "dictionary": "DD172"
+      },
+      {
+        "field": 2,
+        "title": "NMEA Reserved",
+        "type": "bit(2)",
+        "unit": null,
+        "multiplier": null,
+        "dictionary": "DD001"
+      },
+      {
+        "field": 3,
+        "title": "Industry Group",
+        "type": "bit(3)",
+        "unit": null,
+        "multiplier": null,
+        "dictionary": "DD168"
+      },
+      {
+        "field": 4,
+        "title": "Message ID",
+        "type": "uint8",
+        "unit": null,
+        "multiplier": null,
+        "dictionary": "DD005"
+      },
+      {
+        "field": 5,
+        "title": "A",
+        "type": "bit(8)",
+        "unit": null,
+        "multiplier": null,
+        "dictionary": "DD001"
+      },
+      {
+        "field": 6,
+        "title": "Name",
+        "type": "chr(x)",
+        "unit": null,
+        "multiplier": null,
+        "dictionary": "DD192"
+      }
+    ]
+  },
+  "nmea2000/130820/34/419/4": {
+    "title": "Fusion: Unknown (34)",
+    "single": false,
+    "priority": 7,
+    "interval": null,
+    "fields": [
+      {
+        "field": 1,
+        "title": "Manufacturer Code",
+        "type": "bit(11)",
+        "unit": null,
+        "multiplier": null,
+        "dictionary": "DD172"
+      },
+      {
+        "field": 2,
+        "title": "NMEA Reserved",
+        "type": "bit(2)",
+        "unit": null,
+        "multiplier": null,
+        "dictionary": "DD001"
+      },
+      {
+        "field": 3,
+        "title": "Industry Group",
+        "type": "bit(3)",
+        "unit": null,
+        "multiplier": null,
+        "dictionary": "DD168"
+      },
+      {
+        "field": 4,
+        "title": "Message ID",
+        "type": "uint8",
+        "unit": null,
+        "multiplier": null,
+        "dictionary": "DD005"
+      },
+      {
+        "field": 5,
+        "title": "A",
+        "type": "bit(8)",
+        "unit": null,
+        "multiplier": null,
+        "dictionary": "DD001"
+      },
+      {
+        "field": 6,
+        "title": "B",
+        "type": "bit(48)",
+        "unit": null,
+        "multiplier": null,
+        "dictionary": "DD001"
+      }
+    ]
+  },
+  "nmea2000/130820/36/419/4": {
+    "title": "Fusion: SiriusXM Station",
+    "single": false,
+    "priority": 7,
+    "interval": null,
+    "fields": [
+      {
+        "field": 1,
+        "title": "Manufacturer Code",
+        "type": "bit(11)",
+        "unit": null,
+        "multiplier": null,
+        "dictionary": "DD172"
+      },
+      {
+        "field": 2,
+        "title": "NMEA Reserved",
+        "type": "bit(2)",
+        "unit": null,
+        "multiplier": null,
+        "dictionary": "DD001"
+      },
+      {
+        "field": 3,
+        "title": "Industry Group",
+        "type": "bit(3)",
+        "unit": null,
+        "multiplier": null,
+        "dictionary": "DD168"
+      },
+      {
+        "field": 4,
+        "title": "Message ID",
+        "type": "uint8",
+        "unit": null,
+        "multiplier": null,
+        "dictionary": "DD005"
+      },
+      {
+        "field": 5,
+        "title": "A",
+        "type": "bit(8)",
+        "unit": null,
+        "multiplier": null,
+        "dictionary": "DD001"
+      },
+      {
+        "field": 6,
+        "title": "Channel",
+        "type": "uint16",
+        "unit": null,
+        "multiplier": null,
+        "dictionary": "DD007"
+      },
+      {
+        "field": 7,
+        "title": "Station",
+        "type": "chr(100)",
+        "unit": null,
+        "multiplier": null,
+        "dictionary": "DD192"
+      }
+    ]
+  },
+  "nmea2000/130820/37/419/4": {
+    "title": "Fusion: SiriusXM Track",
+    "single": false,
+    "priority": 7,
+    "interval": null,
+    "fields": [
+      {
+        "field": 1,
+        "title": "Manufacturer Code",
+        "type": "bit(11)",
+        "unit": null,
+        "multiplier": null,
+        "dictionary": "DD172"
+      },
+      {
+        "field": 2,
+        "title": "NMEA Reserved",
+        "type": "bit(2)",
+        "unit": null,
+        "multiplier": null,
+        "dictionary": "DD001"
+      },
+      {
+        "field": 3,
+        "title": "Industry Group",
+        "type": "bit(3)",
+        "unit": null,
+        "multiplier": null,
+        "dictionary": "DD168"
+      },
+      {
+        "field": 4,
+        "title": "Message ID",
+        "type": "uint8",
+        "unit": null,
+        "multiplier": null,
+        "dictionary": "DD005"
+      },
+      {
+        "field": 5,
+        "title": "A",
+        "type": "bit(8)",
+        "unit": null,
+        "multiplier": null,
+        "dictionary": "DD001"
+      },
+      {
+        "field": 6,
+        "title": "Channel",
+        "type": "uint16",
+        "unit": null,
+        "multiplier": null,
+        "dictionary": "DD007"
+      },
+      {
+        "field": 7,
+        "title": "Track",
+        "type": "chr(100)",
+        "unit": null,
+        "multiplier": null,
+        "dictionary": "DD192"
+      }
+    ]
+  },
+  "nmea2000/130820/38/419/4": {
+    "title": "Fusion: SiriusXM Artist",
+    "single": false,
+    "priority": 7,
+    "interval": null,
+    "fields": [
+      {
+        "field": 1,
+        "title": "Manufacturer Code",
+        "type": "bit(11)",
+        "unit": null,
+        "multiplier": null,
+        "dictionary": "DD172"
+      },
+      {
+        "field": 2,
+        "title": "NMEA Reserved",
+        "type": "bit(2)",
+        "unit": null,
+        "multiplier": null,
+        "dictionary": "DD001"
+      },
+      {
+        "field": 3,
+        "title": "Industry Group",
+        "type": "bit(3)",
+        "unit": null,
+        "multiplier": null,
+        "dictionary": "DD168"
+      },
+      {
+        "field": 4,
+        "title": "Message ID",
+        "type": "uint8",
+        "unit": null,
+        "multiplier": null,
+        "dictionary": "DD005"
+      },
+      {
+        "field": 5,
+        "title": "A",
+        "type": "bit(8)",
+        "unit": null,
+        "multiplier": null,
+        "dictionary": "DD001"
+      },
+      {
+        "field": 6,
+        "title": "Channel",
+        "type": "uint16",
+        "unit": null,
+        "multiplier": null,
+        "dictionary": "DD007"
+      },
+      {
+        "field": 7,
+        "title": "Artist",
+        "type": "chr(100)",
+        "unit": null,
+        "multiplier": null,
+        "dictionary": "DD192"
+      }
+    ]
+  },
+  "nmea2000/130820/39/419/4": {
+    "title": "Fusion: SiriusXM Channel",
+    "single": false,
+    "priority": 7,
+    "interval": null,
+    "fields": [
+      {
+        "field": 1,
+        "title": "Manufacturer Code",
+        "type": "bit(11)",
+        "unit": null,
+        "multiplier": null,
+        "dictionary": "DD172"
+      },
+      {
+        "field": 2,
+        "title": "NMEA Reserved",
+        "type": "bit(2)",
+        "unit": null,
+        "multiplier": null,
+        "dictionary": "DD001"
+      },
+      {
+        "field": 3,
+        "title": "Industry Group",
+        "type": "bit(3)",
+        "unit": null,
+        "multiplier": null,
+        "dictionary": "DD168"
+      },
+      {
+        "field": 4,
+        "title": "Message ID",
+        "type": "uint8",
+        "unit": null,
+        "multiplier": null,
+        "dictionary": "DD005"
+      },
+      {
+        "field": 5,
+        "title": "A",
+        "type": "bit(8)",
+        "unit": null,
+        "multiplier": null,
+        "dictionary": "DD001"
+      },
+      {
+        "field": 6,
+        "title": "Channel",
+        "type": "uint16",
+        "unit": null,
+        "multiplier": null,
+        "dictionary": "DD007"
+      },
+      {
+        "field": 7,
+        "title": "C",
+        "type": "bit(16)",
+        "unit": null,
+        "multiplier": null,
+        "dictionary": "DD001"
+      }
+    ]
+  },
+  "nmea2000/130820/40/419/4": {
+    "title": "Fusion: SiriusXM Category",
+    "single": false,
+    "priority": 7,
+    "interval": null,
+    "fields": [
+      {
+        "field": 1,
+        "title": "Manufacturer Code",
+        "type": "bit(11)",
+        "unit": null,
+        "multiplier": null,
+        "dictionary": "DD172"
+      },
+      {
+        "field": 2,
+        "title": "NMEA Reserved",
+        "type": "bit(2)",
+        "unit": null,
+        "multiplier": null,
+        "dictionary": "DD001"
+      },
+      {
+        "field": 3,
+        "title": "Industry Group",
+        "type": "bit(3)",
+        "unit": null,
+        "multiplier": null,
+        "dictionary": "DD168"
+      },
+      {
+        "field": 4,
+        "title": "Message ID",
+        "type": "uint8",
+        "unit": null,
+        "multiplier": null,
+        "dictionary": "DD005"
+      },
+      {
+        "field": 5,
+        "title": "A",
+        "type": "bit(8)",
+        "unit": null,
+        "multiplier": null,
+        "dictionary": "DD001"
+      },
+      {
+        "field": 6,
+        "title": "Channel",
+        "type": "uint16",
+        "unit": null,
+        "multiplier": null,
+        "dictionary": "DD007"
+      },
+      {
+        "field": 7,
+        "title": "Category",
+        "type": "chr(100)",
+        "unit": null,
+        "multiplier": null,
+        "dictionary": "DD192"
+      }
+    ]
+  },
+  "nmea2000/130820/41/419/4": {
+    "title": "Fusion: Unknown (41)",
+    "single": false,
+    "priority": 7,
+    "interval": null,
+    "fields": [
+      {
+        "field": 1,
+        "title": "Manufacturer Code",
+        "type": "bit(11)",
+        "unit": null,
+        "multiplier": null,
+        "dictionary": "DD172"
+      },
+      {
+        "field": 2,
+        "title": "NMEA Reserved",
+        "type": "bit(2)",
+        "unit": null,
+        "multiplier": null,
+        "dictionary": "DD001"
+      },
+      {
+        "field": 3,
+        "title": "Industry Group",
+        "type": "bit(3)",
+        "unit": null,
+        "multiplier": null,
+        "dictionary": "DD168"
+      },
+      {
+        "field": 4,
+        "title": "Message ID",
+        "type": "uint8",
+        "unit": null,
+        "multiplier": null,
+        "dictionary": "DD005"
+      },
+      {
+        "field": 5,
+        "title": "A",
+        "type": "bit(8)",
+        "unit": null,
+        "multiplier": null,
+        "dictionary": "DD001"
+      },
+      {
+        "field": 6,
+        "title": "Text",
+        "type": "chr(x)",
+        "unit": null,
+        "multiplier": null,
+        "dictionary": "DD192"
+      }
+    ]
+  },
+  "nmea2000/130820/44/419/4": {
+    "title": "Fusion: Unknown (44)",
+    "single": false,
+    "priority": 7,
+    "interval": null,
+    "fields": [
+      {
+        "field": 1,
+        "title": "Manufacturer Code",
+        "type": "bit(11)",
+        "unit": null,
+        "multiplier": null,
+        "dictionary": "DD172"
+      },
+      {
+        "field": 2,
+        "title": "NMEA Reserved",
+        "type": "bit(2)",
+        "unit": null,
+        "multiplier": null,
+        "dictionary": "DD001"
+      },
+      {
+        "field": 3,
+        "title": "Industry Group",
+        "type": "bit(3)",
+        "unit": null,
+        "multiplier": null,
+        "dictionary": "DD168"
+      },
+      {
+        "field": 4,
+        "title": "Message ID",
+        "type": "uint8",
+        "unit": null,
+        "multiplier": null,
+        "dictionary": "DD005"
+      },
+      {
+        "field": 5,
+        "title": "A",
+        "type": "bit(8)",
+        "unit": null,
+        "multiplier": null,
+        "dictionary": "DD001"
+      },
+      {
+        "field": 6,
+        "title": "Text",
+        "type": "chr(x)",
+        "unit": null,
+        "multiplier": null,
+        "dictionary": "DD192"
+      }
+    ]
+  },
+  "nmea2000/130820/45/419/4": {
+    "title": "Fusion: Zone Name",
+    "single": false,
+    "priority": 7,
+    "interval": null,
+    "fields": [
+      {
+        "field": 1,
+        "title": "Manufacturer Code",
+        "type": "bit(11)",
+        "unit": null,
+        "multiplier": null,
+        "dictionary": "DD172"
+      },
+      {
+        "field": 2,
+        "title": "NMEA Reserved",
+        "type": "bit(2)",
+        "unit": null,
+        "multiplier": null,
+        "dictionary": "DD001"
+      },
+      {
+        "field": 3,
+        "title": "Industry Group",
+        "type": "bit(3)",
+        "unit": null,
+        "multiplier": null,
+        "dictionary": "DD168"
+      },
+      {
+        "field": 4,
+        "title": "Message ID",
+        "type": "uint8",
+        "unit": null,
+        "multiplier": null,
+        "dictionary": "DD005"
+      },
+      {
+        "field": 5,
+        "title": "A",
+        "type": "bit(8)",
+        "unit": null,
+        "multiplier": null,
+        "dictionary": "DD001"
+      },
+      {
+        "field": 6,
+        "title": "Zone",
+        "type": "uint8",
+        "unit": null,
+        "multiplier": null,
+        "dictionary": "DD005"
+      },
+      {
+        "field": 7,
+        "title": "Name",
+        "type": "chr(x)",
+        "unit": null,
+        "multiplier": null,
+        "dictionary": "DD192"
+      }
+    ]
+  },
+  "nmea2000/130820/51/419/4": {
+    "title": "Fusion: Unknown (51)",
+    "single": false,
+    "priority": 7,
+    "interval": null,
+    "fields": [
+      {
+        "field": 1,
+        "title": "Manufacturer Code",
+        "type": "bit(11)",
+        "unit": null,
+        "multiplier": null,
+        "dictionary": "DD172"
+      },
+      {
+        "field": 2,
+        "title": "NMEA Reserved",
+        "type": "bit(2)",
+        "unit": null,
+        "multiplier": null,
+        "dictionary": "DD001"
+      },
+      {
+        "field": 3,
+        "title": "Industry Group",
+        "type": "bit(3)",
+        "unit": null,
+        "multiplier": null,
+        "dictionary": "DD168"
+      },
+      {
+        "field": 4,
+        "title": "Message ID",
+        "type": "uint8",
+        "unit": null,
+        "multiplier": null,
+        "dictionary": "DD005"
+      },
+      {
+        "field": 5,
+        "title": "A",
+        "type": "bit(8)",
+        "unit": null,
+        "multiplier": null,
+        "dictionary": "DD001"
+      },
+      {
+        "field": 6,
+        "title": "B",
+        "type": "bit(104)",
+        "unit": null,
+        "multiplier": null,
+        "dictionary": "DD001"
       }
     ]
   }

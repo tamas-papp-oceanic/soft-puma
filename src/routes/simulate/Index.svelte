@@ -320,25 +320,27 @@
       }
       rec.fields[2].static = null;
     }
-    let cnv = spl.protocol + '/' + spl.pgn;
-    if ((spl.protocol === 'nmea2000') && nmeaconv.hasOwnProperty(cnv)) {
-      rec.fields[nmeaconv[cnv].field].value = parseInt(spl.function);
-      if (!rec.disabledIds.includes(nmeaconv[cnv].field)) {
-        rec.disabledIds.push(nmeaconv[cnv].field);
+    if (spl.function != null) {
+      let cnv = spl.protocol + '/' + spl.pgn;
+      if ((spl.protocol === 'nmea2000') && nmeaconv.hasOwnProperty(cnv)) {
+        rec.fields[nmeaconv[cnv].field].value = parseInt(spl.function);
+        if (!rec.disabledIds.includes(nmeaconv[cnv].field)) {
+          rec.disabledIds.push(nmeaconv[cnv].field);
+        }
+        if (!rec.disabledSim.includes(nmeaconv[cnv].field)) {
+          rec.disabledSim.push(nmeaconv[cnv].field);
+        }
+        rec.fields[nmeaconv[cnv].field].static = null;
+      } else if ((spl.protocol === 'j1939') && j1939conv.hasOwnProperty(cnv)) {
+        rec.fields[j1939conv[cnv].field].value = parseInt(spl.function);
+        if (!rec.disabledIds.includes(j1939conv[cnv].field)) {
+          rec.disabledIds.push(j1939conv[cnv].field);
+        }
+        if (!rec.disabledSim.includes(j1939conv[cnv].field)) {
+          rec.disabledSim.push(j1939conv[cnv].field);
+        }
+        rec.fields[j1939conv[cnv].field].static = null;
       }
-      if (!rec.disabledSim.includes(nmeaconv[cnv].field)) {
-        rec.disabledSim.push(nmeaconv[cnv].field);
-      }
-      rec.fields[nmeaconv[cnv].field].static = null;
-    } else if ((spl.protocol === 'j1939') && j1939conv.hasOwnProperty(cnv)) {
-      rec.fields[j1939conv[cnv].field].value = parseInt(spl.function);
-      if (!rec.disabledIds.includes(j1939conv[cnv].field)) {
-        rec.disabledIds.push(j1939conv[cnv].field);
-      }
-      if (!rec.disabledSim.includes(j1939conv[cnv].field)) {
-        rec.disabledSim.push(j1939conv[cnv].field);
-      }
-      rec.fields[j1939conv[cnv].field].static = null;
     }
     rec.disabledIds.sort();
     rec.disabledSim.sort();
@@ -389,14 +391,16 @@
             simulator.table[i].disabledIds.push(2);
           }
         }
-        let cnv = spl.protocol + '/' + spl.pgn;
-        if ((spl.protocol === 'nmea2000') && nmeaconv.hasOwnProperty(cnv)) {
-          if (!simulator.table[i].disabledIds.includes(nmeaconv[cnv].field)) {
-            simulator.table[i].disabledIds.push(nmeaconv[cnv].field);
-          }
-        } else if ((spl.protocol === 'j1939') && j1939conv.hasOwnProperty(cnv)) {
-          if (!simulator.table[i].disabledIds.includes(j1939conv[cnv].field)) {
-            simulator.table[i].disabledIds.push(j1939conv[cnv].field);
+        if (spl.function != null) {
+          let cnv = spl.protocol + '/' + spl.pgn;
+          if ((spl.protocol === 'nmea2000') && nmeaconv.hasOwnProperty(cnv)) {
+            if (!simulator.table[i].disabledIds.includes(nmeaconv[cnv].field)) {
+              simulator.table[i].disabledIds.push(nmeaconv[cnv].field);
+            }
+          } else if ((spl.protocol === 'j1939') && j1939conv.hasOwnProperty(cnv)) {
+            if (!simulator.table[i].disabledIds.includes(j1939conv[cnv].field)) {
+              simulator.table[i].disabledIds.push(j1939conv[cnv].field);
+            }
           }
         }
       }

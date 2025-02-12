@@ -58,7 +58,7 @@
 		"/details": 												  wrap({ component: Details,				conditions: [(detail) => { return routeGuard(detail); }] }),
 		"/login":													    wrap({ component: Login,					conditions: [(detail) => { return routeGuard(detail); }] }),
 		"/manage":													  wrap({ component: Manage,				  conditions: [(detail) => { return routeGuard(detail); }] }),
-		"/messages/:pgn/:address/:instance":  wrap({ component: Trace,					conditions: [(detail) => { return routeGuard(detail); }] }),
+		"/messages":                          wrap({ component: Trace,					conditions: [(detail) => { return routeGuard(detail); }] }),
 		"/monitor":												    wrap({ component: Monitor,				conditions: [(detail) => { return routeGuard(detail); }] }),
 		"/monitor/:address":								  wrap({ component: Monitor,				conditions: [(detail) => { return routeGuard(detail); }] }),
 		"/profile":												    wrap({ component: Profile,				conditions: [(detail) => { return routeGuard(detail); }] }),

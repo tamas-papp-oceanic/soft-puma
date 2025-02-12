@@ -252,9 +252,9 @@ window.pumaAPI.recv('n2k-data', (e, args) => {
     // Queue handling
     let flt = get(filter);
     if (flt != null) {
-      let qky = msg.header.pgn + '/' + msg.header.src + '/' + (msg.header.hasOwnProperty('ins') ? msg.header.ins : '-');
+      let qky = key + '/' + msg.header.src + '/' + (msg.header.hasOwnProperty('ins') ? msg.header.ins : '-');
       let de2 = get(device);
-      if ((de2 == dev) && (qky == flt)) {
+      if ((de2 == dev) && (flt == qky)) {
         let que = get(queue);
         if (que.length < qlimit) {
           msg.cnt = que.length + 1;
@@ -301,7 +301,7 @@ window.pumaAPI.recv('j1939-data', (e, args) => {
     // Queue handling
     let flt = get(filter);
     if (flt != null) {
-      let qky = msg.header.pgn + '/' + msg.header.src + '/' + (msg.header.hasOwnProperty('ins') ? msg.header.ins : '-');
+      let qky = key + '/' + msg.header.src + '/' + (msg.header.hasOwnProperty('ins') ? msg.header.ins : '-');
       let de2 = get(device);
       if ((flt !== null) && (de2 === dev) && (qky === flt)) {
         let que = get(queue);

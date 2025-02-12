@@ -1,6 +1,7 @@
 <script>
   import { onMount, onDestroy } from "svelte";
-  import { push, pop } from 'svelte-spa-router'
+  import { push, pop, querystring } from 'svelte-spa-router'
+  import { stringify, parse } from 'qs';
   import { Grid, Row, Column, DataTable, Toolbar, ToolbarContent, Tile,
     Button, Pagination, OverflowMenu, OverflowMenuItem } from "carbon-components-svelte";
   import Restart from "carbon-icons-svelte/lib/Restart16";
@@ -8,10 +9,8 @@
   import { queue, start, stop, restart } from "../../stores/data.js";
   import { isRoute } from "../../helpers/route.js";
 
-  export let params;
-
+  let data = parse($querystring, { charset: 'utf-8' });
   let height;
-  let key = null;
   let first = true;
   let curr = new Array();
   let rows = new Array();
@@ -28,9 +27,9 @@
   });
 
   onMount(() => {
-    key = params.pgn + '/' + params.address + '/' + params.instance;
-    title = 'Trace of PGN' + params.pgn;
-    start(key);
+    title = 'Trace of PGN' + data.header.pgn;
+    start(data.key + '/' + data.header.src + '/' + (data.header.hasOwnProperty('ins') ? data.header.ins : '-'));
+    rest();
   }); 
 
   onDestroy(() => {
@@ -51,7 +50,7 @@
   };
 
   function details(e, row) {
-    push('/details?data='+ JSON.stringify(row.dat));
+    push('/details?'+ stringify(row.dat, { charset: 'utf8' }));
   };
 
   function back(e) {
@@ -59,9 +58,9 @@
   };
 
   function getHeaders() {
-    if (first && (key != null) && ($queue.length > 0)) {
+    if (first && (data.key != null) && ($queue.length > 0)) {
       let dat = $queue.at(0);
-      title = 'Trace of PGN' + params.pgn + ' - ' + dat.title + ' ( address: ' + params.address + ' )';
+      title = 'Trace of PGN' + data.header.pgn + ' - ' + dat.title + ' ( address: ' + data.header.src + ' )';
       if ((typeof dat.fields !== 'undefined') && Array.isArray(dat.fields) && (dat.fields.length > 0)) {
         let tmp = new Array({
           key: "overflow",
@@ -95,7 +94,7 @@
       let obj = {
         id: lst.id,
         cnt: lst.cnt,
-        dat: Object.assign({ key: key }, lst),
+        dat: Object.assign({ key: data.key }, lst),
       };
       for (let i in lst.fields) {
         let fld = lst.fields[i];
@@ -107,7 +106,7 @@
   };
 
   function getRows() {
-    if (key != null) {
+    if (data.key != null) {
       let tmp = new Array();
       for (let i in $queue) {
         let dat = $queue[i];
@@ -118,7 +117,7 @@
             overflow: '',
             id: lst.id,
             cnt: lst.cnt,
-            dat: Object.assign({ key: key }, lst),
+            dat: Object.assign({ key: data.key }, lst),
           };
           for (let i in lst.fields) {
             let fld = lst.fields[i];
@@ -129,7 +128,7 @@
         let obj = {
           id: dat.id,
           cnt: dat.cnt,
-          dat: Object.assign({ key: key }, dat),
+          dat: Object.assign({ key: data.key }, dat),
         };
         for (let i in dat.fields) {
           let fld = dat.fields[i];
