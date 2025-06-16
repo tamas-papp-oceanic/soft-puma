@@ -220,6 +220,17 @@ autoUpdater.on('update-downloaded', (info) => {
   mainWindow.webContents.send('upd-download', false);
 });
 
+// SSL/TSL: this is the self signed certificate support
+app.on('certificate-error', (event, webContents, url, error, certificate, callback) => {
+	// On certificate error we disable default behaviour (stop loading the page)
+	// and we then say "it is all fine - true" to the callback
+	if (url.startsWith('https://updates.osukl.com')) {
+		event.preventDefault();
+		callback(true);
+	} else {
+		callback(false);
+	}
+});
 
 // This method will be called when Electron has finished
 // initialization and is ready to create browser windows.
