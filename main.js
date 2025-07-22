@@ -64,16 +64,12 @@ if (isDev) {
       case 'UNKNOWN_OPTION':
         log.error('Unknown option:', err.optionName);
         break;
-
-
       case 'UNKNOWN_VALUE':
         log.error('Unknown value:', err.value);
         break;
-  
       case 'ALREADY_SET':
         log.error('Already set:', err.optionName);
         break;
-  
       case 'INVALID_DEFINITIONS':
         log.error('Invalid definitions');
         break;
